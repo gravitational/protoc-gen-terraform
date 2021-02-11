@@ -9,7 +9,7 @@ func main() {
 	logrus.Infof("protoc-gen-terraform %s", Version)
 	logrus.Infof("protoc-gen-terraform build hash: %s", Sha)
 
-	p := NewPlugin()
+	p := plugin.NewPlugin()
 
 	req := command.Read()
 	//log.Println(req.GetProtoFile()[3].GetName())
