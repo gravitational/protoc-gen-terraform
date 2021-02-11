@@ -1,4 +1,4 @@
-module github.com/gzigzigzeo/gogo-protoc-gen-terraform
+module github.com/gzigzigzeo/protoc-gen-terraform
 
 go 1.16
 
