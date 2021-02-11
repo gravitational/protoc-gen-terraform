@@ -9,83 +9,145 @@ import (
 )
 
 type fieldReflect struct {
-	name             string // Field name
-	snakeName        string // Snake cased field name
-	tfSchemaType     string // Terraform schema type (e.g schema.TypeBool without "schema" part)
-	tfSchemaGoType   string // Terraform schema go type to cast value read from schema into
-	tfSchemaValidate string // Terraform validator if needed
+	name      string // Field name
+	snakeName string // Snake cased field name
 
-	//entityGoType string // Go type to convert schema value from
+	goType string // Target entity go type
+
+	tfSchemaType           string // Terraform schema type (e.g schema.TypeBool without "schema" part)
+	tfSchemaGoType         string // Terraform schema go type to cast value read from schema into (e.g. .(string) for TypeString)
+	tfSchemaValidate       string // Terraform validator if needed (for time, for now)
+	tfSchemaCollectionType string // Terraform collection type (list or map)
+
+	hasNestedType bool            // Field represents nested structure
+	message       *messageReflect // Nested message definition
 }
 
-// newFieldsReflect generates slice of reflect structures for message fields
-func (p *Plugin) newFieldsReflect(m *messageReflect, d *generator.Descriptor) {
+type fieldReflectBuilder struct {
+	plugin          *Plugin
+	descriptor      *generator.Descriptor
+	fieldDescriptor *descriptor.FieldDescriptorProto
+	field           fieldReflect
+}
+
+// reflectFields generates slice of reflect structures for message fields
+func (p *Plugin) reflectFields(m *messageReflect, d *generator.Descriptor) {
 	m.fields = make([]*fieldReflect, len(d.Field))
 
 	for index, f := range d.Field {
-		m.fields[index] = p.newFieldReflect(m, d, f)
+		m.fields[index] = p.reflectField(d, f)
 	}
 }
 
-// newFieldReflect generates reflect structure for message field
-func (p *Plugin) newFieldReflect(
-	m *messageReflect,
-	d *generator.Descriptor,
-	f *descriptor.FieldDescriptorProto,
-) *fieldReflect {
-	field := &fieldReflect{}
-
-	// Set base parameters
-	field.name = f.GetName()
-	field.snakeName = strcase.SnakeCase(field.name)
-
-	// Set terraform schema type parameters. We'll use them to read values from ResourceData object.
-	goType, _ := p.GoType(d, f)
-	tfSchemaType, tfSchemaGoType := tfSchemaTypeFromGoType(goType)
-
-	field.tfSchemaType = tfSchemaType
-	field.tfSchemaGoType = tfSchemaGoType
-
-	// Validation, required for time field
-	field.tfSchemaValidate = tfSchemaValidateFromGoType(goType)
-
-	return field
+// reflectField builds fieldReflect for specific field
+func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldReflect {
+	b := fieldReflectBuilder{
+		plugin:          p,
+		descriptor:      d,
+		fieldDescriptor: f,
+	}
+	b.build()
+	return &b.field
 }
 
-// tfSchemaTypeFromGoType returns Terraform type and go type for that Terraform type
-func tfSchemaTypeFromGoType(goType string) (string, string) {
-	if strings.Contains(goType, "float") || strings.Contains(goType, "fixed") {
+// build builds in fieldReflect structure
+func (b *fieldReflectBuilder) build() {
+	b.setName()
+	b.setGoType()
+	b.setTFSchemaType()
+	b.setTFSchemaValidate()
+	b.setTFSchemaCollectionType()
+	b.setNestedType()
+	b.setMessage()
+}
+
+// setName sets field name and + snake cased
+func (b *fieldReflectBuilder) setName() {
+	b.field.name = b.fieldDescriptor.GetName()
+	b.field.snakeName = strcase.SnakeCase(b.field.name)
+}
+
+// setGoType sets target structure field go type
+func (b *fieldReflectBuilder) setGoType() {
+	goType, _ := b.plugin.GoType(b.descriptor, b.fieldDescriptor)
+	b.field.goType = goType
+}
+
+// setTFSchemaType sets terraform schema type and target go type for a field
+func (b *fieldReflectBuilder) setTFSchemaType() {
+	t, g := b.getTFSchemaType()
+	b.field.tfSchemaType = t
+	b.field.tfSchemaGoType = g
+}
+
+// getTFSchemaType returns terraform schema type and target go type for a field
+func (b *fieldReflectBuilder) getTFSchemaType() (string, string) {
+	t := b.field.goType
+
+	if strings.Contains(t, "float") || strings.Contains(t, "fixed") {
 		return "TypeFloat", "float64"
 	}
 
-	if strings.Contains(goType, "string") {
+	if strings.Contains(t, "string") {
 		return "TypeString", "string"
 	}
 
-	if strings.Contains(goType, "int") {
+	if strings.Contains(t, "int") {
 		return "TypeInt", "int"
 	}
 
-	if strings.Contains(goType, "bool") {
+	if strings.Contains(t, "bool") {
 		return "TypeBool", "bool"
 	}
 
-	if strings.Contains(goType, "time.Time") {
+	if strings.Contains(t, "byte") {
 		return "TypeString", "string"
 	}
 
-	if strings.Contains(goType, "time.Duration") {
+	if strings.Contains(t, "time.Time") {
+		return "TypeString", "string"
+	}
+
+	if strings.Contains(t, "time.Duration") {
 		return "TypeInt", "int"
 	}
 
 	return "", ""
 }
 
-// tfSchemaTypeFromGoType returns validation function for current schema element
-func tfSchemaValidateFromGoType(goType string) string {
-	if strings.Contains(goType, "time.Time") {
-		return "IsRFC3339Time"
+// setTFSchemaValidate sets validation function for current schema element
+func (b *fieldReflectBuilder) setTFSchemaValidate() {
+	if strings.Contains(b.field.goType, "time.Time") {
+		b.field.tfSchemaValidate = "IsRFC3339Time"
+	}
+}
+
+// setTFSchemaCollectionType set tf schema type if it represents a collection
+func (b *fieldReflectBuilder) setTFSchemaCollectionType() {
+	if b.plugin.IsMap(b.fieldDescriptor) {
+		b.field.tfSchemaCollectionType = "TypeMap"
 	}
 
-	return ""
+	if b.fieldDescriptor.IsRepeated() {
+		b.field.tfSchemaCollectionType = "TypeList"
+	}
+}
+
+// setNestedType sets flag true if field has nested type
+func (b *fieldReflectBuilder) setNestedType() {
+	b.field.hasNestedType = b.fieldDescriptor.IsMessage()
+}
+
+// setMessage sets reference to complex
+func (b *fieldReflectBuilder) setMessage() {
+	if !b.fieldDescriptor.IsMessage() {
+		return
+	}
+
+	x := b.plugin.ObjectNamed(b.fieldDescriptor.GetTypeName())
+	desc, ok := x.(*generator.Descriptor)
+	if desc == nil || !ok {
+		return
+	}
+	b.field.message = b.plugin.reflectMessage(desc)
 }

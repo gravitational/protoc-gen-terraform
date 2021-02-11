@@ -13,14 +13,14 @@ type messageReflect struct {
 	fields []*fieldReflect // Fields
 }
 
-func (p *Plugin) newMessageReflect(d *generator.Descriptor) *messageReflect {
+func (p *Plugin) reflectMessage(d *generator.Descriptor) *messageReflect {
 	message := &messageReflect{}
 
 	message.name = d.GetName()
 	message.snakeName = strcase.SnakeCase(message.name)
 	message.goType = p.pkg.Use() + "." + message.name
 
-	p.newFieldsReflect(message, d)
+	p.reflectFields(message, d)
 
 	return message
 }
