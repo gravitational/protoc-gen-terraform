@@ -1,4 +1,5 @@
-version = 1
+# Package version
+version = "0.0.1"
 
 .PHONY: clean
 
@@ -9,7 +10,7 @@ clean:
 
 .PHONY: build
 build: clean
-	go build -o _build/protoc-gen-terraform -X "main.Sha `git rev-parse HEAD` -X main.Version=$(version)" myapp.go
+	go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(version)"
 
 .PHONY: install
 install: build
@@ -21,6 +22,7 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir = "./_out"
+types = "types.UserV2+types.UserSpecV2+types.RoleV3+types.RoleSpecV3+types.ProvisionTokenV2+types.ProvisionTokenSpecV2"
 
 .PHONY: example
 example: build
@@ -32,8 +34,8 @@ endif
 	@protoc \
 		-I$(teleport_dir)/api/types \
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
-		-I$(teleport_dir) \
 		-I$(srcpath) \
+		--proto_path=api/types \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=${out_dir} \
+		--terraform_out=types=${types}:./${out_dir} \
 		types.proto
