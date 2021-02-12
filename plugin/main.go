@@ -62,9 +62,9 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 	}
 
-	for _, message := range p.messages {
-		debugMessage(message, 0)
-	}
+	// for _, message := range p.messages {
+	// 	debugMessage(message, 0)
+	// }
 }
 
 func debugMessage(message *Message, nest int) {

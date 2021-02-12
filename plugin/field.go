@@ -11,14 +11,17 @@ import (
 
 // Field represents field reflection struct
 type Field struct {
-	Name      string // Type name
-	NameSnake string // Type name in snake case
-	GoType    string // Field go type
+	Name       string // Type name
+	NameSnake  string // Type name in snake case
+	GoType     string // Field go type
+	IsRepeated bool   // Field is list
+	IsNullable bool   // Field is nullable and has *
 
-	TFSchemaType       string // Type which is reflected in Terraform schema
-	TFSchemaTypeCast   string // Type which must Terraform schema value cast to
-	TFSchemaGoTypeCast string // Final type to cast to in go (would be time.Duration, while TypeCast is int)
-	TFSchemaValidate   string // Validation applied to tfschema field
+	TFSchemaType          string // Type which is reflected in Terraform schema
+	TFSchemaTypeCast      string // Type which must Terraform schema value cast to
+	TFSchemaGoTypeCast    string // Final type to cast to in go (would be time.Duration, while TypeCast is int)
+	TFSchemaValidate      string // Validation applied to tfschema field
+	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
 
 	Message *Message // Nested message
 }
@@ -58,6 +61,7 @@ func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescri
 func (b *fieldBuilder) build() {
 	b.setName()
 	b.resolveType()
+	b.setNullable()
 }
 
 // setName sets the field name
@@ -146,6 +150,19 @@ func (b *fieldBuilder) resolveType() {
 		log.Fatal("unknown type for", d.GetName())
 	}
 
+	if b.fieldDescriptor.IsRepeated() {
+		b.field.IsRepeated = true
+		b.field.TFSchemaAggregateType = "TypeList"
+	}
+
+	// MAP
+	// if g.IsMap(f) {
+	// 	gf, _ := g.GoType(d, g.GoMapType(nil, f).ValueField)
+	// 	logrus.Println("      ", gf)
+	// }
+
+	// Sets types for underlying maps
+
 	// log.Println(d.TypeName)
 
 	// case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
@@ -197,10 +214,13 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 	b.field.Message = b.plugin.reflectMessage(desc)
+	b.plugin.registerMessage(b.field.Message)
 }
 
-// import (
-// 	"strings"
+// setNullable sets nullable flag
+func (b *fieldBuilder) setNullable() {
+	b.field.IsNullable = b.field.GoType[0] == '*'
+}
 
 // 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 // 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
@@ -332,3 +352,10 @@ func (b *fieldBuilder) setMessage() {
 // func (b *fieldReflectBuilder) setNestedType() {
 // 	b.field.hasNestedType = b.fieldDescriptor.IsMessage()
 // }
+
+func (f *Field) IsAggregate() bool {
+	if f.IsRepeated {
+		return true
+	}
+	return false
+}

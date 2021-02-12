@@ -6,22 +6,26 @@ import (
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gzigzigzeo/protoc-gen-terraform/plugin"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 )
 
-type fieldMarshalMeta struct {
-	name              string // struct field name
-	snakeName         string // struct field name, camel cased
-	goType            string // go type this marshalled into
-	assignable        bool   // can be directly assigned
-	byReferencePrefix string // & prefix or empty
-	castToSuffix      string // .() suffix or empty
-
-	// than it can be map or list or just nested resource (list with 1 item)
-
-	valueFmt string // constructor function, for time
+// MessageSchema represents message writer instance
+type MessageSchema struct {
+	message *plugin.Message
 }
+
+// NewMessage returns message writer instance
+func NewMessage(m *plugin.Message) *MessageSchema {
+	return &MessageSchema{message: m}
+}
+
+// Writer writes terraform.Schema for a message
+func (w *MessageSchema) Write() {
+}
+
+//func (w *MessageWriter) writeReadRawValue()
 
 func buildFieldMarshalMeta(
 	g *generator.Generator,
@@ -42,7 +46,6 @@ func buildFieldMarshalMeta(
 	}
 
 	if gogoproto.IsStdTime(f) {
-		m.valueFmt = "time.Parse(time.RFC3339, %v)"
 		m.assignable = true
 	} else if f.IsMessage() {
 
