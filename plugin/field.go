@@ -46,6 +46,7 @@ func (p *Plugin) isFieldRequired(f *descriptor.FieldDescriptorProto) bool {
 	return true
 }
 
+// TODO: move to main package
 func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
 	b := fieldBuilder{
 		plugin:          p,

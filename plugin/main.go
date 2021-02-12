@@ -62,30 +62,8 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 	}
 
-	// for _, message := range p.messages {
-	// 	debugMessage(message, 0)
-	// }
-}
-
-func debugMessage(message *Message, nest int) {
-	n := ""
-
-	for x := 0; x < (nest+1)*4; x++ {
-		n = n + " "
-	}
-
-	logrus.Println(n, message.GoTypeName)
-
-	for _, field := range message.Fields {
-		logrus.Println(n, "name=", field.Name)
-		//logrus.Println(n, "schema=", field.TFSchemaType)
-		//logrus.Println(n, "typecast=", field.TFSchemaTypeCast)
-		logrus.Println(n, "gotypecast=", field.TFSchemaGoTypeCast)
-		logrus.Println(n, "gotype=", field.GoType)
-
-		if field.Message != nil {
-			debugMessage(field.Message, nest+1)
-		}
+	for _, message := range p.messages {
+		NewMessageSchemaWriter(message).Write()
 	}
 }
 
