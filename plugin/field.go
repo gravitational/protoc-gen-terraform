@@ -22,6 +22,7 @@ type Field struct {
 	TFSchemaGoTypeCast    string // Final type to cast to in go (would be time.Duration, while TypeCast is int)
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
+	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1
 
 	Message *Message // Nested message
 }
@@ -145,6 +146,8 @@ func (b *fieldBuilder) resolveType() {
 		b.setTypes("TypeInt", "time.Duration")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE):
 		b.setMessage()
+		b.field.TFSchemaAggregateType = "TypeList"
+		b.field.TFSchemaMaxItems = 1
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setTypes("TypeString", "string")
 	default:
@@ -358,5 +361,13 @@ func (f *Field) IsAggregate() bool {
 	if f.IsRepeated {
 		return true
 	}
+	return false
+}
+
+func (f *Field) HasNestedMessage() bool {
+	if f.Message != nil {
+		return true
+	}
+
 	return false
 }

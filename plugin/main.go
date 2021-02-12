@@ -23,7 +23,7 @@ type Plugin struct {
 	// Passed from command line (--terraform_out=types=types.UserV2:./_out)
 	types []string
 
-	messages map[string]*Message // Map of reflected messages
+	Messages map[string]*Message // Map of reflected messages, public just in case some post analysis is required
 
 	// // NOTE: Replace with addImport
 	// schemaPkg     generator.Single // Reference to terraform schema package
@@ -34,7 +34,7 @@ type Plugin struct {
 // NewPlugin creates the new plugin
 func NewPlugin() *Plugin {
 	return &Plugin{
-		messages: make(map[string]*Message),
+		Messages: make(map[string]*Message),
 	}
 }
 
@@ -62,8 +62,8 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 	}
 
-	for _, message := range p.messages {
-		NewMessageSchemaWriter(message).Write()
+	for _, message := range p.Messages {
+		p.P(newMessageSchemaWriter(message).write())
 	}
 }
 
@@ -88,7 +88,7 @@ func (p *Plugin) fetchTypesFromCommandLine(g *generator.Generator) {
 func (p *Plugin) setImports() {
 	p.PluginImports = generator.NewPluginImports(p.Generator)
 
-	// TODO: Save names?
+	// So those could be referenced via schema. and validation.
 	p.AddImport("github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema")
 	p.AddImport("github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation")
 }
@@ -101,7 +101,7 @@ func (p *Plugin) isRequiredMessage(d *generator.Descriptor) bool {
 
 // registerMessage puts message in the list of registered
 func (p *Plugin) registerMessage(m *Message) {
-	p.messages[m.Name] = m
+	p.Messages[m.Name] = m
 }
 
 // schemaRef returns type name with reference to terraform schema ns
