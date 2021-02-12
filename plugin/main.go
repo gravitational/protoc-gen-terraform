@@ -26,8 +26,6 @@ type Plugin struct {
 	Messages map[string]*Message // Map of reflected messages, public just in case some post analysis is required
 
 	// // NOTE: Replace with addImport
-	// schemaPkg     generator.Single // Reference to terraform schema package
-	// validationPkg generator.Single // Reference to terraform validation package
 	// pkg           generator.Single // Reference to package with protoc types
 }
 
@@ -64,6 +62,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 
 	for _, message := range p.Messages {
 		p.P(newMessageSchemaWriter(message).write())
+		p.P(newMessageMarshalWriter(message).write())
 	}
 }
 

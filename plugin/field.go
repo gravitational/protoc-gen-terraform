@@ -10,19 +10,21 @@ import (
 )
 
 // Field represents field reflection struct
+// This struct and the following methods know about both schema details and types, and target structs
 type Field struct {
 	Name       string // Type name
 	NameSnake  string // Type name in snake case
-	GoType     string // Field go type
 	IsRepeated bool   // Field is list
 	IsNullable bool   // Field is nullable and has *
 
 	TFSchemaType          string // Type which is reflected in Terraform schema
 	TFSchemaTypeCast      string // Type which must Terraform schema value cast to
-	TFSchemaGoTypeCast    string // Final type to cast to in go (would be time.Duration, while TypeCast is int)
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
 	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1
+
+	GoTypeCast string // Final type to cast to in go (would be time.Duration, while TypeCast is int)
+	GoType     string // Field go type, as gogo returned
 
 	Message *Message // Nested message
 }
@@ -96,7 +98,7 @@ func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
 		*t = "string"
 	}
 
-	b.field.TFSchemaGoTypeCast = goTypeCast
+	b.field.GoTypeCast = goTypeCast
 }
 
 // resolveType analyses field type and sets required fields in Field structure
@@ -143,7 +145,7 @@ func (b *fieldBuilder) resolveType() {
 		b.setTypes("TypeString", "time.Time")
 		b.field.TFSchemaValidate = "validation.IsRFC3339Time"
 	case gogoproto.IsStdDuration(d):
-		b.setTypes("TypeInt", "time.Duration")
+		b.setTypes("TypeString", "time.Duration")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE):
 		b.setMessage()
 		b.field.TFSchemaAggregateType = "TypeList"
@@ -357,6 +359,7 @@ func (b *fieldBuilder) setNullable() {
 // 	b.field.hasNestedType = b.fieldDescriptor.IsMessage()
 // }
 
+// IsAggregate returns true if field is either list or map
 func (f *Field) IsAggregate() bool {
 	if f.IsRepeated {
 		return true
@@ -364,6 +367,7 @@ func (f *Field) IsAggregate() bool {
 	return false
 }
 
+// HasNestedMessage returns true if field has complex type
 func (f *Field) HasNestedMessage() bool {
 	if f.Message != nil {
 		return true
