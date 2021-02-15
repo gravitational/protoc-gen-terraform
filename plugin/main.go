@@ -69,7 +69,6 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 			p.Generator.Fail(trace.Wrap(err).Error())
 		}
 		p.P(buf.String())
-		//p.P(newMessageMarshalWriter(message).write())
 	}
 }
 
@@ -104,9 +103,9 @@ func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 	typeName := d.File().GetPackage() + "." + d.GetName()
 	required := slice.Contains(p.types, typeName)
 
-	if !required {
-		logrus.Println("Skipping type:", typeName)
-	}
+	// if !required {
+	// 	logrus.Println("Skipping type:", typeName)
+	// }
 
 	return required
 }

@@ -54,31 +54,33 @@ map[string]*schema.Schema {
 {{- define "fieldsUnmarshal" -}}
 {{- range $index, $field := . }}
 {
-	// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .GoType }}
+	// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
     _raw, ok := d.GetOk(p + "{{ .NameSnake}}")
     if ok {
         {{- if .IsAggregate }}
             {{- if .IsRepeated }}
                 _rawi := _raw.([]interface{})
-                t.{{.Name}} = make([]{{.RawGoType}}, len(_rawi))
+                t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
                 for i := 0; i < len(_rawi); i++ {
                     {{- if .IsMessage }}
-                    Unmarshal{{ .Message.Name }}(d, &t.{{ .Name }}[i], fmt.Sprintf("{{ .NameSnake }}.%i.", i))
+                    Unmarshal{{ .Message.Name }}(d, &t.{{ .Name }}[i], p+fmt.Sprintf("{{ .NameSnake }}.%v.", i))
+                    _raw = _raw
                     {{- else }}
                     _currentRaw := _rawi[i]
                     {{- template "rawToValue" dict "raw" "_currentRaw" "field" . }}
-                    _tmp := {{.RawGoType}}(_value)
-                    t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_placeholder
+                    _tmp := {{.GoType}}(_value)
+                    t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_tmp
                     {{- end }}
                 }
             {{- end }}
         {{- else -}}
             {{- if .IsMessage -}}
                 Unmarshal{{ .Message.Name }}(d, &t.{{ .Name }}, "{{ .NameSnake }}.0.")
+                _raw = _raw
             {{- else -}}
                 {{/* We convert from schema type to real type */}}
                 {{ template "rawToValue" dict "raw" "_raw" "field" . }}
-                _tmp := {{.RawGoType}}(_value)
+                _tmp := {{.GoType}}(_value)
                 t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_tmp
             {{- end }}                
         {{- end }}

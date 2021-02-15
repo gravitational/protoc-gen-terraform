@@ -27,8 +27,8 @@ type Field struct {
 	TFSchemaType    string // Type which is reflected in Terraform schema (a-la types.TypeString)
 	TFSchemaRawType string // Terraform schema raw value type (float64 for types.Float)
 	TFSchemaGoType  string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
-	GoType          string // Final field type (casttype, customtype, *, [])
-	RawGoType       string // Go type without prefixes, but with package name
+	RawGoType       string // Field type returned by gogoprotobuf
+	GoType          string // Go type without prefixes, but with package name
 	GoTypeIsSlice   bool   // Go type is a slice
 	GoTypeIsPtr     bool   // Go type is a pointer
 
@@ -78,6 +78,21 @@ func (b *fieldBuilder) build() {
 // isValid returns true if built type is valid
 // TODO make build() bool
 func (b *fieldBuilder) isValid() bool {
+	// gogoproto.Map
+	// if b.plugin.IsGroup(b.fieldDescriptor) {
+	// 	logrus.Println(b.fieldDescriptor.GetName(), "Something found")
+	// }
+
+	// NOTE: Temporary no maps
+	if b.plugin.IsMap(b.fieldDescriptor) {
+		return false
+	}
+
+	// NOTE: Temporary no custom types
+	if gogoproto.IsCustomType(b.fieldDescriptor) {
+		return false
+	}
+
 	if b.field.IsMessage && b.field.Message == nil {
 		return false
 	}
@@ -137,23 +152,27 @@ func (b *fieldBuilder) isDuration() bool {
 	return isStdDuration || isCastToDuration
 }
 
+// isMessage returns true if field is message
+func (b *fieldBuilder) isMessage() bool {
+	return b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
+}
+
+// setGoType Sets go type with gogoprotobuf standard method, sets type information flags
 func (b *fieldBuilder) setGoType() {
 	f := b.field // shortrut
 
 	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
 	goType, _ := b.plugin.GoType(b.descriptor, b.fieldDescriptor)
-	f.GoType = goType
 	f.RawGoType = goType
+	f.GoType = goType
 
 	if goType[0] == '[' {
-		f.RawGoType = goType[2:]
+		f.GoType = goType[2:]
 		f.GoTypeIsSlice = true
 	} else if goType[0] == '*' {
-		f.RawGoType = goType[1:]
+		f.GoType = goType[1:]
 		f.GoTypeIsPtr = true
 	}
-
-	f.RawGoType = b.descriptor.File().GetPackage() + "." + f.RawGoType
 }
 
 // resolveType analyses field type and sets required fields in Field structure
@@ -162,6 +181,7 @@ func (b *fieldBuilder) resolveType() {
 	d := b.fieldDescriptor // shortcut
 	f := b.field           // shortcut
 
+	// Basics
 	switch {
 	case b.isTime():
 		b.setTypes("TypeString", "time.Time")
@@ -200,7 +220,7 @@ func (b *fieldBuilder) resolveType() {
 		b.setTypes("TypeString", "int32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
 		b.setTypes("TypeString", "int64")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE):
+	case b.isMessage():
 		b.setMessage()
 		f.TFSchemaAggregateType = "TypeList"
 		f.IsMessage = true
@@ -211,14 +231,26 @@ func (b *fieldBuilder) resolveType() {
 		return
 	}
 
+	// logrus.Println(f.Name, f.GoType, f.RawGoType)
+
 	// TODO: switch
 	if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 		f.IsAggregate = true
 		f.TFSchemaAggregateType = "TypeList"
-	} else {
+	} else if f.IsMessage == true {
 		// Is not repeated message, still a list
 		f.TFSchemaMaxItems = 1
+	}
+
+	// Append type suffix to cast type, custom type and message
+	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) || b.isMessage() {
+		l := f.GoType[0:1]
+
+		// In other words, if the first letter of type name is uppercase, this means this type is not prefixed
+		if strings.ToLower(l) != l {
+			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
+		}
 	}
 
 	// MAP
@@ -226,34 +258,10 @@ func (b *fieldBuilder) resolveType() {
 	// 	gf, _ := g.GoType(d, g.GoMapType(nil, f).ValueField)
 	// 	logrus.Println("      ", gf)
 	// }
-
-	// Sets types for underlying maps
-
-	// log.Println(d.TypeName)
-
-	// case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-	// 	desc := g.ObjectNamed(field.GetTypeName())
-	// 	typ, wire = g.TypeName(desc), "bytes"
-
-	// switch {
-	// if needsStar(field, g.file.proto3 && field.Extendee == nil, message != nil && message.allowOneof()) {
-	// 	typ = "*" + typ
-	// }
-	// if isRepeated(field) {
-	// 	typ = "[]" + typ
-	// }
-	// return
 }
 
 // setMessage sets reference to nested message
 func (b *fieldBuilder) setMessage() {
-	if !b.fieldDescriptor.IsMessage() {
-		return
-	}
-
-	// logrus.Println(b.descriptor.File().GoPackageName())
-	// logrus.Println(b.fieldDescriptor.GetTypeName())
-
 	// Resolve underlying message via protobuf
 	x := b.plugin.ObjectNamed(b.fieldDescriptor.GetTypeName())
 	desc, ok := x.(*generator.Descriptor)
