@@ -9,33 +9,37 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
+const (
+	durationCustomType = "Duration" // This type name will be treated as extendee of time.Duration, TODO: Parameterize?
+)
+
 // Field represents field reflection struct
 // This struct and the following methods know about both schema details and types, and target structs
 type Field struct {
 	Name      string // Type name
 	NameSnake string // Type name in snake case
 
-	// Field properties
-	IsRepeated  bool // Is list
-	IsAggregate bool // Is aggregate (either list or map)
-	IsMessage   bool // Is message (might be list or map in the same time)
-	IsRequired  bool // Is required TODO: implement
-	IsTime      bool // Contains time, value needs to be parsed from string
-	IsDuration  bool // Contains duration, value needs to be parsed from string
-
-	// Type conversion
-	TFSchemaType    string // Type which is reflected in Terraform schema (a-la types.TypeString)
-	TFSchemaRawType string // Terraform schema raw value type (float64 for types.Float)
-	TFSchemaGoType  string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
-	RawGoType       string // Field type returned by gogoprotobuf
-	GoType          string // Go type without prefixes, but with package name
-	GoTypeIsSlice   bool   // Go type is a slice
-	GoTypeIsPtr     bool   // Go type is a pointer
-
-	// Auxilary
+	// TFSchema properties
+	TFSchemaType          string // Type which is reflected in Terraform schema (a-la types.TypeString)
+	TFSchemaRawType       string // Terraform schema raw value type (float64 for types.Float)
+	TFSchemaGoType        string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
 	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1
+
+	// Field properties
+	RawGoType     string // Field type returned by gogoprotobuf
+	GoType        string // Go type without prefixes, but with package name
+	GoTypeIsSlice bool   // Go type is a slice
+	GoTypeIsPtr   bool   // Go type is a pointer
+
+	// Metadata
+	IsRepeated  bool // Is list
+	IsAggregate bool // Is aggregate (either list or map)
+	IsMessage   bool // Is message (might be repeated in the same time)
+	IsRequired  bool // Is required TODO: implement
+	IsTime      bool // Contains time, value needs to be parsed from string
+	IsDuration  bool // Contains duration, value needs to be parsed from string
 
 	Message *Message // Reference to nested message
 }
@@ -49,50 +53,36 @@ type fieldBuilder struct {
 }
 
 func (p *Plugin) newFieldBuilder(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
-	return nil
-}
-
-// TODO: move to main package
-// reflectField builds field reflection structure, or returns nil in case field must be skipped
-func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
-	b := fieldBuilder{
+	return &fieldBuilder{
 		plugin:          p,
 		descriptor:      d,
 		fieldDescriptor: f,
 		field:           &Field{},
 	}
-	b.build()
-	if b.isValid() {
-		return b.field
-	}
-	return nil
 }
 
 // build fills in a Field structure
-func (b *fieldBuilder) build() {
+func (b *fieldBuilder) build() bool {
 	b.setName()
 	b.setGoType()
 	b.resolveType()
+
+	return b.isValid()
 }
 
 // isValid returns true if built type is valid
-// TODO make build() bool
 func (b *fieldBuilder) isValid() bool {
-	// gogoproto.Map
-	// if b.plugin.IsGroup(b.fieldDescriptor) {
-	// 	logrus.Println(b.fieldDescriptor.GetName(), "Something found")
-	// }
-
-	// NOTE: Temporary no maps
+	// NOTE: Temporary skip maps
 	if b.plugin.IsMap(b.fieldDescriptor) {
 		return false
 	}
 
-	// NOTE: Temporary no custom types
+	// NOTE: Temporary skip custom types
 	if gogoproto.IsCustomType(b.fieldDescriptor) {
 		return false
 	}
 
+	// If field is message, but underlying message failed to reflect (is not present in types= cmd line arg, we skip this field)
 	if b.field.IsMessage && b.field.Message == nil {
 		return false
 	}
@@ -133,7 +123,7 @@ func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
 	b.field.TFSchemaGoType = goTypeCast
 }
 
-// isTime returns true if field contains time at the end
+// isTime returns true if field stores time (is standard, google or golang time)
 func (b *fieldBuilder) isTime() bool {
 	t := b.fieldDescriptor.TypeName
 
@@ -144,12 +134,17 @@ func (b *fieldBuilder) isTime() bool {
 	return isStdTime || isGoogleTime || isCastToTime
 }
 
-// isDuration return true if field contains duration at the end
+// isDuration return true if field stores duration (is standard duration, or casted to duration)
 func (b *fieldBuilder) isDuration() bool {
-	isStdDuration := gogoproto.IsStdDuration(b.fieldDescriptor)
-	isCastToDuration := gogoproto.GetCastType(b.fieldDescriptor) == "Duration"
+	ct := gogoproto.GetCastType(b.fieldDescriptor)
+	t := b.fieldDescriptor.TypeName
 
-	return isStdDuration || isCastToDuration
+	isStdDuration := gogoproto.IsStdDuration(b.fieldDescriptor)
+	isGoogleDuration := (t != nil && strings.HasSuffix(*t, "google.protobuf.Duration"))
+	isCastToCustomDuration := ct == durationCustomType
+	isCastToDuration := ct == "time.Duration"
+
+	return isStdDuration || isGoogleDuration || isCastToDuration || isCastToCustomDuration
 }
 
 // isMessage returns true if field is message
@@ -231,9 +226,7 @@ func (b *fieldBuilder) resolveType() {
 		return
 	}
 
-	// logrus.Println(f.Name, f.GoType, f.RawGoType)
-
-	// TODO: switch
+	// Field value is repeated (slice)
 	if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 		f.IsAggregate = true
@@ -244,16 +237,20 @@ func (b *fieldBuilder) resolveType() {
 	}
 
 	// Append type suffix to cast type, custom type and message
+	// Note on custom type: it is guaranteed that custom type has the same subset of fields as protobuf schema type
+	// However, it does not guarantee that custom type can be directly casted to schema type
+	// This is clearly gogoprotobuf antipattern or lack of proper implementation
 	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) || b.isMessage() {
 		l := f.GoType[0:1]
 
-		// In other words, if the first letter of type name is uppercase, this means this type is not prefixed
+		// In other words, if the first letter of type name is uppercase, this means this type is not prefixed with
+		// package name, try to prefix.
 		if strings.ToLower(l) != l {
 			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
 		}
 	}
 
-	// MAP
+	// Check if field value is a map
 	// if g.IsMap(f) {
 	// 	gf, _ := g.GoType(d, g.GoMapType(nil, f).ValueField)
 	// 	logrus.Println("      ", gf)
@@ -281,43 +278,3 @@ func (f *Field) HasNestedMessage() bool {
 
 	return false
 }
-
-// // build builds in fieldReflect structure
-// func (b *fieldReflectBuilder) build() {
-// 	b.setName()
-// 	b.setGoType()
-// 	b.setTFSchemaType()
-// 	b.setTFSchemaValidate()
-// 	b.setTFSchemaCollectionType()
-// 	b.setNestedType()
-// 	b.setMessage()
-// }
-
-// // getTFSchemaType returns terraform schema type and target go type for a field
-// func (b *fieldReflectBuilder) getTFSchemaType() (string, string) {
-// 	t := b.field.goType
-
-// // setTFSchemaValidate sets validation function for current schema element
-// func (b *fieldReflectBuilder) setTFSchemaValidate() {
-// 	if strings.Contains(b.field.goType, "time.Time") {
-// 		b.field.tfSchemaValidate = "IsRFC3339Time"
-// 	}
-// }
-
-// // setTFSchemaCollectionType set tf schema type if it represents a collection
-// func (b *fieldReflectBuilder) setTFSchemaCollectionType() {
-// 	if b.plugin.IsMap(b.fieldDescriptor) {
-// 		b.field.tfSchemaCollectionType = "TypeMap"
-// 	}
-
-// 	if b.fieldDescriptor.IsRepeated() {
-// 		b.field.tfSchemaCollectionType = "TypeList"
-// 	}
-// }
-
-// // setNestedType sets flag true if field has nested type
-// func (b *fieldReflectBuilder) setNestedType() {
-// 	b.field.hasNestedType = b.fieldDescriptor.IsMessage()
-// }
-
-// IsAggregate returns true if field is either list or map

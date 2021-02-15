@@ -9,7 +9,7 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
     return nil
 }
 
-{{/* Schema rendering */}}
+{{/* ---- Schema rendering ---------------------------------------------------------------*/}}
 
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
@@ -50,7 +50,7 @@ map[string]*schema.Schema {
 },
 {{- end -}}
 
-{{/* Unmarshal rendering */}}
+{{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
 {{- define "fieldsUnmarshal" -}}
 {{- range $index, $field := . }}
 {
@@ -76,7 +76,6 @@ map[string]*schema.Schema {
         {{- else -}}
             {{- if .IsMessage -}}
                 Unmarshal{{ .Message.Name }}(d, &t.{{ .Name }}, "{{ .NameSnake }}.0.")
-                _raw = _raw
             {{- else -}}
                 {{/* We convert from schema type to real type */}}
                 {{ template "rawToValue" dict "raw" "_raw" "field" . }}

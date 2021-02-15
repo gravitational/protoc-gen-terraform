@@ -3,6 +3,7 @@ package plugin
 import (
 	"strings"
 
+	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
@@ -144,4 +145,13 @@ func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
 			m.Fields = append(m.Fields, f)
 		}
 	}
+}
+
+// reflectField builds field reflection structure, or returns nil in case field must be skipped
+func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
+	b := p.newFieldBuilder(d, f)
+	if b.build() {
+		return b.field
+	}
+	return nil
 }
