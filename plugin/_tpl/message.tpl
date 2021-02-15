@@ -57,25 +57,27 @@ map[string]*schema.Schema {
 	// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .GoType }}
     _raw, ok := d.GetOk(prefix + "{{ .NameSnake}}")
     if ok {
-        {{- if .IsMessage }} // and not IsAggregate
-            Unmarshal{{ .Message.Name }}(r, &d.{{ .Name }}, "{{ .NameSnake }}.0.")
-        {{- else if .IsAggregate }}
+        {{- if .IsAggregate }}
         {{- else -}}
-            {{/* We convert from schema type to real type */}}
-            {{- if .IsTime }}
-            _value, ok := time.Parse(time.RFC3339, _raw.({{.TFSchemaRawType}}))
-            if !ok {
-                return fmt.Errorf("Malformed time value for field {{.Name}}")
-            }
-            {{- else if .IsDuration }}
-            _value, ok := time.ParseDuration(_raw.({{.TFSchemaRawType}}))
-            if !ok {
-                return fmt.Errorf("Malformed duration value for field {{.Name}}")
-            }
+            {{- if .IsMessage }}
+                Unmarshal{{ .Message.Name }}(r, &d.{{ .Name }}, "{{ .NameSnake }}.0.")
             {{- else }}
-            _value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
-            {{- end }}
-            t.{{.Name}} = {{- if .IsNullable -}}&{{- end -}}{{.GoType}}(_value)
+                {{/* We convert from schema type to real type */}}
+                {{- if .IsTime }}
+                _value, ok := time.Parse(time.RFC3339, _raw.({{.TFSchemaRawType}}))
+                if !ok {
+                    return fmt.Errorf("Malformed time value for field {{.Name}}")
+                }
+                {{- else if .IsDuration }}
+                _value, ok := time.ParseDuration(_raw.({{.TFSchemaRawType}}))
+                if !ok {
+                    return fmt.Errorf("Malformed duration value for field {{.Name}}")
+                }
+                {{- else }}
+                _value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
+                {{- end }}
+                t.{{.Name}} = {{- if .IsNullable -}}&{{- end -}}{{.GoType}}(_value)
+            {{- end }}                
         {{- end }}
     }
 }
