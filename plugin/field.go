@@ -17,14 +17,14 @@ type Field struct {
 	IsRepeated bool   // Field is list
 	IsNullable bool   // Field is nullable and has *
 
-	TFSchemaType          string // Type which is reflected in Terraform schema
-	TFSchemaTypeCast      string // Type which must Terraform schema value cast to
+	TFSchemaType    string // Type which is reflected in Terraform schema (a-la types.TypeString)
+	TFSchemaRawType string // Terraform schema value type (float64 for types.Float)
+	TFSchemaGoType  string // Value in Go according to target field type
+	GoType          string // Target field type, as gogo returned it, with possible [], * and casttype
+
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
 	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1
-
-	GoTypeCast string // Final type to cast to in go (would be time.Duration, while TypeCast is int)
-	GoType     string // Field go type, as gogo returned
 
 	Message *Message // Nested message
 }
@@ -85,7 +85,7 @@ func (b *fieldBuilder) isTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
 func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
 	b.field.TFSchemaType = schemaType
 
-	t := &b.field.TFSchemaTypeCast
+	t := &b.field.TFSchemaRawType
 
 	switch schemaType {
 	case "TypeFloat":
@@ -98,7 +98,7 @@ func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
 		*t = "string"
 	}
 
-	b.field.GoTypeCast = goTypeCast
+	b.field.TFSchemaGoType = goTypeCast
 }
 
 // resolveType analyses field type and sets required fields in Field structure
@@ -111,6 +111,11 @@ func (b *fieldBuilder) resolveType() {
 	b.field.GoType = goType
 
 	switch {
+	case gogoproto.IsStdTime(d) || (d.TypeName != nil && *d.TypeName == ".google.protobuf.Timestamp"):
+		b.setTypes("TypeString", "time.Time")
+		b.field.TFSchemaValidate = "validation.IsRFC3339Time"
+	case gogoproto.IsStdDuration(d): // || b.IsCastToDuration()
+		b.setTypes("TypeString", "time.Duration")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
 		b.setTypes("TypeFloat", "double64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(d):
@@ -141,11 +146,6 @@ func (b *fieldBuilder) resolveType() {
 		b.setTypes("TypeString", "int32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
 		b.setTypes("TypeString", "int64")
-	case gogoproto.IsStdTime(d) || *d.TypeName == ".google.protobuf.Timestamp":
-		b.setTypes("TypeString", "time.Time")
-		b.field.TFSchemaValidate = "validation.IsRFC3339Time"
-	case gogoproto.IsStdDuration(d):
-		b.setTypes("TypeString", "time.Duration")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE):
 		b.setMessage()
 		b.field.TFSchemaAggregateType = "TypeList"

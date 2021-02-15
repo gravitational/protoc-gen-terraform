@@ -1,24 +1,28 @@
 package plugin
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/sirupsen/logrus"
+)
 
 // fieldMarshalWriter represents logic required to generate field read go code
 type fieldMarshalWriter struct {
 	writer
 	field *Field
 
-	rawVarName  string
-	castVarName string
-	castGoName  string
+	rawVarName        string
+	schemaTypeVarName string
+	goTypeVarName     string
 }
 
 // newFieldMarshalWriter returns an instance of FieldWriter
 func newFieldMarshalWriter(f *Field) *fieldMarshalWriter {
 	return &fieldMarshalWriter{
-		field:       f,
-		rawVarName:  `_` + f.NameSnake + `_raw`,
-		castVarName: `_` + f.NameSnake + `_cast`,
-		castGoName:  `_` + f.NameSnake + `_go_cast`,
+		field:             f,
+		rawVarName:        `_` + f.NameSnake + `_raw`,
+		schemaTypeVarName: `_` + f.NameSnake + `_schema`,
+		goTypeVarName:     `_` + f.NameSnake + `_go`,
 	}
 }
 
@@ -51,24 +55,23 @@ func (w *fieldMarshalWriter) pGetRawValue() {
 }
 
 func (w *fieldMarshalWriter) pCastToSchemaGoType() {
-	w.p(w.castVarName, ` := `, w.rawVarName, `.(`, w.field.TFSchemaTypeCast, `)`)
+	w.p(w.schemaTypeVarName, ` := `, w.rawVarName, `.(`, w.field.TFSchemaRawType, `)`)
 }
 
 func (w *fieldMarshalWriter) pCastToTargetGoType() {
 	if w.isTime() {
-		// TODO: Handle error
-		w.p(w.castGoName, `, ok := time.Parse(time.RFC3339, `, w.castVarName, `)`)
+		w.p(w.goTypeVarName, `, ok := time.Parse(time.RFC3339, `, w.schemaTypeVarName, `)`)
 		w.p(`if !ok {`)
 		w.p(`  return fmt.Errorf("Malformed time value for field `, w.field.Name, `")`)
 		w.p(`}`)
 	} else if w.isDuration() {
 		// TODO: Handle error
-		w.p(w.castGoName, `, ok := time.ParseDuration(`, w.castVarName, `)`)
+		w.p(w.goTypeVarName, `, ok := time.ParseDuration(`, w.schemaTypeVarName, `)`)
 		w.p(`if !ok {`)
 		w.p(`  return fmt.Errorf("Malformed duration for field `, w.field.Name, `")`)
 		w.p(`}`)
 	} else {
-		w.p(w.castGoName, ` := `, w.castVarName, `.(`, w.field.GoTypeCast, `)`)
+		w.p(w.goTypeVarName, ` := `, w.schemaTypeVarName, `.(`, w.field.TFSchemaGoType, `)`)
 	}
 }
 
@@ -81,7 +84,9 @@ func (w *fieldMarshalWriter) pEndIfOk() {
 }
 
 func (w *fieldMarshalWriter) pAssign() {
-	w.a(`t.`, w.field.Name, ` = `, w.castGoNameWithPtr())
+	logrus.Println(w.field.Name)
+	logrus.Println(w.field.TFSchemaGoType, " ", w.field.GoType)
+	w.p(`t.`, w.field.Name, ` = `, w.castGoNameWithPtr())
 }
 
 func (w *fieldMarshalWriter) castGoNameWithPtr() string {
@@ -90,40 +95,16 @@ func (w *fieldMarshalWriter) castGoNameWithPtr() string {
 		s = s + "&"
 	}
 
-	return s + w.castGoName
+	return s + w.goTypeVarName
 }
 
 func (w *fieldMarshalWriter) isTime() bool {
-	return strings.HasSuffix(w.field.GoTypeCast, "time.Time")
+	return strings.HasSuffix(w.field.GoType, "time.Time")
 }
 
 func (w *fieldMarshalWriter) isDuration() bool {
-	return strings.HasSuffix(w.field.GoTypeCast, "time.Duration")
+	return strings.HasSuffix(w.field.GoType, "time.Duration")
 }
-
-// func (w *FieldWriter) writeReadRaw() {
-
-// }
-
-// func (w *FieldWriter) writeReadRawList() {
-
-// }
-
-// func (w *FieldWriter) writeCastRawToSchemaType() {
-
-// }
-
-// func (w *FieldWriter) writeCastRawListToSchemaType() {
-
-// }
-
-// func (w *FieldWriter) writeCastSchemaTypeToStructType() {
-
-// }
-
-// func (w *FieldWriter) writeCastSchemaTypeToStructTypeList() {
-
-// }
 
 // // Message writes message descriptor
 // func Message(g *generator.Generator, d *generator.Descriptor) {
