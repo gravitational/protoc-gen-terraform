@@ -35,11 +35,16 @@ type Field struct {
 	Message *Message // Reference to nested message
 }
 
+// fieldBuilder is axilarry struct responsible for building Field
 type fieldBuilder struct {
 	plugin          *Plugin
 	descriptor      *generator.Descriptor
 	fieldDescriptor *descriptor.FieldDescriptorProto
 	field           *Field
+}
+
+func (p *Plugin) newFieldBuilder(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
+	return nil
 }
 
 // TODO: move to main package
@@ -66,6 +71,7 @@ func (b *fieldBuilder) build() {
 }
 
 // isValid returns true if built type is valid
+// TODO make build() bool
 func (b *fieldBuilder) isValid() bool {
 	// TODO: message is nil, but hasNested is true == false
 	return true

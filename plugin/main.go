@@ -10,7 +10,9 @@ import (
 )
 
 const (
-	name = "terraform" // Plugin name
+	name          = "terraform"                                                      // Plugin name
+	schemaPkg     = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
+	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
 )
 
 // Plugin is terraform generator plugin
@@ -24,7 +26,8 @@ type Plugin struct {
 	// Passed from command line (--terraform_out=types=types.UserV2:./_out)
 	types []string
 
-	Messages map[string]*Message // Map of reflected messages, public just in case some post analysis is required
+	// Map of reflected messages, public just in case some post analysis is required
+	Messages map[string]*Message
 
 	// // NOTE: Replace with addImport
 	// pkg           generator.Single // Reference to package with protoc types
@@ -60,8 +63,8 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	}
 
 	for _, message := range p.Messages {
-		p.P(newMessageSchemaWriter(message).write())
-		p.P(newMessageMarshalWriter(message).write())
+		p.P(message.GoString())
+		//p.P(newMessageMarshalWriter(message).write())
 	}
 }
 
@@ -87,8 +90,8 @@ func (p *Plugin) setImports() {
 	p.PluginImports = generator.NewPluginImports(p.Generator)
 
 	// So those could be referenced via schema. and validation.
-	p.AddImport("github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema")
-	p.AddImport("github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation")
+	p.AddImport(schemaPkg)
+	p.AddImport(validationPkg)
 }
 
 // isMessageRequired returns true if message was marked for export via command-line args
