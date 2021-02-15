@@ -16,17 +16,19 @@ type Field struct {
 	NameSnake string // Type name in snake case
 
 	// Field properties
-	IsRepeated  bool // Field is list
-	IsAggregate bool // Field is aggregate
-	IsNullable  bool // Field is nullable and has * in the beginning
-	IsMessage   bool // Field is message
+	IsRepeated  bool // Is list
+	IsAggregate bool // Is aggregate (either list or map)
+	IsNullable  bool // Is nullable and has * in the beginning
+	IsMessage   bool // Is message (might be list or map in the same time)
+	IsRequired  bool // Is required TODO: implement
+	IsTime      bool // Contains time, value needs to be parsed from string
+	IsDuration  bool // Contains duration, value needs to be parsed from string
 
 	// Type conversion
 	TFSchemaType    string // Type which is reflected in Terraform schema (a-la types.TypeString)
 	TFSchemaRawType string // Terraform schema raw value type (float64 for types.Float)
 	TFSchemaGoType  string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
 	GoType          string // Final field type (casttype, customtype, *, [])
-	IsRequired      bool   // Field is required
 
 	// Auxilary
 	TFSchemaValidate      string // Validation applied to tfschema field
@@ -136,18 +138,21 @@ func (b *fieldBuilder) isDuration() bool {
 // resolveType analyses field type and sets required fields in Field structure
 // This method is pretty much copy & paste from gogo/protobuf generator.GoType
 func (b *fieldBuilder) resolveType() {
-	d := b.fieldDescriptor
+	d := b.fieldDescriptor // shortcut
+	f := b.field           // shortcut
 
 	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
 	goType, _ := b.plugin.GoType(b.descriptor, d)
-	b.field.GoType = goType
+	f.GoType = goType
 
 	switch {
 	case b.isTime():
 		b.setTypes("TypeString", "time.Time")
-		b.field.TFSchemaValidate = "validation.IsRFC3339Time"
+		f.TFSchemaValidate = "validation.IsRFC3339Time"
+		f.IsTime = true
 	case b.isDuration():
 		b.setTypes("TypeString", "time.Duration")
+		f.IsDuration = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
 		b.setTypes("TypeFloat", "double64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(d):
@@ -180,9 +185,8 @@ func (b *fieldBuilder) resolveType() {
 		b.setTypes("TypeString", "int64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE):
 		b.setMessage()
-		b.field.TFSchemaAggregateType = "TypeList"
-		b.field.TFSchemaMaxItems = 1
-		b.field.IsMessage = true
+		f.TFSchemaAggregateType = "TypeList"
+		f.IsMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setTypes("TypeString", "string")
 	default:
@@ -191,9 +195,12 @@ func (b *fieldBuilder) resolveType() {
 	}
 
 	if b.fieldDescriptor.IsRepeated() {
-		b.field.IsRepeated = true
-		b.field.IsAggregate = true
-		b.field.TFSchemaAggregateType = "TypeList"
+		f.IsRepeated = true
+		f.IsAggregate = true
+		f.TFSchemaAggregateType = "TypeList"
+	} else {
+		// Is not repeated message, still a list
+		f.TFSchemaMaxItems = 1
 	}
 
 	// MAP

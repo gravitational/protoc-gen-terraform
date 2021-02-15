@@ -38,13 +38,13 @@ map[string]*schema.Schema {
 	ValidateFunc: {{ .TFSchemaValidate }},
 	{{- end }}
 
-    {{- if .IsAggregate }}
-    Elem: &schema.Schema {
-        Type: schema.{{ .TFSchemaType }},
-    },
-    {{- else if .IsMessage }}
+    {{- if .IsMessage }}
     Elem: &schema.Resource {
         Schema: Schema{{ .Message.Name }}(),
+    },
+    {{- else if .IsAggregate }}
+    Elem: &schema.Schema {
+        Type: schema.{{ .TFSchemaType }},
     },
     {{- end }}
 },
@@ -53,14 +53,31 @@ map[string]*schema.Schema {
 {{/* Marshal rendering */}}
 {{- define "fieldsUnmarshal" -}}
 {{- range $index, $field := . }}
+{
 	// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .GoType }}
-    _{{ .NameSnake }}_raw, ok := d.GetOk(prefix + "{{ .NameSnake}}")
+    _raw, ok := d.GetOk(prefix + "{{ .NameSnake}}")
     if ok {
-        {{- if .IsMessage }}
+        {{- if .IsMessage }} // and not IsAggregate
+            Unmarshal{{ .Message.Name }}(r, &d.{{ .Name }}, "{{ .NameSnake }}.0.")
         {{- else if .IsAggregate }}
-        {{- else }}
-
+        {{- else -}}
+            {{/* We convert from schema type to real type */}}
+            {{- if .IsTime }}
+            _value, ok := time.Parse(time.RFC3339, _raw.({{.TFSchemaRawType}}))
+            if !ok {
+                return fmt.Errorf("Malformed time value for field {{.Name}}")
+            }
+            {{- else if .IsDuration }}
+            _value, ok := time.ParseDuration(_raw.({{.TFSchemaRawType}}))
+            if !ok {
+                return fmt.Errorf("Malformed duration value for field {{.Name}}")
+            }
+            {{- else }}
+            _value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
+            {{- end }}
+            t.{{.Name}} = {{- if .IsNullable -}}&{{- end -}}{{.GoType}}(_value)
         {{- end }}
     }
+}
 {{- end }}
 {{- end -}}

@@ -105,7 +105,7 @@ func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 	required := slice.Contains(p.types, typeName)
 
 	if !required {
-		logrus.Println("Skipping type: ", typeName)
+		logrus.Println("Skipping type:", typeName)
 	}
 
 	return required
