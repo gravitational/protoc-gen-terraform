@@ -18,7 +18,6 @@ type Field struct {
 	// Field properties
 	IsRepeated  bool // Is list
 	IsAggregate bool // Is aggregate (either list or map)
-	IsNullable  bool // Is nullable and has * in the beginning
 	IsMessage   bool // Is message (might be list or map in the same time)
 	IsRequired  bool // Is required TODO: implement
 	IsTime      bool // Contains time, value needs to be parsed from string
@@ -29,6 +28,9 @@ type Field struct {
 	TFSchemaRawType string // Terraform schema raw value type (float64 for types.Float)
 	TFSchemaGoType  string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
 	GoType          string // Final field type (casttype, customtype, *, [])
+	RawGoType       string // Go type without prefixes, but with package name
+	GoTypeIsSlice   bool   // Go type is a slice
+	GoTypeIsPtr     bool   // Go type is a pointer
 
 	// Auxilary
 	TFSchemaValidate      string // Validation applied to tfschema field
@@ -69,8 +71,8 @@ func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescri
 // build fills in a Field structure
 func (b *fieldBuilder) build() {
 	b.setName()
+	b.setGoType()
 	b.resolveType()
-	b.setNullable()
 }
 
 // isValid returns true if built type is valid
@@ -135,15 +137,30 @@ func (b *fieldBuilder) isDuration() bool {
 	return isStdDuration || isCastToDuration
 }
 
+func (b *fieldBuilder) setGoType() {
+	f := b.field // shortrut
+
+	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
+	goType, _ := b.plugin.GoType(b.descriptor, b.fieldDescriptor)
+	f.GoType = goType
+	f.RawGoType = goType
+
+	if goType[0] == '[' {
+		f.RawGoType = goType[2:]
+		f.GoTypeIsSlice = true
+	} else if goType[0] == '*' {
+		f.RawGoType = goType[1:]
+		f.GoTypeIsPtr = true
+	}
+
+	f.RawGoType = b.descriptor.File().GetPackage() + "." + f.RawGoType
+}
+
 // resolveType analyses field type and sets required fields in Field structure
 // This method is pretty much copy & paste from gogo/protobuf generator.GoType
 func (b *fieldBuilder) resolveType() {
 	d := b.fieldDescriptor // shortcut
 	f := b.field           // shortcut
-
-	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
-	goType, _ := b.plugin.GoType(b.descriptor, d)
-	f.GoType = goType
 
 	switch {
 	case b.isTime():
@@ -194,6 +211,7 @@ func (b *fieldBuilder) resolveType() {
 		return
 	}
 
+	// TODO: switch
 	if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 		f.IsAggregate = true
@@ -233,6 +251,9 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
+	// logrus.Println(b.descriptor.File().GoPackageName())
+	// logrus.Println(b.fieldDescriptor.GetTypeName())
+
 	// Resolve underlying message via protobuf
 	x := b.plugin.ObjectNamed(b.fieldDescriptor.GetTypeName())
 	desc, ok := x.(*generator.Descriptor)
@@ -242,14 +263,6 @@ func (b *fieldBuilder) setMessage() {
 
 	// Nested message schema, or nil if message is not whitelisted
 	b.field.Message = b.plugin.reflectMessage(desc)
-}
-
-// setNullable sets nullable flag
-func (b *fieldBuilder) setNullable() {
-	if b.field.GoType[0] == '*' {
-		b.field.IsNullable = true
-		b.field.GoType = b.field.GoType[1:]
-	}
 }
 
 // HasNestedMessage returns true if field has complex type

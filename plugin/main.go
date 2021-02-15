@@ -97,11 +97,13 @@ func (p *Plugin) setImports() {
 	// So those could be referenced via schema. and validation.
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
+	p.AddImport("github.com/gravitational/teleport/api/types")
+	p.AddImport("github.com/gravitational/teleport/api/types/wrappers")
 }
 
 // isMessageRequired returns true if message was marked for export via command-line args
 func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
-	typeName := d.File().GoPackageName() + "." + d.GetName()
+	typeName := d.File().GetPackage() + "." + d.GetName()
 	required := slice.Contains(p.types, typeName)
 
 	if !required {
@@ -128,7 +130,7 @@ func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
 
 	message.Name = name
 	message.NameSnake = strcase.SnakeCase(name)
-	message.GoTypeName = d.File().GoPackageName() + "." + name
+	message.GoTypeName = d.File().GetPackage() + "." + name
 
 	p.reflectFields(message, d)
 
@@ -146,85 +148,3 @@ func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
 		}
 	}
 }
-
-// schemaRef returns type name with reference to terraform schema ns
-// func (p *Plugin) schemaRef(ref string) string {
-// 	return p.schemaPkg.Use() + "." + ref
-// }
-
-// // writeMessage writes message go code to output buffer
-// func (p *Plugin) writeMessage(r *messageReflect) {
-// 	p.P(`// `, r.name)
-// 	p.P(`func Schema`, r.name, `() *`, p.schemaRef(`Schema {`))
-// 	p.WriteString(`  return `)
-// 	p.writeSchema(r, false)
-// 	p.P(`}`)
-
-// 	p.P()
-
-// 	p.P(`func Unmarshal`, r.name, `(r *`, p.schemaRef(`ResourceData`), `, t *`, r.goType, `, prefix string) {`)
-// 	p.writeUnmarshal(r)
-// 	p.P(`}`)
-// 	p.P()
-// }
-
-// // writeSchema writes schema definition
-// func (p *Plugin) writeSchema(r *messageReflect, comma bool) {
-// 	p.P(`map[string]*`, p.schemaRef(`Schema {`))
-
-// 	for _, f := range r.fields {
-// 		p.P(`"`, f.snakeName, `": {`)
-
-// 		if f.hasNestedType {
-// 			p.P(`Type: `, p.schemaRef("TypeList"), `,`)
-// 			p.P(`Optional: true,`)
-// 			p.P(`MaxItems: 1,`)
-// 			p.P(`Elem: &`, p.schemaRef("Resource"), `{`)
-// 			p.WriteString(`  Schema: `)
-// 			p.writeSchema(f.message, true)
-// 			p.P(`},`)
-
-// 		} else {
-// 			if f.tfSchemaCollectionType != "" {
-// 				p.P(`Type: `, p.schemaRef(f.tfSchemaCollectionType), `,`)
-// 				p.P(`Optional: true,`)
-// 				p.P(`Elem: &`, p.schemaRef(`Schema {`))
-// 				p.writeSchemaScalar(f)
-// 				p.P(`},`)
-// 			} else {
-// 				p.writeSchemaScalar(f)
-// 				p.P(`Optional: true,`)
-// 			}
-// 		}
-
-// 		p.P(`},`)
-// 	}
-
-// 	if comma == true {
-// 		p.P(`},`)
-// 	} else {
-// 		p.P(`}`)
-// 	}
-// }
-
-// func (p *Plugin) writeSchemaScalar(f *fieldReflect) {
-// 	// This is scalar value
-// 	if f.tfSchemaType != "" {
-// 		p.P(`Type: `, p.schemaRef(f.tfSchemaType), `,`)
-
-// 		if f.tfSchemaValidate != "" {
-// 			p.P(`Validate: `, p.validationPkg.Use(), `.`, f.tfSchemaValidate, `,`)
-// 		}
-// 	}
-// }
-
-// // writeUnmarshal writes unmarshaling function
-// func (p *Plugin) writeUnmarshal(r *messageReflect) {
-// 	for _, f := range r.fields {
-// 		if f.tfSchemaType != "" {
-// 			p.P(`_`, f.snakeName, `, ok := r.GetOk(prefix + "`, f.snakeName+`").(`, f.tfSchemaGoType, `)`)
-// 			p.P(`if (ok) {`)
-// 			p.P(`}`)
-// 		}
-// 	}
-// }

@@ -104,9 +104,6 @@ func (w *fieldMarshalWriter) pAssign() {
 
 func (w *fieldMarshalWriter) castGoNameWithPtr() string {
 	s := ""
-	if w.field.IsNullable {
-		s = s + "&"
-	}
 
 	return s + w.field.GoType + "(" + w.goTypeVarName + ")"
 }
