@@ -3,8 +3,10 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 	return {{ template "fieldsSchema" .Fields -}}
 }
 
-func Unmarshal{{ .Name }}(d *schema.ResourceData, t *types.{{ .Name }}, p string) {
+func Unmarshal{{ .Name }}(d *schema.ResourceData, t *types.{{ .Name }}, p string) error {
+    {{ template "fieldsUnmarashal" .Fields -}}
 
+    return nil
 }
 
 {{/* Schema rendering */}}
@@ -49,3 +51,13 @@ map[string]*schema.Schema {
 {{- end -}}
 
 {{/* Marshal rendering */}}
+{{- define "fieldsUnmarshal" -}}
+{{- range $index, $field := . }}
+	// {{ .NameSnake }}
+    _{{ .NameSnake }}_raw, ok := d.GetOk(prefix + "{{ .NameSnake}}")
+    if ok {
+    
+    }
+{{- end }}
+}
+{{- end -}}
