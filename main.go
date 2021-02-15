@@ -13,15 +13,6 @@ func main() {
 	p := plugin.NewPlugin()
 
 	req := command.Read()
-	//log.Println(req.GetProtoFile()[3].GetName())
-
-	//log.Println(req.GetProtoFile()[4].GetDependency())
-	//logrus.Println(req.GetProtoFile()[4].GetPackage())
-	// x := req.GetProtoFile()[4].GetMessageType()[2].Field[5]
-	// logrus.Println(req.GetProtoFile()[4].GetMessageType()[2].GetName())
-	// logrus.Println(x.GetName())
-	// logrus.Println(proto.GetCastType(x))
-
 	resp := command.GeneratePlugin(req, p, "_terraform.go")
 
 	command.Write(resp)

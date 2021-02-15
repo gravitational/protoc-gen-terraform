@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	"log"
+	"strings"
 
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
@@ -12,21 +12,27 @@ import (
 // Field represents field reflection struct
 // This struct and the following methods know about both schema details and types, and target structs
 type Field struct {
-	Name       string // Type name
-	NameSnake  string // Type name in snake case
-	IsRepeated bool   // Field is list
-	IsNullable bool   // Field is nullable and has *
+	Name      string // Type name
+	NameSnake string // Type name in snake case
 
+	// Field properties
+	IsRepeated bool // Field is list
+	IsNullable bool // Field is nullable and has * in the beginning
+	// IsWrapper   bool
+	// IsCustomMap bool
+
+	// Type conversion
 	TFSchemaType    string // Type which is reflected in Terraform schema (a-la types.TypeString)
-	TFSchemaRawType string // Terraform schema value type (float64 for types.Float)
-	TFSchemaGoType  string // Value in Go according to target field type
-	GoType          string // Target field type, as gogo returned it, with possible [], * and casttype
+	TFSchemaRawType string // Terraform schema raw value type (float64 for types.Float)
+	TFSchemaGoType  string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
+	GoType          string // Final field type (casttype, customtype, *, [])
 
+	// Auxilary
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
 	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1
 
-	Message *Message // Nested message
+	Message *Message // Reference to nested message
 }
 
 type fieldBuilder struct {
@@ -101,6 +107,25 @@ func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
 	b.field.TFSchemaGoType = goTypeCast
 }
 
+// isTime returns true if field contains time at the end
+func (b *fieldBuilder) isTime() bool {
+	t := b.fieldDescriptor.TypeName
+
+	isStdTime := gogoproto.IsStdTime(b.fieldDescriptor)
+	isGoogleTime := (t != nil && strings.HasSuffix(*t, "google.protobuf.Timestamp"))
+	isCastToTime := gogoproto.GetCastType(b.fieldDescriptor) == "time.Time"
+
+	return isStdTime || isGoogleTime || isCastToTime
+}
+
+// isDuration return true if field contains duration at the end
+func (b *fieldBuilder) isDuration() bool {
+	isStdDuration := gogoproto.IsStdDuration(b.fieldDescriptor)
+	isCastToDuration := gogoproto.GetCastType(b.fieldDescriptor) == "Duration"
+
+	return isStdDuration || isCastToDuration
+}
+
 // resolveType analyses field type and sets required fields in Field structure
 // This method is pretty much copy & paste from gogo/protobuf generator.GoType
 func (b *fieldBuilder) resolveType() {
@@ -111,10 +136,10 @@ func (b *fieldBuilder) resolveType() {
 	b.field.GoType = goType
 
 	switch {
-	case gogoproto.IsStdTime(d) || (d.TypeName != nil && *d.TypeName == ".google.protobuf.Timestamp"):
+	case b.isTime():
 		b.setTypes("TypeString", "time.Time")
 		b.field.TFSchemaValidate = "validation.IsRFC3339Time"
-	case gogoproto.IsStdDuration(d): // || b.IsCastToDuration()
+	case b.isDuration():
 		b.setTypes("TypeString", "time.Duration")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
 		b.setTypes("TypeFloat", "double64")
@@ -137,7 +162,7 @@ func (b *fieldBuilder) resolveType() {
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_STRING) || gogoproto.IsStdString(d):
 		b.setTypes("TypeString", "string")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_BYTES) || gogoproto.IsStdBytes(d):
-		b.setTypes("TypeString", "string")
+		b.setTypes("TypeString", "[]byte")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED32):
 		b.setTypes("TypeString", "int32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED64):
@@ -153,7 +178,8 @@ func (b *fieldBuilder) resolveType() {
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setTypes("TypeString", "string")
 	default:
-		log.Fatal("unknown type for", d.GetName())
+		b.plugin.Generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
+		return
 	}
 
 	if b.fieldDescriptor.IsRepeated() {
@@ -176,29 +202,6 @@ func (b *fieldBuilder) resolveType() {
 	// 	typ, wire = g.TypeName(desc), "bytes"
 
 	// switch {
-	// case gogoproto.IsCustomType(field) && gogoproto.IsCastType(field):
-	// 	g.Fail(field.GetName() + " cannot be custom type and cast type")
-	// case gogoproto.IsCustomType(field):
-	// 	var packageName string
-	// 	var err error
-	// 	packageName, typ, err = getCustomType(field)
-	// 	if err != nil {
-	// 		g.Fail(err.Error())
-	// 	}
-	// 	if len(packageName) > 0 {
-	// 		g.customImports = append(g.customImports, packageName)
-	// 	}
-	// case gogoproto.IsCastType(field):
-	// 	var packageName string
-	// 	var err error
-	// 	packageName, typ, err = getCastType(field)
-	// 	if err != nil {
-	// 		g.Fail(err.Error())
-	// 	}
-	// 	if len(packageName) > 0 {
-	// 		g.customImports = append(g.customImports, packageName)
-	// 	}
-	// }
 	// if needsStar(field, g.file.proto3 && field.Extendee == nil, message != nil && message.allowOneof()) {
 	// 	typ = "*" + typ
 	// }
@@ -220,12 +223,14 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 	b.field.Message = b.plugin.reflectMessage(desc)
-	b.plugin.registerMessage(b.field.Message)
 }
 
 // setNullable sets nullable flag
 func (b *fieldBuilder) setNullable() {
-	b.field.IsNullable = b.field.GoType[0] == '*'
+	if b.field.GoType[0] == '*' {
+		b.field.IsNullable = true
+		b.field.GoType = b.field.GoType[1:]
+	}
 }
 
 // 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/sirupsen/logrus"
+	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -27,6 +28,7 @@ type Plugin struct {
 
 	// // NOTE: Replace with addImport
 	// pkg           generator.Single // Reference to package with protoc types
+	// referencePackages map[string]string
 }
 
 // NewPlugin creates the new plugin
@@ -54,9 +56,8 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	p.setImports()
 
 	for _, message := range file.Messages() {
-		if p.isRequiredMessage(message) {
-			r := p.reflectMessage(message)
-			p.registerMessage(r)
+		if p.isMessageRequired(message) {
+			p.reflectMessage(message)
 		}
 	}
 
@@ -93,14 +94,30 @@ func (p *Plugin) setImports() {
 }
 
 // isMessageRequired returns true if message was marked for export via command-line args
-func (p *Plugin) isRequiredMessage(d *generator.Descriptor) bool {
+func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 	typeName := d.File().GoPackageName() + "." + d.GetName()
 	return slice.Contains(p.types, typeName)
 }
 
-// registerMessage puts message in the list of registered
-func (p *Plugin) registerMessage(m *Message) {
-	p.Messages[m.Name] = m
+// reflectMessage reflects message type
+func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
+	name := d.GetName()
+
+	if p.Messages[name] != nil {
+		return p.Messages[name]
+	}
+
+	message := &Message{}
+
+	message.Name = name
+	message.NameSnake = strcase.SnakeCase(name)
+	message.GoTypeName = d.File().GoPackageName() + "." + name
+
+	p.reflectFields(message, d)
+
+	p.Messages[name] = message
+
+	return message
 }
 
 // schemaRef returns type name with reference to terraform schema ns
