@@ -6,6 +6,8 @@ import (
 	"path"
 	"runtime"
 	"text/template"
+
+	"github.com/Masterminds/sprig"
 )
 
 var (
@@ -34,7 +36,7 @@ func (m *Message) GoString() (*bytes.Buffer, error) {
 
 	filepath := path.Join(path.Dir(filename), templatesDir, templateFilename)
 
-	tpl, err := template.New("message").ParseFiles(filepath)
+	tpl, err := template.New("message").Funcs(sprig.TxtFuncMap()).ParseFiles(filepath)
 
 	if err != nil {
 		return nil, err

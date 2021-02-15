@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
@@ -63,7 +64,11 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	}
 
 	for _, message := range p.Messages {
-		p.P(message.GoString())
+		buf, err := message.GoString()
+		if err != nil {
+			p.Generator.Fail(trace.Wrap(err).Error())
+		}
+		p.P(buf.String())
 		//p.P(newMessageMarshalWriter(message).write())
 	}
 }
@@ -97,10 +102,17 @@ func (p *Plugin) setImports() {
 // isMessageRequired returns true if message was marked for export via command-line args
 func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 	typeName := d.File().GoPackageName() + "." + d.GetName()
-	return slice.Contains(p.types, typeName)
+	required := slice.Contains(p.types, typeName)
+
+	if !required {
+		logrus.Println("Skipping type: ", typeName)
+	}
+
+	return required
 }
 
 // reflectMessage reflects message type
+// todo: builder function?
 func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
 	if !p.isMessageRequired(d) {
 		return nil

@@ -16,16 +16,17 @@ type Field struct {
 	NameSnake string // Type name in snake case
 
 	// Field properties
-	IsRepeated bool // Field is list
-	IsNullable bool // Field is nullable and has * in the beginning
-	// IsWrapper   bool
-	// IsCustomMap bool
+	IsRepeated  bool // Field is list
+	IsAggregate bool // Field is aggregate
+	IsNullable  bool // Field is nullable and has * in the beginning
+	IsMessage   bool // Field is message
 
 	// Type conversion
 	TFSchemaType    string // Type which is reflected in Terraform schema (a-la types.TypeString)
 	TFSchemaRawType string // Terraform schema raw value type (float64 for types.Float)
 	TFSchemaGoType  string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
 	GoType          string // Final field type (casttype, customtype, *, [])
+	IsRequired      bool   // Field is required
 
 	// Auxilary
 	TFSchemaValidate      string // Validation applied to tfschema field
@@ -73,7 +74,10 @@ func (b *fieldBuilder) build() {
 // isValid returns true if built type is valid
 // TODO make build() bool
 func (b *fieldBuilder) isValid() bool {
-	// TODO: message is nil, but hasNested is true == false
+	if b.field.IsMessage && b.field.Message == nil {
+		return false
+	}
+
 	return true
 }
 
@@ -178,7 +182,7 @@ func (b *fieldBuilder) resolveType() {
 		b.setMessage()
 		b.field.TFSchemaAggregateType = "TypeList"
 		b.field.TFSchemaMaxItems = 1
-		// b.field.HasNestedMessage = true
+		b.field.IsMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setTypes("TypeString", "string")
 	default:
@@ -188,6 +192,7 @@ func (b *fieldBuilder) resolveType() {
 
 	if b.fieldDescriptor.IsRepeated() {
 		b.field.IsRepeated = true
+		b.field.IsAggregate = true
 		b.field.TFSchemaAggregateType = "TypeList"
 	}
 
@@ -238,13 +243,6 @@ func (b *fieldBuilder) setNullable() {
 		b.field.IsNullable = true
 		b.field.GoType = b.field.GoType[1:]
 	}
-}
-
-func (f *Field) IsAggregate() bool {
-	if f.IsRepeated {
-		return true
-	}
-	return false
 }
 
 // HasNestedMessage returns true if field has complex type

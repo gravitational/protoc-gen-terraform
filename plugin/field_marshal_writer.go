@@ -27,7 +27,7 @@ func newFieldMarshalWriter(f *Field) *fieldMarshalWriter {
 
 // Write generates code required for field
 func (w *fieldMarshalWriter) write() string {
-	if w.field.IsAggregate() {
+	if w.field.IsAggregate {
 		if w.field.IsRepeated {
 			if !w.field.HasNestedMessage() {
 				w.pSimpleList()
