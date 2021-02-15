@@ -56,9 +56,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	p.setImports()
 
 	for _, message := range file.Messages() {
-		if p.isMessageRequired(message) {
-			p.reflectMessage(message)
-		}
+		p.reflectMessage(message)
 	}
 
 	for _, message := range p.Messages {
@@ -101,6 +99,10 @@ func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 
 // reflectMessage reflects message type
 func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
+	if !p.isMessageRequired(d) {
+		return nil
+	}
+
 	name := d.GetName()
 
 	if p.Messages[name] != nil {
@@ -118,6 +120,16 @@ func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
 	p.Messages[name] = message
 
 	return message
+}
+
+// reflectFields builds array of message.Fields
+func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
+	for _, f := range d.GetField() {
+		f := p.reflectField(d, f)
+		if f != nil {
+			m.Fields = append(m.Fields, f)
+		}
+	}
 }
 
 // schemaRef returns type name with reference to terraform schema ns

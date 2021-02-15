@@ -42,20 +42,8 @@ type fieldBuilder struct {
 	field           *Field
 }
 
-func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
-	for _, f := range d.GetField() {
-		if p.isFieldRequired(f) {
-			m.Fields = append(m.Fields, p.reflectField(d, f))
-		}
-	}
-}
-
-// isFieldRequired returns true if field type is listed in allowed types
-func (p *Plugin) isFieldRequired(f *descriptor.FieldDescriptorProto) bool {
-	return true
-}
-
 // TODO: move to main package
+// reflectField builds field reflection structure, or returns nil in case field must be skipped
 func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
 	b := fieldBuilder{
 		plugin:          p,
@@ -64,7 +52,10 @@ func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescri
 		field:           &Field{},
 	}
 	b.build()
-	return b.field
+	if b.isValid() {
+		return b.field
+	}
+	return nil
 }
 
 // build fills in a Field structure
@@ -72,6 +63,12 @@ func (b *fieldBuilder) build() {
 	b.setName()
 	b.resolveType()
 	b.setNullable()
+}
+
+// isValid returns true if built type is valid
+func (b *fieldBuilder) isValid() bool {
+	// TODO: message is nil, but hasNested is true == false
+	return true
 }
 
 // setName sets the field name
@@ -87,7 +84,7 @@ func (b *fieldBuilder) isTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
 	return *b.fieldDescriptor.Type == t
 }
 
-// setTypes is utility setter method
+// setTypes sets TFSchemaType and TFSchemaGoType, plus TFSchemaRawType according to TFSchemaType
 func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
 	b.field.TFSchemaType = schemaType
 
@@ -175,6 +172,7 @@ func (b *fieldBuilder) resolveType() {
 		b.setMessage()
 		b.field.TFSchemaAggregateType = "TypeList"
 		b.field.TFSchemaMaxItems = 1
+		// b.field.HasNestedMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setTypes("TypeString", "string")
 	default:
@@ -217,11 +215,14 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
+	// Resolve underlying message via protobuf
 	x := b.plugin.ObjectNamed(b.fieldDescriptor.GetTypeName())
 	desc, ok := x.(*generator.Descriptor)
 	if desc == nil || !ok {
 		return
 	}
+
+	// Nested message schema, or nil if message is not whitelisted
 	b.field.Message = b.plugin.reflectMessage(desc)
 }
 
@@ -233,52 +234,21 @@ func (b *fieldBuilder) setNullable() {
 	}
 }
 
-// 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
-// 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-// 	"github.com/stoewer/go-strcase"
-// )
+func (f *Field) IsAggregate() bool {
+	if f.IsRepeated {
+		return true
+	}
+	return false
+}
 
-// type fieldReflect struct {
-// 	name      string // Field name
-// 	snakeName string // Snake cased field name
+// HasNestedMessage returns true if field has complex type
+func (f *Field) HasNestedMessage() bool {
+	if f.Message != nil {
+		return true
+	}
 
-// 	goType string // Target entity go type
-
-// 	tfSchemaType           string // Terraform schema type (e.g schema.TypeBool without "schema" part)
-// 	tfSchemaGoType         string // Terraform schema go type to cast value read from schema into (e.g. .(string) for TypeString)
-// 	tfSchemaValidate       string // Terraform validator if needed (for time, for now)
-// 	tfSchemaCollectionType string // Terraform collection type (list or map)
-
-// 	hasNestedType bool            // Field represents nested structure
-// 	message       *messageReflect // Nested message definition
-// }
-
-// type fieldReflectBuilder struct {
-// 	plugin          *Plugin
-// 	descriptor      *generator.Descriptor
-// 	fieldDescriptor *descriptor.FieldDescriptorProto
-// 	field           fieldReflect
-// }
-
-// // reflectFields generates slice of reflect structures for message fields
-// func (p *Plugin) reflectFields(m *messageReflect, d *generator.Descriptor) {
-// 	m.fields = make([]*fieldReflect, len(d.Field))
-
-// 	for index, f := range d.Field {
-// 		m.fields[index] = p.reflectField(d, f)
-// 	}
-// }
-
-// // reflectField builds fieldReflect for specific field
-// func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldReflect {
-// 	b := fieldReflectBuilder{
-// 		plugin:          p,
-// 		descriptor:      d,
-// 		fieldDescriptor: f,
-// 	}
-// 	b.build()
-// 	return &b.field
-// }
+	return false
+}
 
 // // build builds in fieldReflect structure
 // func (b *fieldReflectBuilder) build() {
@@ -291,55 +261,9 @@ func (b *fieldBuilder) setNullable() {
 // 	b.setMessage()
 // }
 
-// // setName sets field name and + snake cased
-// func (b *fieldReflectBuilder) setName() {
-// 	b.field.name = b.fieldDescriptor.GetName()
-// 	b.field.snakeName = strcase.SnakeCase(b.field.name)
-// }
-
-// // setGoType sets target structure field go type
-
-// // setTFSchemaType sets terraform schema type and target go type for a field
-// func (b *fieldReflectBuilder) setTFSchemaType() {
-// 	t, g := b.getTFSchemaType()
-// 	b.field.tfSchemaType = t
-// 	b.field.tfSchemaGoType = g
-// }
-
 // // getTFSchemaType returns terraform schema type and target go type for a field
 // func (b *fieldReflectBuilder) getTFSchemaType() (string, string) {
 // 	t := b.field.goType
-
-// 	if strings.Contains(t, "float") || strings.Contains(t, "fixed") {
-// 		return "TypeFloat", "float64"
-// 	}
-
-// 	if strings.Contains(t, "string") {
-// 		return "TypeString", "string"
-// 	}
-
-// 	if strings.Contains(t, "int") {
-// 		return "TypeInt", "int"
-// 	}
-
-// 	if strings.Contains(t, "bool") {
-// 		return "TypeBool", "bool"
-// 	}
-
-// 	if strings.Contains(t, "byte") {
-// 		return "TypeString", "string"
-// 	}
-
-// 	if strings.Contains(t, "time.Time") {
-// 		return "TypeString", "string"
-// 	}
-
-// 	if strings.Contains(t, "time.Duration") {
-// 		return "TypeInt", "int"
-// 	}
-
-// 	return "", ""
-// }
 
 // // setTFSchemaValidate sets validation function for current schema element
 // func (b *fieldReflectBuilder) setTFSchemaValidate() {
@@ -365,18 +289,3 @@ func (b *fieldBuilder) setNullable() {
 // }
 
 // IsAggregate returns true if field is either list or map
-func (f *Field) IsAggregate() bool {
-	if f.IsRepeated {
-		return true
-	}
-	return false
-}
-
-// HasNestedMessage returns true if field has complex type
-func (f *Field) HasNestedMessage() bool {
-	if f.Message != nil {
-		return true
-	}
-
-	return false
-}
