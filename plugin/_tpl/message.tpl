@@ -56,7 +56,11 @@ map[string]*schema.Schema {
 	// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .GoType }}
     _{{ .NameSnake }}_raw, ok := d.GetOk(prefix + "{{ .NameSnake}}")
     if ok {
-    
+        {{- if .IsMessage }}
+        {{- else if .IsAggregate }}
+        {{- else }}
+
+        {{- end }}
     }
 {{- end }}
 {{- end -}}
