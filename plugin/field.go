@@ -34,13 +34,15 @@ type Field struct {
 	GoTypeIsPtr   bool   // Go type is a pointer
 
 	// Metadata
-	IsRepeated  bool // Is list
+	Kind        string // Field kind (resulting of combination of meta flags)
+	IsRepeated  bool   // Is list
 	IsMap       bool
 	IsAggregate bool // Is aggregate (either list or map)
 	IsMessage   bool // Is message (might be repeated in the same time)
 	IsRequired  bool // Is required TODO: implement
 	IsTime      bool // Contains time, value needs to be parsed from string
 	IsDuration  bool // Contains duration, value needs to be parsed from string
+	IsFold      bool // Field contains single field
 
 	Message *Message // Reference to nested message
 }
@@ -67,17 +69,24 @@ func (b *fieldBuilder) build() bool {
 	b.setName()
 	b.setGoType()
 	b.resolveType()
+	b.setKind()
 
 	return b.isValid()
 }
 
 // isValid returns true if built type is valid
 func (b *fieldBuilder) isValid() bool {
+	// Maps are temporary disabled
 	if b.field.IsMap {
 		return false
 	}
 
-	// If field is message, but underlying message failed to reflect (is not present in types= cmd line arg, we skip this field)
+	// No kind == invalid
+	if b.field.Kind == "" {
+		return false
+	}
+
+	// If field is message, but underlying message failed to reflect (is invalid)
 	if b.field.IsMessage && b.field.Message == nil {
 		return false
 	}
@@ -266,6 +275,41 @@ func (b *fieldBuilder) setMessage() {
 
 	m := b.plugin.reflectMessage(desc, true)
 
-	// Nested message schema, or nil if message is not whitelisted
-	b.field.Message = m
+	if m != nil {
+		// Nested message schema, or nil if message is not whitelisted
+		b.field.Message = m
+		b.setIsFold()
+	}
+}
+
+// setIsFold sets folding flag. This flag means that field is a container for a single field
+// For instance, that could be custom BoolValue with Value field
+func (b *fieldBuilder) setIsFold() {
+	f := b.field
+
+	if f.IsAggregate {
+		return
+	}
+
+	m := f.Message
+
+	if len(m.Fields) == 1 {
+		f.IsFold = true
+	}
+}
+
+// setKind sets field kind which represents field kind for generation
+func (b *fieldBuilder) setKind() {
+	f := b.field
+
+	switch {
+	case f.IsAggregate && f.IsRepeated && f.IsMessage:
+		f.Kind = "REPEATED_MESSAGE"
+	case f.IsAggregate && f.IsRepeated:
+		f.Kind = "REPEATED_ELEMENTARY"
+	case f.IsMessage:
+		f.Kind = "SINGULAR_MESSAGE"
+	default:
+		f.Kind = "SINGULAR_ELEMENTARY"
+	}
 }

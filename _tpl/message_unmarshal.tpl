@@ -16,14 +16,15 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 {{- define "fieldUnmarshal" -}}
 
 // schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
+// {{ .Kind }}
 {
-{{- if and .IsAggregate .IsRepeated .IsMessage }}
+{{- if eq .Kind "REPEATED_MESSAGE" }}
     {{ template "repeatedMessage" . }}
-{{- else if and .IsAggregate .IsRepeated }}
+{{- else if eq .Kind "REPEATED_ELEMENTARY" }}
     {{ template "repeatedElementary" . }}
-{{- else if .IsMessage }}
+{{- else if eq .Kind "SINGULAR_MESSAGE" }}
     {{ template "singularMessage" . }}
-{{- else }}
+{{- else if eq .Kind "SINGULAR_ELEMENTARY" }}
     {{ template "singularElementary" . }}
 {{- end }}
 }
@@ -46,7 +47,6 @@ _value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
 {{- end -}}
 
 {{- define "repeatedMessage" -}}
-// repeated message
 p := p + "{{.NameSnake}}"
 _rawi, ok := d.GetOk(p)
 if ok {
@@ -61,7 +61,6 @@ if ok {
 {{- end -}}
 
 {{- define "repeatedElementary" -}}
-// repeated elementary
 _rawi, ok := d.GetOk(p + "{{ .NameSnake}}")
 if ok {
     _rawi := _rawi.([]interface{})
@@ -76,7 +75,6 @@ if ok {
 {{- end -}}
 
 {{- define "singularMessage" -}}
-// singular message
 p := p + "{{ .NameSnake }}.0."
 {{ if .GoTypeIsPtr }}
 _obj := {{ .GoType}}{}
@@ -91,7 +89,6 @@ t = t
 {{- end -}}
 
 {{- define "singularElementary" -}}
-// singular elementary
 _raw, ok := d.GetOk(p + "{{ .NameSnake}}")
 if ok {
     {{- template "rawToValue" . }}

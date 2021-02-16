@@ -15,6 +15,18 @@ map[string]*schema.Schema {
 
 {{- define "fieldSchema" -}}
 {   
+    {{- if eq .Kind "REPEATED_MESSAGE" }}
+    {{- end }}
+
+    {{- if eq .Kind "REPEATED_ELEMENTARY" }}
+    {{- end }}
+
+    {{- if eq .Kind "SINGULAR_MESSAGE" }}
+    {{- end }}
+
+    {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
+    {{- end }}
+
 	Type: schema.{{ coalesce .TFSchemaAggregateType .TFSchemaType }},
 
 	{{- if .IsRequired }}
