@@ -50,6 +50,8 @@ map[string]*schema.Schema {
 {{- end -}}
 
 {{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
+{{/* Made KISS as possible, for the price of DRY */}}
+
 {{- define "fieldsUnmarshal" -}}
 {{- range $index, $field := . }}
     {{ template "fieldUnmarshal" $field }}
@@ -57,56 +59,19 @@ map[string]*schema.Schema {
 {{- end -}}
 
 {{- define "fieldUnmarshal" -}}
-// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
 
+// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
+{
 {{- if and .IsAggregate .IsRepeated .IsMessage }}
-// repeated message
-{
-    p := p + "{{.NameSnake}}"
-    _rawi, ok := d.GetOk(p)
-    if ok {
-        _rawi := _rawi.([]interface{})
-        t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
-        for i := 0; i < len(_rawi); i++ {
-            t := &t.{{ .Name }}[i]
-            p := p + fmt.Sprintf(".%v.", i)
-            {{- template "fieldsUnmarshal" .Message.Fields }}            
-        }
-    }
-}
+    {{ template "repeatedMessage" . }}
 {{- else if and .IsAggregate .IsRepeated }}
-// repeated elementary
-{
-    _rawi, ok := d.GetOk(p + "{{ .NameSnake}}")
-    if ok {
-        _rawi := _rawi.([]interface{})
-        t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
-        for i := 0; i < len(_rawi); i++ {
-            _raw := _rawi[i]
-            {{- template "rawToValue" . }}
-            _final := {{.GoType}}(_value)
-            t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_final            
-        }
-    }
-}
+    {{ template "repeatedElementary" . }}
 {{- else if .IsMessage }}
-// singular message
-{
-    p := p + "{{ .NameSnake }}.0."
-    t := &t.{{ .Name }}
-    {{- template "fieldsUnmarshal" .Message.Fields }}
-}
+    {{ template "singularMessage" . }}
 {{- else }}
-{
-    // singular elementary
-    _raw, ok := d.GetOk(p + "{{ .NameSnake}}")
-    if ok {
-        {{- template "rawToValue" . }}
-        _final := {{.GoType}}(_value)
-        t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
-    }
-}
+    {{ template "singularElementary" . }}
 {{- end }}
+}
 {{- end -}}
 
 {{- define "rawToValue" -}}
@@ -123,4 +88,59 @@ if err != nil {
 {{- else }}
 _value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
 {{- end }}
+{{- end -}}
+
+{{- define "repeatedMessage" -}}
+// repeated message
+p := p + "{{.NameSnake}}"
+_rawi, ok := d.GetOk(p)
+if ok {
+    _rawi := _rawi.([]interface{})
+    t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
+    for i := 0; i < len(_rawi); i++ {
+        t := &t.{{ .Name }}[i]
+        p := p + fmt.Sprintf(".%v.", i)
+        {{- template "fieldsUnmarshal" .Message.Fields }}            
+    }
+}
+{{- end -}}
+
+{{- define "repeatedElementary" -}}
+// repeated elementary
+_rawi, ok := d.GetOk(p + "{{ .NameSnake}}")
+if ok {
+    _rawi := _rawi.([]interface{})
+    t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
+    for i := 0; i < len(_rawi); i++ {
+        _raw := _rawi[i]
+        {{- template "rawToValue" . }}
+        _final := {{.GoType}}(_value)
+        t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_final            
+    }
+}
+{{- end -}}
+
+{{- define "singularMessage" -}}
+// singular message
+p := p + "{{ .NameSnake }}.0."
+{{ if .GoTypeIsPtr }}
+_obj := {{ .GoType}}{}
+t.{{ .Name }} = &_obj
+t := &_obj
+{{- else -}}
+t := &t.{{ .Name }}
+{{ end }}
+{{- template "fieldsUnmarshal" .Message.Fields }}
+p = p
+t = t
+{{- end -}}
+
+{{- define "singularElementary" -}}
+// singular elementary
+_raw, ok := d.GetOk(p + "{{ .NameSnake}}")
+if ok {
+    {{- template "rawToValue" . }}
+    _final := {{.GoType}}(_value)
+    t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
+}
 {{- end -}}

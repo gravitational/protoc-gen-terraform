@@ -22,7 +22,7 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir = "./_out"
-types = "types.UserV2+types.UserSpecV2+types.RoleV3+types.RoleSpecV3+types.ProvisionTokenV2+types.ProvisionTokenSpecV2+types.Metadata+types.ExternalIdentity+types.RoleOptions+types.RoleConditions+types.BoolValue+types.ExternalIdentity+wrappers.LabelValues"
+types = "types.UserV2+types.UserSpecV2+types.RoleV3+types.RoleSpecV3+types.ProvisionTokenV2+types.ProvisionTokenSpecV2+types.Metadata+types.ExternalIdentity+types.RoleOptions+types.RoleConditions+types.BoolValue+types.ExternalIdentity+wrappers.LabelValues+types.CreatedBy+wrappers.StringValues+wrappers.ValuesEntry"
 # types = "types.RoleOptions+types.BoolValue"
 
 .PHONY: example

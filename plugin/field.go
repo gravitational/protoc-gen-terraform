@@ -6,6 +6,7 @@ import (
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -35,6 +36,7 @@ type Field struct {
 
 	// Metadata
 	IsRepeated  bool // Is list
+	IsMap       bool
 	IsAggregate bool // Is aggregate (either list or map)
 	IsMessage   bool // Is message (might be repeated in the same time)
 	IsRequired  bool // Is required TODO: implement
@@ -72,16 +74,6 @@ func (b *fieldBuilder) build() bool {
 
 // isValid returns true if built type is valid
 func (b *fieldBuilder) isValid() bool {
-	// NOTE: Temporary skip maps
-	if b.plugin.IsMap(b.fieldDescriptor) {
-		return false
-	}
-
-	// NOTE: Temporary skip custom types
-	if gogoproto.IsCustomType(b.fieldDescriptor) {
-		return false
-	}
-
 	// If field is message, but underlying message failed to reflect (is not present in types= cmd line arg, we skip this field)
 	if b.field.IsMessage && b.field.Message == nil {
 		return false
@@ -236,6 +228,14 @@ func (b *fieldBuilder) resolveType() {
 		f.TFSchemaMaxItems = 1
 	}
 
+	if b.plugin.IsMap(b.fieldDescriptor) {
+		f.TFSchemaAggregateType = "TypeMap"
+		f.IsMap = true
+
+		x := b.plugin.GoMapType(nil, b.fieldDescriptor)
+		logrus.Println(x)
+	}
+
 	// Append type suffix to cast type, custom type and message
 	// Note on custom type: it is guaranteed that custom type has the same subset of fields as protobuf schema type
 	// However, it does not guarantee that custom type can be directly casted to schema type
@@ -249,12 +249,6 @@ func (b *fieldBuilder) resolveType() {
 			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
 		}
 	}
-
-	// Check if field value is a map
-	// if g.IsMap(f) {
-	// 	gf, _ := g.GoType(d, g.GoMapType(nil, f).ValueField)
-	// 	logrus.Println("      ", gf)
-	// }
 }
 
 // setMessage sets reference to nested message
@@ -266,6 +260,7 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
+	m := b.plugin.reflectMessage(desc)
 	// Nested message schema, or nil if message is not whitelisted
-	b.field.Message = b.plugin.reflectMessage(desc)
+	b.field.Message = m
 }
