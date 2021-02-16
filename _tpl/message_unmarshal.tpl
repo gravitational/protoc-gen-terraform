@@ -96,6 +96,6 @@ _raw, ok := d.GetOk(p + "{{ .NameSnake}}")
 if ok {
     {{- template "rawToValue" . }}
     _final := {{.GoType}}(_value)
-    t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
+    t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}{{if .GoTypeIsSlice }}[]{{end}}_final
 }
 {{- end -}}

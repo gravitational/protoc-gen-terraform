@@ -22,7 +22,7 @@ type Field struct {
 	// TFSchema properties
 	TFSchemaType          string // Type which is reflected in Terraform schema (a-la types.TypeString)
 	TFSchemaRawType       string // Terraform schema raw value type (float64 for types.Float)
-	TFSchemaGoType        string // Go type to convert schema raw type to (uint32, []bytes, time.Time, time.Duration)
+	TFSchemaGoType        string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
 	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1

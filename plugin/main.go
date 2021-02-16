@@ -14,7 +14,7 @@ const (
 	name           = "terraform"                                                      // Plugin name
 	schemaPkg      = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
 	validationPkg  = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
-	paramDelimiter = "+"                                                              // Delimiter for types and ignore
+	paramDelimiter = "+"                                                              // Delimiter for types and ignoreFields
 )
 
 // Plugin is terraform generator plugin
@@ -35,10 +35,6 @@ type Plugin struct {
 
 	// Map of reflected messages, public just in case some post analysis is required
 	Messages map[string]*Message
-
-	// // NOTE: Replace with addImport
-	// pkg           generator.Single // Reference to package with protoc types
-	// referencePackages map[string]string
 }
 
 // NewPlugin creates the new plugin
