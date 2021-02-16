@@ -33,7 +33,7 @@ map[string]*schema.Schema {
 
     {{- if .IsMessage }}
     Elem: &schema.Resource {
-        Schema: Schema{{ .Message.Name }}(),
+        Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
     {{- else if .IsAggregate }}
     Elem: &schema.Schema {
