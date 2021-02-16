@@ -24,6 +24,8 @@ type Message struct {
 	// TODO: Comments
 }
 
+// TODO: Split to GoSchemaString() & GoUnmarshalString(0)
+
 // GoString returns go code for this message as terraform schema
 func (m *Message) GoString() (*bytes.Buffer, error) {
 	var buf bytes.Buffer

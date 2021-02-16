@@ -97,6 +97,10 @@ func (p *Plugin) setImports() {
 	// So those could be referenced via schema. and validation.
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
+
+	// TODO: Temporary
+	p.AddImport("github.com/gravitational/teleport/api/types")
+	p.AddImport("github.com/gravitational/teleport/api/types/wrappers")
 }
 
 // isMessageRequired returns true if message was marked for export via command-line args

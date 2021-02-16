@@ -4,8 +4,7 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 }
 
 func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string) error {
-    {{- template "fieldsUnmarshal" .Fields }}
-
+    {{ template "fieldsUnmarshal" .Fields }}
     return nil
 }
 
@@ -53,53 +52,75 @@ map[string]*schema.Schema {
 {{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
 {{- define "fieldsUnmarshal" -}}
 {{- range $index, $field := . }}
+    {{ template "fieldUnmarshal" $field }}
+{{- end }}
+{{- end -}}
+
+{{- define "fieldUnmarshal" -}}
+// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
+
+{{- if and .IsAggregate .IsRepeated .IsMessage }}
+// repeated message
 {
-	// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
+    p := p + "{{.NameSnake}}"
+    _rawi, ok := d.GetOk(p)
+    if ok {
+        _rawi := _rawi.([]interface{})
+        t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
+        for i := 0; i < len(_rawi); i++ {
+            t := &t.{{ .Name }}[i]
+            p := p + fmt.Sprintf(".%v.", i)
+            {{- template "fieldsUnmarshal" .Message.Fields }}            
+        }
+    }
+}
+{{- else if and .IsAggregate .IsRepeated }}
+// repeated elementary
+{
+    _rawi, ok := d.GetOk(p + "{{ .NameSnake}}")
+    if ok {
+        _rawi := _rawi.([]interface{})
+        t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
+        for i := 0; i < len(_rawi); i++ {
+            _raw := _rawi[i]
+            {{- template "rawToValue" . }}
+            _final := {{.GoType}}(_value)
+            t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_final            
+        }
+    }
+}
+{{- else if .IsMessage }}
+// singular message
+{
+    p := p + "{{ .NameSnake }}.0."
+    t := &t.{{ .Name }}
+    {{- template "fieldsUnmarshal" .Message.Fields }}
+}
+{{- else }}
+{
+    // singular elementary
     _raw, ok := d.GetOk(p + "{{ .NameSnake}}")
     if ok {
-        {{- if .IsAggregate }}
-            {{- if .IsRepeated }}
-                _rawi := _raw.([]interface{})
-                t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
-                for i := 0; i < len(_rawi); i++ {
-                    {{- if .IsMessage }}
-                    Unmarshal{{ .Message.Name }}(d, &t.{{ .Name }}[i], p+fmt.Sprintf("{{ .NameSnake }}.%v.", i))
-                    _raw = _raw
-                    {{- else }}
-                    _currentRaw := _rawi[i]
-                    {{- template "rawToValue" dict "raw" "_currentRaw" "field" . }}
-                    _tmp := {{.GoType}}(_value)
-                    t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_tmp
-                    {{- end }}
-                }
-            {{- end }}
-        {{- else -}}
-            {{- if .IsMessage -}}
-                Unmarshal{{ .Message.Name }}(d, &t.{{ .Name }}, "{{ .NameSnake }}.0.")
-            {{- else -}}
-                {{/* We convert from schema type to real type */}}
-                {{ template "rawToValue" dict "raw" "_raw" "field" . }}
-                _tmp := {{.GoType}}(_value)
-                t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_tmp
-            {{- end }}                
-        {{- end }}
+        {{- template "rawToValue" . }}
+        _final := {{.GoType}}(_value)
+        t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
     }
 }
 {{- end }}
 {{- end -}}
 
 {{- define "rawToValue" -}}
-{{- if .field.IsTime }}
-_value, err := time.Parse(time.RFC3339, {{.raw}}.({{.field.TFSchemaRawType}}))
+{{- if .IsTime }}
+_value, err := time.Parse(time.RFC3339, _raw.({{.TFSchemaRawType}}))
 if err != nil {
-    return fmt.Errorf("Malformed time value for field {{.field.Name}} : %w", err)
+    return fmt.Errorf("Malformed time value for field {{.Name}} : %w", err)
 }
-{{- else if .field.IsDuration }}
-_value, err := time.ParseDuration({{.raw}}.({{.field.TFSchemaRawType}}))
+{{- else if .IsDuration }}
+_value, err := time.ParseDuration(_raw.({{.TFSchemaRawType}}))
 if err != nil {
-    return fmt.Errorf("Malformed duration value for field {{.field.Name}} : %w", err)
+    return fmt.Errorf("Malformed duration value for field {{.Name}} : %w", err)
 }
 {{- else }}
-_value := {{.field.TFSchemaGoType}}({{.raw}}.({{.field.TFSchemaRawType}}))
+_value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
 {{- end }}
 {{- end -}}
