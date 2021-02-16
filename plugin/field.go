@@ -269,12 +269,3 @@ func (b *fieldBuilder) setMessage() {
 	// Nested message schema, or nil if message is not whitelisted
 	b.field.Message = b.plugin.reflectMessage(desc)
 }
-
-// HasNestedMessage returns true if field has complex type
-func (f *Field) HasNestedMessage() bool {
-	if f.Message != nil {
-		return true
-	}
-
-	return false
-}
