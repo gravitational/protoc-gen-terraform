@@ -60,7 +60,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 	}
 
 	logrus.Printf("Types: %s", p.types)
-	logrus.Printf("Excluded fields: %s", p.types)
+	logrus.Printf("Excluded fields: %s", p.excludeFields)
 }
 
 // Name returns the name of the plugin

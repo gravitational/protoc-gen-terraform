@@ -6,7 +6,6 @@ import (
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -237,7 +236,8 @@ func (b *fieldBuilder) resolveType() {
 		f.IsMap = true
 
 		x := b.plugin.GoMapType(nil, b.fieldDescriptor)
-		logrus.Println(x)
+		x = x
+		//logrus.Println(x)
 	}
 
 	// Append type suffix to cast type, custom type and message
