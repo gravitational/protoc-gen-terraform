@@ -7,14 +7,14 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
-	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
 )
 
 const (
-	name          = "terraform"                                                      // Plugin name
-	schemaPkg     = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
-	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
+	name           = "terraform"                                                      // Plugin name
+	schemaPkg      = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
+	validationPkg  = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
+	paramDelimiter = "+"                                                              // Delimiter for types and ignore
 )
 
 // Plugin is terraform generator plugin
@@ -27,6 +27,11 @@ type Plugin struct {
 	//
 	// Passed from command line (--terraform_out=types=types.UserV2:./_out)
 	types []string
+
+	// The list of fields to ignore.
+	//
+	// Passed from command line (--terraform_out=excludeFields=types.UserV2.Expires:./_out)
+	excludeFields []string
 
 	// Map of reflected messages, public just in case some post analysis is required
 	Messages map[string]*Message
@@ -46,7 +51,16 @@ func NewPlugin() *Plugin {
 // Init initializes plugin and sets the generator instance
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
-	p.fetchTypesFromCommandLine(p.Generator)
+
+	p.types = strings.Split(g.Param["types"], paramDelimiter)
+	p.excludeFields = strings.Split(g.Param["excludeFields"], paramDelimiter)
+
+	if len(p.types) == 0 {
+		logrus.Fatal("Please, specify explicit top level type list, eg. --terraform-out=types=UserV2+UserSpecV2:./_out")
+	}
+
+	logrus.Printf("Types: %s", p.types)
+	logrus.Printf("Excluded fields: %s", p.types)
 }
 
 // Name returns the name of the plugin
@@ -61,33 +75,24 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	p.setImports()
 
 	for _, message := range file.Messages() {
-		p.reflectMessage(message)
+		p.reflectMessage(message, false)
 	}
 
 	for _, message := range p.Messages {
-		buf, err := message.GoString()
+		buf, err := message.GoSchemaString()
 		if err != nil {
 			p.Generator.Fail(trace.Wrap(err).Error())
 		}
 		p.P(buf.String())
 	}
-}
 
-// fetchTypesFromCommandLine loads loads and parses type list from command line
-func (p *Plugin) fetchTypesFromCommandLine(g *generator.Generator) {
-	if g.Param["types"] == "" {
-		logrus.Fatal("Please, specify explicit top level type list, eg. --terraform-out=types=UserV2+UserSpecV2:./_out")
-	}
-
-	p.types = strings.Split(g.Param["types"], "+")
-
-	if len(p.types) == 0 {
-		if g.Param["types"] == "" {
-			logrus.Fatal("Types list is malformed or empty!")
+	for _, message := range p.Messages {
+		buf, err := message.GoUnmarshalString()
+		if err != nil {
+			p.Generator.Fail(trace.Wrap(err).Error())
 		}
+		p.P(buf.String())
 	}
-
-	logrus.Printf("Types: %s", p.types)
 }
 
 // setImports sets import definitions for current file
@@ -108,17 +113,12 @@ func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 	typeName := d.File().GetPackage() + "." + d.GetName()
 	required := slice.Contains(p.types, typeName)
 
-	// if !required {
-	// 	logrus.Println("Skipping type:", typeName)
-	// }
-
 	return required
 }
 
 // reflectMessage reflects message type
-// todo: builder function?
-func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
-	if !p.isMessageRequired(d) {
+func (p *Plugin) reflectMessage(d *generator.Descriptor, nested bool) *Message {
+	if !nested && !p.isMessageRequired(d) {
 		return nil
 	}
 
@@ -128,15 +128,11 @@ func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
 		return p.Messages[name]
 	}
 
-	message := &Message{}
+	message := p.buildMessage(d)
 
-	message.Name = name
-	message.NameSnake = strcase.SnakeCase(name)
-	message.GoTypeName = d.File().GetPackage() + "." + name
-
-	p.reflectFields(message, d)
-
-	p.Messages[name] = message
+	if !nested {
+		p.Messages[name] = message
+	}
 
 	return message
 }
@@ -144,11 +140,21 @@ func (p *Plugin) reflectMessage(d *generator.Descriptor) *Message {
 // reflectFields builds array of message.Fields
 func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
 	for _, f := range d.GetField() {
-		f := p.reflectField(d, f)
-		if f != nil {
-			m.Fields = append(m.Fields, f)
+		if !p.isFieldIgnored(d, f) {
+			f := p.reflectField(d, f)
+			if f != nil {
+				m.Fields = append(m.Fields, f)
+			}
 		}
 	}
+}
+
+// isMessageRequired returns true if message was marked for export via command-line args
+func (p *Plugin) isFieldIgnored(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) bool {
+	fieldName := d.File().GetPackage() + "." + d.GetName() + "." + f.GetName()
+	ignored := slice.Contains(p.excludeFields, fieldName)
+
+	return ignored
 }
 
 // reflectField builds field reflection structure, or returns nil in case field must be skipped

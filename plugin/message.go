@@ -2,17 +2,18 @@ package plugin
 
 import (
 	"bytes"
-	"errors"
-	"path"
-	"runtime"
+	"io"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/markbates/pkger"
+	"github.com/stoewer/go-strcase"
 )
 
 var (
-	templateFilename = "message.tpl"
-	templatesDir     = "_tpl"
+	schemaTplFilename    = pkger.Include("/_tpl/message_schema.tpl")
+	unmarshalTplFilename = pkger.Include("/_tpl/message_unmarshal.tpl")
 )
 
 // Message holds reflection information about message
@@ -24,31 +25,54 @@ type Message struct {
 	// TODO: Comments
 }
 
-// TODO: Split to GoSchemaString() & GoUnmarshalString(0)
+// build Builds message
+func (p *Plugin) buildMessage(d *generator.Descriptor) *Message {
+	name := d.GetName()
 
-// GoString returns go code for this message as terraform schema
-func (m *Message) GoString() (*bytes.Buffer, error) {
+	message := &Message{}
+
+	message.Name = name
+	message.NameSnake = strcase.SnakeCase(name)
+	message.GoTypeName = d.File().GetPackage() + "." + name
+
+	p.reflectFields(message, d)
+
+	return message
+}
+
+// GoUnmarshalString returns go code for this message as unmarshaller
+func (m *Message) GoUnmarshalString() (*bytes.Buffer, error) {
+	return m.renderTemplate(unmarshalTplFilename, "message")
+}
+
+// GoSchemaString returns go code for this message as terraform schema
+func (m *Message) GoSchemaString() (*bytes.Buffer, error) {
+	return m.renderTemplate(schemaTplFilename, "message")
+}
+
+func (m *Message) renderTemplate(fileName string, name string) (*bytes.Buffer, error) {
 	var buf bytes.Buffer
 
-	_, filename, _, ok := runtime.Caller(1)
-
-	if !ok {
-		return nil, errors.New("Can't get path to runtime file")
+	f, err := pkger.Open(fileName)
+	if err != nil {
+		return nil, err
 	}
+	defer f.Close()
 
-	filepath := path.Join(path.Dir(filename), templatesDir, templateFilename)
-
-	tpl, err := template.New("message").Funcs(sprig.TxtFuncMap()).ParseFiles(filepath)
-
+	b, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}
 
-	err = tpl.ExecuteTemplate(&buf, templateFilename, m)
+	tpl, err := template.New(name).Funcs(sprig.TxtFuncMap()).Parse(string(b))
+	if err != nil {
+		return nil, err
+	}
+
+	err = tpl.ExecuteTemplate(&buf, name, m)
 	if err != nil {
 		return nil, err
 	}
 
 	return &buf, nil
-
 }

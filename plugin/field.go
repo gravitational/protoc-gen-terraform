@@ -74,6 +74,10 @@ func (b *fieldBuilder) build() bool {
 
 // isValid returns true if built type is valid
 func (b *fieldBuilder) isValid() bool {
+	if b.field.IsMap {
+		return false
+	}
+
 	// If field is message, but underlying message failed to reflect (is not present in types= cmd line arg, we skip this field)
 	if b.field.IsMessage && b.field.Message == nil {
 		return false
@@ -243,8 +247,8 @@ func (b *fieldBuilder) resolveType() {
 	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) || b.isMessage() {
 		l := f.GoType[0:1]
 
-		// In other words, if the first letter of type name is uppercase, this means this type is not prefixed with
-		// package name, try to prefix.
+		// In other words, if the first letter of a type name is uppercase, this means that type is not prefixed with
+		// package name.
 		if strings.ToLower(l) != l {
 			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
 		}
@@ -260,7 +264,8 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
-	m := b.plugin.reflectMessage(desc)
+	m := b.plugin.reflectMessage(desc, true)
+
 	// Nested message schema, or nil if message is not whitelisted
 	b.field.Message = m
 }

@@ -10,7 +10,7 @@ clean:
 
 .PHONY: build
 build: clean
-	go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(version)"
+	pkger && go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(version)"
 
 .PHONY: install
 install: build
@@ -22,8 +22,8 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir = "./_out"
-types = "types.UserV2+types.UserSpecV2+types.RoleV3+types.RoleSpecV3+types.ProvisionTokenV2+types.ProvisionTokenSpecV2+types.Metadata+types.ExternalIdentity+types.RoleOptions+types.RoleConditions+types.BoolValue+types.ExternalIdentity+wrappers.LabelValues+types.CreatedBy+wrappers.StringValues+wrappers.ValuesEntry"
-# types = "types.RoleOptions+types.BoolValue"
+types = "types.UserV2+types.UserSpecV2+types.RoleV3+types.RoleSpecV3+types.ProvisionTokenV2+types.ProvisionTokenSpecV2"
+ignore = ""
 
 .PHONY: example
 example: build
@@ -37,5 +37,5 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types}:./${out_dir} \
+		--terraform_out=types=${types},ignore=${ignore}:./${out_dir} \
 		types.proto

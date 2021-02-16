@@ -1,56 +1,11 @@
-// Type full name: {{ .Name }}
-func Schema{{ .Name }}() map[string]*schema.Schema {
-	return {{ template "fieldsSchema" .Fields -}}
-}
+{{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
+{{/* Made KISS as possible, for the price of DRY */}}
 
+// Type full name: {{ .Name }}
 func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string) error {
     {{ template "fieldsUnmarshal" .Fields }}
     return nil
 }
-
-{{/* ---- Schema rendering ---------------------------------------------------------------*/}}
-
-{{- define "fieldsSchema" -}}
-map[string]*schema.Schema {
-{{- range $index, $field := . }}
-	// {{ .Name }}
-	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
-{{- end }}
-}
-{{- end -}}
-
-{{- define "fieldSchema" -}}
-{   
-	Type: schema.{{ coalesce .TFSchemaAggregateType .TFSchemaType }},
-
-	{{- if .IsRequired }}
-	Required: true,
-	{{- else }}
-	Optional: true,
-	{{- end }}
-
-	{{- if .TFSchemaMaxItems }}
-	MaxItems: {{ .TFSchemaMaxItems }},
-	{{- end }}
-
-	{{- if .TFSchemaValidate }}
-	ValidateFunc: {{ .TFSchemaValidate }},
-	{{- end }}
-
-    {{- if .IsMessage }}
-    Elem: &schema.Resource {
-        Schema: Schema{{ .Message.Name }}(),
-    },
-    {{- else if .IsAggregate }}
-    Elem: &schema.Schema {
-        Type: schema.{{ .TFSchemaType }},
-    },
-    {{- end }}
-},
-{{- end -}}
-
-{{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
-{{/* Made KISS as possible, for the price of DRY */}}
 
 {{- define "fieldsUnmarshal" -}}
 {{- range $index, $field := . }}
