@@ -1,5 +1,5 @@
 {{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
-{{/* Made KISS as possible, for the price of DRY */}}
+{{/* Made KISS as possible, for the exchange of DRY */}}
 
 // Type full name: {{ .Name }}
 func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string) error {
@@ -14,7 +14,6 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 {{- end -}}
 
 {{- define "fieldUnmarshal" -}}
-
 // schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
 // {{ .Kind }}
 {
@@ -24,6 +23,8 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
     {{ template "repeatedElementary" . }}
 {{- else if eq .Kind "SINGULAR_MESSAGE" }}
     {{ template "singularMessage" . }}
+{{- else if eq .Kind "SINGULAR_MESSAGE_FOLD" }}
+    {{ template "singularMessageFold" . }}
 {{- else if eq .Kind "SINGULAR_ELEMENTARY" }}
     {{ template "singularElementary" . }}
 {{- end }}
@@ -61,7 +62,7 @@ if ok {
 {{- end -}}
 
 {{- define "repeatedElementary" -}}
-_rawi, ok := d.GetOk(p + "{{ .NameSnake}}")
+_rawi, ok := d.GetOk(p + "{{.NameSnake}}")
 if ok {
     _rawi := _rawi.([]interface{})
     t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
@@ -75,7 +76,7 @@ if ok {
 {{- end -}}
 
 {{- define "singularMessage" -}}
-p := p + "{{ .NameSnake }}.0."
+p := p + "{{.NameSnake}}.0."
 {{ if .GoTypeIsPtr }}
 _obj := {{ .GoType}}{}
 t.{{ .Name }} = &_obj
@@ -84,15 +85,40 @@ t := &_obj
 t := &t.{{ .Name }}
 {{ end }}
 {{- template "fieldsUnmarshal" .Message.Fields }}
+// NOTE: remove
+p = p
+t = t
+{{- end -}}
+
+{{- define "singularMessageFold" -}}
+_raw, ok := d.GetOk(p + "{{.NameSnake}}")
+if ok {
+    {{ if .GoTypeIsPtr }}
+    _obj := {{.GoType}}{}
+    t.{{ .Name }} = &_obj
+    t := &_obj
+    {{- else -}}
+    t := &t.{{.Name}}
+    {{ end }}
+
+    {{ $folded := .Message.Fields | first }}
+    {{ template "rawToValue" $folded }}
+    {{ template "assignSingularElementary" $folded }}
+}
+// NOTE: remove
 p = p
 t = t
 {{- end -}}
 
 {{- define "singularElementary" -}}
-_raw, ok := d.GetOk(p + "{{ .NameSnake}}")
+_raw, ok := d.GetOk(p + "{{.NameSnake}}")
 if ok {
-    {{- template "rawToValue" . }}
-    _final := {{if .GoTypeIsSlice }}[]{{end}}{{.GoType}}(_value)
-    t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
+    {{ template "rawToValue" . }}
+    {{ template "assignSingularElementary" . }}
 }
+{{- end -}}
+
+{{- define "assignSingularElementary" -}}
+_final := {{if .GoTypeIsSlice }}[]{{end}}{{.GoType}}(_value)
+t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
 {{- end -}}

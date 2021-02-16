@@ -7,7 +7,7 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
-	// {{ .Name }}
+	// {{ .Name }} {{ .Kind }}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
@@ -16,41 +16,46 @@ map[string]*schema.Schema {
 {{- define "fieldSchema" -}}
 {   
     {{- if eq .Kind "REPEATED_MESSAGE" }}
-    {{- end }}
-
-    {{- if eq .Kind "REPEATED_ELEMENTARY" }}
-    {{- end }}
-
-    {{- if eq .Kind "SINGULAR_MESSAGE" }}
-    {{- end }}
-
-    {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
-    {{- end }}
-
-	Type: schema.{{ coalesce .TFSchemaAggregateType .TFSchemaType }},
-
-	{{- if .IsRequired }}
-	Required: true,
-	{{- else }}
-	Optional: true,
-	{{- end }}
-
-	{{- if .TFSchemaMaxItems }}
-	MaxItems: {{ .TFSchemaMaxItems }},
-	{{- end }}
-
-	{{- if .TFSchemaValidate }}
-	ValidateFunc: {{ .TFSchemaValidate }},
-	{{- end }}
-
-    {{- if .IsMessage }}
+    Type: schema.{{ .TFSchemaAggregateType }},
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
-    {{- else if .IsAggregate }}
+    {{- end }}
+
+    {{- if eq .Kind "REPEATED_ELEMENTARY" }}
+    Type: schema.{{ .TFSchemaAggregateType }},
     Elem: &schema.Schema {
         Type: schema.{{ .TFSchemaType }},
     },
     {{- end }}
+
+    {{- if eq .Kind "SINGULAR_MESSAGE" }}
+    Type: schema.{{ .TFSchemaAggregateType }},
+    MaxItems: 1,
+    Elem: &schema.Resource {
+        Schema: {{ template "fieldsSchema" .Message.Fields }},
+    },
+    {{- end }}
+
+    {{- if eq .Kind "SINGULAR_MESSAGE_FOLD" }}
+    {{ template "singularElementary" .Message.Fields | first }}
+    {{- end }}
+
+    {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
+    {{ template "singularElementary" . }}
+    {{- end }}
+
+    {{- if .IsRequired }}
+    Required: true,
+    {{- else }}
+    Optional: true,
+    {{- end }}
 },
+{{- end -}}
+
+{{- define "singularElementary" -}}
+Type: schema.{{ .TFSchemaType }},
+{{- if .TFSchemaValidate }}
+ValidateFunc: {{ .TFSchemaValidate }},
+{{- end }}
 {{- end -}}

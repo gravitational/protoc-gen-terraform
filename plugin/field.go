@@ -25,7 +25,6 @@ type Field struct {
 	TFSchemaGoType        string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 	TFSchemaValidate      string // Validation applied to tfschema field
 	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
-	TFSchemaMaxItems      int    // If current field has nested message, it is list with max items 1
 
 	// Field properties
 	RawGoType     string // Field type returned by gogoprotobuf
@@ -235,9 +234,6 @@ func (b *fieldBuilder) resolveType() {
 		f.IsRepeated = true
 		f.IsAggregate = true
 		f.TFSchemaAggregateType = "TypeList"
-	} else if f.IsMessage == true {
-		// Is not repeated message, still a list
-		f.TFSchemaMaxItems = 1
 	}
 
 	if b.plugin.IsMap(b.fieldDescriptor) {
@@ -283,7 +279,7 @@ func (b *fieldBuilder) setMessage() {
 }
 
 // setIsFold sets folding flag. This flag means that field is a container for a single field
-// For instance, that could be custom BoolValue with Value field
+// For instance, that could be custom BoolValue with only bool Value field, which could be set directly.
 func (b *fieldBuilder) setIsFold() {
 	f := b.field
 
@@ -307,6 +303,8 @@ func (b *fieldBuilder) setKind() {
 		f.Kind = "REPEATED_MESSAGE"
 	case f.IsAggregate && f.IsRepeated:
 		f.Kind = "REPEATED_ELEMENTARY"
+	case f.IsFold:
+		f.Kind = "SINGULAR_MESSAGE_FOLD"
 	case f.IsMessage:
 		f.Kind = "SINGULAR_MESSAGE"
 	default:

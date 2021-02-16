@@ -42,14 +42,15 @@ func (p *Plugin) buildMessage(d *generator.Descriptor) *Message {
 
 // GoUnmarshalString returns go code for this message as unmarshaller
 func (m *Message) GoUnmarshalString() (*bytes.Buffer, error) {
-	return m.renderTemplate(unmarshalTplFilename, "message")
+	return m.renderTemplate(unmarshalTplFilename, "unmarshal")
 }
 
 // GoSchemaString returns go code for this message as terraform schema
 func (m *Message) GoSchemaString() (*bytes.Buffer, error) {
-	return m.renderTemplate(schemaTplFilename, "message")
+	return m.renderTemplate(schemaTplFilename, "schema")
 }
 
+// renderTemplate renders template from embedded template
 func (m *Message) renderTemplate(fileName string, name string) (*bytes.Buffer, error) {
 	var buf bytes.Buffer
 
