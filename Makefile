@@ -23,7 +23,7 @@ teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir = "./_out"
 types = "types.UserV2+types.UserSpecV2+types.RoleV3"
-excludeFields = ""
+excludeFields = "types.UserSpecV2.LocalAuth"
 
 .PHONY: example
 example: build
