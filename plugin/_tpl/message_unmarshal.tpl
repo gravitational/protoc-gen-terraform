@@ -15,7 +15,7 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 
 {{- define "fieldUnmarshal" -}}
 // schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
-// {{ .Kind }}
+// {{ .Kind }}, Map: {{ .IsMap }}, List: {{ .IsRepeated }}
 {
 {{- if eq .Kind "REPEATED_MESSAGE" }}
     {{ template "repeatedMessage" . }}

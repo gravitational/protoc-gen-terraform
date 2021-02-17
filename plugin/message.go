@@ -8,6 +8,7 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/stoewer/go-strcase"
 
+	// go:embed won't work otherwise
 	_ "embed"
 )
 

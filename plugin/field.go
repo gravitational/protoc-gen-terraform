@@ -32,15 +32,15 @@ type Field struct {
 	// Metadata
 	Kind                string // Field kind (resulting of combination of meta flags)
 	IsRepeated          bool   // Is list
-	IsMap               bool
-	IsAggregate         bool // Is aggregate (either list or map)
-	IsMessage           bool // Is message (might be repeated in the same time)
-	IsRequired          bool // Is required TODO: implement
-	IsTime              bool // Contains time, value needs to be parsed from string
-	IsDuration          bool // Contains duration, value needs to be parsed from string
-	IsSingularContainer bool // Field contains single field
+	IsMap               bool   // Is map
+	IsMessage           bool   // Is message (might be repeated in the same time)
+	IsRequired          bool   // Is required TODO: implement
+	IsTime              bool   // Contains time, value needs to be parsed from string
+	IsDuration          bool   // Contains duration, value needs to be parsed from string
+	IsSingularContainer bool   // Field contains single field
 
-	Message *Message // Reference to nested message
+	Message       *Message // Reference to nested message
+	MapValueField *Field   // Reference to map value field reflection
 }
 
 // fieldBuilder is axilarry struct responsible for building Field
@@ -49,6 +49,20 @@ type fieldBuilder struct {
 	descriptor      *generator.Descriptor
 	fieldDescriptor *descriptor.FieldDescriptorProto
 	field           *Field
+}
+
+// fieldBuildError represents field error reflection error
+type fieldBuildError struct {
+	Message string
+}
+
+func newBuildError(message string) *fieldBuildError {
+	return &fieldBuildError{Message: message}
+}
+
+// Error returns error message
+func (e *fieldBuildError) Error() string {
+	return e.Message
 }
 
 func (p *Plugin) newFieldBuilder(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
@@ -74,7 +88,10 @@ func (b *fieldBuilder) build() bool {
 func (b *fieldBuilder) isValid() bool {
 	// Maps are temporary disabled
 	if b.field.IsMap {
-		return false
+		// NOTE: Debug
+		if b.field.Name != "Labels" {
+			return false
+		}
 	}
 
 	// No kind == invalid
@@ -213,22 +230,25 @@ func (b *fieldBuilder) resolveType() {
 	// Field value is repeated (slice)
 	if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
-		f.IsAggregate = true
 	}
 
 	if b.plugin.IsMap(b.fieldDescriptor) {
 		f.IsMap = true
-
-		x := b.plugin.GoMapType(nil, b.fieldDescriptor)
-		x = x
-		//logrus.Println(x)
+		b.reflectMap()
 	}
 
-	// Append type suffix to cast type, custom type and message
-	// Note on custom type: it is guaranteed that custom type has the same subset of fields as protobuf schema type
-	// However, it does not guarantee that custom type can be directly casted to schema type
-	// This is clearly gogoprotobuf antipattern or lack of proper implementation
+	b.prependPackageName()
+}
+
+// Append type suffix to cast type, custom type and message
+// Note on custom type: it is guaranteed that custom type has the same subset of fields as protobuf schema type
+// However, it does not guarantee that custom type can be directly casted to schema type
+func (b *fieldBuilder) prependPackageName() {
+	d := b.fieldDescriptor
+
 	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) || b.isMessage() {
+		f := b.field
+
 		l := f.GoType[0:1]
 
 		// In other words, if the first letter of a type name is uppercase, this means that type is not prefixed with
@@ -236,6 +256,22 @@ func (b *fieldBuilder) resolveType() {
 		if strings.ToLower(l) != l {
 			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
 		}
+	}
+}
+
+// reflectMap sets map value properties
+func (b *fieldBuilder) reflectMap() {
+	m := b.plugin.GoMapType(nil, b.fieldDescriptor)
+
+	keyGoType, _ := b.plugin.GoType(b.descriptor, m.KeyField)
+	if keyGoType != "string" {
+		b.plugin.Fail("Maps with non-string keys are not supported")
+	}
+
+	// break dependency
+	valueField, ok := b.plugin.reflectField(b.descriptor, m.ValueField)
+	if ok {
+		b.field.MapValueField = valueField
 	}
 }
 
@@ -248,6 +284,7 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
+	// Break dependency
 	m := b.plugin.reflectMessage(desc, true)
 
 	if m != nil {
@@ -257,36 +294,42 @@ func (b *fieldBuilder) setMessage() {
 	}
 }
 
-// setIsFold sets folding flag. This flag means that field is a container for a single field
+// setIsContainer sets folding flag. This flag means that field is a message, which has single elementary field.
 // For instance, that could be custom BoolValue with only bool Value field, which could be set directly.
 func (b *fieldBuilder) setIsContainer() {
 	f := b.field
 
-	if f.IsAggregate {
+	// Lists and maps can not be containers
+	if f.IsRepeated || f.IsMap {
 		return
 	}
 
-	m := f.Message
+	fields := f.Message.Fields
 
-	if len(m.Fields) == 1 && !m.Fields[0].IsAggregate {
+	if len(fields) == 1 && !fields[0].IsMessage {
 		f.IsSingularContainer = true
 	}
 }
 
-// setKind sets field kind which represents field kind for generation
+// setKind sets field kind which represents field meta type for generation
 func (b *fieldBuilder) setKind() {
 	f := b.field
 
 	switch {
-	case f.IsAggregate && f.IsRepeated && f.IsMessage:
-		f.Kind = "REPEATED_MESSAGE"
-	case f.IsAggregate && f.IsRepeated:
-		f.Kind = "REPEATED_ELEMENTARY"
+	case f.IsMap && f.IsRepeated:
+		// panic(newBuildError(fmt.Sprintf("Repeated maps are not supported %s %s", f.Name, f.GoType)))
+		f.Kind = ""
+	case f.IsMap:
+		f.Kind = "MAP"
+	case f.IsRepeated && f.IsMessage:
+		f.Kind = "REPEATED_MESSAGE" // ex: []struct
+	case f.IsRepeated:
+		f.Kind = "REPEATED_ELEMENTARY" // ex: []string
 	case f.IsSingularContainer:
-		f.Kind = "SINGULAR_CONTAINER"
+		f.Kind = "SINGULAR_CONTAINER" // ex: struct { bool value }
 	case f.IsMessage:
-		f.Kind = "SINGULAR_MESSAGE"
+		f.Kind = "SINGULAR_MESSAGE" // ex: struct
 	default:
-		f.Kind = "SINGULAR_ELEMENTARY"
+		f.Kind = "SINGULAR_ELEMENTARY" // ex: string
 	}
 }

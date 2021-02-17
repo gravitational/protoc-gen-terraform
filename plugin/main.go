@@ -137,8 +137,8 @@ func (p *Plugin) reflectMessage(d *generator.Descriptor, nested bool) *Message {
 func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
 	for _, f := range d.GetField() {
 		if !p.isFieldIgnored(d, f) {
-			f := p.reflectField(d, f)
-			if f != nil {
+			f, ok := p.reflectField(d, f)
+			if ok {
 				m.Fields = append(m.Fields, f)
 			}
 		}
@@ -154,10 +154,8 @@ func (p *Plugin) isFieldIgnored(d *generator.Descriptor, f *descriptor.FieldDesc
 }
 
 // reflectField builds field reflection structure, or returns nil in case field must be skipped
-func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
+func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) (*Field, bool) {
 	b := p.newFieldBuilder(d, f)
-	if b.build() {
-		return b.field
-	}
-	return nil
+	ok := b.build()
+	return b.field, ok
 }
