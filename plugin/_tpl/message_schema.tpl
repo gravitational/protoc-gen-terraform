@@ -37,7 +37,7 @@ map[string]*schema.Schema {
     },
     {{- end }}
 
-    {{- if eq .Kind "SINGULAR_MESSAGE_FOLD" }}
+    {{- if eq .Kind "ELEMENTARY_CONTAINER" }}
     {{ template "singularElementary" .Message.Fields | first }}
     {{- end }}
 

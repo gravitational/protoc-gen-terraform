@@ -23,7 +23,7 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
     {{ template "repeatedElementary" . }}
 {{- else if eq .Kind "SINGULAR_MESSAGE" }}
     {{ template "singularMessage" . }}
-{{- else if eq .Kind "SINGULAR_MESSAGE_FOLD" }}
+{{- else if eq .Kind "ELEMENTARY_CONTAINER" }}
     {{ template "singularMessageFold" . }}
 {{- else if eq .Kind "SINGULAR_ELEMENTARY" }}
     {{ template "singularElementary" . }}

@@ -30,15 +30,15 @@ type Field struct {
 	GoTypeIsPtr   bool   // Go type is a pointer
 
 	// Metadata
-	Kind        string // Field kind (resulting of combination of meta flags)
-	IsRepeated  bool   // Is list
-	IsMap       bool
-	IsAggregate bool // Is aggregate (either list or map)
-	IsMessage   bool // Is message (might be repeated in the same time)
-	IsRequired  bool // Is required TODO: implement
-	IsTime      bool // Contains time, value needs to be parsed from string
-	IsDuration  bool // Contains duration, value needs to be parsed from string
-	IsFold      bool // Field contains single field
+	Kind                       string // Field kind (resulting of combination of meta flags)
+	IsRepeated                 bool   // Is list
+	IsMap                      bool
+	IsAggregate                bool // Is aggregate (either list or map)
+	IsMessage                  bool // Is message (might be repeated in the same time)
+	IsRequired                 bool // Is required TODO: implement
+	IsTime                     bool // Contains time, value needs to be parsed from string
+	IsDuration                 bool // Contains duration, value needs to be parsed from string
+	IsElementaryValueContainer bool // Field contains single field
 
 	Message *Message // Reference to nested message
 }
@@ -253,13 +253,13 @@ func (b *fieldBuilder) setMessage() {
 	if m != nil {
 		// Nested message schema, or nil if message is not whitelisted
 		b.field.Message = m
-		b.setIsFold()
+		b.setIsContainer()
 	}
 }
 
 // setIsFold sets folding flag. This flag means that field is a container for a single field
 // For instance, that could be custom BoolValue with only bool Value field, which could be set directly.
-func (b *fieldBuilder) setIsFold() {
+func (b *fieldBuilder) setIsContainer() {
 	f := b.field
 
 	if f.IsAggregate {
@@ -268,8 +268,8 @@ func (b *fieldBuilder) setIsFold() {
 
 	m := f.Message
 
-	if len(m.Fields) == 1 {
-		f.IsFold = true
+	if len(m.Fields) == 1 && !m.Fields[0].IsAggregate {
+		f.IsElementaryValueContainer = true
 	}
 }
 
@@ -282,8 +282,8 @@ func (b *fieldBuilder) setKind() {
 		f.Kind = "REPEATED_MESSAGE"
 	case f.IsAggregate && f.IsRepeated:
 		f.Kind = "REPEATED_ELEMENTARY"
-	case f.IsFold:
-		f.Kind = "SINGULAR_MESSAGE_FOLD"
+	case f.IsElementaryValueContainer:
+		f.Kind = "ELEMENTARY_CONTAINER"
 	case f.IsMessage:
 		f.Kind = "SINGULAR_MESSAGE"
 	default:
