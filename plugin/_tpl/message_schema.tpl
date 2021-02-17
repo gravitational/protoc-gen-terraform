@@ -29,6 +29,13 @@ map[string]*schema.Schema {
     },
     {{- end }}
 
+    {{- if eq .Kind "MAP" }}
+    Type: schema.TypeMap,
+    Elem: &schema.Resource {
+        Type: {{ template "type" .MapValueField.SchemaRawType }},
+    },
+    {{- end }}
+
     {{- if eq .Kind "SINGULAR_MESSAGE" }}
     Type: schema.TypeList,
     MaxItems: 1,

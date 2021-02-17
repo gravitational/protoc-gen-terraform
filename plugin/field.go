@@ -73,7 +73,7 @@ func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.F
 		if r := recover(); r != nil {
 			e, ok := r.(*buildError)
 			if !ok {
-				panic(e)
+				panic(r)
 			}
 			logrus.Printf("%+v", e)
 		}
@@ -227,11 +227,6 @@ func (b *fieldBuilder) resolveType() {
 		return
 	}
 
-	// Field value is repeated (slice)
-	if b.fieldDescriptor.IsRepeated() {
-		f.IsRepeated = true
-	}
-
 	if b.generator.IsMap(b.fieldDescriptor) {
 		if f.Name != "Labels" {
 			panic(newBuildError("DEBUG: only labels are supported for maps"))
@@ -239,6 +234,8 @@ func (b *fieldBuilder) resolveType() {
 
 		f.IsMap = true
 		b.reflectMap()
+	} else if b.fieldDescriptor.IsRepeated() {
+		f.IsRepeated = true
 	}
 
 	b.prependPackageName()
@@ -273,9 +270,10 @@ func (b *fieldBuilder) reflectMap() {
 	}
 
 	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
-	if valueField != nil {
-		b.field.MapValueField = valueField
+	if valueField == nil {
+		panic(newBuildError(fmt.Sprintf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)))
 	}
+	b.field.MapValueField = valueField
 }
 
 // setMessage sets reference to nested message
@@ -319,13 +317,14 @@ func (b *fieldBuilder) setIsContainer() {
 func (b *fieldBuilder) setKind() {
 	f := b.field
 
-	if f.IsMap && f.IsRepeated {
-		panic(newBuildError(fmt.Sprintf("Repeated maps are not supported %s %s", f.Name, f.GoType)))
-	}
+	// if f.IsMap && f.IsRepeated {
+	// 	panic(newBuildError(fmt.Sprintf("Repeated maps are not supported %s %s", f.Name, f.GoType)))
+	// }
 
 	switch {
 	case f.IsMap:
 		f.Kind = "MAP"
+		logrus.Printf("MAP", f.MapValueField)
 	case f.IsRepeated && f.IsMessage:
 		f.Kind = "REPEATED_MESSAGE" // ex: []struct
 	case f.IsRepeated:
