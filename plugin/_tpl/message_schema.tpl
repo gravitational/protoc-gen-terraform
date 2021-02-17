@@ -31,8 +31,15 @@ map[string]*schema.Schema {
 
     {{- if eq .Kind "MAP" }}
     Type: schema.TypeMap,
-    Elem: &schema.Resource {
+    Elem: &schema.Schema {
         Type: {{ template "type" .MapValueField.SchemaRawType }},
+    },
+    {{- end }}
+
+{{- if eq .Kind "MAP_MESSAGE" }}
+    Type: schema.TypeMap,
+    Elem: &schema.Resource {
+        Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
     {{- end }}
 

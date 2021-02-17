@@ -7,6 +7,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
+	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
 
@@ -43,6 +44,13 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 
 	if cache[typeName] != nil {
 		return cache[typeName]
+	}
+
+	for _, field := range d.GetField() {
+		if field.OneofIndex != nil {
+			logrus.Println("Oneof messages are not supported yet")
+			return nil
+		}
 	}
 
 	name := d.GetName()

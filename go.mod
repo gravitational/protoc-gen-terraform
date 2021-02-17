@@ -16,4 +16,5 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
+	github.com/vigo/go-inspect v0.0.0-20180830132450-6e1c9f930fff
 )

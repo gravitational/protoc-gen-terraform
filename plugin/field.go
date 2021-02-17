@@ -81,13 +81,12 @@ func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.F
 
 	b := newFieldBuilder(g, d, f)
 	b.build()
-
 	return b.field
 }
 
 // getFieldTypeName returns field name with package
 func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) string {
-	return getMessageTypeName(d) + "+" + f.GetName()
+	return getMessageTypeName(d) + "." + f.GetName()
 }
 
 func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
@@ -228,12 +227,12 @@ func (b *fieldBuilder) resolveType() {
 	}
 
 	if b.generator.IsMap(b.fieldDescriptor) {
-		if f.Name != "Labels" {
-			panic(newBuildError("DEBUG: only labels are supported for maps"))
-		}
+		// if f.Name != "Labels" {
+		// 	panic(newBuildError("DEBUG: only labels are supported for maps"))
+		// }
 
 		f.IsMap = true
-		b.reflectMap()
+		b.setMap()
 	} else if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 	}
@@ -261,7 +260,7 @@ func (b *fieldBuilder) prependPackageName() {
 }
 
 // reflectMap sets map value properties
-func (b *fieldBuilder) reflectMap() {
+func (b *fieldBuilder) setMap() {
 	m := b.generator.GoMapType(nil, b.fieldDescriptor)
 
 	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
@@ -317,14 +316,15 @@ func (b *fieldBuilder) setIsContainer() {
 func (b *fieldBuilder) setKind() {
 	f := b.field
 
-	// if f.IsMap && f.IsRepeated {
-	// 	panic(newBuildError(fmt.Sprintf("Repeated maps are not supported %s %s", f.Name, f.GoType)))
-	// }
+	if f.IsMap && f.MapValueField.IsMessage {
+		panic(newBuildError(fmt.Sprintf("Maps of resources are not supported by Terraform %s %s", f.Name, f.GoType)))
+	}
 
 	switch {
+	case f.IsMap && f.MapValueField.IsMessage:
+		f.Kind = "MAP_MESSAGE"
 	case f.IsMap:
 		f.Kind = "MAP"
-		logrus.Printf("MAP", f.MapValueField)
 	case f.IsRepeated && f.IsMessage:
 		f.Kind = "REPEATED_MESSAGE" // ex: []struct
 	case f.IsRepeated:
