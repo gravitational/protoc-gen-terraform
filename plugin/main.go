@@ -1,37 +1,24 @@
 package plugin
 
 import (
-	"strings"
-
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
+	"github.com/gzigzigzeo/protoc-gen-terraform/config"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/stew/slice"
 )
 
 const (
-	name           = "terraform"                                                      // Plugin name
-	schemaPkg      = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
-	validationPkg  = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
-	paramDelimiter = "+"                                                              // Delimiter for types and ignoreFields
+	name          = "terraform"                                                      // Plugin name
+	schemaPkg     = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
+	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
 )
 
 // Plugin is terraform generator plugin
 type Plugin struct {
 	*generator.Generator
 	generator.PluginImports
-
-	// The list of types to export. This list must be explicit. In case, a type is not listed, it would not be
-	// present in output along with all fields which reference it. This is the way of keeping a structures private.
-	//
-	// Passed from command line (--terraform_out=types=types.UserV2:./_out)
-	types []string
-
-	// The list of fields to ignore.
-	//
-	// Passed from command line (--terraform_out=excludeFields=types.UserV2.Expires:./_out)
-	excludeFields []string
 
 	// Map of reflected messages, public just in case some post analysis is required
 	Messages map[string]*Message
@@ -48,15 +35,8 @@ func NewPlugin() *Plugin {
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
-	p.types = strings.Split(g.Param["types"], paramDelimiter)
-	p.excludeFields = strings.Split(g.Param["excludeFields"], paramDelimiter)
-
-	if len(p.types) == 0 {
-		logrus.Fatal("Please, specify explicit top level type list, eg. --terraform-out=types=UserV2+UserSpecV2:./_out")
-	}
-
-	logrus.Printf("Types: %s", p.types)
-	logrus.Printf("Excluded fields: %s", p.excludeFields)
+	config.ParseTypes(g.Param["types"])
+	config.ParseExcludeFields(g.Param["excludeFields"])
 }
 
 // Name returns the name of the plugin
@@ -107,7 +87,7 @@ func (p *Plugin) setImports() {
 // isMessageRequired returns true if message was marked for export via command-line args
 func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
 	typeName := d.File().GetPackage() + "." + d.GetName()
-	required := slice.Contains(p.types, typeName)
+	required := slice.Contains(config.Types, typeName)
 
 	return required
 }
@@ -120,15 +100,15 @@ func (p *Plugin) reflectMessage(d *generator.Descriptor, nested bool) *Message {
 
 	name := d.GetName()
 
-	if p.Messages[name] != nil {
-		return p.Messages[name]
-	}
+	// if p.Messages[name] != nil {
+	// 	return p.Messages[name]
+	// }
 
 	message := p.buildMessage(d)
 
-	if !nested {
-		p.Messages[name] = message
-	}
+	// if !nested {
+	// 	p.Messages[name] = message
+	// }
 
 	return message
 }
@@ -148,7 +128,7 @@ func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
 // isMessageRequired returns true if message was marked for export via command-line args
 func (p *Plugin) isFieldIgnored(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) bool {
 	fieldName := d.File().GetPackage() + "." + d.GetName() + "." + f.GetName()
-	ignored := slice.Contains(p.excludeFields, fieldName)
+	ignored := slice.Contains(config.ExcludeFields, fieldName)
 
 	return ignored
 }
