@@ -6,7 +6,9 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gzigzigzeo/protoc-gen-terraform/config"
 	"github.com/stoewer/go-strcase"
+	"github.com/stretchr/stew/slice"
 
 	// go:embed won't work otherwise
 	_ "embed"
@@ -17,6 +19,8 @@ var (
 	schemaTpl string
 	//go:embed _tpl/message_unmarshal.tpl
 	unmarshalTpl string
+	// Message descriptor cache
+	cache map[string]*Message = make(map[string]*Message)
 )
 
 // Message holds reflection information about message
@@ -28,19 +32,35 @@ type Message struct {
 	// TODO: Comments
 }
 
-// build Builds message
-func (p *Plugin) buildMessage(d *generator.Descriptor) *Message {
+// BuildMessage builds Message from it's protobuf descriptor
+// checkValiditiy is should be false for nested fields, otherwise we'll have to be over-explicit in allowed type
+func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) *Message {
+	typeName := getMessageTypeName(d)
+
+	if !slice.Contains(config.Types, typeName) && checkValidity {
+		return nil
+	}
+
+	if cache[typeName] != nil {
+		return cache[typeName]
+	}
+
 	name := d.GetName()
 
-	message := &Message{}
+	message := &Message{
+		Name:       name,
+		NameSnake:  strcase.SnakeCase(name),
+		GoTypeName: typeName,
+	}
 
-	message.Name = name
-	message.NameSnake = strcase.SnakeCase(name)
-	message.GoTypeName = d.File().GetPackage() + "." + name
-
-	p.reflectFields(message, d)
+	BuildFields(message, g, d)
 
 	return message
+}
+
+// getMessageTypeName returns full message name
+func getMessageTypeName(d *generator.Descriptor) string {
+	return d.File().GetPackage() + "." + d.GetName()
 }
 
 // GoUnmarshalString returns go code for this message as unmarshaller

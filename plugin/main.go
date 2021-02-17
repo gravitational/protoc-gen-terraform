@@ -1,12 +1,10 @@
 package plugin
 
 import (
-	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/stew/slice"
 )
 
 const (
@@ -51,7 +49,10 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	p.setImports()
 
 	for _, message := range file.Messages() {
-		p.reflectMessage(message, false)
+		m := BuildMessage(p.Generator, message, true)
+		if m != nil {
+			p.Messages[m.GoTypeName] = m
+		}
 	}
 
 	for _, message := range p.Messages {
@@ -84,58 +85,60 @@ func (p *Plugin) setImports() {
 	p.AddImport("github.com/gravitational/teleport/api/types/wrappers")
 }
 
-// isMessageRequired returns true if message was marked for export via command-line args
-func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
-	typeName := d.File().GetPackage() + "." + d.GetName()
-	required := slice.Contains(config.Types, typeName)
+// // isMessageRequired returns true if message was marked for export via command-line args
+// func (p *Plugin) isMessageRequired(d *generator.Descriptor) bool {
+// 	typeName := d.File().GetPackage() + "." + d.GetName()
+// 	required := slice.Contains(config.Types, typeName)
 
-	return required
-}
+// 	return required
+// }
 
-// reflectMessage reflects message type
-func (p *Plugin) reflectMessage(d *generator.Descriptor, nested bool) *Message {
-	if !nested && !p.isMessageRequired(d) {
-		return nil
-	}
+// // reflectMessage reflects message type
+// func (p *Plugin) reflectMessage(d *generator.Descriptor, nested bool) *Message {
+// 	if !nested && !p.isMessageRequired(d) {
+// 		return nil
+// 	}
 
-	name := d.GetName()
+// 	logrus.Println(d.GetName())
 
-	// if p.Messages[name] != nil {
-	// 	return p.Messages[name]
-	// }
+// 	name := d.GetName()
 
-	message := p.buildMessage(d)
+// 	if p.Messages[name] != nil {
+// 		return p.Messages[name]
+// 	}
 
-	// if !nested {
-	// 	p.Messages[name] = message
-	// }
+// 	message := p.buildMessage(d)
 
-	return message
-}
+// 	if !nested {
+// 		p.Messages[name] = message
+// 	}
 
-// reflectFields builds array of message.Fields
-func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
-	for _, f := range d.GetField() {
-		if !p.isFieldIgnored(d, f) {
-			f, ok := p.reflectField(d, f)
-			if ok {
-				m.Fields = append(m.Fields, f)
-			}
-		}
-	}
-}
+// 	return message
+// }
 
-// isMessageRequired returns true if message was marked for export via command-line args
-func (p *Plugin) isFieldIgnored(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) bool {
-	fieldName := d.File().GetPackage() + "." + d.GetName() + "." + f.GetName()
-	ignored := slice.Contains(config.ExcludeFields, fieldName)
+// // reflectFields builds array of message.Fields
+// func (p *Plugin) reflectFields(m *Message, d *generator.Descriptor) {
+// 	for _, f := range d.GetField() {
+// 		if !p.isFieldIgnored(d, f) {
+// 			f, ok := p.reflectField(d, f)
+// 			if ok {
+// 				m.Fields = append(m.Fields, f)
+// 			}
+// 		}
+// 	}
+// }
 
-	return ignored
-}
+// // isMessageRequired returns true if message was marked for export via command-line args
+// func (p *Plugin) isFieldIgnored(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) bool {
+// 	fieldName := d.File().GetPackage() + "." + d.GetName() + "." + f.GetName()
+// 	ignored := slice.Contains(config.ExcludeFields, fieldName)
 
-// reflectField builds field reflection structure, or returns nil in case field must be skipped
-func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) (*Field, bool) {
-	b := p.newFieldBuilder(d, f)
-	ok := b.build()
-	return b.field, ok
-}
+// 	return ignored
+// }
+
+// // reflectField builds field reflection structure, or returns nil in case field must be skipped
+// func (p *Plugin) reflectField(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) (*Field, bool) {
+// 	b := p.newFieldBuilder(d, f)
+// 	ok := b.build()
+// 	return b.field, ok
+// }

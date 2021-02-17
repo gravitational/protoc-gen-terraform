@@ -6,7 +6,9 @@ import (
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gzigzigzeo/protoc-gen-terraform/config"
 	"github.com/stoewer/go-strcase"
+	"github.com/stretchr/stew/slice"
 )
 
 const (
@@ -45,29 +47,46 @@ type Field struct {
 
 // fieldBuilder is axilarry struct responsible for building Field
 type fieldBuilder struct {
-	plugin          *Plugin
+	generator       *generator.Generator
 	descriptor      *generator.Descriptor
 	fieldDescriptor *descriptor.FieldDescriptorProto
 	field           *Field
 }
 
-// fieldBuildError represents field error reflection error
-type fieldBuildError struct {
-	Message string
+// BuildFields builds []*Field from descriptors of specified message
+func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
+	for _, f := range d.GetField() {
+		typeName := getFieldTypeName(d, f)
+
+		if slice.Contains(config.ExcludeFields, typeName) {
+			continue
+		}
+
+		f := BuildField(g, d, f)
+		if f != nil {
+			m.Fields = append(m.Fields, f)
+		}
+	}
 }
 
-func newBuildError(message string) *fieldBuildError {
-	return &fieldBuildError{Message: message}
+// BuildField builds field reflection structure, or returns nil in case field build failed
+func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
+	b := newFieldBuilder(g, d, f)
+	ok := b.build()
+	if ok {
+		return b.field
+	}
+	return nil
 }
 
-// Error returns error message
-func (e *fieldBuildError) Error() string {
-	return e.Message
+// getFieldTypeName returns field name with package
+func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) string {
+	return getMessageTypeName(d) + "+" + f.GetName()
 }
 
-func (p *Plugin) newFieldBuilder(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
+func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
 	return &fieldBuilder{
-		plugin:          p,
+		generator:       g,
 		descriptor:      d,
 		fieldDescriptor: f,
 		field:           &Field{},
@@ -160,7 +179,7 @@ func (b *fieldBuilder) setGoType() {
 	f := b.field // shortrut
 
 	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
-	goType, _ := b.plugin.GoType(b.descriptor, b.fieldDescriptor)
+	goType, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
 	f.RawGoType = goType
 	f.GoType = goType
 
@@ -223,7 +242,7 @@ func (b *fieldBuilder) resolveType() {
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setSchemaTypes("string", "string")
 	default:
-		b.plugin.Generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
+		b.generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
 		return
 	}
 
@@ -232,7 +251,7 @@ func (b *fieldBuilder) resolveType() {
 		f.IsRepeated = true
 	}
 
-	if b.plugin.IsMap(b.fieldDescriptor) {
+	if b.generator.IsMap(b.fieldDescriptor) {
 		f.IsMap = true
 		b.reflectMap()
 	}
@@ -261,16 +280,15 @@ func (b *fieldBuilder) prependPackageName() {
 
 // reflectMap sets map value properties
 func (b *fieldBuilder) reflectMap() {
-	m := b.plugin.GoMapType(nil, b.fieldDescriptor)
+	m := b.generator.GoMapType(nil, b.fieldDescriptor)
 
-	keyGoType, _ := b.plugin.GoType(b.descriptor, m.KeyField)
+	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
 	if keyGoType != "string" {
-		b.plugin.Fail("Maps with non-string keys are not supported")
+		b.generator.Fail("Maps with non-string keys are not supported")
 	}
 
-	// break dependency
-	valueField, ok := b.plugin.reflectField(b.descriptor, m.ValueField)
-	if ok {
+	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
+	if valueField != nil {
 		b.field.MapValueField = valueField
 	}
 }
@@ -278,14 +296,14 @@ func (b *fieldBuilder) reflectMap() {
 // setMessage sets reference to nested message
 func (b *fieldBuilder) setMessage() {
 	// Resolve underlying message via protobuf
-	x := b.plugin.ObjectNamed(b.fieldDescriptor.GetTypeName())
+	x := b.generator.ObjectNamed(b.fieldDescriptor.GetTypeName())
 	desc, ok := x.(*generator.Descriptor)
 	if desc == nil || !ok {
 		return
 	}
 
 	// Break dependency
-	m := b.plugin.reflectMessage(desc, true)
+	m := BuildMessage(b.generator, desc, false)
 
 	if m != nil {
 		// Nested message schema, or nil if message is not whitelisted
