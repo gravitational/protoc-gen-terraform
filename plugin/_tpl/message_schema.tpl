@@ -7,64 +7,63 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
-	// {{ .Name }} {{ .Kind }}
+	// {{ .Name }} {{ .Kind }} Container: {{ .IsSingularContainer }}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
 {{- end -}}
 
 {{- define "fieldSchema" -}}
-{   
-    {{- if eq .Kind "REPEATED_MESSAGE" }}
-    Type: schema.TypeList,
-    Elem: &schema.Resource {
-        Schema: {{ template "fieldsSchema" .Message.Fields }},
-    },
-    {{- end }}
-
-    {{- if eq .Kind "REPEATED_ELEMENTARY" }}
-    Type: schema.TypeList,
-    Elem: &schema.Schema {
-        Type: {{ template "type" .SchemaRawType }},
-    },
-    {{- end }}
-
-    {{- if eq .Kind "MAP" }}
-    Type: schema.TypeMap,
-    Elem: &schema.Schema {
-        Type: {{ template "type" .MapValueField.SchemaRawType }},
-    },
-    {{- end }}
-
-{{- if eq .Kind "MAP_MESSAGE" }}
-    Type: schema.TypeMap,
-    Elem: &schema.Resource {
-        Schema: {{ template "fieldsSchema" .Message.Fields }},
-    },
-    {{- end }}
-
-    {{- if eq .Kind "SINGULAR_MESSAGE" }}
-    Type: schema.TypeList,
-    MaxItems: 1,
-    Elem: &schema.Resource {
-        Schema: {{ template "fieldsSchema" .Message.Fields }},
-    },
-    {{- end }}
-
-    {{- if eq .Kind "SINGULAR_CONTAINER" }}
-    {{ template "singularElementary" .Message.Fields | first }}
-    {{- end }}
-
-    {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
-    {{ template "singularElementary" . }}
-    {{- end }}
-
-    {{- if .IsRequired }}
-    Required: true,
-    {{- else }}
-    Optional: true,
-    {{- end }}
+{{- if eq .Kind "REPEATED_MESSAGE" }}
+{
+    {{ template "required" . }}
+    {{ template "repeatedMessage" . }}
 },
+{{- end }}
+
+{{- if eq .Kind "REPEATED_ELEMENTARY" }}
+{
+    {{ template "required" . }}
+    {{ template "repeatedElementary" . }}
+},
+{{- end }}
+
+{{- if eq .Kind "MAP" }}
+{
+    {{ template "required" . }}
+    {{ template "map" . }}
+},
+{{- end }}
+
+{{- if eq .Kind "ARTIFICIAL_OBJECT_MAP" }}
+{
+    {{ template "required" . }}
+    {{ template "artificialObjectMap" . }}
+},
+{{- end }}
+
+{{- if eq .Kind "SINGULAR_MESSAGE" }}
+{{- if .IsSingularContainer }}
+    {{- template "fieldSchema" .Message.Fields | first }}
+{{ else }}
+    {
+        {{ template "required" . }}
+        Type: schema.TypeList,
+        MaxItems: 1,
+        Elem: &schema.Resource {
+            Schema: {{ template "fieldsSchema" .Message.Fields }},
+        },
+    },
+{{ end }}
+{{- end }}
+
+{{- if eq .Kind "SINGULAR_ELEMENTARY" }}
+{
+    {{ template "singularElementary" . }}
+    {{ template "required" . }}    
+},
+{{- end }}
+
 {{- end -}}
 
 {{- define "singularElementary" -}}
@@ -72,6 +71,38 @@ Type: {{ template "type" .SchemaRawType }},
 {{- if .IsTime }}
 ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
+{{- end -}}
+
+{{- define "repeatedMessage" -}}
+Type: schema.TypeList,
+Elem: &schema.Resource {
+    Schema: {{ template "fieldsSchema" .Message.Fields }},
+},
+{{- end -}}
+
+{{- define "repeatedElementary" -}}
+Type: schema.TypeList,
+Elem: &schema.Schema {
+    Type: {{ template "type" .SchemaRawType }},
+},
+{{- end -}}
+
+{{- define "map" -}}
+Type: schema.TypeMap,
+Elem: &schema.Schema {
+    Type: {{ template "type" .MapValueField.SchemaRawType }},
+},
+{{- end -}}
+
+{{- define "artificialObjectMap" -}}
+Type: schema.TypeList,
+Elem: &schema.Resource {
+    "name": {
+        Type: schema.TypeString,
+        Required: true,
+    },
+    "value": {{ template "fieldSchema" .MapValueField }}
+},
 {{- end -}}
 
 {{- define "type" -}}
@@ -83,5 +114,13 @@ schema.TypeInt
 schema.TypeBool
 {{- else if eq . "string" -}}
 schema.TypeString
+{{- end -}}
+{{- end -}}
+
+{{- define "required" -}}
+{{- if .IsRequired -}}
+Required: true,
+{{- else -}}
+Optional: true,
 {{- end -}}
 {{- end -}}

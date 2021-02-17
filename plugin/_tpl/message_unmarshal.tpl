@@ -92,6 +92,7 @@ p := p + "{{.NameSnake}}"
 
 {{ template "getOk" . }}
 if ok {
+    {{ template "initMessage" . }}
     {{ template "rawToValue" . }}
     {{ template "assignSingularElementary" . }}
 }

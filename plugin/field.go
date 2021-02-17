@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
+	inspect "github.com/vigo/go-inspect"
 )
 
 // Field represents field reflection struct
@@ -227,10 +228,6 @@ func (b *fieldBuilder) resolveType() {
 	}
 
 	if b.generator.IsMap(b.fieldDescriptor) {
-		// if f.Name != "Labels" {
-		// 	panic(newBuildError("DEBUG: only labels are supported for maps"))
-		// }
-
 		f.IsMap = true
 		b.setMap()
 	} else if b.fieldDescriptor.IsRepeated() {
@@ -307,7 +304,7 @@ func (b *fieldBuilder) setIsContainer() {
 
 	fields := f.Message.Fields
 
-	if len(fields) == 1 && !fields[0].IsMessage {
+	if len(fields) == 1 {
 		f.IsSingularContainer = true
 	}
 }
@@ -316,21 +313,17 @@ func (b *fieldBuilder) setIsContainer() {
 func (b *fieldBuilder) setKind() {
 	f := b.field
 
-	if f.IsMap && f.MapValueField.IsMessage {
-		panic(newBuildError(fmt.Sprintf("Maps of resources are not supported by Terraform %s %s", f.Name, f.GoType)))
-	}
-
 	switch {
 	case f.IsMap && f.MapValueField.IsMessage:
-		f.Kind = "MAP_MESSAGE"
+		logrus.Println(inspect.Element(f.MapValueField))
+		logrus.Println(inspect.Element(f.Message))
+		f.Kind = "ARTIFICIAL_OBJECT_MAP"
 	case f.IsMap:
 		f.Kind = "MAP"
 	case f.IsRepeated && f.IsMessage:
 		f.Kind = "REPEATED_MESSAGE" // ex: []struct
 	case f.IsRepeated:
 		f.Kind = "REPEATED_ELEMENTARY" // ex: []string
-	case f.IsSingularContainer:
-		f.Kind = "SINGULAR_CONTAINER" // ex: struct { bool value }
 	case f.IsMessage:
 		f.Kind = "SINGULAR_MESSAGE" // ex: struct
 	default:
