@@ -15,18 +15,25 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 
 {{- define "fieldUnmarshal" -}}
 // schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
-// {{ .Kind }}, Map: {{ .IsMap }}, List: {{ .IsRepeated }}
+// {{ .Kind }}, Map: {{ .IsMap }}, List: {{ .IsRepeated }}, Container: {{ .IsContainer }}
 {
 {{- if eq .Kind "REPEATED_MESSAGE" }}
     {{ template "repeatedMessage" . }}
 {{- else if eq .Kind "REPEATED_ELEMENTARY" }}
     {{ template "repeatedElementary" . }}
 {{- else if eq .Kind "SINGULAR_MESSAGE" }}
+{{- if .IsContainer }}
+    {{ template "container" . }}
+{{- else }}
     {{ template "singularMessage" . }}
-{{- else if eq .Kind "SINGULAR_CONTAINER" }}
-    {{ template "singularContainer" . }}
+{{- end }}
 {{- else if eq .Kind "SINGULAR_ELEMENTARY" }}
     {{ template "singularElementary" . }}
+{{- else if eq .Kind "MAP" }}
+    {{ template "map" . }}
+{{- else if eq .Kind "ARTIFICIAL_OBJECT_MAP" }}
+    _raw = _raw
+    t = t
 {{- end }}
 }
 {{- end -}}
@@ -40,7 +47,7 @@ if ok {
     for i := 0; i < len(_rawi); i++ {
         t := &t.{{ .Name }}[i]
         p := p + fmt.Sprintf(".%v.", i)
-        {{- template "fieldsUnmarshal" .Message.Fields }}            
+        {{- template "fieldsUnmarshal" .Message.Fields }}
     }
 }
 {{- end -}}
@@ -55,7 +62,7 @@ if ok {
         _raw := _rawi[i]
         {{- template "rawToValue" . }}
         _final := {{.GoType}}(_value)
-        t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_final            
+        t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_final
     }
 }
 {{- end -}}
@@ -67,24 +74,13 @@ p := p + "{{.NameSnake}}.0."
 
 {{ template "initMessage" . }}
 {{ template "fieldsUnmarshal" .Message.Fields }}
-// NOTE: remove
-p = p
-t = t
 {{- end -}}
 
-{{- define "singularContainer" -}}
+{{- define "container" -}}
 {{ $folded := .Message.Fields | first }}
 p := p + "{{.NameSnake}}"
-
-{{ template "getOk" $folded }}
-if ok {
-    {{ template "initMessage" . }}
-    {{ template "rawToValue" $folded }}
-    {{ template "assignSingularElementary" $folded }}
-}
-// NOTE: remove
-p = p
-t = t
+{{ template "initMessage" . }}
+{{ template "fieldUnmarshal" $folded }}
 {{- end -}}
 
 {{- define "singularElementary" -}}
@@ -92,9 +88,24 @@ p := p + "{{.NameSnake}}"
 
 {{ template "getOk" . }}
 if ok {
-    {{ template "initMessage" . }}
     {{ template "rawToValue" . }}
     {{ template "assignSingularElementary" . }}
+}
+{{- end -}}
+
+{{- define "map" -}}
+{{ $m := .MapValueField }}
+p := p + "{{.NameSnake}}"
+_rawm, ok := d.GetOk(p)
+if ok {
+    _rawm := _rawm.(map[string]interface{})
+    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawm))
+    for _k, _v := range _rawm {
+        _raw := _v
+        {{- template "rawToValue" $m }}
+        _final := {{if $m.GoTypeIsSlice }}[]{{end}}{{$m.GoType}}(_value)
+        t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_final
+    }   
 }
 {{- end -}}
 

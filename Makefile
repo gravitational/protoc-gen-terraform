@@ -22,8 +22,8 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
-# types = "types.UserV2+types.UserSpecV2+types.RoleV3"
-types = "types.RoleConditions+types.RoleOptions"
+types = "types.UserV2+types.UserSpecV2+types.RoleV3"
+# types = "types.Metadata"
 excludeFields = "types.UserSpecV2.LocalAuth"
 
 .PHONY: example

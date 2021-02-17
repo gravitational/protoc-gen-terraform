@@ -7,7 +7,7 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
-	// {{ .Name }} {{ .Kind }} Container: {{ .IsSingularContainer }}
+	// {{ .Name }} {{ .Kind }}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
@@ -43,7 +43,7 @@ map[string]*schema.Schema {
 {{- end }}
 
 {{- if eq .Kind "SINGULAR_MESSAGE" }}
-{{- if .IsSingularContainer }}
+{{- if .IsContainer }}
     {{- template "fieldSchema" .Message.Fields | first }}
 {{ else }}
     {
@@ -97,11 +97,13 @@ Elem: &schema.Schema {
 {{- define "artificialObjectMap" -}}
 Type: schema.TypeList,
 Elem: &schema.Resource {
-    "name": {
-        Type: schema.TypeString,
-        Required: true,
+    Schema: map[string]*schema.Schema{
+        "key": {
+            Type: schema.TypeString,
+            Required: true,
+        },
+        "value": {{ template "fieldSchema" .MapValueField }}
     },
-    "value": {{ template "fieldSchema" .MapValueField }}
 },
 {{- end -}}
 

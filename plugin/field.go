@@ -11,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
-	inspect "github.com/vigo/go-inspect"
 )
 
 // Field represents field reflection struct
@@ -31,14 +30,14 @@ type Field struct {
 	GoTypeIsPtr   bool   // Go type is a pointer
 
 	// Metadata
-	Kind                string // Field kind (resulting of combination of meta flags)
-	IsRepeated          bool   // Is list
-	IsMap               bool   // Is map
-	IsMessage           bool   // Is message (might be repeated in the same time)
-	IsRequired          bool   // Is required TODO: implement
-	IsTime              bool   // Contains time, value needs to be parsed from string
-	IsDuration          bool   // Contains duration, value needs to be parsed from string
-	IsSingularContainer bool   // Field contains single field
+	Kind        string // Field kind (resulting of combination of meta flags)
+	IsRepeated  bool   // Is list
+	IsMap       bool   // Is map
+	IsMessage   bool   // Is message (might be repeated in the same time)
+	IsRequired  bool   // Is required TODO: implement
+	IsTime      bool   // Contains time, value needs to be parsed from string
+	IsDuration  bool   // Contains duration, value needs to be parsed from string
+	IsContainer bool   // Field contains single field
 
 	Message       *Message // Reference to nested message
 	MapValueField *Field   // Reference to map value field reflection
@@ -292,8 +291,8 @@ func (b *fieldBuilder) setMessage() {
 	b.setIsContainer()
 }
 
-// setIsContainer sets folding flag. This flag means that field is a message, which has single elementary field.
-// For instance, that could be custom BoolValue with only bool Value field, which could be set directly.
+// setIsContainer sets folding flag. This flag means that field is a message having single elementary field.
+// There is no point to have redundant nesting.
 func (b *fieldBuilder) setIsContainer() {
 	f := b.field
 
@@ -305,7 +304,7 @@ func (b *fieldBuilder) setIsContainer() {
 	fields := f.Message.Fields
 
 	if len(fields) == 1 {
-		f.IsSingularContainer = true
+		f.IsContainer = true
 	}
 }
 
@@ -315,11 +314,10 @@ func (b *fieldBuilder) setKind() {
 
 	switch {
 	case f.IsMap && f.MapValueField.IsMessage:
-		logrus.Println(inspect.Element(f.MapValueField))
-		logrus.Println(inspect.Element(f.Message))
-		f.Kind = "ARTIFICIAL_OBJECT_MAP"
+		// Terraform does not support map of objects. We replace such field with list of objects having key and value fields.
+		f.Kind = "ARTIFICIAL_OBJECT_MAP" // ex: map[string]struct, requires additional steps to unmarshal
 	case f.IsMap:
-		f.Kind = "MAP"
+		f.Kind = "MAP" // ex: map[string]string
 	case f.IsRepeated && f.IsMessage:
 		f.Kind = "REPEATED_MESSAGE" // ex: []struct
 	case f.IsRepeated:
