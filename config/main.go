@@ -16,6 +16,11 @@ var (
 	//
 	// Passed from command line (--terraform_out=excludeFields=types.UserV2.Expires:./_out)
 	ExcludeFields []string
+
+	// NOTE: namespace? list?
+
+	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
+	DurationCustomType = "Duration"
 )
 
 const (

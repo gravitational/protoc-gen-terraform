@@ -1,15 +1,15 @@
 package plugin
 
-// fieldBuildError represents field error reflection error
-type fieldBuildError struct {
+// buildError represents field error reflection error
+type buildError struct {
 	Message string
 }
 
-func newBuildError(message string) *fieldBuildError {
-	return &fieldBuildError{Message: message}
+func newBuildError(message string) *buildError {
+	return &buildError{Message: message}
 }
 
 // Error returns error message
-func (e *fieldBuildError) Error() string {
+func (e *buildError) Error() string {
 	return e.Message
 }

@@ -1,18 +1,16 @@
 package plugin
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
+	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
-)
-
-const (
-	durationCustomType = "Duration" // This type name will be treated as extendee of time.Duration, TODO: Parameterize?
 )
 
 // Field represents field reflection struct
@@ -71,12 +69,20 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
 
 // BuildField builds field reflection structure, or returns nil in case field build failed
 func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
+	defer func() {
+		if r := recover(); r != nil {
+			e, ok := r.(*buildError)
+			if !ok {
+				panic(e)
+			}
+			logrus.Printf("%+v", e)
+		}
+	}()
+
 	b := newFieldBuilder(g, d, f)
-	ok := b.build()
-	if ok {
-		return b.field
-	}
-	return nil
+	b.build()
+
+	return b.field
 }
 
 // getFieldTypeName returns field name with package
@@ -94,36 +100,11 @@ func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descrip
 }
 
 // build fills in a Field structure
-func (b *fieldBuilder) build() bool {
+func (b *fieldBuilder) build() {
 	b.setName()
 	b.setGoType()
 	b.resolveType()
 	b.setKind()
-
-	return b.isValid()
-}
-
-// isValid returns true if built type is valid
-func (b *fieldBuilder) isValid() bool {
-	// Maps are temporary disabled
-	if b.field.IsMap {
-		// NOTE: Debug
-		if b.field.Name != "Labels" {
-			return false
-		}
-	}
-
-	// No kind == invalid
-	if b.field.Kind == "" {
-		return false
-	}
-
-	// If field is message, but underlying message failed to reflect (is invalid)
-	if b.field.IsMessage && b.field.Message == nil {
-		return false
-	}
-
-	return true
 }
 
 // setName sets the field name
@@ -163,7 +144,7 @@ func (b *fieldBuilder) isDuration() bool {
 
 	isStdDuration := gogoproto.IsStdDuration(b.fieldDescriptor)
 	isGoogleDuration := (t != nil && strings.HasSuffix(*t, "google.protobuf.Duration"))
-	isCastToCustomDuration := ct == durationCustomType
+	isCastToCustomDuration := ct == config.DurationCustomType
 	isCastToDuration := ct == "time.Duration"
 
 	return isStdDuration || isGoogleDuration || isCastToDuration || isCastToCustomDuration
@@ -252,6 +233,10 @@ func (b *fieldBuilder) resolveType() {
 	}
 
 	if b.generator.IsMap(b.fieldDescriptor) {
+		if f.Name != "Labels" {
+			panic(newBuildError("DEBUG: only labels are supported for maps"))
+		}
+
 		f.IsMap = true
 		b.reflectMap()
 	}
@@ -304,12 +289,13 @@ func (b *fieldBuilder) setMessage() {
 
 	// Break dependency
 	m := BuildMessage(b.generator, desc, false)
-
-	if m != nil {
-		// Nested message schema, or nil if message is not whitelisted
-		b.field.Message = m
-		b.setIsContainer()
+	if m == nil {
+		panic(newBuildError("Nested message is invalid"))
 	}
+
+	// Nested message schema, or nil if message is not whitelisted
+	b.field.Message = m
+	b.setIsContainer()
 }
 
 // setIsContainer sets folding flag. This flag means that field is a message, which has single elementary field.
@@ -333,10 +319,11 @@ func (b *fieldBuilder) setIsContainer() {
 func (b *fieldBuilder) setKind() {
 	f := b.field
 
+	if f.IsMap && f.IsRepeated {
+		panic(newBuildError(fmt.Sprintf("Repeated maps are not supported %s %s", f.Name, f.GoType)))
+	}
+
 	switch {
-	case f.IsMap && f.IsRepeated:
-		// panic(newBuildError(fmt.Sprintf("Repeated maps are not supported %s %s", f.Name, f.GoType)))
-		f.Kind = ""
 	case f.IsMap:
 		f.Kind = "MAP"
 	case f.IsRepeated && f.IsMessage:
