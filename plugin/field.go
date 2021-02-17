@@ -30,15 +30,15 @@ type Field struct {
 	GoTypeIsPtr   bool   // Go type is a pointer
 
 	// Metadata
-	Kind                       string // Field kind (resulting of combination of meta flags)
-	IsRepeated                 bool   // Is list
-	IsMap                      bool
-	IsAggregate                bool // Is aggregate (either list or map)
-	IsMessage                  bool // Is message (might be repeated in the same time)
-	IsRequired                 bool // Is required TODO: implement
-	IsTime                     bool // Contains time, value needs to be parsed from string
-	IsDuration                 bool // Contains duration, value needs to be parsed from string
-	IsElementaryValueContainer bool // Field contains single field
+	Kind                string // Field kind (resulting of combination of meta flags)
+	IsRepeated          bool   // Is list
+	IsMap               bool
+	IsAggregate         bool // Is aggregate (either list or map)
+	IsMessage           bool // Is message (might be repeated in the same time)
+	IsRequired          bool // Is required TODO: implement
+	IsTime              bool // Contains time, value needs to be parsed from string
+	IsDuration          bool // Contains duration, value needs to be parsed from string
+	IsSingularContainer bool // Field contains single field
 
 	Message *Message // Reference to nested message
 }
@@ -269,7 +269,7 @@ func (b *fieldBuilder) setIsContainer() {
 	m := f.Message
 
 	if len(m.Fields) == 1 && !m.Fields[0].IsAggregate {
-		f.IsElementaryValueContainer = true
+		f.IsSingularContainer = true
 	}
 }
 
@@ -282,8 +282,8 @@ func (b *fieldBuilder) setKind() {
 		f.Kind = "REPEATED_MESSAGE"
 	case f.IsAggregate && f.IsRepeated:
 		f.Kind = "REPEATED_ELEMENTARY"
-	case f.IsElementaryValueContainer:
-		f.Kind = "ELEMENTARY_CONTAINER"
+	case f.IsSingularContainer:
+		f.Kind = "SINGULAR_CONTAINER"
 	case f.IsMessage:
 		f.Kind = "SINGULAR_MESSAGE"
 	default:

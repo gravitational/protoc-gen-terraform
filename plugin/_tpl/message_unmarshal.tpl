@@ -23,8 +23,8 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
     {{ template "repeatedElementary" . }}
 {{- else if eq .Kind "SINGULAR_MESSAGE" }}
     {{ template "singularMessage" . }}
-{{- else if eq .Kind "ELEMENTARY_CONTAINER" }}
-    {{ template "singularMessageFold" . }}
+{{- else if eq .Kind "SINGULAR_CONTAINER" }}
+    {{ template "singularContainer" . }}
 {{- else if eq .Kind "SINGULAR_ELEMENTARY" }}
     {{ template "singularElementary" . }}
 {{- end }}
@@ -72,7 +72,7 @@ p = p
 t = t
 {{- end -}}
 
-{{- define "singularMessageFold" -}}
+{{- define "singularContainer" -}}
 {{ $folded := .Message.Fields | first }}
 p := p + "{{.NameSnake}}"
 
