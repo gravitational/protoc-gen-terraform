@@ -32,8 +32,8 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 {{- else if eq .Kind "MAP" }}
     {{ template "map" . }}
 {{- else if eq .Kind "ARTIFICIAL_OBJECT_MAP" }}
-    _raw = _raw
     t = t
+    p = p
 {{- end }}
 }
 {{- end -}}
