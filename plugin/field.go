@@ -19,12 +19,9 @@ type Field struct {
 	Name      string // Type name
 	NameSnake string // Type name in snake case
 
-	// TFSchema properties
-	TFSchemaType          string // Type which is reflected in Terraform schema (a-la types.TypeString)
-	TFSchemaRawType       string // Terraform schema raw value type (float64 for types.Float)
-	TFSchemaGoType        string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
-	TFSchemaValidate      string // Validation applied to tfschema field
-	TFSchemaAggregateType string // If current field is aggregate value, it will be rendered via this type
+	// Schema properties
+	SchemaRawType string // Terraform schema raw value type (float64 for types.Float)
+	SchemaGoType  string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 
 	// Field properties
 	RawGoType     string // Field type returned by gogoprotobuf
@@ -106,24 +103,10 @@ func (b *fieldBuilder) isTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
 	return *b.fieldDescriptor.Type == t
 }
 
-// setTypes sets TFSchemaType and TFSchemaGoType, plus TFSchemaRawType according to TFSchemaType
-func (b *fieldBuilder) setTypes(schemaType string, goTypeCast string) {
-	b.field.TFSchemaType = schemaType
-
-	t := &b.field.TFSchemaRawType
-
-	switch schemaType {
-	case "TypeFloat":
-		*t = "float64"
-	case "TypeInt":
-		*t = "int"
-	case "TypeBool":
-		*t = "bool"
-	case "TypeString":
-		*t = "string"
-	}
-
-	b.field.TFSchemaGoType = goTypeCast
+// setTypes sets SchemaType and SchemaGoType
+func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
+	b.field.SchemaRawType = schemaRawType
+	b.field.SchemaGoType = goTypeCast
 }
 
 // isTime returns true if field stores time (is standard, google or golang time)
@@ -182,48 +165,46 @@ func (b *fieldBuilder) resolveType() {
 	// Basics
 	switch {
 	case b.isTime():
-		b.setTypes("TypeString", "time.Time")
-		f.TFSchemaValidate = "validation.IsRFC3339Time"
+		b.setSchemaTypes("string", "time.Time")
 		f.IsTime = true
 	case b.isDuration():
-		b.setTypes("TypeString", "time.Duration")
+		b.setSchemaTypes("string", "time.Duration")
 		f.IsDuration = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
-		b.setTypes("TypeFloat", "double64")
+		b.setSchemaTypes("float64", "double64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(d):
-		b.setTypes("TypeFloat", "float32")
+		b.setSchemaTypes("float64", "float32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_INT64) || gogoproto.IsStdInt64(d):
-		b.setTypes("TypeInt", "int64")
+		b.setSchemaTypes("int", "int64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT64) || gogoproto.IsStdUInt64(d):
-		b.setTypes("TypeInt", "uint64")
+		b.setSchemaTypes("int", "uint64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_INT32) || gogoproto.IsStdInt32(d):
-		b.setTypes("TypeInt", "int32")
+		b.setSchemaTypes("int", "int32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT32) || gogoproto.IsStdUInt32(d):
-		b.setTypes("TypeInt", "uint32")
+		b.setSchemaTypes("int", "uint32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FIXED64):
-		b.setTypes("TypeInt", "uint64")
+		b.setSchemaTypes("int", "uint64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FIXED32):
-		b.setTypes("TypeInt", "uint32")
+		b.setSchemaTypes("int", "uint32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_BOOL) || gogoproto.IsStdBool(d):
-		b.setTypes("TypeBool", "bool")
+		b.setSchemaTypes("bool", "bool")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_STRING) || gogoproto.IsStdString(d):
-		b.setTypes("TypeString", "string")
+		b.setSchemaTypes("string", "string")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_BYTES) || gogoproto.IsStdBytes(d):
-		b.setTypes("TypeString", "[]byte")
+		b.setSchemaTypes("string", "[]byte")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED32):
-		b.setTypes("TypeString", "int32")
+		b.setSchemaTypes("int", "int32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED64):
-		b.setTypes("TypeString", "int64")
+		b.setSchemaTypes("int", "int64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT32):
-		b.setTypes("TypeString", "int32")
+		b.setSchemaTypes("int", "int32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
-		b.setTypes("TypeString", "int64")
+		b.setSchemaTypes("string", "int64")
 	case b.isMessage():
 		b.setMessage()
-		f.TFSchemaAggregateType = "TypeList"
 		f.IsMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
-		b.setTypes("TypeString", "string")
+		b.setSchemaTypes("string", "string")
 	default:
 		b.plugin.Generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
 		return
@@ -233,11 +214,9 @@ func (b *fieldBuilder) resolveType() {
 	if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 		f.IsAggregate = true
-		f.TFSchemaAggregateType = "TypeList"
 	}
 
 	if b.plugin.IsMap(b.fieldDescriptor) {
-		f.TFSchemaAggregateType = "TypeMap"
 		f.IsMap = true
 
 		x := b.plugin.GoMapType(nil, b.fieldDescriptor)

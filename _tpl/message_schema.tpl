@@ -16,21 +16,21 @@ map[string]*schema.Schema {
 {{- define "fieldSchema" -}}
 {   
     {{- if eq .Kind "REPEATED_MESSAGE" }}
-    Type: schema.{{ .TFSchemaAggregateType }},
+    Type: schema.TypeList,
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
     {{- end }}
 
     {{- if eq .Kind "REPEATED_ELEMENTARY" }}
-    Type: schema.{{ .TFSchemaAggregateType }},
+    Type: schema.TypeList,
     Elem: &schema.Schema {
-        Type: schema.{{ .TFSchemaType }},
+        Type: {{ template "type" .SchemaRawType }},
     },
     {{- end }}
 
     {{- if eq .Kind "SINGULAR_MESSAGE" }}
-    Type: schema.{{ .TFSchemaAggregateType }},
+    Type: schema.TypeList,
     MaxItems: 1,
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
@@ -54,8 +54,20 @@ map[string]*schema.Schema {
 {{- end -}}
 
 {{- define "singularElementary" -}}
-Type: schema.{{ .TFSchemaType }},
-{{- if .TFSchemaValidate }}
-ValidateFunc: {{ .TFSchemaValidate }},
+Type: {{ template "type" .SchemaRawType }},
+{{- if .IsTime }}
+ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
+{{- end -}}
+
+{{- define "type" -}}
+{{- if eq . "float64" -}}
+schema.TypeFloat
+{{- else if eq . "int" -}}
+schema.TypeInt
+{{- else if eq . "bool" -}}
+schema.TypeBool
+{{- else if eq . "string" -}}
+schema.TypeString
+{{- end -}}
 {{- end -}}

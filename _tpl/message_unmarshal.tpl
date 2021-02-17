@@ -31,22 +31,6 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 }
 {{- end -}}
 
-{{- define "rawToValue" -}}
-{{- if .IsTime }}
-_value, err := time.Parse(time.RFC3339, _raw.({{.TFSchemaRawType}}))
-if err != nil {
-    return fmt.Errorf("Malformed time value for field {{.Name}} : %w", err)
-}
-{{- else if .IsDuration }}
-_value, err := time.ParseDuration(_raw.({{.TFSchemaRawType}}))
-if err != nil {
-    return fmt.Errorf("Malformed duration value for field {{.Name}} : %w", err)
-}
-{{- else }}
-_value := {{.TFSchemaGoType}}(_raw.({{.TFSchemaRawType}}))
-{{- end }}
-{{- end -}}
-
 {{- define "repeatedMessage" -}}
 p := p + "{{.NameSnake}}"
 _rawi, ok := d.GetOk(p)
@@ -116,6 +100,22 @@ if ok {
     {{ template "rawToValue" . }}
     {{ template "assignSingularElementary" . }}
 }
+{{- end -}}
+
+{{- define "rawToValue" -}}
+{{- if .IsTime }}
+_value, err := time.Parse(time.RFC3339, _raw.({{.SchemaRawType}}))
+if err != nil {
+    return fmt.Errorf("Malformed time value for field {{.Name}} : %w", err)
+}
+{{- else if .IsDuration }}
+_value, err := time.ParseDuration(_raw.({{.SchemaRawType}}))
+if err != nil {
+    return fmt.Errorf("Malformed duration value for field {{.Name}} : %w", err)
+}
+{{- else }}
+_value := {{.SchemaGoType}}(_raw.({{.SchemaRawType}}))
+{{- end }}
 {{- end -}}
 
 {{- define "assignSingularElementary" -}}
