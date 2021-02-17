@@ -46,7 +46,8 @@ if ok {
 {{- end -}}
 
 {{- define "repeatedElementary" -}}
-_rawi, ok := d.GetOk(p + "{{.NameSnake}}")
+p := p + "{{.NameSnake}}"
+_rawi, ok := d.GetOk(p)
 if ok {
     _rawi := _rawi.([]interface{})
     t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
@@ -61,31 +62,35 @@ if ok {
 
 {{- define "singularMessage" -}}
 p := p + "{{.NameSnake}}.0."
+
 {{ if .GoTypeIsPtr }}
-_obj := {{ .GoType}}{}
+_obj := {{.GoType}}{}
 t.{{ .Name }} = &_obj
 t := &_obj
 {{- else -}}
-t := &t.{{ .Name }}
+t := &t.{{.Name}}
 {{ end }}
-{{- template "fieldsUnmarshal" .Message.Fields }}
+
+{{ template "fieldsUnmarshal" .Message.Fields }}
 // NOTE: remove
 p = p
 t = t
 {{- end -}}
 
 {{- define "singularMessageFold" -}}
-_raw, ok := d.GetOk(p + "{{.NameSnake}}")
+{{ $folded := .Message.Fields | first }}
+p := p + "{{.NameSnake}}"
+
+{{ template "getOk" $folded }}
 if ok {
     {{ if .GoTypeIsPtr }}
     _obj := {{.GoType}}{}
-    t.{{ .Name }} = &_obj
+    t.{{ .Name }} = {{ if.GoTypeIsPtr}}&{{end}}_obj
     t := &_obj
-    {{- else -}}
+    {{ else }}
     t := &t.{{.Name}}
     {{ end }}
 
-    {{ $folded := .Message.Fields | first }}
     {{ template "rawToValue" $folded }}
     {{ template "assignSingularElementary" $folded }}
 }
@@ -95,7 +100,9 @@ t = t
 {{- end -}}
 
 {{- define "singularElementary" -}}
-_raw, ok := d.GetOk(p + "{{.NameSnake}}")
+p := p + "{{.NameSnake}}"
+
+{{ template "getOk" . }}
 if ok {
     {{ template "rawToValue" . }}
     {{ template "assignSingularElementary" . }}
@@ -122,3 +129,11 @@ _value := {{.SchemaGoType}}(_raw.({{.SchemaRawType}}))
 _final := {{if .GoTypeIsSlice }}[]{{end}}{{.GoType}}(_value)
 t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_final
 {{- end -}}
+
+{{- define "getOk" -}}
+{{- if eq .SchemaRawType "bool" }}
+_raw, ok := d.GetOkExists(p)
+{{- else }}
+_raw, ok := d.GetOk(p)
+{{- end }}
+{{- end }}

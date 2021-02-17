@@ -10,7 +10,7 @@ clean:
 
 .PHONY: build
 build: clean
-	pkger && go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(version)"
+	go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(version)"
 
 .PHONY: install
 install: build
@@ -21,7 +21,7 @@ srcpath = $(gopath)/src
 teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
-out_dir = "./_out"
+out_dir := "./_out"
 types = "types.UserV2+types.UserSpecV2+types.RoleV3"
 excludeFields = "types.UserSpecV2.LocalAuth"
 
@@ -37,5 +37,5 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types},excludeFields=${excludeFields}:./${out_dir} \
+		--terraform_out=types=${types},excludeFields=${excludeFields}:${out_dir} \
 		types.proto

@@ -2,18 +2,20 @@ package plugin
 
 import (
 	"bytes"
-	"io"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-	"github.com/markbates/pkger"
 	"github.com/stoewer/go-strcase"
+
+	_ "embed"
 )
 
 var (
-	schemaTplFilename    = pkger.Include("/_tpl/message_schema.tpl")
-	unmarshalTplFilename = pkger.Include("/_tpl/message_unmarshal.tpl")
+	//go:embed _tpl/message_schema.tpl
+	schemaTpl string
+	//go:embed _tpl/message_unmarshal.tpl
+	unmarshalTpl string
 )
 
 // Message holds reflection information about message
@@ -42,30 +44,19 @@ func (p *Plugin) buildMessage(d *generator.Descriptor) *Message {
 
 // GoUnmarshalString returns go code for this message as unmarshaller
 func (m *Message) GoUnmarshalString() (*bytes.Buffer, error) {
-	return m.renderTemplate(unmarshalTplFilename, "unmarshal")
+	return m.renderTemplate(unmarshalTpl, "unmarshal")
 }
 
 // GoSchemaString returns go code for this message as terraform schema
 func (m *Message) GoSchemaString() (*bytes.Buffer, error) {
-	return m.renderTemplate(schemaTplFilename, "schema")
+	return m.renderTemplate(schemaTpl, "schema")
 }
 
 // renderTemplate renders template from embedded template
-func (m *Message) renderTemplate(fileName string, name string) (*bytes.Buffer, error) {
+func (m *Message) renderTemplate(content string, name string) (*bytes.Buffer, error) {
 	var buf bytes.Buffer
 
-	f, err := pkger.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	b, err := io.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-
-	tpl, err := template.New(name).Funcs(sprig.TxtFuncMap()).Parse(string(b))
+	tpl, err := template.New(name).Funcs(sprig.TxtFuncMap()).Parse(content)
 	if err != nil {
 		return nil, err
 	}
