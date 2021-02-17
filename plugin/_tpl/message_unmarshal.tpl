@@ -63,14 +63,9 @@ if ok {
 {{- define "singularMessage" -}}
 p := p + "{{.NameSnake}}.0."
 
-{{ if .GoTypeIsPtr }}
-_obj := {{.GoType}}{}
-t.{{ .Name }} = &_obj
-t := &_obj
-{{- else -}}
-t := &t.{{.Name}}
-{{ end }}
+// TODO: Check if section exists to skip pointer initialization
 
+{{ template "initMessage" . }}
 {{ template "fieldsUnmarshal" .Message.Fields }}
 // NOTE: remove
 p = p
@@ -83,14 +78,7 @@ p := p + "{{.NameSnake}}"
 
 {{ template "getOk" $folded }}
 if ok {
-    {{ if .GoTypeIsPtr }}
-    _obj := {{.GoType}}{}
-    t.{{ .Name }} = {{ if.GoTypeIsPtr}}&{{end}}_obj
-    t := &_obj
-    {{ else }}
-    t := &t.{{.Name}}
-    {{ end }}
-
+    {{ template "initMessage" . }}
     {{ template "rawToValue" $folded }}
     {{ template "assignSingularElementary" $folded }}
 }
@@ -136,4 +124,14 @@ _raw, ok := d.GetOkExists(p)
 {{- else }}
 _raw, ok := d.GetOk(p)
 {{- end }}
+{{- end }}
+
+{{- define "initMessage" -}}
+{{ if .GoTypeIsPtr }}
+_obj := {{.GoType}}{}
+t.{{ .Name }} = &_obj
+t := &_obj
+{{ else }}
+t := &t.{{.Name}}
+{{ end }}
 {{- end }}
