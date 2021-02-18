@@ -90,11 +90,11 @@ func (m *Message) GoTypeMapString(prefixa string) string {
 	//b.WriteString(fmt.Sprintf("//%-30v\n", prefixa+m.GoTypeName))
 
 	for _, f := range m.Fields {
-		s := fmt.Sprintf("//%-40v %-50v %-25v %-7v %-7v\n", prefixa+f.Name, f.GoType, f.Kind, f.IsMap, f.IsContainer)
+		s := fmt.Sprintf("// %-40v %-50v %-25v %-7v %-7v\n", prefixa+f.Name, f.GoType, f.Kind, f.IsMap, f.IsContainer)
 		b.WriteString(s)
 
 		if f.IsMessage {
-			b.WriteString(f.Message.GoTypeMapString(prefixa + " "))
+			b.WriteString(f.Message.GoTypeMapString(prefixa + "  "))
 		}
 	}
 

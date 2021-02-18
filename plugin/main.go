@@ -56,7 +56,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	}
 
 	for _, message := range p.Messages {
-		p.P(message.GoTypeMapString(" "))
+		p.P(message.GoTypeMapString(""))
 	}
 
 	for _, message := range p.Messages {

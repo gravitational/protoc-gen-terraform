@@ -103,6 +103,7 @@ func (b *fieldBuilder) build() {
 	b.setName()
 	b.setGoType()
 	b.resolveType()
+	b.setAggregate()
 	b.setKind()
 }
 
@@ -226,13 +227,6 @@ func (b *fieldBuilder) resolveType() {
 		return
 	}
 
-	if b.generator.IsMap(b.fieldDescriptor) {
-		f.IsMap = true
-		b.setMap()
-	} else if b.fieldDescriptor.IsRepeated() {
-		f.IsRepeated = true
-	}
-
 	b.prependPackageName()
 }
 
@@ -253,22 +247,6 @@ func (b *fieldBuilder) prependPackageName() {
 			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
 		}
 	}
-}
-
-// reflectMap sets map value properties
-func (b *fieldBuilder) setMap() {
-	m := b.generator.GoMapType(nil, b.fieldDescriptor)
-
-	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
-	if keyGoType != "string" {
-		b.generator.Fail("Maps with non-string keys are not supported")
-	}
-
-	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
-	if valueField == nil {
-		panic(newBuildError(fmt.Sprintf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)))
-	}
-	b.field.MapValueField = valueField
 }
 
 // setMessage sets reference to nested message
@@ -307,6 +285,34 @@ func (b *fieldBuilder) setIsContainer() {
 		f.IsContainer = true
 		// logrus.Println(inspect.Element(f.Message.Fields[0]))
 	}
+}
+
+func (b *fieldBuilder) setAggregate() {
+	f := b.field
+
+	if b.generator.IsMap(b.fieldDescriptor) {
+		f.IsMap = true
+		b.setMap()
+	} else if b.fieldDescriptor.IsRepeated() {
+		f.IsRepeated = true
+	}
+}
+
+// reflectMap sets map value properties
+func (b *fieldBuilder) setMap() {
+	m := b.generator.GoMapType(nil, b.fieldDescriptor)
+
+	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
+	if keyGoType != "string" {
+		b.generator.Fail("Maps with non-string keys are not supported")
+	}
+
+	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
+	if valueField == nil {
+		panic(newBuildError(fmt.Sprintf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)))
+	}
+	b.field.Message.Fields = []*Field{valueField}
+	//b.field.MapValueField = valueField
 }
 
 // setKind sets field kind which represents field meta type for generation

@@ -92,8 +92,13 @@ if ok {
 
 {{- define "singularContainerMessage" -}}
 {{ $folded := .Message.Fields | first }}
+{{ if $folded.IsMap }}
+{{ template "initTarget" $folded.MapValueField }}
+{{ template "fieldUnmarshalBody" $folded.MapValueField }}
+{{ else }}
 {{ template "initTarget" . }}
 {{ template "fieldUnmarshalBody" $folded }}
+{{ end }}
 {{- end -}}
 
 {{- define "map" -}}
