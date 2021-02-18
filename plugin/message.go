@@ -94,7 +94,7 @@ func (m *Message) GoTypeMapString(prefixa string) string {
 		b.WriteString(s)
 
 		if f.IsMessage {
-			b.WriteString(f.Message.GoTypeMapString(prefixa + prefixa))
+			b.WriteString(f.Message.GoTypeMapString(prefixa + " "))
 		}
 	}
 
