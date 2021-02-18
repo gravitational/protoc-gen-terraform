@@ -305,6 +305,7 @@ func (b *fieldBuilder) setIsContainer() {
 
 	if len(fields) == 1 {
 		f.IsContainer = true
+		// logrus.Println(inspect.Element(f.Message.Fields[0]))
 	}
 }
 
