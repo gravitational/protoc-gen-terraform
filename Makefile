@@ -22,12 +22,13 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
-types = "types.UserV2+types.RoleV3"
+# types = "types.UserV2+types.RoleV3"
 # types = "types.Metadata"
-excludeFields = "types.UserSpecV2.LocalAuth"
+types = "test.Test"
+# excludeFields = "types.UserSpecV2.LocalAuth"
 
-.PHONY: example
-example: build
+.PHONY: terraform
+terraform: build
 ifeq ("$(wildcard $(teleport_dir))", "")
 	@echo "Teleport source code is required to build this example!"
 	@echo "git clone ${teleport_repo} ${teleport_dir} to proceed"
@@ -39,4 +40,16 @@ endif
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
 		--terraform_out=types=${types},excludeFields=${excludeFields}:${out_dir} \
-		types.proto
+		test.proto
+
+.PHONY: example
+example: build
+	@protoc \
+		-I$(srcpath)/github.com/gzigzigzeo/protoc-gen-terraform/test \
+		-I$(srcpath)/github.com/gzigzigzeo/protoc-gen-terraform \
+		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
+		-I$(srcpath) \
+		--plugin=./_build/protoc-gen-terraform \
+		--terraform_out=types=${types},excludeFields=${excludeFields}:test \
+		--gogo_out=test \
+		test.proto

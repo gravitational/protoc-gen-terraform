@@ -22,6 +22,8 @@ var (
 	schemaTpl string
 	//go:embed _tpl/message_unmarshal.tpl
 	unmarshalTpl string
+	//go:embed _tpl/message_unmarshal_reflect.tpl
+	newUnmarshalTpl string
 	// Message descriptor cache
 	cache map[string]*Message = make(map[string]*Message)
 )
@@ -98,4 +100,8 @@ func (m *Message) GoTypeMapString(prefixa string) string {
 	}
 
 	return b.String()
+}
+
+func (m *Message) GoNewUnmarshal() (*bytes.Buffer, error) {
+	return render.Template(newUnmarshalTpl, "newUnmarshal", m)
 }

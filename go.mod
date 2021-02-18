@@ -9,6 +9,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gravitational/trace v1.1.14
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.4.3
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
@@ -16,5 +17,5 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
-	github.com/vigo/go-inspect v0.0.0-20180830132450-6e1c9f930fff
+	google.golang.org/protobuf v1.25.0
 )

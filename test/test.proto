@@ -1,0 +1,95 @@
+syntax = "proto3";
+package test;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+message Nested {
+    string String = 1;
+    NestedLevel2 Nested = 2;
+}
+
+message NestedLevel2 {
+    string String = 1;
+}
+
+message Test {
+    // --- Elementary fields ----------------------------------------------------------------
+
+    // string field
+    string Str = 1;
+
+    // int32 field
+    int32 Int32 = 2;
+
+    // int64 field
+    int64 Int64 = 3;
+
+    // float field
+    float Float = 4;
+
+    // double field
+    double Double = 5;
+
+    // bool field
+    bool Bool = 6;
+
+    // byte[] field
+    bytes Bytes = 7;
+
+    // time.Time field
+    google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+
+    // time.Duration field (standard)
+    int64 DurationStd = 9 [ (gogoproto.stdduration) = true ];
+
+    // time.Duration field (custom)
+    int64 DurationCustom = 10 [ (gogoproto.casttype) = "Duration" ];
+
+    // --- Elementary nullable fields -------------------------------------------------------
+    
+    // *bool field
+    bool BoolN = 11 [ (gogoproto.nullable) = true ];
+
+    // *byte[] field
+    bytes BytesN = 12 [ (gogoproto.nullable) = true ];
+
+    // *time.Time field
+    google.protobuf.Timestamp TimestampN = 13 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+
+    // *time.Duration field
+    int64 DurationN = 14 [ (gogoproto.casttype) = "Duration" ];
+
+    // --- Elementary arrays (+ cast and custom types) ----------------------------------------
+
+    // []string field
+    repeated string StringA = 15;
+
+    // []bool field
+    repeated bool BoolA = 16 [ (gogoproto.customtype) = "BoolCustomArray" ];
+
+    // [][]byte field
+    repeated bytes BytesA = 17;
+
+    // []time.Time field
+    repeated google.protobuf.Timestamp TimestampA = 18 [ (gogoproto.stdtime) = true ];
+
+    // []time.Duration field
+    repeated int64 GracePeriodA = 19 [ (gogoproto.casttype) = "Duration" ];
+
+    // --- Nested messages ---------------------------------------------------------------------
+
+    // Nested field
+    Nested Nested = 20;   
+
+    // --- Message arrays ----------------------------------------------------------------------
+
+    // Nested array
+    repeated Nested NestedA = 21;
+
+    // --- Maps --------------------------------------------------------------------------------
+}
