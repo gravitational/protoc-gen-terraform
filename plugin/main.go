@@ -56,6 +56,10 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	}
 
 	for _, message := range p.Messages {
+		p.P(message.GoTypeMapString(" "))
+	}
+
+	for _, message := range p.Messages {
 		buf, err := message.GoSchemaString()
 		if err != nil {
 			p.Generator.Fail(trace.Wrap(err).Error())

@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"bytes"
+	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
@@ -10,6 +11,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
+
+	"fmt"
 
 	// go:embed won't work otherwise
 	_ "embed"
@@ -79,6 +82,23 @@ func (m *Message) GoUnmarshalString() (*bytes.Buffer, error) {
 // GoSchemaString returns go code for this message as terraform schema
 func (m *Message) GoSchemaString() (*bytes.Buffer, error) {
 	return m.renderTemplate(schemaTpl, "schema")
+}
+
+func (m *Message) GoTypeMapString(prefixa string) string {
+	b := strings.Builder{}
+
+	//b.WriteString(fmt.Sprintf("//%-30v\n", prefixa+m.GoTypeName))
+
+	for _, f := range m.Fields {
+		s := fmt.Sprintf("//%-40v %-50v %-25v %-7v %-7v\n", prefixa+f.Name, f.GoType, f.Kind, f.IsMap, f.IsContainer)
+		b.WriteString(s)
+
+		if f.IsMessage {
+			b.WriteString(f.Message.GoTypeMapString(prefixa + prefixa))
+		}
+	}
+
+	return b.String()
 }
 
 // renderTemplate renders template from embedded template

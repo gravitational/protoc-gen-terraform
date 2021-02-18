@@ -36,8 +36,8 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}) error {
 {{ template "repeatedMessage" . }}
 {{- else if eq .Kind "SINGULAR_MESSAGE" }}
 // SINGULAR_MESSAGE {{ .Name }}
-{{ if .IsContainer }}
-// CONTAINER
+{{ if .IsContainer  }}
+// NORMAL CONTAINER
 {{ template "singularContainerMessage" . }}
 {{ else }}
 {{ template "singularMessage" . }}
@@ -112,7 +112,7 @@ if ok {
 
 {{- define "artificialObjectMap" -}}
 {{ $m := .MapValueField }}
-// {{ .MapValueField.GoType }}
+// value: {{ .MapValueField.GoType }} {{ .MapValueField.IsContainer }}
 _rawi, ok := d.GetOk(p)
 if ok {
     _rawi := _rawi.([]interface{})
