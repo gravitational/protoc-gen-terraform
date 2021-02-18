@@ -2,7 +2,8 @@
 {{/* Made KISS as possible, for the exchange of DRY */}}
 
 // Type full name: {{ .Name }}
-func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string) error {
+func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}) error {
+    p := ""
     {{ template "fieldsUnmarshal" .Fields }}
     return nil
 }
@@ -14,9 +15,6 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 {{- end -}}
 
 {{- define "fieldUnmarshal" -}}
-// schema["{{ .NameSnake }}"] => {{ .Name }}, {{ .RawGoType }}, {{ .GoType }}
-// {{ .Kind }}, Map: {{ .IsMap }}, List: {{ .IsRepeated }}, Container: {{ .IsContainer }}
-{
 {{- if eq .Kind "REPEATED_MESSAGE" }}
     {{ template "repeatedMessage" . }}
 {{- else if eq .Kind "REPEATED_ELEMENTARY" }}
@@ -32,8 +30,7 @@ func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}, p string
 {{- else if eq .Kind "MAP" }}
     {{ template "map" . }}
 {{- else if eq .Kind "ARTIFICIAL_OBJECT_MAP" }}
-    t = t
-    p = p
+    {{ template "artificialObjectMap" . }}
 {{- end }}
 }
 {{- end -}}
@@ -85,7 +82,6 @@ p := p + "{{.NameSnake}}"
 
 {{- define "singularElementary" -}}
 p := p + "{{.NameSnake}}"
-
 {{ template "getOk" . }}
 if ok {
     {{ template "rawToValue" . }}
@@ -106,6 +102,22 @@ if ok {
         _final := {{if $m.GoTypeIsSlice }}[]{{end}}{{$m.GoType}}(_value)
         t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_final
     }   
+}
+{{- end -}}
+
+{{- define "artificialObjectMap" -}}
+{{ $m := .MapValueField }}
+// {{ .MapValueField.GoType }}
+_rawi, ok := d.GetOk(p)
+if ok {
+    _rawi := _rawi.([]interface{})
+    for _, _artificialItem := range _rawi {
+        _item := _artificialItem.(map[string]interface{})
+
+        p := p + "." + _item["key"].(string)
+
+        {{ template "fieldUnmarshal" .MapValueField }}
+    }
 }
 {{- end -}}
 
