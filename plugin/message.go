@@ -3,11 +3,10 @@ package plugin
 import (
 	"bytes"
 	"strings"
-	"text/template"
 
-	"github.com/Masterminds/sprig"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
+	"github.com/gzigzigzeo/protoc-gen-terraform/render"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
@@ -76,12 +75,12 @@ func getMessageTypeName(d *generator.Descriptor) string {
 
 // GoUnmarshalString returns go code for this message as unmarshaller
 func (m *Message) GoUnmarshalString() (*bytes.Buffer, error) {
-	return m.renderTemplate(unmarshalTpl, "unmarshal")
+	return render.Template(unmarshalTpl, "unmarshal", m)
 }
 
 // GoSchemaString returns go code for this message as terraform schema
 func (m *Message) GoSchemaString() (*bytes.Buffer, error) {
-	return m.renderTemplate(schemaTpl, "schema")
+	return render.Template(schemaTpl, "schema", m)
 }
 
 func (m *Message) GoTypeMapString(prefixa string) string {
@@ -99,21 +98,4 @@ func (m *Message) GoTypeMapString(prefixa string) string {
 	}
 
 	return b.String()
-}
-
-// renderTemplate renders template from embedded template
-func (m *Message) renderTemplate(content string, name string) (*bytes.Buffer, error) {
-	var buf bytes.Buffer
-
-	tpl, err := template.New(name).Funcs(sprig.TxtFuncMap()).Parse(content)
-	if err != nil {
-		return nil, err
-	}
-
-	err = tpl.ExecuteTemplate(&buf, name, m)
-	if err != nil {
-		return nil, err
-	}
-
-	return &buf, nil
 }

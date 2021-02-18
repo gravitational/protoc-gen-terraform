@@ -311,8 +311,7 @@ func (b *fieldBuilder) setMap() {
 	if valueField == nil {
 		panic(newBuildError(fmt.Sprintf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)))
 	}
-	b.field.Message.Fields = []*Field{valueField}
-	//b.field.MapValueField = valueField
+	b.field.MapValueField = valueField
 }
 
 // setKind sets field kind which represents field meta type for generation
