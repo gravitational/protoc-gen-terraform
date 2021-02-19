@@ -24,7 +24,7 @@ teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
 # types = "types.UserV2+types.RoleV3"
 # types = "types.Metadata"
-types = "test.Test"
+types = "Test"
 # excludeFields = "types.UserSpecV2.LocalAuth"
 
 .PHONY: terraform

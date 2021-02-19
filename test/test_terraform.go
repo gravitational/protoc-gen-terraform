@@ -8,6 +8,7 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	validation "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	math "math"
 	time "time"
@@ -174,7 +175,4 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			SchemaGoType:  "",
 		},
 	}
-
-	meta = meta
-	return nil
 }

@@ -72,6 +72,13 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 
 // getMessageTypeName returns full message name
 func getMessageTypeName(d *generator.Descriptor) string {
+	if d.GoImportPath() == "." {
+		if config.DefaultPkgName != "" {
+			return strings.Join([]string{config.DefaultPkgName, d.GetName()}, ".")
+		} else {
+			return d.GetName()
+		}
+	}
 	return d.File().GetPackage() + "." + d.GetName()
 }
 

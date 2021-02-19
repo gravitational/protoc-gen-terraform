@@ -35,6 +35,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 
 	config.ParseTypes(g.Param["types"])
 	config.ParseExcludeFields(g.Param["excludeFields"])
+	config.ParseDefaultPkgName(g.Param["pkg"])
 }
 
 // Name returns the name of the plugin
@@ -45,6 +46,8 @@ func (p *Plugin) Name() string {
 // Generate is the plugin body
 func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	logrus.Printf("Processing: %s", *file.Name)
+
+	//logrus.Println(p.PackageImportPath)
 
 	p.setImports()
 

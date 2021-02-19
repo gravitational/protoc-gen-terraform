@@ -21,6 +21,10 @@ var (
 
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
 	DurationCustomType = "Duration"
+
+	// DefaultPkgName default package name, gets appended to type name if it's import path is ".", but the type itself
+	// is located in another package
+	DefaultPkgName string
 )
 
 const (
@@ -43,4 +47,9 @@ func ParseExcludeFields(arg string) {
 	ExcludeFields = strings.Split(arg, paramDelimiter)
 
 	logrus.Printf("Excluded fields: %s", ExcludeFields)
+}
+
+// ParseDefaultPkgName parses default package name and import path
+func ParseDefaultPkgName(arg string) {
+	DefaultPkgName = arg
 }
