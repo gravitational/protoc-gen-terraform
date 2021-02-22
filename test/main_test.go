@@ -26,7 +26,7 @@ func buildSubject(t *testing.T) *Test {
 	return subject
 }
 
-func TestAll(t *testing.T) {
+func TestElementaries(t *testing.T) {
 	subject := buildSubject(t)
 
 	assert.Equal(t, subject.Str, "TestString", "Test.Str")
