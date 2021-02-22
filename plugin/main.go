@@ -82,7 +82,7 @@ func (p *Plugin) setImports() {
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
 
-	// // TODO: Temporary, replace with imports
+	// // TODO: Temporary, replace with argument
 	// p.AddImport("github.com/gravitational/teleport/api/types")
 	// p.AddImport("github.com/gravitational/teleport/api/types/wrappers")
 }

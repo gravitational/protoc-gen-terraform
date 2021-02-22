@@ -70,7 +70,7 @@ if ok {
 _rawi, ok := d.GetOk(p + {{ .NameSnake | quote }})
 if ok {
     _rawi := _rawi.([]interface{})
-    t.{{.Name}} = make({{.RawGoType}}, len(_rawi))
+    t.{{.Name}} = make({{.GoTypeFull}}, len(_rawi))
     for i := 0; i < len(_rawi); i++ {
         _raw := _rawi[i]
         {{- template "rawToValue" . }}
@@ -103,11 +103,7 @@ if err != nil {
 }
 _value := {{.GoType}}(_valued)
 {{- else }}
-{{- if eq .SchemaRawType .SchemaGoType }}
-_value := _raw.({{.SchemaRawType}})
-{{- else }}
 _value := {{.GoType}}({{.SchemaGoType}}(_raw.({{.SchemaRawType}})))
-{{- end }}
 {{- end }}
 {{- end -}}
 
@@ -144,7 +140,7 @@ p := p + {{.NameSnake | quote }}
 _rawi, ok := d.GetOk(p)
 if ok {
     _rawi := _rawi.([]interface{})
-    t.{{.Name}} = make({{.RawGoType}}, len(_rawi))
+    t.{{.Name}} = make({{.GoTypeFull}}, len(_rawi))
     for i := 0; i < len(_rawi); i++ {
         {{ if .GoTypeIsPtr }}
         _obj := {{.GoType}}{}
@@ -184,7 +180,7 @@ p := p + {{.NameSnake | quote }}
 _rawi, ok := d.GetOk(p)
 if ok {
     _rawi := _rawi.([]interface{})
-    _value := make(map[string]{{$m.RawGoType}})
+    _value := make(map[string]{{$m.GoTypeFull}})
 
     for i, _ := range _rawi {
         key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)

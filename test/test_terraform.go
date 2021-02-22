@@ -335,7 +335,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "str")
 		if ok {
-			_value := _raw.(string)
+			_value := string(string(_raw.(string)))
 			t.Str = _value
 		}
 	}
@@ -367,7 +367,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "double")
 		if ok {
-			_value := _raw.(float64)
+			_value := float64(float64(_raw.(float64)))
 			t.Double = _value
 		}
 	}
@@ -375,7 +375,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOkExists(p + "bool")
 		if ok {
-			_value := _raw.(bool)
+			_value := bool(bool(_raw.(bool)))
 			t.Bool = _value
 		}
 	}
@@ -440,7 +440,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.StringA = make([]string, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
-				_value := _raw.(string)
+				_value := string(string(_raw.(string)))
 				t.StringA[i] = _value
 			}
 		}
@@ -505,7 +505,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 			_raw, ok := d.GetOk(p + "str")
 			if ok {
-				_value := _raw.(string)
+				_value := string(string(_raw.(string)))
 				t.Str = _value
 			}
 		}
@@ -528,7 +528,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 							_raw, ok := d.GetOk(p + "str")
 							if ok {
-								_value := _raw.(string)
+								_value := string(string(_raw.(string)))
 								t.Str = _value
 							}
 						}
@@ -546,7 +546,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				t.NestedM = make(map[string]string, len(_rawm))
 				for _k, _v := range _rawm {
 					_raw := _v
-					_value := _raw.(string)
+					_value := string(string(_raw.(string)))
 					t.NestedM[_k] = _value
 				}
 			}
@@ -576,7 +576,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 							_raw, ok := d.GetOk(p + "str")
 							if ok {
-								_value := _raw.(string)
+								_value := string(string(_raw.(string)))
 								t.Str = _value
 							}
 						}
@@ -608,7 +608,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 						_raw, ok := d.GetOk(p + "str")
 						if ok {
-							_value := _raw.(string)
+							_value := string(string(_raw.(string)))
 							t.Str = _value
 						}
 					}
@@ -631,7 +631,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := _raw.(string)
+											_value := string(string(_raw.(string)))
 											t.Str = _value
 										}
 									}
@@ -649,7 +649,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							t.NestedM = make(map[string]string, len(_rawm))
 							for _k, _v := range _rawm {
 								_raw := _v
-								_value := _raw.(string)
+								_value := string(string(_raw.(string)))
 								t.NestedM[_k] = _value
 							}
 						}
@@ -679,7 +679,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := _raw.(string)
+											_value := string(string(_raw.(string)))
 											t.Str = _value
 										}
 									}
@@ -704,7 +704,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.NestedM = make(map[string]string, len(_rawm))
 			for _k, _v := range _rawm {
 				_raw := _v
-				_value := _raw.(string)
+				_value := string(string(_raw.(string)))
 				t.NestedM[_k] = _value
 			}
 		}
@@ -734,7 +734,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 						_raw, ok := d.GetOk(p + "str")
 						if ok {
-							_value := _raw.(string)
+							_value := string(string(_raw.(string)))
 							t.Str = _value
 						}
 					}
@@ -757,7 +757,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := _raw.(string)
+											_value := string(string(_raw.(string)))
 											t.Str = _value
 										}
 									}
@@ -775,7 +775,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							t.NestedM = make(map[string]string, len(_rawm))
 							for _k, _v := range _rawm {
 								_raw := _v
-								_value := _raw.(string)
+								_value := string(string(_raw.(string)))
 								t.NestedM[_k] = _value
 							}
 						}
@@ -805,7 +805,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := _raw.(string)
+											_value := string(string(_raw.(string)))
 											t.Str = _value
 										}
 									}

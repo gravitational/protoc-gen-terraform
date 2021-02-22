@@ -28,6 +28,7 @@ type Field struct {
 	GoType        string // Go type without [] and *, but with package name prepended
 	GoTypeIsSlice bool   // Go type is a slice?
 	GoTypeIsPtr   bool   // Go type is a pointer?
+	GoTypeFull    string // Go type with [] and * and package name prepended
 
 	// Metadata
 	Kind                  string // Field kind (resulting of combination of meta flags, see setKind method)
@@ -102,8 +103,8 @@ func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descrip
 // build fills in a Field structure
 func (b *fieldBuilder) build() {
 	b.setName()
-	b.setGoType()
 	b.resolveType()
+	b.setGoType()
 	b.setAggregate()
 	b.setCustomType()
 	b.setKind()
@@ -155,33 +156,6 @@ func (b *fieldBuilder) isMessage() bool {
 func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
 	b.field.SchemaRawType = schemaRawType
 	b.field.SchemaGoType = goTypeCast
-}
-
-// setGoType Sets go type with gogoprotobuf standard method, sets type information flags
-func (b *fieldBuilder) setGoType() {
-	f := b.field // shortrut
-
-	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
-	goType, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
-	f.RawGoType = goType
-	f.GoType = goType
-
-	if f.GoType[0] == '[' {
-		f.GoType = f.GoType[2:]
-		f.GoTypeIsSlice = true
-	}
-
-	if f.GoType[0] == '*' {
-		f.GoType = f.GoType[1:]
-		f.GoTypeIsPtr = true
-	}
-
-	// This is an exception: we get all []byte arrays from strings, it is an elementary type on protobuf side
-	// TODO: Param containing list of fields which want to be real byte arrays
-	if goType == "[]byte" || goType == "[]*byte" {
-		f.GoType = "[]byte"
-		return
-	}
 }
 
 // resolveType analyses field type and sets required fields in Field structure
@@ -236,8 +210,6 @@ func (b *fieldBuilder) resolveType() {
 		b.generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
 		return
 	}
-
-	b.prependPackageName()
 }
 
 // Append type suffix to cast type, custom type and message
@@ -245,9 +217,10 @@ func (b *fieldBuilder) prependPackageName() {
 	d := b.fieldDescriptor
 	f := b.field
 
-	if b.isMessage() && b.field.Message != nil {
-		f.GoType = b.field.Message.GoTypeName
-		return
+	if gogoproto.IsCastType(d) {
+		f.GoType = gogoproto.GetCastType(d)
+	} else if gogoproto.IsCustomType(d) {
+		f.GoType = gogoproto.GetCustomType(d)
 	}
 
 	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) {
@@ -255,7 +228,47 @@ func (b *fieldBuilder) prependPackageName() {
 		if !strings.Contains(f.GoType, ".") && config.DefaultPkgName != "" {
 			f.GoType = config.DefaultPkgName + "." + f.GoType
 		}
+	} else {
+		if b.isMessage() && b.field.Message != nil {
+			f.GoType = b.field.Message.GoTypeName
+		}
 	}
+}
+
+// setGoType Sets go type with gogoprotobuf standard method, sets type information flags
+func (b *fieldBuilder) setGoType() {
+	f := b.field // shortrut
+
+	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
+	goType, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
+	f.RawGoType = goType
+	f.GoType = goType
+
+	// If type is a slice, mark as slice
+	if f.GoType[0] == '[' {
+		f.GoType = f.GoType[2:]
+		f.GoTypeIsSlice = true
+		f.GoTypeFull = "[]"
+	}
+
+	// If type is a pointer, mark as pointer
+	if f.GoType[0] == '*' {
+		f.GoType = f.GoType[1:]
+		f.GoTypeIsPtr = true
+		f.GoTypeFull = f.GoTypeFull + "*"
+	}
+
+	b.prependPackageName()
+
+	// This is an exception: we get all []byte arrays from strings, it is an elementary type on protobuf side
+	// TODO: Param containing list of fields which want to be real byte arrays
+	if goType == "[]byte" || goType == "[]*byte" {
+		f.GoType = goType
+		f.GoTypeFull = goType
+		return
+	}
+
+	f.GoTypeFull = f.GoTypeFull + f.GoType
 }
 
 // setMessage sets reference to nested message
