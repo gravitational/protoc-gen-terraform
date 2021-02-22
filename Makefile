@@ -22,10 +22,8 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
-# types = "UserV2+RoleV3"
-# types = "types.Metadata"
-types = "Test"
-# excludeFields = "types.UserSpecV2.LocalAuth"
+types = "types.UserV2+types.RoleV3"
+excludeFields = "types.UserSpecV2.LocalAuth"
 
 .PHONY: terraform
 terraform: build
@@ -50,7 +48,7 @@ test: build
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types},excludeFields=${excludeFields}:test \
+		--terraform_out=types=Test:test \
 		--gogo_out=test \
 		test.proto
 	@go test -v ./test
