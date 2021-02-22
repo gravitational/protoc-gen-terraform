@@ -36,6 +36,12 @@ func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     {{ template "singularMessage" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "REPEATED_MESSAGE" -}}
+{
+    {{ template "repeatedMessage" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders unmarshaller for singular value of any type */}}
@@ -117,4 +123,27 @@ t := &t.{{.Name}}
 {{ end }}
 
 {{ template "fields" .Message.Fields }}
+{{- end -}}
+
+{{/* Repeated message */}}
+{{- define "repeatedMessage" -}}
+p := p + {{.NameSnake | quote }}
+
+_rawi, ok := d.GetOk(p)
+if ok {
+    _rawi := _rawi.([]interface{})
+    t.{{.Name}} = make({{.RawGoType}}, len(_rawi))
+    for i := 0; i < len(_rawi); i++ {
+        {{ if .GoTypeIsPtr }}
+        _obj := {{.GoType}}{}
+        t.{{.Name }}[i] = &_obj
+        {{ end }}
+
+        {
+            t := {{if not .GoTypeIsPtr}}&{{end}}t.{{.Name }}[i]
+            p := p + fmt.Sprintf(".%v.", i)
+            {{ template "fields" .Message.Fields }}
+        }
+    }
+}
 {{- end -}}

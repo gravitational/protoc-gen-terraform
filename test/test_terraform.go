@@ -509,7 +509,91 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				t.Str = _value
 			}
 		}
+		{
+			p := p + "nested"
 
+			_rawi, ok := d.GetOk(p)
+			if ok {
+				_rawi := _rawi.([]interface{})
+				t.Nested = make([]*NestedLevel2, len(_rawi))
+				for i := 0; i < len(_rawi); i++ {
+
+					_obj := NestedLevel2{}
+					t.Nested[i] = &_obj
+
+					{
+						t := t.Nested[i]
+						p := p + fmt.Sprintf(".%v.", i)
+						{
+
+							_raw, ok := d.GetOk(p + "str")
+							if ok {
+								_value := _raw.(string)
+								t.Str = _value
+							}
+						}
+
+					}
+				}
+			}
+		}
+
+	}
+	{
+		p := p + "nested_a"
+
+		_rawi, ok := d.GetOk(p)
+		if ok {
+			_rawi := _rawi.([]interface{})
+			t.NestedA = make([]*Nested, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+
+				_obj := Nested{}
+				t.NestedA[i] = &_obj
+
+				{
+					t := t.NestedA[i]
+					p := p + fmt.Sprintf(".%v.", i)
+					{
+
+						_raw, ok := d.GetOk(p + "str")
+						if ok {
+							_value := _raw.(string)
+							t.Str = _value
+						}
+					}
+					{
+						p := p + "nested"
+
+						_rawi, ok := d.GetOk(p)
+						if ok {
+							_rawi := _rawi.([]interface{})
+							t.Nested = make([]*NestedLevel2, len(_rawi))
+							for i := 0; i < len(_rawi); i++ {
+
+								_obj := NestedLevel2{}
+								t.Nested[i] = &_obj
+
+								{
+									t := t.Nested[i]
+									p := p + fmt.Sprintf(".%v.", i)
+									{
+
+										_raw, ok := d.GetOk(p + "str")
+										if ok {
+											_value := _raw.(string)
+											t.Str = _value
+										}
+									}
+
+								}
+							}
+						}
+					}
+
+				}
+			}
+		}
 	}
 
 	return nil

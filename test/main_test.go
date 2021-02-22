@@ -38,6 +38,14 @@ var (
 		"nested": []interface{}{
 			map[string]interface{}{
 				"str": "TestString",
+				"nested": []interface{}{
+					map[string]interface{}{
+						"str": "TestString1",
+					},
+					map[string]interface{}{
+						"str": "TestString2",
+					},
+				},
 			},
 		},
 	}
@@ -99,4 +107,11 @@ func TestNestedMessage(t *testing.T) {
 	subject, _ := buildSubject(t)
 
 	assert.Equal(t, subject.Nested.Str, "TestString", "Test.Nested.Str")
+}
+
+func TestNestedMessageArray(t *testing.T) {
+	subject, _ := buildSubject(t)
+
+	assert.Equal(t, subject.Nested.Nested[0].Str, "TestString1")
+	assert.Equal(t, subject.Nested.Nested[1].Str, "TestString2")
 }
