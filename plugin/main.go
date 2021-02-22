@@ -4,6 +4,7 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
+	"github.com/gzigzigzeo/protoc-gen-terraform/render"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,12 +59,8 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 	}
 
-	// for _, message := range p.Messages {
-	// 	p.P(message.GoTypeMapString(""))
-	// }
-
 	for _, message := range p.Messages {
-		buf, err := message.GoSchemaString()
+		buf, err := render.Template(render.SchemaTpl, message)
 		if err != nil {
 			p.Generator.Fail(trace.Wrap(err).Error())
 		}
@@ -71,20 +68,12 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	}
 
 	for _, message := range p.Messages {
-		buf, err := message.GoNewUnmarshal()
+		buf, err := render.Template(render.UnmarshalTpl, message)
 		if err != nil {
 			p.Generator.Fail(trace.Wrap(err).Error())
 		}
 		p.P(buf.String())
 	}
-
-	// for _, message := range p.Messages {
-	// 	buf, err := message.GoUnmarshalString()
-	// 	if err != nil {
-	// 		p.Generator.Fail(trace.Wrap(err).Error())
-	// 	}
-	// 	p.P(buf.String())
-	// }
 }
 
 // setImports sets import definitions for current file

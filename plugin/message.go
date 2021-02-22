@@ -1,30 +1,18 @@
 package plugin
 
 import (
-	"bytes"
 	"strings"
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
-	"github.com/gzigzigzeo/protoc-gen-terraform/render"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
 
 	"fmt"
-
-	// go:embed won't work otherwise
-	_ "embed"
 )
 
 var (
-	//go:embed _tpl/message_schema.tpl
-	schemaTpl string
-	//go:embed _tpl/message_unmarshal.tpl
-	unmarshalTpl string
-	//go:embed _tpl/message_unmarshal_reflect.tpl
-	newUnmarshalTpl string
-	// Message descriptor cache
 	cache map[string]*Message = make(map[string]*Message)
 )
 
@@ -82,16 +70,7 @@ func getMessageTypeName(d *generator.Descriptor) string {
 	return d.File().GetPackage() + "." + d.GetName()
 }
 
-// GoUnmarshalString returns go code for this message as unmarshaller
-func (m *Message) GoUnmarshalString() (*bytes.Buffer, error) {
-	return render.Template(unmarshalTpl, "unmarshal", m)
-}
-
-// GoSchemaString returns go code for this message as terraform schema
-func (m *Message) GoSchemaString() (*bytes.Buffer, error) {
-	return render.Template(schemaTpl, "schema", m)
-}
-
+// NOTE: temp comments render
 func (m *Message) GoTypeMapString(prefixa string) string {
 	b := strings.Builder{}
 
@@ -107,8 +86,4 @@ func (m *Message) GoTypeMapString(prefixa string) string {
 	}
 
 	return b.String()
-}
-
-func (m *Message) GoNewUnmarshal() (*bytes.Buffer, error) {
-	return render.Template(newUnmarshalTpl, "newUnmarshal", m)
 }
