@@ -217,18 +217,21 @@ func (b *fieldBuilder) prependPackageName() {
 	d := b.fieldDescriptor
 	f := b.field
 
+	// Override field type
 	if gogoproto.IsCastType(d) {
 		f.GoType = gogoproto.GetCastType(d)
 	} else if gogoproto.IsCustomType(d) {
 		f.GoType = gogoproto.GetCustomType(d)
 	}
 
+	// Prepend package name to overriden field type
 	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) {
 		// Is cast type is within current package, append default package name to it
 		if !strings.Contains(f.GoType, ".") && config.DefaultPkgName != "" {
 			f.GoType = config.DefaultPkgName + "." + f.GoType
 		}
 	} else {
+		// Get go type from a message
 		if b.isMessage() && b.field.Message != nil {
 			f.GoType = b.field.Message.GoTypeName
 		}
@@ -236,6 +239,7 @@ func (b *fieldBuilder) prependPackageName() {
 }
 
 // setGoType Sets go type with gogoprotobuf standard method, sets type information flags
+// It deconstructs type returned by gogo, and than reconstructs it back using type with prepend package.
 func (b *fieldBuilder) setGoType() {
 	f := b.field // shortrut
 

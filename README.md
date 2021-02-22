@@ -40,6 +40,12 @@ Where types.Traits changes according to populated field type.
 
 See [Makefile](Makefile) for details.
 
+# Testing
+
+Run:
+
+```make test```
+
 # Note on maps of messages
 
 Terraform does not support map of resources. If a field in protoc object is map of messages, it could not be defined in Terraform. This case is emulated via generating list with `key` and `value` fields instead. See `NestedMObj` field of [`Test`](test/custom_types.go) message for example.
