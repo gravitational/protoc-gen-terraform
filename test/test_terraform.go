@@ -572,7 +572,6 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 					{
 						p := fmt.Sprintf("%v.%v.value.0.", p, i)
-						fmt.Println(p)
 						{
 
 							_raw, ok := d.GetOk(p + "str")
@@ -676,7 +675,6 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 								{
 									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									fmt.Println(p)
 									{
 
 										_raw, ok := d.GetOk(p + "str")
@@ -732,7 +730,6 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 				{
 					p := fmt.Sprintf("%v.%v.value.0.", p, i)
-					fmt.Println(p)
 					{
 
 						_raw, ok := d.GetOk(p + "str")
@@ -804,7 +801,6 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 								{
 									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									fmt.Println(p)
 									{
 
 										_raw, ok := d.GetOk(p + "str")

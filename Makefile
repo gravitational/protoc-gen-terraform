@@ -42,8 +42,8 @@ endif
 		--terraform_out=types=${types},excludeFields=${excludeFields}:${out_dir} \
 		types.proto
 
-.PHONY: example
-example: build
+.PHONY: test
+test: build
 	@protoc \
 		-I$(srcpath)/github.com/gzigzigzeo/protoc-gen-terraform/test \
 		-I$(srcpath)/github.com/gzigzigzeo/protoc-gen-terraform \
@@ -53,3 +53,4 @@ example: build
 		--terraform_out=types=${types},excludeFields=${excludeFields}:test \
 		--gogo_out=test \
 		test.proto
+	@go test -v ./test
