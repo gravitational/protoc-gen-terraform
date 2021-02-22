@@ -82,7 +82,7 @@ message Test {
     repeated google.protobuf.Timestamp TimestampA = 16 [ (gogoproto.stdtime) = true ];
 
     // []time.Duration field
-    repeated int64 GracePeriodA = 17 [ (gogoproto.casttype) = "Duration" ];
+    repeated int64 DurationCustomA = 17 [ (gogoproto.casttype) = "Duration" ];
 
     // --- Nested messages ---------------------------------------------------------------------
 

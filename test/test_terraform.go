@@ -107,8 +107,8 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// GracePeriodA REPEATED_ELEMENTARY
-		"grace_period_a": {
+		// DurationCustomA REPEATED_ELEMENTARY
+		"duration_custom_a": {
 			Optional: true,
 			Type:     schema.TypeList,
 			Elem: &schema.Schema{
@@ -479,20 +479,37 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "grace_period_a")
+		_rawi, ok := d.GetOk(p + "duration_custom_a")
 		if ok {
 			_rawi := _rawi.([]interface{})
-			t.GracePeriodA = make([]Duration, len(_rawi))
+			t.DurationCustomA = make([]Duration, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
 				_valued, err := time.ParseDuration(_raw.(string))
 				if err != nil {
-					return fmt.Errorf("Malformed duration value for field GracePeriodA : %w", err)
+					return fmt.Errorf("Malformed duration value for field DurationCustomA : %w", err)
 				}
 				_value := Duration(_valued)
-				t.GracePeriodA[i] = _value
+				t.DurationCustomA[i] = _value
 			}
 		}
+	}
+	{
+		p := p + "nested" + ".0."
+
+		_obj := Nested{}
+		t.Nested = &_obj
+		t := &_obj
+
+		{
+
+			_raw, ok := d.GetOk(p + "str")
+			if ok {
+				_value := _raw.(string)
+				t.Str = _value
+			}
+		}
+
 	}
 
 	return nil

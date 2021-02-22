@@ -1,13 +1,13 @@
 func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     p := ""
 
-    {{ template "fields" . }}
+    {{ template "fields" .Fields }}
 
     return nil
 }
 
 {{- define "fields" -}}
-{{ range $index, $field := .Fields }}
+{{ range $index, $field := . }}
 {{- template "field" $field }}
 {{ end }}
 {{- end -}}
@@ -28,6 +28,12 @@ func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
 {{- if eq .Kind "CUSTOM_TYPE" -}}
 {
     {{ template "custom" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "SINGULAR_MESSAGE" -}}
+{
+    {{ template "singularMessage" . }}
 }
 {{- end -}}
 {{- end -}}
@@ -97,3 +103,18 @@ _raw, ok := d.GetOkExists(p + {{ .NameSnake | quote }})
 _raw, ok := d.GetOk(p + {{ .NameSnake | quote  }})
 {{- end }}
 {{- end }}
+
+{{/* Singular message */}}
+{{- define "singularMessage" -}}
+p := p + {{.NameSnake | quote }} + ".0."
+
+{{ if .GoTypeIsPtr }}
+_obj := {{.GoType}}{}
+t.{{ .Name }} = &_obj
+t := &_obj
+{{ else }}
+t := &t.{{.Name}}
+{{ end }}
+
+{{ template "fields" .Message.Fields }}
+{{- end -}}

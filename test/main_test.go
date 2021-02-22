@@ -18,19 +18,28 @@ const (
 
 var (
 	fixutre map[string]interface{} = map[string]interface{}{
-		"str":             "TestString",
-		"int32":           999,
-		"int64":           998,
-		"float":           18.1,
-		"double":          18.4,
-		"bool":            true,
-		"bytes":           "TestBytes",
-		"timestamp":       defaultTimestamp,
-		"duration_std":    "1h",
-		"duration_custom": "1m",
-		"timestamp_n":     defaultTimestamp,
-		"string_a":        []interface{}{"TestString1", "TestString2"},
-		"bool_a":          []interface{}{false, true, false},
+		"str":               "TestString",
+		"int32":             999,
+		"int64":             998,
+		"float":             18.1,
+		"double":            18.4,
+		"bool":              true,
+		"bytes":             "TestBytes",
+		"timestamp":         defaultTimestamp,
+		"duration_std":      "1h",
+		"duration_custom":   "1m",
+		"timestamp_n":       defaultTimestamp,
+		"string_a":          []interface{}{"TestString1", "TestString2"},
+		"bool_a":            []interface{}{false, true, false},
+		"bytes_a":           []interface{}{"TestBytes1", "TestBytes2"},
+		"timestamp_a":       []interface{}{defaultTimestamp},
+		"duration_custom_a": []interface{}{"1m"},
+
+		"nested": []interface{}{
+			map[string]interface{}{
+				"str": "TestString",
+			},
+		},
 	}
 )
 
@@ -76,6 +85,18 @@ func TestTimes(t *testing.T) {
 func TestArrays(t *testing.T) {
 	subject, _ := buildSubject(t)
 
+	timestamp, _ := time.Parse(time.RFC3339, defaultTimestamp)
+	duration, _ := time.ParseDuration("1m")
+
 	assert.Equal(t, subject.StringA, []string{"TestString1", "TestString2"}, "Test.StringA[0]")
 	assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false}, "Test.BoolA")
+	assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")}, "Test.BytesA")
+	assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp}, "Test.TimestampA")
+	assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)}, "Test.DurationCustomA")
+}
+
+func TestNestedMessage(t *testing.T) {
+	subject, _ := buildSubject(t)
+
+	assert.Equal(t, subject.Nested.Str, "TestString", "Test.Nested.Str")
 }
