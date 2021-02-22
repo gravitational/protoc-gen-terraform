@@ -35,26 +35,22 @@ map[string]*schema.Schema {
 },
 {{- end }}
 
-{{- if eq .Kind "ARTIFICIAL_OBJECT_MAP" }}
+{{- if eq .Kind "OBJECT_MAP" }}
 {
     {{ template "required" . }}
-    {{ template "artificialObjectMap" . }}
+    {{ template "objectMap" . }}
 },
 {{- end }}
 
 {{- if eq .Kind "SINGULAR_MESSAGE" }}
-{{- if .IsContainer }}
-    {{- template "fieldSchema" .Message.Fields | first }}
-{{ else }}
-    {
-        {{ template "required" . }}
-        Type: schema.TypeList,
-        MaxItems: 1,
-        Elem: &schema.Resource {
-            Schema: {{ template "fieldsSchema" .Message.Fields }},
-        },
+{
+    {{ template "required" . }}
+    Type: schema.TypeList,
+    MaxItems: 1,
+    Elem: &schema.Resource {
+        Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
-{{ end }}
+},
 {{- end }}
 
 {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
@@ -64,6 +60,9 @@ map[string]*schema.Schema {
 },
 {{- end }}
 
+{{- if eq .Kind "CUSTOM_TYPE" }}
+Schema{{.CustomTypeMethodInfix}}(),
+{{- end }}
 {{- end -}}
 
 {{- define "singularElementary" -}}
@@ -94,7 +93,7 @@ Elem: &schema.Schema {
 },
 {{- end -}}
 
-{{- define "artificialObjectMap" -}}
+{{- define "objectMap" -}}
 Type: schema.TypeList,
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{

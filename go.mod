@@ -17,5 +17,6 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
+	github.com/stretchr/testify v1.6.1
 	google.golang.org/protobuf v1.25.0
 )

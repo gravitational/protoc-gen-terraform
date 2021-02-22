@@ -22,7 +22,7 @@ teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
-# types = "types.UserV2+types.RoleV3"
+# types = "UserV2+RoleV3"
 # types = "types.Metadata"
 types = "Test"
 # excludeFields = "types.UserSpecV2.LocalAuth"
@@ -40,7 +40,7 @@ endif
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
 		--terraform_out=types=${types},excludeFields=${excludeFields}:${out_dir} \
-		test.proto
+		types.proto
 
 .PHONY: example
 example: build

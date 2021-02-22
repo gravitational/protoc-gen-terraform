@@ -30,14 +30,15 @@ type Field struct {
 	GoTypeIsPtr   bool   // Go type is a pointer
 
 	// Metadata
-	Kind        string // Field kind (resulting of combination of meta flags)
-	IsRepeated  bool   // Is list
-	IsMap       bool   // Is map
-	IsMessage   bool   // Is message (might be repeated in the same time)
-	IsRequired  bool   // Is required TODO: implement
-	IsTime      bool   // Contains time, value needs to be parsed from string
-	IsDuration  bool   // Contains duration, value needs to be parsed from string
-	IsContainer bool   // Field contains single field
+	Kind                  string // Field kind (resulting of combination of meta flags)
+	IsRepeated            bool   // Is list
+	IsMap                 bool   // Is map
+	IsMessage             bool   // Is message (might be repeated in the same time)
+	IsRequired            bool   // Is required TODO: implement
+	IsTime                bool   // Contains time, value needs to be parsed from string
+	IsDuration            bool   // Contains duration, value needs to be parsed from string
+	IsCustomType          bool   // Custom types require manual marshallers and schemas
+	CustomTypeMethodInfix string // Custom type method name
 
 	Message       *Message // Reference to nested message
 	MapValueField *Field   // Reference to map value field reflection
@@ -104,6 +105,7 @@ func (b *fieldBuilder) build() {
 	b.setGoType()
 	b.resolveType()
 	b.setAggregate()
+	b.setCustomType()
 	b.setKind()
 }
 
@@ -164,12 +166,18 @@ func (b *fieldBuilder) setGoType() {
 	f.RawGoType = goType
 	f.GoType = goType
 
+	if goType[0] == '*' {
+		f.GoType = goType[1:]
+		f.GoTypeIsPtr = true
+	}
+
+	if goType == "[]byte" {
+		return
+	}
+
 	if goType[0] == '[' {
 		f.GoType = goType[2:]
 		f.GoTypeIsSlice = true
-	} else if goType[0] == '*' {
-		f.GoType = goType[1:]
-		f.GoTypeIsPtr = true
 	}
 }
 
@@ -188,7 +196,7 @@ func (b *fieldBuilder) resolveType() {
 		b.setSchemaTypes("string", "time.Duration")
 		f.IsDuration = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
-		b.setSchemaTypes("float64", "double64")
+		b.setSchemaTypes("float64", "float64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(d):
 		b.setSchemaTypes("float64", "float32")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_INT64) || gogoproto.IsStdInt64(d):
@@ -231,20 +239,19 @@ func (b *fieldBuilder) resolveType() {
 }
 
 // Append type suffix to cast type, custom type and message
-// Note on custom type: it is guaranteed that custom type has the same subset of fields as protobuf schema type
-// However, it does not guarantee that custom type can be directly casted to schema type
 func (b *fieldBuilder) prependPackageName() {
 	d := b.fieldDescriptor
+	f := b.field
 
-	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) || b.isMessage() {
-		f := b.field
+	if b.isMessage() && b.field.Message != nil {
+		f.GoType = b.field.Message.GoTypeName
+		return
+	}
 
-		l := f.GoType[0:1]
-
-		// In other words, if the first letter of a type name is uppercase, this means that type is not prefixed with
-		// package name.
-		if strings.ToLower(l) != l {
-			f.GoType = b.descriptor.File().GoPackageName() + "." + f.GoType
+	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) {
+		// Is cast type is within current package, append default package name to it
+		if !strings.Contains(f.GoType, ".") && config.DefaultPkgName != "" {
+			f.GoType = config.DefaultPkgName + "." + f.GoType
 		}
 	}
 }
@@ -266,25 +273,6 @@ func (b *fieldBuilder) setMessage() {
 
 	// Nested message schema, or nil if message is not whitelisted
 	b.field.Message = m
-	b.setIsContainer()
-}
-
-// setIsContainer sets folding flag. This flag means that field is a message having single elementary field.
-// There is no point to have redundant nesting.
-func (b *fieldBuilder) setIsContainer() {
-	f := b.field
-
-	// Lists and maps can not be containers
-	if f.IsRepeated || f.IsMap {
-		return
-	}
-
-	fields := f.Message.Fields
-
-	if len(fields) == 1 {
-		f.IsContainer = true
-		// logrus.Println(inspect.Element(f.Message.Fields[0]))
-	}
 }
 
 func (b *fieldBuilder) setAggregate() {
@@ -296,6 +284,15 @@ func (b *fieldBuilder) setAggregate() {
 	} else if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 	}
+}
+
+func (b *fieldBuilder) setCustomType() {
+	if !gogoproto.IsCustomType(b.fieldDescriptor) {
+		return
+	}
+
+	b.field.IsCustomType = true
+	b.field.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(b.field.GoType, "/", ""), ".", "")
 }
 
 // reflectMap sets map value properties
@@ -319,9 +316,11 @@ func (b *fieldBuilder) setKind() {
 	f := b.field
 
 	switch {
+	case f.IsCustomType:
+		f.Kind = "CUSTOM_TYPE"
 	case f.IsMap && f.MapValueField.IsMessage:
 		// Terraform does not support map of objects. We replace such field with list of objects having key and value fields.
-		f.Kind = "ARTIFICIAL_OBJECT_MAP" // ex: map[string]struct, requires additional steps to unmarshal
+		f.Kind = "OBJECT_MAP" // ex: map[string]struct, requires additional steps to unmarshal
 	case f.IsMap:
 		f.Kind = "MAP" // ex: map[string]string
 	case f.IsRepeated && f.IsMessage:

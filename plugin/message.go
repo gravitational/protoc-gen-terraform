@@ -70,11 +70,11 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 	return message
 }
 
-// getMessageTypeName returns full message name
+// getMessageTypeName returns full message name, with prepended DefaultPkgName if needed
 func getMessageTypeName(d *generator.Descriptor) string {
 	if d.GoImportPath() == "." {
 		if config.DefaultPkgName != "" {
-			return strings.Join([]string{config.DefaultPkgName, d.GetName()}, ".")
+			return config.DefaultPkgName + "." + d.GetName()
 		} else {
 			return d.GetName()
 		}
@@ -98,7 +98,7 @@ func (m *Message) GoTypeMapString(prefixa string) string {
 	//b.WriteString(fmt.Sprintf("//%-30v\n", prefixa+m.GoTypeName))
 
 	for _, f := range m.Fields {
-		s := fmt.Sprintf("// %-40v %-50v %-25v %-7v %-7v\n", prefixa+f.Name, f.GoType, f.Kind, f.IsMap, f.IsContainer)
+		s := fmt.Sprintf("// %-40v %-50v %-25v %-7v\n", prefixa+f.Name, f.GoType, f.Kind, f.IsMap)
 		b.WriteString(s)
 
 		if f.IsMessage {

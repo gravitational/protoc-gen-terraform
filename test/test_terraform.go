@@ -10,6 +10,7 @@ import (
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	validation "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
+	_ "google.golang.org/protobuf/types/known/wrapperspb"
 	math "math"
 	time "time"
 )
@@ -20,159 +21,486 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-func UnmarshalTest(d *schema.ResourceData, t *Test) error {
-	meta := []struct {
-		Name          string
-		SchemaName    string
-		SchemaRawType string
-		SchemaGoType  string
-	}{
-
-		{
-			Name:          "Str",
-			SchemaName:    "str",
-			SchemaRawType: "string",
-			SchemaGoType:  "string",
+// Type full name: Test
+func SchemaTest() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		// Str SINGULAR_ELEMENTARY
+		"str": {
+			Type:     schema.TypeString,
+			Optional: true,
 		},
-
-		{
-			Name:          "Int32",
-			SchemaName:    "int32",
-			SchemaRawType: "int",
-			SchemaGoType:  "int32",
+		// Int32 SINGULAR_ELEMENTARY
+		"int32": {
+			Type:     schema.TypeInt,
+			Optional: true,
 		},
-
-		{
-			Name:          "Int64",
-			SchemaName:    "int64",
-			SchemaRawType: "int",
-			SchemaGoType:  "int64",
+		// Int64 SINGULAR_ELEMENTARY
+		"int64": {
+			Type:     schema.TypeInt,
+			Optional: true,
 		},
-
-		{
-			Name:          "Float",
-			SchemaName:    "float",
-			SchemaRawType: "float64",
-			SchemaGoType:  "float32",
+		// Float SINGULAR_ELEMENTARY
+		"float": {
+			Type:     schema.TypeFloat,
+			Optional: true,
 		},
-
-		{
-			Name:          "Double",
-			SchemaName:    "double",
-			SchemaRawType: "float64",
-			SchemaGoType:  "double64",
+		// Double SINGULAR_ELEMENTARY
+		"double": {
+			Type:     schema.TypeFloat,
+			Optional: true,
 		},
-
-		{
-			Name:          "Bool",
-			SchemaName:    "bool",
-			SchemaRawType: "bool",
-			SchemaGoType:  "bool",
+		// Bool SINGULAR_ELEMENTARY
+		"bool": {
+			Type:     schema.TypeBool,
+			Optional: true,
 		},
-
-		{
-			Name:          "Bytes",
-			SchemaName:    "bytes",
-			SchemaRawType: "string",
-			SchemaGoType:  "[]byte",
+		// Bytes SINGULAR_ELEMENTARY
+		"bytes": {
+			Type:     schema.TypeString,
+			Optional: true,
 		},
-
-		{
-			Name:          "Timestamp",
-			SchemaName:    "timestamp",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Time",
+		// Timestamp SINGULAR_ELEMENTARY
+		"timestamp": {
+			Type:         schema.TypeString,
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
 		},
-
-		{
-			Name:          "DurationStd",
-			SchemaName:    "duration_std",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Duration",
+		// DurationStd SINGULAR_ELEMENTARY
+		"duration_std": {
+			Type:     schema.TypeString,
+			Optional: true,
 		},
-
-		{
-			Name:          "DurationCustom",
-			SchemaName:    "duration_custom",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Duration",
+		// DurationCustom SINGULAR_ELEMENTARY
+		"duration_custom": {
+			Type:     schema.TypeString,
+			Optional: true,
 		},
-
-		{
-			Name:          "BoolN",
-			SchemaName:    "bool_n",
-			SchemaRawType: "bool",
-			SchemaGoType:  "bool",
+		// BoolN SINGULAR_ELEMENTARY
+		"bool_n": {
+			Type:     schema.TypeBool,
+			Optional: true,
 		},
-
-		{
-			Name:          "BytesN",
-			SchemaName:    "bytes_n",
-			SchemaRawType: "string",
-			SchemaGoType:  "[]byte",
+		// BytesN SINGULAR_ELEMENTARY
+		"bytes_n": {
+			Type:     schema.TypeString,
+			Optional: true,
 		},
-
-		{
-			Name:          "TimestampN",
-			SchemaName:    "timestamp_n",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Time",
+		// TimestampN SINGULAR_ELEMENTARY
+		"timestamp_n": {
+			Type:         schema.TypeString,
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
 		},
-
-		{
-			Name:          "DurationN",
-			SchemaName:    "duration_n",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Duration",
+		// DurationN SINGULAR_ELEMENTARY
+		"duration_n": {
+			Type:     schema.TypeString,
+			Optional: true,
 		},
-
-		{
-			Name:          "StringA",
-			SchemaName:    "string_a",
-			SchemaRawType: "string",
-			SchemaGoType:  "string",
+		// StringA REPEATED_ELEMENTARY
+		"string_a": {
+			Optional: true,
+			Type:     schema.TypeList,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
-
-		{
-			Name:          "BoolA",
-			SchemaName:    "bool_a",
-			SchemaRawType: "bool",
-			SchemaGoType:  "bool",
+		// BoolA CUSTOM_TYPE
+		"bool_a": SchemaBoolCustomArray(),
+		// BytesA REPEATED_ELEMENTARY
+		"bytes_a": {
+			Optional: true,
+			Type:     schema.TypeList,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
-
-		{
-			Name:          "BytesA",
-			SchemaName:    "bytes_a",
-			SchemaRawType: "string",
-			SchemaGoType:  "[]byte",
+		// TimestampA REPEATED_ELEMENTARY
+		"timestamp_a": {
+			Optional: true,
+			Type:     schema.TypeList,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
-
-		{
-			Name:          "TimestampA",
-			SchemaName:    "timestamp_a",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Time",
+		// GracePeriodA REPEATED_ELEMENTARY
+		"grace_period_a": {
+			Optional: true,
+			Type:     schema.TypeList,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
-
-		{
-			Name:          "GracePeriodA",
-			SchemaName:    "grace_period_a",
-			SchemaRawType: "string",
-			SchemaGoType:  "time.Duration",
+		// Nested SINGULAR_MESSAGE
+		"nested": {
+			Optional: true,
+			Type:     schema.TypeList,
+			MaxItems: 1,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str SINGULAR_ELEMENTARY
+					"str": {
+						Type:     schema.TypeString,
+						Optional: true,
+					},
+					// Nested REPEATED_MESSAGE
+					"nested": {
+						Optional: true,
+						Type:     schema.TypeList,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str SINGULAR_ELEMENTARY
+								"str": {
+									Type:     schema.TypeString,
+									Optional: true,
+								},
+							},
+						},
+					},
+					// NestedS MAP
+					"nested_s": {
+						Optional: true,
+						Type:     schema.TypeMap,
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+					// NestedM OBJECT_MAP
+					"nested_m": {
+						Optional: true,
+						Type:     schema.TypeList,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Optional: true,
+									Type:     schema.TypeList,
+									MaxItems: 1,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str SINGULAR_ELEMENTARY
+											"str": {
+												Type:     schema.TypeString,
+												Optional: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
-
-		{
-			Name:          "Nested",
-			SchemaName:    "nested",
-			SchemaRawType: "",
-			SchemaGoType:  "",
+		// NestedA REPEATED_MESSAGE
+		"nested_a": {
+			Optional: true,
+			Type:     schema.TypeList,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str SINGULAR_ELEMENTARY
+					"str": {
+						Type:     schema.TypeString,
+						Optional: true,
+					},
+					// Nested REPEATED_MESSAGE
+					"nested": {
+						Optional: true,
+						Type:     schema.TypeList,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str SINGULAR_ELEMENTARY
+								"str": {
+									Type:     schema.TypeString,
+									Optional: true,
+								},
+							},
+						},
+					},
+					// NestedS MAP
+					"nested_s": {
+						Optional: true,
+						Type:     schema.TypeMap,
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+					// NestedM OBJECT_MAP
+					"nested_m": {
+						Optional: true,
+						Type:     schema.TypeList,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Optional: true,
+									Type:     schema.TypeList,
+									MaxItems: 1,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str SINGULAR_ELEMENTARY
+											"str": {
+												Type:     schema.TypeString,
+												Optional: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
-
-		{
-			Name:          "NestedA",
-			SchemaName:    "nested_a",
-			SchemaRawType: "",
-			SchemaGoType:  "",
+		// NestedS MAP
+		"nested_s": {
+			Optional: true,
+			Type:     schema.TypeMap,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		// NestedM OBJECT_MAP
+		"nested_m": {
+			Optional: true,
+			Type:     schema.TypeList,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+					"value": {
+						Optional: true,
+						Type:     schema.TypeList,
+						MaxItems: 1,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str SINGULAR_ELEMENTARY
+								"str": {
+									Type:     schema.TypeString,
+									Optional: true,
+								},
+								// Nested REPEATED_MESSAGE
+								"nested": {
+									Optional: true,
+									Type:     schema.TypeList,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str SINGULAR_ELEMENTARY
+											"str": {
+												Type:     schema.TypeString,
+												Optional: true,
+											},
+										},
+									},
+								},
+								// NestedS MAP
+								"nested_s": {
+									Optional: true,
+									Type:     schema.TypeMap,
+									Elem: &schema.Schema{
+										Type: schema.TypeString,
+									},
+								},
+								// NestedM OBJECT_MAP
+								"nested_m": {
+									Optional: true,
+									Type:     schema.TypeList,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											"key": {
+												Type:     schema.TypeString,
+												Required: true,
+											},
+											"value": {
+												Optional: true,
+												Type:     schema.TypeList,
+												MaxItems: 1,
+												Elem: &schema.Resource{
+													Schema: map[string]*schema.Schema{
+														// Str SINGULAR_ELEMENTARY
+														"str": {
+															Type:     schema.TypeString,
+															Optional: true,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	}
+}
+func UnmarshalTest(d *schema.ResourceData, t *Test) error {
+	p := ""
+	{
+		_raw, ok := d.GetOk(p + "str")
+		if ok {
+			_value := _raw.(string)
+			t.Str = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "int32")
+		if ok {
+			_value := int32(int32(_raw.(int)))
+			t.Int32 = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "int64")
+		if ok {
+			_value := int64(int64(_raw.(int)))
+			t.Int64 = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "float")
+		if ok {
+			_value := float32(float32(_raw.(float64)))
+			t.Float = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "double")
+		if ok {
+			_value := _raw.(float64)
+			t.Double = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOkExists(p + "bool")
+		if ok {
+			_value := _raw.(bool)
+			t.Bool = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "bytes")
+		if ok {
+			_value := []byte([]byte(_raw.(string)))
+			t.Bytes = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "timestamp")
+		if ok {
+			_value, err := time.Parse(time.RFC3339, _raw.(string))
+			if err != nil {
+				return fmt.Errorf("Malformed time value for field Timestamp : %w", err)
+			}
+			t.Timestamp = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "duration_std")
+		if ok {
+			_valued, err := time.ParseDuration(_raw.(string))
+			if err != nil {
+				return fmt.Errorf("Malformed duration value for field DurationStd : %w", err)
+			}
+			_value := time.Duration(_valued)
+			t.DurationStd = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "duration_custom")
+		if ok {
+			_valued, err := time.ParseDuration(_raw.(string))
+			if err != nil {
+				return fmt.Errorf("Malformed duration value for field DurationCustom : %w", err)
+			}
+			_value := Duration(_valued)
+			t.DurationCustom = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOkExists(p + "bool_n")
+		if ok {
+			_value := _raw.(bool)
+			t.BoolN = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "bytes_n")
+		if ok {
+			_value := []byte([]byte(_raw.(string)))
+			t.BytesN = _value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "timestamp_n")
+		if ok {
+			_value, err := time.Parse(time.RFC3339, _raw.(string))
+			if err != nil {
+				return fmt.Errorf("Malformed time value for field TimestampN : %w", err)
+			}
+			t.TimestampN = &_value
+		}
+	}
+
+	{
+		_raw, ok := d.GetOk(p + "duration_n")
+		if ok {
+			_valued, err := time.ParseDuration(_raw.(string))
+			if err != nil {
+				return fmt.Errorf("Malformed duration value for field DurationN : %w", err)
+			}
+			_value := Duration(_valued)
+			t.DurationN = _value
+		}
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	{
+	}
+
+	return nil
 }

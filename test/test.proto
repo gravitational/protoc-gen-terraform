@@ -3,18 +3,30 @@ package test;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option (gogoproto.marshaler_all) = false;
 option (gogoproto.unmarshaler_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 
 message Nested {
-    string String = 1;
-    NestedLevel2 Nested = 2;
+    // Nested field
+    string Str = 1;
+
+    // Nested message
+    repeated NestedLevel2 Nested = 2;
+
+    // --- Nested maps ----------------------------------------------------------------------
+    
+    // Normal map
+    map<string, string> NestedS = 3;
+
+    // Object map
+    map<string, NestedLevel2> NestedM = 4;
 }
 
 message NestedLevel2 {
-    string String = 1;
+    string Str = 1;
 }
 
 message Test {
@@ -92,4 +104,10 @@ message Test {
     repeated Nested NestedA = 21;
 
     // --- Maps --------------------------------------------------------------------------------
+
+    // Normal map
+    map<string, string> NestedS = 22;
+
+    // Object map
+    map<string, Nested> NestedM = 23;
 }

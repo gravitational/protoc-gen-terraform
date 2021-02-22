@@ -58,6 +58,18 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 	}
 
+	// for _, message := range p.Messages {
+	// 	p.P(message.GoTypeMapString(""))
+	// }
+
+	for _, message := range p.Messages {
+		buf, err := message.GoSchemaString()
+		if err != nil {
+			p.Generator.Fail(trace.Wrap(err).Error())
+		}
+		p.P(buf.String())
+	}
+
 	for _, message := range p.Messages {
 		buf, err := message.GoNewUnmarshal()
 		if err != nil {
@@ -65,27 +77,6 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 		p.P(buf.String())
 	}
-
-	// if len(p.Messages) > 0 {
-	// 	logrus.Println(p.Messages)
-	// 	buf, err := p.Messages["types.RoleV3"].GoNewUnmarshal()
-	// 	if err != nil {
-	// 		p.Generator.Fail(trace.Wrap(err).Error())
-	// 	}
-	// 	p.P(buf.String())
-	// }
-
-	// for _, message := range p.Messages {
-	// 	p.P(message.GoTypeMapString(""))
-	// }
-
-	// for _, message := range p.Messages {
-	// 	buf, err := message.GoSchemaString()
-	// 	if err != nil {
-	// 		p.Generator.Fail(trace.Wrap(err).Error())
-	// 	}
-	// 	p.P(buf.String())
-	// }
 
 	// for _, message := range p.Messages {
 	// 	buf, err := message.GoUnmarshalString()
@@ -104,7 +95,7 @@ func (p *Plugin) setImports() {
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
 
-	// // TODO: Temporary
+	// // TODO: Temporary, replace with imports
 	// p.AddImport("github.com/gravitational/teleport/api/types")
 	// p.AddImport("github.com/gravitational/teleport/api/types/wrappers")
 }
