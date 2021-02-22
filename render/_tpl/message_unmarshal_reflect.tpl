@@ -42,6 +42,12 @@ func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     {{ template "repeatedMessage" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "MAP" -}}
+{
+    {{ template "map" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders unmarshaller for singular value of any type */}}
@@ -145,5 +151,21 @@ if ok {
             {{ template "fields" .Message.Fields }}
         }
     }
+}
+{{- end -}}
+
+{{/* Elementary string -> value map */}}
+{{- define "map" -}}
+{{ $m := .MapValueField }}
+p := p + {{.NameSnake | quote }}
+_rawm, ok := d.GetOk(p)
+if ok {
+    _rawm := _rawm.(map[string]interface{})
+    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawm))
+    for _k, _v := range _rawm {
+        _raw := _v
+        {{- template "rawToValue" $m }}
+        t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
+    }   
 }
 {{- end -}}

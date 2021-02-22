@@ -141,16 +141,16 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
-					// NestedS MAP
-					"nested_s": {
+					// NestedM MAP
+					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
 						},
 					},
-					// NestedM OBJECT_MAP
-					"nested_m": {
+					// NestedMObj OBJECT_MAP
+					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
@@ -204,16 +204,16 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
-					// NestedS MAP
-					"nested_s": {
+					// NestedM MAP
+					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
 						},
 					},
-					// NestedM OBJECT_MAP
-					"nested_m": {
+					// NestedMObj OBJECT_MAP
+					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
@@ -242,16 +242,16 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedS MAP
-		"nested_s": {
+		// NestedM MAP
+		"nested_m": {
 			Optional: true,
 			Type:     schema.TypeMap,
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		// NestedM OBJECT_MAP
-		"nested_m": {
+		// NestedMObj OBJECT_MAP
+		"nested_m_obj": {
 			Optional: true,
 			Type:     schema.TypeList,
 			Elem: &schema.Resource{
@@ -285,16 +285,16 @@ func SchemaTest() map[string]*schema.Schema {
 										},
 									},
 								},
-								// NestedS MAP
-								"nested_s": {
+								// NestedM MAP
+								"nested_m": {
 									Optional: true,
 									Type:     schema.TypeMap,
 									Elem: &schema.Schema{
 										Type: schema.TypeString,
 									},
 								},
-								// NestedM OBJECT_MAP
-								"nested_m": {
+								// NestedMObj OBJECT_MAP
+								"nested_m_obj": {
 									Optional: true,
 									Type:     schema.TypeList,
 									Elem: &schema.Resource{
@@ -537,6 +537,20 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				}
 			}
 		}
+		{
+
+			p := p + "nested_m"
+			_rawm, ok := d.GetOk(p)
+			if ok {
+				_rawm := _rawm.(map[string]interface{})
+				t.NestedM = make(map[string]string, len(_rawm))
+				for _k, _v := range _rawm {
+					_raw := _v
+					_value := _raw.(string)
+					t.NestedM[_k] = _value
+				}
+			}
+		}
 
 	}
 	{
@@ -590,8 +604,36 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							}
 						}
 					}
+					{
+
+						p := p + "nested_m"
+						_rawm, ok := d.GetOk(p)
+						if ok {
+							_rawm := _rawm.(map[string]interface{})
+							t.NestedM = make(map[string]string, len(_rawm))
+							for _k, _v := range _rawm {
+								_raw := _v
+								_value := _raw.(string)
+								t.NestedM[_k] = _value
+							}
+						}
+					}
 
 				}
+			}
+		}
+	}
+	{
+
+		p := p + "nested_m"
+		_rawm, ok := d.GetOk(p)
+		if ok {
+			_rawm := _rawm.(map[string]interface{})
+			t.NestedM = make(map[string]string, len(_rawm))
+			for _k, _v := range _rawm {
+				_raw := _v
+				_value := _raw.(string)
+				t.NestedM[_k] = _value
 			}
 		}
 	}

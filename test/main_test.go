@@ -48,6 +48,11 @@ var (
 				},
 			},
 		},
+
+		"nested_m": map[string]interface{}{
+			"k1": "v1",
+			"k2": "v2",
+		},
 	}
 )
 
@@ -96,11 +101,11 @@ func TestArrays(t *testing.T) {
 	timestamp, _ := time.Parse(time.RFC3339, defaultTimestamp)
 	duration, _ := time.ParseDuration("1m")
 
-	assert.Equal(t, subject.StringA, []string{"TestString1", "TestString2"}, "Test.StringA[0]")
-	assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false}, "Test.BoolA")
-	assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")}, "Test.BytesA")
-	assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp}, "Test.TimestampA")
-	assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)}, "Test.DurationCustomA")
+	assert.Equal(t, subject.StringA, []string{"TestString1", "TestString2"})
+	assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
+	assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
+	assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
+	assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
 }
 
 func TestNestedMessage(t *testing.T) {
@@ -114,4 +119,11 @@ func TestNestedMessageArray(t *testing.T) {
 
 	assert.Equal(t, subject.Nested.Nested[0].Str, "TestString1")
 	assert.Equal(t, subject.Nested.Nested[1].Str, "TestString2")
+}
+
+func TestMap(t *testing.T) {
+	subject, _ := buildSubject(t)
+
+	assert.Equal(t, subject.NestedM["k1"], "v1")
+	assert.Equal(t, subject.NestedM["k2"], "v2")
 }

@@ -19,10 +19,10 @@ message Nested {
     // --- Nested maps ----------------------------------------------------------------------
     
     // Normal map
-    map<string, string> NestedS = 3;
+    map<string, string> NestedM = 3;
 
     // Object map
-    map<string, NestedLevel2> NestedM = 4;
+    map<string, NestedLevel2> NestedMObj = 4;
 }
 
 message NestedLevel2 {
@@ -97,8 +97,8 @@ message Test {
     // --- Maps --------------------------------------------------------------------------------
 
     // Normal map
-    map<string, string> NestedS = 20;
+    map<string, string> NestedM = 20;
 
     // Object map
-    map<string, Nested> NestedM = 21;
+    map<string, Nested> NestedMObj = 21;
 }
