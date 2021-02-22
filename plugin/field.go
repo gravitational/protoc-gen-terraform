@@ -24,17 +24,17 @@ type Field struct {
 	SchemaGoType  string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 
 	// Field properties
-	RawGoType     string // Field type returned by gogoprotobuf
-	GoType        string // Go type without prefixes, but with package name
-	GoTypeIsSlice bool   // Go type is a slice
-	GoTypeIsPtr   bool   // Go type is a pointer
+	RawGoType     string // Field type returned by gogoprotobuf with * and []
+	GoType        string // Go type without [] and *, but with package name prepended
+	GoTypeIsSlice bool   // Go type is a slice?
+	GoTypeIsPtr   bool   // Go type is a pointer?
 
 	// Metadata
-	Kind                  string // Field kind (resulting of combination of meta flags)
+	Kind                  string // Field kind (resulting of combination of meta flags, see setKind method)
 	IsRepeated            bool   // Is list
 	IsMap                 bool   // Is map
 	IsMessage             bool   // Is message (might be repeated in the same time)
-	IsRequired            bool   // Is required TODO: implement
+	IsRequired            bool   // Is required TODO: implement via param
 	IsTime                bool   // Contains time, value needs to be parsed from string
 	IsDuration            bool   // Contains duration, value needs to be parsed from string
 	IsCustomType          bool   // Custom types require manual marshallers and schemas
@@ -122,12 +122,6 @@ func (b *fieldBuilder) isTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
 	return *b.fieldDescriptor.Type == t
 }
 
-// setTypes sets SchemaType and SchemaGoType
-func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
-	b.field.SchemaRawType = schemaRawType
-	b.field.SchemaGoType = goTypeCast
-}
-
 // isTime returns true if field stores time (is standard, google or golang time)
 func (b *fieldBuilder) isTime() bool {
 	t := b.fieldDescriptor.TypeName
@@ -157,6 +151,12 @@ func (b *fieldBuilder) isMessage() bool {
 	return b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
 }
 
+// setTypes sets SchemaType and SchemaGoType
+func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
+	b.field.SchemaRawType = schemaRawType
+	b.field.SchemaGoType = goTypeCast
+}
+
 // setGoType Sets go type with gogoprotobuf standard method, sets type information flags
 func (b *fieldBuilder) setGoType() {
 	f := b.field // shortrut
@@ -166,18 +166,21 @@ func (b *fieldBuilder) setGoType() {
 	f.RawGoType = goType
 	f.GoType = goType
 
-	if goType[0] == '*' {
-		f.GoType = goType[1:]
+	if f.GoType[0] == '[' {
+		f.GoType = f.GoType[2:]
+		f.GoTypeIsSlice = true
+	}
+
+	if f.GoType[0] == '*' {
+		f.GoType = f.GoType[1:]
 		f.GoTypeIsPtr = true
 	}
 
-	if goType == "[]byte" {
+	// This is an exception: we get all []byte arrays from strings, it is an elementary type on protobuf side
+	// TODO: Param containing list of fields which want to be real byte arrays
+	if goType == "[]byte" || goType == "[]*byte" {
+		f.GoType = "[]byte"
 		return
-	}
-
-	if goType[0] == '[' {
-		f.GoType = goType[2:]
-		f.GoTypeIsSlice = true
 	}
 }
 
@@ -187,7 +190,6 @@ func (b *fieldBuilder) resolveType() {
 	d := b.fieldDescriptor // shortcut
 	f := b.field           // shortcut
 
-	// Basics
 	switch {
 	case b.isTime():
 		b.setSchemaTypes("string", "time.Time")
@@ -265,7 +267,6 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
-	// Break dependency
 	m := BuildMessage(b.generator, desc, false)
 	if m == nil {
 		panic(newBuildError("Nested message is invalid"))
@@ -275,6 +276,7 @@ func (b *fieldBuilder) setMessage() {
 	b.field.Message = m
 }
 
+// Sets IsList and IsMap flags
 func (b *fieldBuilder) setAggregate() {
 	f := b.field
 
@@ -286,6 +288,7 @@ func (b *fieldBuilder) setAggregate() {
 	}
 }
 
+// Sets gogo.customtype flag
 func (b *fieldBuilder) setCustomType() {
 	if !gogoproto.IsCustomType(b.fieldDescriptor) {
 		return

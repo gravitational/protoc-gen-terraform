@@ -1,22 +1,34 @@
 func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     p := ""
 
-    {{- template "fields" . }}
+    {{ template "fields" . }}
 
     return nil
 }
 
 {{- define "fields" -}}
 {{ range $index, $field := .Fields }}
-{
-    {{- template "field" $field }}
-}
+{{- template "field" $field }}
 {{ end }}
 {{- end -}}
 
 {{- define "field" -}}
 {{- if eq .Kind "SINGULAR_ELEMENTARY" -}}
+{
     {{ template "singularElementary" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "REPEATED_ELEMENTARY" -}}
+{
+    {{ template "repeatedElementary" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "CUSTOM_TYPE" -}}
+{
+    {{ template "custom" . }}
+}
 {{- end -}}
 {{- end -}}
 
@@ -26,6 +38,28 @@ func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
 if ok {
     {{- template "rawToValue" . }}
     t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_value
+}
+{{- end -}}
+
+{{/* Renders unmarshaller for elementary array of any type */}}
+{{- define "repeatedElementary" -}}
+_rawi, ok := d.GetOk(p + {{ .NameSnake | quote }})
+if ok {
+    _rawi := _rawi.([]interface{})
+    t.{{.Name}} = make({{.RawGoType}}, len(_rawi))
+    for i := 0; i < len(_rawi); i++ {
+        _raw := _rawi[i]
+        {{- template "rawToValue" . }}
+        t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_value
+    }
+}
+{{- end -}}
+
+{{/* Renders custom unmarshaller custom type */}}
+{{- define "custom" -}}
+err := Unmarshal{{.CustomTypeMethodInfix}}(p + {{.NameSnake | quote}}, d, &t.{{.Name}})
+if err != nil {
+    return err
 }
 {{- end -}}
 
@@ -53,7 +87,7 @@ _value := {{.GoType}}({{.SchemaGoType}}(_raw.({{.SchemaRawType}})))
 {{- end }}
 {{- end -}}
 
-{{/* Generates schema getter statement */}}
+{{/* Generates schema getter statement with an exception for bool, which must not be parsed if not set */}}
 {{/* Input: p */}}
 {{/* Output: _raw */}}
 {{- define "getOk" -}}

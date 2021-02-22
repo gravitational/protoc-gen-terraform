@@ -1,17 +1,20 @@
 package test
 
-import schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
 
-// Custom duration type
+// Duration custom duration type
 type Duration int64
 
-// Custom bool array
-type BoolCustomArray []bool
+// BoolCustom custom bool array
+type BoolCustom bool
 
+// SomethingCustom some custom value
 type SomethingCustom int
 
-// SchemaBoolCustomArray returns schema for custom bool array
-func SchemaBoolCustomArray() *schema.Schema {
+// SchemaBoolCustom returns schema for custom bool array
+func SchemaBoolCustom() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Required: true,
@@ -19,4 +22,19 @@ func SchemaBoolCustomArray() *schema.Schema {
 			Type: schema.TypeBool,
 		},
 	}
+}
+
+// UnmarshalBoolCustom custom unmarshaller
+func UnmarshalBoolCustom(path string, data *schema.ResourceData, target *[]BoolCustom) error {
+	rawi, ok := data.GetOk(path)
+	if ok {
+		arr := rawi.([]interface{})
+		*target = make([]BoolCustom, len(arr))
+
+		for i := 0; i < len(arr); i++ {
+			(*target)[i] = BoolCustom(arr[i].(bool))
+		}
+	}
+
+	return nil
 }

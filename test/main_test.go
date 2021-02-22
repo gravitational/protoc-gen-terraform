@@ -29,27 +29,27 @@ var (
 		"duration_std":    "1h",
 		"duration_custom": "1m",
 		"timestamp_n":     defaultTimestamp,
+		"string_a":        []interface{}{"TestString1", "TestString2"},
+		"bool_a":          []interface{}{false, true, false},
 	}
 )
 
-func buildSubject(t *testing.T) *Test {
-	subject := &Test{}
-	data := schema.TestResourceDataRaw(t, SchemaTest(), fixutre)
-	UnmarshalTest(data, subject)
-	return subject
-}
-
-func TestUnmarshal(t *testing.T) {
+func buildSubject(t *testing.T) (*Test, error) {
 	subject := &Test{}
 	data := schema.TestResourceDataRaw(t, SchemaTest(), fixutre)
 	err := UnmarshalTest(data, subject)
+	return subject, err
+}
+
+func TestUnmarshal(t *testing.T) {
+	_, err := buildSubject(t)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func TestElementaries(t *testing.T) {
-	subject := buildSubject(t)
+	subject, _ := buildSubject(t)
 
 	assert.Equal(t, subject.Str, "TestString", "Test.Str")
 	assert.Equal(t, subject.Int32, int32(999), "Test.Int32")
@@ -61,7 +61,7 @@ func TestElementaries(t *testing.T) {
 }
 
 func TestTimes(t *testing.T) {
-	subject := buildSubject(t)
+	subject, _ := buildSubject(t)
 
 	timestamp, _ := time.Parse(time.RFC3339, defaultTimestamp)
 	durationStd, _ := time.ParseDuration("1h")
@@ -71,4 +71,11 @@ func TestTimes(t *testing.T) {
 	assert.Equal(t, subject.DurationStd, durationStd, "Test.DurationStd")
 	assert.Equal(t, subject.DurationCustom, Duration(durationCustom), "Test.DurationCustom")
 	assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
+}
+
+func TestArrays(t *testing.T) {
+	subject, _ := buildSubject(t)
+
+	assert.Equal(t, subject.StringA, []string{"TestString1", "TestString2"}, "Test.StringA[0]")
+	assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false}, "Test.BoolA")
 }

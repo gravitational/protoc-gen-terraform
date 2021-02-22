@@ -90,7 +90,7 @@ func SchemaTest() map[string]*schema.Schema {
 			},
 		},
 		// BoolA CUSTOM_TYPE
-		"bool_a": SchemaBoolCustomArray(),
+		"bool_a": SchemaBoolCustom(),
 		// BytesA REPEATED_ELEMENTARY
 		"bytes_a": {
 			Optional: true,
@@ -330,63 +330,65 @@ func SchemaTest() map[string]*schema.Schema {
 }
 func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	p := ""
+
 	{
+
 		_raw, ok := d.GetOk(p + "str")
 		if ok {
 			_value := _raw.(string)
 			t.Str = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "int32")
 		if ok {
 			_value := int32(int32(_raw.(int)))
 			t.Int32 = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "int64")
 		if ok {
 			_value := int64(int64(_raw.(int)))
 			t.Int64 = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "float")
 		if ok {
 			_value := float32(float32(_raw.(float64)))
 			t.Float = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "double")
 		if ok {
 			_value := _raw.(float64)
 			t.Double = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOkExists(p + "bool")
 		if ok {
 			_value := _raw.(bool)
 			t.Bool = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "bytes")
 		if ok {
 			_value := []byte([]byte(_raw.(string)))
 			t.Bytes = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "timestamp")
 		if ok {
 			_value, err := time.Parse(time.RFC3339, _raw.(string))
@@ -396,8 +398,8 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.Timestamp = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "duration_std")
 		if ok {
 			_valued, err := time.ParseDuration(_raw.(string))
@@ -408,8 +410,8 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.DurationStd = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "duration_custom")
 		if ok {
 			_valued, err := time.ParseDuration(_raw.(string))
@@ -420,8 +422,8 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.DurationCustom = _value
 		}
 	}
-
 	{
+
 		_raw, ok := d.GetOk(p + "timestamp_n")
 		if ok {
 			_value, err := time.Parse(time.RFC3339, _raw.(string))
@@ -431,32 +433,66 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.TimestampN = &_value
 		}
 	}
-
 	{
+		_rawi, ok := d.GetOk(p + "string_a")
+		if ok {
+			_rawi := _rawi.([]interface{})
+			t.StringA = make([]string, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_value := _raw.(string)
+				t.StringA[i] = _value
+			}
+		}
 	}
-
 	{
+		err := UnmarshalBoolCustom(p+"bool_a", d, &t.BoolA)
+		if err != nil {
+			return err
+		}
 	}
-
 	{
+		_rawi, ok := d.GetOk(p + "bytes_a")
+		if ok {
+			_rawi := _rawi.([]interface{})
+			t.BytesA = make([][]byte, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_value := []byte([]byte(_raw.(string)))
+				t.BytesA[i] = _value
+			}
+		}
 	}
-
 	{
+		_rawi, ok := d.GetOk(p + "timestamp_a")
+		if ok {
+			_rawi := _rawi.([]interface{})
+			t.TimestampA = make([]*time.Time, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_value, err := time.Parse(time.RFC3339, _raw.(string))
+				if err != nil {
+					return fmt.Errorf("Malformed time value for field TimestampA : %w", err)
+				}
+				t.TimestampA[i] = &_value
+			}
+		}
 	}
-
 	{
-	}
-
-	{
-	}
-
-	{
-	}
-
-	{
-	}
-
-	{
+		_rawi, ok := d.GetOk(p + "grace_period_a")
+		if ok {
+			_rawi := _rawi.([]interface{})
+			t.GracePeriodA = make([]Duration, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_valued, err := time.ParseDuration(_raw.(string))
+				if err != nil {
+					return fmt.Errorf("Malformed duration value for field GracePeriodA : %w", err)
+				}
+				_value := Duration(_valued)
+				t.GracePeriodA[i] = _value
+			}
+		}
 	}
 
 	return nil

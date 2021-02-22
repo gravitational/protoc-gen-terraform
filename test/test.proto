@@ -73,7 +73,7 @@ message Test {
     repeated string StringA = 13;
 
     // []bool field
-    repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustomArray" ];
+    repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustom" ];
 
     // [][]byte field
     repeated bytes BytesA = 15;
