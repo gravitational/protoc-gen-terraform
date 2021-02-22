@@ -48,8 +48,6 @@ func (p *Plugin) Name() string {
 func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	logrus.Printf("Processing: %s", *file.Name)
 
-	//logrus.Println(p.PackageImportPath)
-
 	p.setImports()
 
 	for _, message := range file.Messages() {
