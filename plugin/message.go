@@ -1,15 +1,11 @@
 package plugin
 
 import (
-	"strings"
-
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gzigzigzeo/protoc-gen-terraform/config"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
-
-	"fmt"
 )
 
 var (
@@ -68,22 +64,4 @@ func getMessageTypeName(d *generator.Descriptor) string {
 		}
 	}
 	return d.File().GetPackage() + "." + d.GetName()
-}
-
-// NOTE: temp comments render
-func (m *Message) GoTypeMapString(prefixa string) string {
-	b := strings.Builder{}
-
-	//b.WriteString(fmt.Sprintf("//%-30v\n", prefixa+m.GoTypeName))
-
-	for _, f := range m.Fields {
-		s := fmt.Sprintf("// %-40v %-50v %-25v %-7v\n", prefixa+f.Name, f.GoType, f.Kind, f.IsMap)
-		b.WriteString(s)
-
-		if f.IsMessage {
-			b.WriteString(f.Message.GoTypeMapString(prefixa + "  "))
-		}
-	}
-
-	return b.String()
 }
