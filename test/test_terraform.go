@@ -551,6 +551,43 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				}
 			}
 		}
+		{
+			p := p + "nested_m_obj"
+
+			_rawi, ok := d.GetOk(p)
+			if ok {
+				_rawi := _rawi.([]interface{})
+				_value := make(map[string]*NestedLevel2)
+
+				for i, _ := range _rawi {
+					key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
+
+					if key == "" {
+						return fmt.Errorf("Missing key field in object map NestedMObj")
+					}
+
+					_obj := NestedLevel2{}
+					_value[key] = &_obj
+					t := &_obj
+
+					{
+						p := fmt.Sprintf("%v.%v.value.0.", p, i)
+						fmt.Println(p)
+						{
+
+							_raw, ok := d.GetOk(p + "str")
+							if ok {
+								_value := _raw.(string)
+								t.Str = _value
+							}
+						}
+
+					}
+				}
+
+				t.NestedMObj = _value
+			}
+		}
 
 	}
 	{
@@ -618,6 +655,43 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							}
 						}
 					}
+					{
+						p := p + "nested_m_obj"
+
+						_rawi, ok := d.GetOk(p)
+						if ok {
+							_rawi := _rawi.([]interface{})
+							_value := make(map[string]*NestedLevel2)
+
+							for i, _ := range _rawi {
+								key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
+
+								if key == "" {
+									return fmt.Errorf("Missing key field in object map NestedMObj")
+								}
+
+								_obj := NestedLevel2{}
+								_value[key] = &_obj
+								t := &_obj
+
+								{
+									p := fmt.Sprintf("%v.%v.value.0.", p, i)
+									fmt.Println(p)
+									{
+
+										_raw, ok := d.GetOk(p + "str")
+										if ok {
+											_value := _raw.(string)
+											t.Str = _value
+										}
+									}
+
+								}
+							}
+
+							t.NestedMObj = _value
+						}
+					}
 
 				}
 			}
@@ -635,6 +709,122 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				_value := _raw.(string)
 				t.NestedM[_k] = _value
 			}
+		}
+	}
+	{
+		p := p + "nested_m_obj"
+
+		_rawi, ok := d.GetOk(p)
+		if ok {
+			_rawi := _rawi.([]interface{})
+			_value := make(map[string]*Nested)
+
+			for i, _ := range _rawi {
+				key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
+
+				if key == "" {
+					return fmt.Errorf("Missing key field in object map NestedMObj")
+				}
+
+				_obj := Nested{}
+				_value[key] = &_obj
+				t := &_obj
+
+				{
+					p := fmt.Sprintf("%v.%v.value.0.", p, i)
+					fmt.Println(p)
+					{
+
+						_raw, ok := d.GetOk(p + "str")
+						if ok {
+							_value := _raw.(string)
+							t.Str = _value
+						}
+					}
+					{
+						p := p + "nested"
+
+						_rawi, ok := d.GetOk(p)
+						if ok {
+							_rawi := _rawi.([]interface{})
+							t.Nested = make([]*NestedLevel2, len(_rawi))
+							for i := 0; i < len(_rawi); i++ {
+
+								_obj := NestedLevel2{}
+								t.Nested[i] = &_obj
+
+								{
+									t := t.Nested[i]
+									p := p + fmt.Sprintf(".%v.", i)
+									{
+
+										_raw, ok := d.GetOk(p + "str")
+										if ok {
+											_value := _raw.(string)
+											t.Str = _value
+										}
+									}
+
+								}
+							}
+						}
+					}
+					{
+
+						p := p + "nested_m"
+						_rawm, ok := d.GetOk(p)
+						if ok {
+							_rawm := _rawm.(map[string]interface{})
+							t.NestedM = make(map[string]string, len(_rawm))
+							for _k, _v := range _rawm {
+								_raw := _v
+								_value := _raw.(string)
+								t.NestedM[_k] = _value
+							}
+						}
+					}
+					{
+						p := p + "nested_m_obj"
+
+						_rawi, ok := d.GetOk(p)
+						if ok {
+							_rawi := _rawi.([]interface{})
+							_value := make(map[string]*NestedLevel2)
+
+							for i, _ := range _rawi {
+								key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
+
+								if key == "" {
+									return fmt.Errorf("Missing key field in object map NestedMObj")
+								}
+
+								_obj := NestedLevel2{}
+								_value[key] = &_obj
+								t := &_obj
+
+								{
+									p := fmt.Sprintf("%v.%v.value.0.", p, i)
+									fmt.Println(p)
+									{
+
+										_raw, ok := d.GetOk(p + "str")
+										if ok {
+											_value := _raw.(string)
+											t.Str = _value
+										}
+									}
+
+								}
+							}
+
+							t.NestedMObj = _value
+						}
+					}
+
+				}
+			}
+
+			t.NestedMObj = _value
 		}
 	}
 

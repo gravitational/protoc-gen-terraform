@@ -57,6 +57,17 @@ var (
 			"k1": "v1",
 			"k2": "v2",
 		},
+
+		"nested_m_obj": []interface{}{
+			map[string]interface{}{
+				"key": "obj1",
+				"value": []interface{}{
+					map[string]interface{}{
+						"str": "TestString1",
+					},
+				},
+			},
+		},
 	}
 )
 
@@ -132,4 +143,10 @@ func TestMap(t *testing.T) {
 	assert.Equal(t, subject.NestedM["k2"], "v2")
 	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
 	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
+}
+
+func TestObjectMap(t *testing.T) {
+	subject, _ := buildSubject(t)
+
+	assert.Equal(t, subject.NestedMObj["obj1"].Str, "TestString1")
 }

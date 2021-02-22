@@ -48,6 +48,12 @@ func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     {{ template "map" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "OBJECT_MAP" -}}
+{
+    {{ template "objectMap" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders unmarshaller for singular value of any type */}}
@@ -154,7 +160,7 @@ if ok {
 }
 {{- end -}}
 
-{{/* Elementary string -> value map */}}
+{{/* String -> elementary value map */}}
 {{- define "map" -}}
 {{ $m := .MapValueField }}
 p := p + {{.NameSnake | quote }}
@@ -167,5 +173,40 @@ if ok {
         {{- template "rawToValue" $m }}
         t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
     }   
+}
+{{- end -}}
+
+{{/* String -> object map */}}
+{{- define "objectMap" -}}
+p := p + {{.NameSnake | quote }}
+
+{{ $m := .MapValueField }}
+_rawi, ok := d.GetOk(p)
+if ok {
+    _rawi := _rawi.([]interface{})
+    _value := make(map[string]{{$m.RawGoType}})
+
+    for i, _ := range _rawi {
+        key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
+        
+        if key == "" {
+            return fmt.Errorf("Missing key field in object map {{.Name}}")
+        }
+
+        {{ if $m.GoTypeIsPtr }}
+        _obj := {{$m.GoType}}{}
+        _value[key] = &_obj
+        t := &_obj
+        {{ else }}
+        t := &_value[key]
+        {{ end }}
+
+        {
+            p := fmt.Sprintf("%v.%v.value.0.", p, i)
+            {{ template "fields" $m.Message.Fields }}
+        }
+    }
+
+    t.{{.Name}} = _value
 }
 {{- end -}}
