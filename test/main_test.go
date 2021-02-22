@@ -46,6 +46,10 @@ var (
 						"str": "TestString2",
 					},
 				},
+				"nested_m": map[string]interface{}{
+					"kn1": "vn1",
+					"kn2": "vn2",
+				},
 			},
 		},
 
@@ -126,4 +130,6 @@ func TestMap(t *testing.T) {
 
 	assert.Equal(t, subject.NestedM["k1"], "v1")
 	assert.Equal(t, subject.NestedM["k2"], "v2")
+	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
+	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
 }
