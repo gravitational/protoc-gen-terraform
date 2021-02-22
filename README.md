@@ -25,6 +25,19 @@ protoc \
 
 This will generate `types_terraform.go` in _out directory. This file will contain `UnmarshalUserV2` and `UnmarshalRolesV3` along with `SchemaUserV2` and `SchemaRolesV3` methods. Target package name should be changed manually. It also might contain some unused imports.
 
+Schema method should have the following prototype:
+
+```
+func SchemawrappersLabelValues() *schema.Schema
+```
+
+Unmarshalling method should look like this:
+```
+func SchemawrappersLabelValues(string path, data *schema.ResourceData, target *types.Traits) error
+```
+
+Where types.Traits changes according to populated field type.
+
 See [Makefile](Makefile) for details.
 
 # Note on maps of messages
