@@ -1,69 +1,76 @@
-{{/* ---- Unmarshalling ------------------------------------------------------------------*/}}
+func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
+    p := ""
 
-// Type: {{ .GoTypeName }}
-func Unmarshal{{ .Name }}(d *schema.ResourceData, t *{{ .GoTypeName }}) error {
-    var p string
-    {{ template "fieldsUnmarshal" .Fields }}
+    {{ template "fields" .Fields }}
+
     return nil
 }
 
-{{- define "fieldsUnmarshal" -}}
-{{- range $index, $field := . }}
-    {{ template "fieldUnmarshal" $field }}
-{{- end }}
+{{- define "fields" -}}
+{{ range $index, $field := . }}
+{{- template "field" $field }}
+{{ end }}
 {{- end -}}
 
-{{- define "fieldUnmarshal" -}}
+{{- define "field" -}}
+{{- if eq .Kind "SINGULAR_ELEMENTARY" -}}
 {
-    {{ if eq .Kind "SINGULAR_MESSAGE" }}
-    p := p + "{{.NameSnake}}{{ if not .IsContainer }}.0.{{ end }}"
-    {{ else }}
-    p := p + "{{.NameSnake}}"
-    {{ end }}
-    {{ template "fieldUnmarshalBody" . }}
+    {{ template "singularElementary" . }}
 }
 {{- end -}}
 
-{{- define "fieldUnmarshalBody" -}}
-{{- if eq .Kind "SINGULAR_ELEMENTARY" }}
-// SINGULAR_ELEMENTARY {{ .Name }}
-{{ template "singularElementary" . }}
-{{- else if eq .Kind "REPEATED_ELEMENTARY" }}
-// REPEATED_ELEMENTARY {{ .Name }}
-{{ template "repeatedElementary" . }}
-{{- else if eq .Kind "REPEATED_MESSAGE" }}
-// REPEATED_MESSAGE {{ .Name }}
-{{ template "repeatedMessage" . }}
-{{- else if eq .Kind "SINGULAR_MESSAGE" }}
-// SINGULAR_MESSAGE {{ .Name }}
-{{ if .IsContainer  }}
-// NORMAL CONTAINER
-{{ template "singularContainerMessage" . }}
-{{ else }}
-{{ template "singularMessage" . }}
-{{ end }}
-{{- else if eq .Kind "MAP" }}
-// MAP {{ .Name }}
-{{ template "map" . }}
-{{- else if eq .Kind "ARTIFICIAL_OBJECT_MAP" }}
-// ARTIFICIAL_OBJECT_MAP {{ .Name }}
-{{ template "artificialObjectMap" . }}
-{{- end }}
+{{- if eq .Kind "REPEATED_ELEMENTARY" -}}
+{
+    {{ template "repeatedElementary" . }}
+}
 {{- end -}}
 
+{{- if eq .Kind "CUSTOM_TYPE" -}}
+{
+    {{ template "custom" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "SINGULAR_MESSAGE" -}}
+{
+    {{ template "singularMessage" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "REPEATED_MESSAGE" -}}
+{
+    {{ template "repeatedMessage" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "MAP" -}}
+{
+    {{ template "map" . }}
+}
+{{- end -}}
+
+{{- if eq .Kind "OBJECT_MAP" -}}
+{
+    {{ template "objectMap" . }}
+}
+{{- end -}}
+{{- end -}}
+
+{{/* Renders unmarshaller for singular value of any type */}}
 {{- define "singularElementary" -}}
-{{ template "getOk" . }}
+{{- template "getOk" . }}
 if ok {
-    {{ template "rawToValue" . }}
+    {{- template "rawToValue" . }}
     t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_value
 }
 {{- end -}}
 
+{{/* Renders unmarshaller for elementary array of any type */}}
 {{- define "repeatedElementary" -}}
-_rawi, ok := d.GetOk(p)
+_rawi, ok := d.GetOk(p + {{ .NameSnake | quote }})
 if ok {
     _rawi := _rawi.([]interface{})
-    t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
+    t.{{.Name}} = make({{.RawGoType}}, len(_rawi))
     for i := 0; i < len(_rawi); i++ {
         _raw := _rawi[i]
         {{- template "rawToValue" . }}
@@ -72,62 +79,11 @@ if ok {
 }
 {{- end -}}
 
-{{- define "repeatedMessage" -}}
-_rawi, ok := d.GetOk(p)
-if ok {
-    _rawi := _rawi.([]interface{})
-    t.{{.Name}} = make([]{{.GoType}}, len(_rawi))
-    for i := 0; i < len(_rawi); i++ {
-        t := &t.{{ .Name }}[i]
-        p := p + fmt.Sprintf(".%v.", i)
-        {{- template "fieldsUnmarshal" .Message.Fields }}
-    }
-}
-{{- end -}}
-
-{{- define "singularMessage" -}}
-{{ template "initTarget" . }}
-{{ template "fieldsUnmarshal" .Message.Fields }}
-{{- end -}}
-
-{{- define "singularContainerMessage" -}}
-{{ $folded := .Message.Fields | first }}
-{{ if $folded.IsMap }}
-{{ template "initTarget" $folded.MapValueField }}
-{{ template "fieldUnmarshalBody" $folded.MapValueField }}
-{{ else }}
-{{ template "initTarget" . }}
-{{ template "fieldUnmarshalBody" $folded }}
-{{ end }}
-{{- end -}}
-
-{{- define "map" -}}
-{{ $m := .MapValueField }}
-_rawm, ok := d.GetOk(p)
-if ok {
-    _rawm := _rawm.(map[string]interface{})
-    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawm))
-    for _k, _v := range _rawm {
-        _raw := _v
-        {{- template "rawToValue" $m }}
-        t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
-    }   
-}
-{{- end -}}
-
-{{- define "artificialObjectMap" -}}
-{{ $m := .MapValueField }}
-// value: {{ .MapValueField.GoType }} {{ .MapValueField.IsContainer }}
-_rawi, ok := d.GetOk(p)
-if ok {
-    _rawi := _rawi.([]interface{})
-    for _, _artificialItem := range _rawi {
-        _item := _artificialItem.(map[string]interface{})
-
-        p := p + "." + _item["key"].(string)
-
-        {{ template "fieldUnmarshalBody" .MapValueField }}
-    }
+{{/* Renders custom unmarshaller custom type */}}
+{{- define "custom" -}}
+err := Unmarshal{{.CustomTypeMethodInfix}}(p + {{.NameSnake | quote}}, d, &t.{{.Name}})
+if err != nil {
+    return err
 }
 {{- end -}}
 
@@ -141,29 +97,35 @@ if err != nil {
     return fmt.Errorf("Malformed time value for field {{.Name}} : %w", err)
 }
 {{- else if .IsDuration }}
-_value, err := time.ParseDuration(_raw.({{.SchemaRawType}}))
+_valued, err := time.ParseDuration(_raw.({{.SchemaRawType}}))
 if err != nil {
     return fmt.Errorf("Malformed duration value for field {{.Name}} : %w", err)
 }
+_value := {{.GoType}}(_valued)
+{{- else }}
+{{- if eq .SchemaRawType .SchemaGoType }}
+_value := _raw.({{.SchemaRawType}})
 {{- else }}
 _value := {{.GoType}}({{.SchemaGoType}}(_raw.({{.SchemaRawType}})))
 {{- end }}
+{{- end }}
 {{- end -}}
 
-{{/* Generates schema getter statement */}}
+{{/* Generates schema getter statement with an exception for bool, which must not be parsed if not set */}}
 {{/* Input: p */}}
 {{/* Output: _raw */}}
 {{- define "getOk" -}}
 {{- if eq .SchemaRawType "bool" }}
-_raw, ok := d.GetOkExists(p)
+_raw, ok := d.GetOkExists(p + {{ .NameSnake | quote }})
 {{- else }}
-_raw, ok := d.GetOk(p)
+_raw, ok := d.GetOk(p + {{ .NameSnake | quote  }})
 {{- end }}
 {{- end }}
 
-{{/* Initializes target struct field if needed */}}
-{{/* Output: new t */}}
-{{- define "initTarget" -}}
+{{/* Singular message */}}
+{{- define "singularMessage" -}}
+p := p + {{.NameSnake | quote }} + ".0."
+
 {{ if .GoTypeIsPtr }}
 _obj := {{.GoType}}{}
 t.{{ .Name }} = &_obj
@@ -171,4 +133,80 @@ t := &_obj
 {{ else }}
 t := &t.{{.Name}}
 {{ end }}
-{{- end }}
+
+{{ template "fields" .Message.Fields }}
+{{- end -}}
+
+{{/* Repeated message */}}
+{{- define "repeatedMessage" -}}
+p := p + {{.NameSnake | quote }}
+
+_rawi, ok := d.GetOk(p)
+if ok {
+    _rawi := _rawi.([]interface{})
+    t.{{.Name}} = make({{.RawGoType}}, len(_rawi))
+    for i := 0; i < len(_rawi); i++ {
+        {{ if .GoTypeIsPtr }}
+        _obj := {{.GoType}}{}
+        t.{{.Name }}[i] = &_obj
+        {{ end }}
+
+        {
+            t := {{if not .GoTypeIsPtr}}&{{end}}t.{{.Name }}[i]
+            p := p + fmt.Sprintf(".%v.", i)
+            {{ template "fields" .Message.Fields }}
+        }
+    }
+}
+{{- end -}}
+
+{{/* String -> elementary value map */}}
+{{- define "map" -}}
+{{ $m := .MapValueField }}
+p := p + {{.NameSnake | quote }}
+_rawm, ok := d.GetOk(p)
+if ok {
+    _rawm := _rawm.(map[string]interface{})
+    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawm))
+    for _k, _v := range _rawm {
+        _raw := _v
+        {{- template "rawToValue" $m }}
+        t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
+    }   
+}
+{{- end -}}
+
+{{/* String -> object map */}}
+{{- define "objectMap" -}}
+p := p + {{.NameSnake | quote }}
+
+{{ $m := .MapValueField }}
+_rawi, ok := d.GetOk(p)
+if ok {
+    _rawi := _rawi.([]interface{})
+    _value := make(map[string]{{$m.RawGoType}})
+
+    for i, _ := range _rawi {
+        key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
+        
+        if key == "" {
+            return fmt.Errorf("Missing key field in object map {{.Name}}")
+        }
+
+        {{ if $m.GoTypeIsPtr }}
+        _obj := {{$m.GoType}}{}
+        _value[key] = &_obj
+        t := &_obj
+        {{ else }}
+        t := &_value[key]
+        {{ end }}
+
+        {
+            p := fmt.Sprintf("%v.%v.value.0.", p, i)
+            {{ template "fields" $m.Message.Fields }}
+        }
+    }
+
+    t.{{.Name}} = _value
+}
+{{- end -}}

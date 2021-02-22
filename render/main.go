@@ -16,7 +16,7 @@ var (
 	SchemaTpl string
 
 	// UnmarshalTpl is unmarshaller template
-	//go:embed _tpl/message_unmarshal_reflect.tpl
+	//go:embed _tpl/message_unmarshal.tpl
 	UnmarshalTpl string
 )
 
