@@ -75,26 +75,11 @@ func SchemaTest() map[string]*schema.Schema {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// BoolN SINGULAR_ELEMENTARY
-		"bool_n": {
-			Type:     schema.TypeBool,
-			Optional: true,
-		},
-		// BytesN SINGULAR_ELEMENTARY
-		"bytes_n": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
 		// TimestampN SINGULAR_ELEMENTARY
 		"timestamp_n": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
-		},
-		// DurationN SINGULAR_ELEMENTARY
-		"duration_n": {
-			Type:     schema.TypeString,
-			Optional: true,
 		},
 		// StringA REPEATED_ELEMENTARY
 		"string_a": {
@@ -437,22 +422,6 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	}
 
 	{
-		_raw, ok := d.GetOkExists(p + "bool_n")
-		if ok {
-			_value := _raw.(bool)
-			t.BoolN = _value
-		}
-	}
-
-	{
-		_raw, ok := d.GetOk(p + "bytes_n")
-		if ok {
-			_value := []byte([]byte(_raw.(string)))
-			t.BytesN = _value
-		}
-	}
-
-	{
 		_raw, ok := d.GetOk(p + "timestamp_n")
 		if ok {
 			_value, err := time.Parse(time.RFC3339, _raw.(string))
@@ -460,18 +429,6 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				return fmt.Errorf("Malformed time value for field TimestampN : %w", err)
 			}
 			t.TimestampN = &_value
-		}
-	}
-
-	{
-		_raw, ok := d.GetOk(p + "duration_n")
-		if ok {
-			_valued, err := time.ParseDuration(_raw.(string))
-			if err != nil {
-				return fmt.Errorf("Malformed duration value for field DurationN : %w", err)
-			}
-			_value := Duration(_valued)
-			t.DurationN = _value
 		}
 	}
 

@@ -64,50 +64,41 @@ message Test {
 
     // --- Elementary nullable fields -------------------------------------------------------
     
-    // *bool field
-    bool BoolN = 11 [ (gogoproto.nullable) = true ];
-
-    // *byte[] field
-    bytes BytesN = 12 [ (gogoproto.nullable) = true ];
-
     // *time.Time field
-    google.protobuf.Timestamp TimestampN = 13 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
-
-    // *time.Duration field
-    int64 DurationN = 14 [ (gogoproto.casttype) = "Duration" ];
+    google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
 
     // --- Elementary arrays (+ cast and custom types) ----------------------------------------
 
     // []string field
-    repeated string StringA = 15;
+    repeated string StringA = 13;
 
     // []bool field
-    repeated bool BoolA = 16 [ (gogoproto.customtype) = "BoolCustomArray" ];
+    repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustomArray" ];
 
     // [][]byte field
-    repeated bytes BytesA = 17;
+    repeated bytes BytesA = 15;
 
     // []time.Time field
-    repeated google.protobuf.Timestamp TimestampA = 18 [ (gogoproto.stdtime) = true ];
+    repeated google.protobuf.Timestamp TimestampA = 16 [ (gogoproto.stdtime) = true ];
 
     // []time.Duration field
-    repeated int64 GracePeriodA = 19 [ (gogoproto.casttype) = "Duration" ];
+    repeated int64 GracePeriodA = 17 [ (gogoproto.casttype) = "Duration" ];
 
     // --- Nested messages ---------------------------------------------------------------------
 
     // Nested field
-    Nested Nested = 20;   
+    Nested Nested = 18;   
 
     // --- Message arrays ----------------------------------------------------------------------
 
     // Nested array
-    repeated Nested NestedA = 21;
+    repeated Nested NestedA = 19;
 
     // --- Maps --------------------------------------------------------------------------------
 
     // Normal map
-    map<string, string> NestedS = 22;
+    map<string, string> NestedS = 20;
 
     // Object map
-    map<string, Nested> NestedM = 23;
+    map<string, Nested> NestedM = 21;
 }

@@ -20,7 +20,7 @@ type Field struct {
 	NameSnake string // Type name in snake case
 
 	// Schema properties
-	SchemaRawType string // Terraform schema raw value type (float64 for types.Float)
+	SchemaRawType string // Terraform schema raw value type (float64 for types.Float), used in schema generation
 	SchemaGoType  string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 
 	// Field properties
