@@ -1,3 +1,3 @@
 _build
 _out
-gogo-protoc-gen-terraform
+protoc-gen-terraform
