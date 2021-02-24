@@ -23,7 +23,7 @@ teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
 types = "types.UserV2+types.RoleV3"
-excludeFields = "types.UserSpecV2.LocalAuth"
+exclude_fields = "types.UserSpecV2.LocalAuth"
 
 .PHONY: terraform
 terraform: build
@@ -37,7 +37,7 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types},excludeFields=${excludeFields},pkg=types:${out_dir} \
+		--terraform_out=types=${types},exclude_fields=${exclude_fields},pkg=types:${out_dir} \
 		types.proto
 
 .PHONY: test

@@ -40,6 +40,12 @@ Where types.Traits changes according to populated field type.
 
 See [Makefile](Makefile) for details.
 
+Options:
+
+* `types` - the list of top level types to export (with namespace).
+* `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`).
+* `pkg` - default package name to prepend to type names with no package reference. This option is required if a target package of Terraform generated code is different from original protobuf generated code package.
+
 # Testing
 
 Run:
@@ -58,5 +64,7 @@ If a field has `gogoproto.casttype` flag, it can not be automatically unmarshall
 
 # TODO
 
-1. Oneof is not supported yet
-2. Extract comments from original protoc file
+- [ ] Oneof is not supported yet
+- [ ] Extract comments from original protoc file
+- [ ] Add argument to provide custom duration type
+- [ ] Add argument to provide custom imports for target file

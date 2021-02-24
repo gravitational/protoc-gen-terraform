@@ -35,7 +35,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
 	config.ParseTypes(g.Param["types"])
-	config.ParseExcludeFields(g.Param["excludeFields"])
+	config.ParseExcludeFields(g.Param["exclude_fields"])
 	config.ParseDefaultPkgName(g.Param["pkg"])
 }
 
@@ -81,8 +81,4 @@ func (p *Plugin) setImports() {
 	// So those could be referenced via schema. and validation.
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
-
-	// // TODO: Temporary, replace with argument
-	// p.AddImport("github.com/gravitational/teleport/api/types")
-	// p.AddImport("github.com/gravitational/teleport/api/types/wrappers")
 }
