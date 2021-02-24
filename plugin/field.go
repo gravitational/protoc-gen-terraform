@@ -72,19 +72,14 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
 
 // BuildField builds field reflection structure, or returns nil in case field build failed
 func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
-	defer func() {
-		// Ignore field if it has build error (e.g. oneof), report it to log
-		if r := recover(); r != nil {
-			e, ok := r.(*buildError)
-			if !ok {
-				panic(r)
-			}
-			logrus.Printf("%+v", e)
-		}
-	}()
-
 	b := newFieldBuilder(g, d, f)
-	b.build()
+	err := b.build()
+
+	if err != nil {
+		// Display error in the log, proceed further
+		logrus.Printf("%+v", err)
+		return nil
+	}
 	return b.field
 }
 
@@ -103,13 +98,25 @@ func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descrip
 }
 
 // build fills in a Field structure
-func (b *fieldBuilder) build() {
+func (b *fieldBuilder) build() error {
 	b.setName()
-	b.resolveType()
+
+	err := b.resolveType()
+	if err != nil {
+		return err
+	}
+
 	b.setGoType()
-	b.setAggregate()
+
+	err = b.setAggregate()
+	if err != nil {
+		return err
+	}
+
 	b.setCustomType()
 	b.setKind()
+
+	return nil
 }
 
 // setName sets the field name
@@ -162,7 +169,7 @@ func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
 
 // resolveType analyses field type and sets required fields in Field structure
 // This method is pretty much copy & paste from gogo/protobuf generator.GoType
-func (b *fieldBuilder) resolveType() {
+func (b *fieldBuilder) resolveType() error {
 	d := b.fieldDescriptor // shortcut
 	f := b.field           // shortcut
 
@@ -204,14 +211,19 @@ func (b *fieldBuilder) resolveType() {
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
 		b.setSchemaTypes("string", "int64")
 	case b.isMessage():
-		b.setMessage()
+		err := b.setMessage()
+		if err != nil {
+			return err
+		}
 		f.IsMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setSchemaTypes("string", "string")
 	default:
 		b.generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
-		return
+		return nil
 	}
+
+	return nil
 }
 
 // Append type suffix to cast type, custom type or message
@@ -278,34 +290,41 @@ func (b *fieldBuilder) setGoType() {
 }
 
 // setMessage sets reference to nested message
-func (b *fieldBuilder) setMessage() {
+func (b *fieldBuilder) setMessage() error {
 	// Resolve underlying message via protobuf
 	x := b.generator.ObjectNamed(b.fieldDescriptor.GetTypeName())
 	desc, ok := x.(*generator.Descriptor)
 	if desc == nil || !ok {
-		return
+		return nil
 	}
 
 	// Try to analyse it
 	m := BuildMessage(b.generator, desc, false)
 	if m == nil {
-		panic(newBuildError("Nested message is invalid"))
+		return fmt.Errorf("Nested message is invalid for field %v", b.field.Name)
 	}
 
 	// Nested message schema, or nil if message is not whitelisted
 	b.field.Message = m
+
+	return nil
 }
 
 // Sets IsList and IsMap flags
-func (b *fieldBuilder) setAggregate() {
+func (b *fieldBuilder) setAggregate() error {
 	f := b.field
 
 	if b.generator.IsMap(b.fieldDescriptor) {
 		f.IsMap = true
-		b.setMap()
+		err := b.setMap()
+		if err != nil {
+			return err
+		}
 	} else if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
 	}
+
+	return nil
 }
 
 // Sets gogo.customtype flag
@@ -319,7 +338,7 @@ func (b *fieldBuilder) setCustomType() {
 }
 
 // reflectMap sets map value properties
-func (b *fieldBuilder) setMap() {
+func (b *fieldBuilder) setMap() error {
 	m := b.generator.GoMapType(nil, b.fieldDescriptor)
 
 	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
@@ -329,9 +348,11 @@ func (b *fieldBuilder) setMap() {
 
 	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
 	if valueField == nil {
-		panic(newBuildError(fmt.Sprintf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)))
+		return fmt.Errorf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)
 	}
 	b.field.MapValueField = valueField
+
+	return nil
 }
 
 // setKind sets field kind which represents field meta type for generation
