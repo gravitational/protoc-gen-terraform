@@ -43,8 +43,8 @@ endif
 .PHONY: test
 test: build
 	@protoc \
-		-I$(srcpath)/github.com/gzigzigzeo/protoc-gen-terraform/test \
-		-I$(srcpath)/github.com/gzigzigzeo/protoc-gen-terraform \
+		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform/test \
+		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform \
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \

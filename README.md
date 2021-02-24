@@ -7,7 +7,7 @@ Generates Terraform schema and unmarshalling methods from gogo/protobuf .protoc 
 Install protobuf. 
 
 ```
-go get github.com/gzigzigzeo/protoc-gen-terraform
+go get github.com/gravitational/protoc-gen-terraform
 ```
 
 # Usage

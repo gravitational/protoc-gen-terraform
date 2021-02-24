@@ -2,9 +2,9 @@ package plugin
 
 import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gravitational/protoc-gen-terraform/config"
+	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
-	"github.com/gzigzigzeo/protoc-gen-terraform/config"
-	"github.com/gzigzigzeo/protoc-gen-terraform/render"
 	"github.com/sirupsen/logrus"
 )
 

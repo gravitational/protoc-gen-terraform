@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-	"github.com/gzigzigzeo/protoc-gen-terraform/config"
+	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
