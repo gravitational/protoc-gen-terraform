@@ -48,15 +48,26 @@ func (p *Plugin) Name() string {
 func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	logrus.Printf("Processing: %s", *file.Name)
 
+	// Adds Terraform package imports to target file
 	p.setImports()
 
+	p.reflect(file)
+	p.writeSchema()
+	p.writeUnmarshallers()
+}
+
+// reflect builds message dictionary from a messages in protoc file
+func (p *Plugin) reflect(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
 		m := BuildMessage(p.Generator, message, true)
 		if m != nil {
 			p.Messages[m.GoTypeName] = m
 		}
 	}
+}
 
+// writeSchema writes schema definition to target file
+func (p *Plugin) writeSchema() {
 	for _, message := range p.Messages {
 		buf, err := render.Template(render.SchemaTpl, message)
 		if err != nil {
@@ -64,7 +75,10 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		}
 		p.P(buf.String())
 	}
+}
 
+// writeUnmarshallers writes unmarshallers definition to target file
+func (p *Plugin) writeUnmarshallers() {
 	for _, message := range p.Messages {
 		buf, err := render.Template(render.UnmarshalTpl, message)
 		if err != nil {

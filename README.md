@@ -44,7 +44,7 @@ Options:
 
 * `types` - the list of top level types to export (with namespace).
 * `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`).
-* `pkg` - default package name to prepend to type names with no package reference. This option is required if a target package of Terraform generated code is different from original protobuf generated code package.
+* `pkg` - default package name to prepend to type names with no package reference. This option is required if the target package of Terraform generated code is different from package of original protobuf generated code.
 
 # Testing
 
@@ -68,3 +68,4 @@ If a field has `gogoproto.casttype` flag, it can not be automatically unmarshall
 - [ ] Extract comments from original protoc file
 - [ ] Add argument to provide custom duration type
 - [ ] Add argument to provide custom imports for target file
+- [ ] Add argument which will represent specific []byte fields as byte lists on Terraform side

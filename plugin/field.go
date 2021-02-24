@@ -14,7 +14,7 @@ import (
 )
 
 // Field represents field reflection struct
-// This struct and the following methods know about both schema details and types, and target structs
+// This struct and the following methods know about both schema details and target field details
 type Field struct {
 	Name      string // Type name
 	NameSnake string // Type name in snake case
@@ -31,7 +31,7 @@ type Field struct {
 	GoTypeFull    string // Go type with [] and * and package name prepended
 
 	// Metadata
-	Kind                  string // Field kind (resulting of combination of meta flags, see setKind method)
+	Kind                  string // Field kind (resulting of combination of flags below, see setKind method)
 	IsRepeated            bool   // Is list
 	IsMap                 bool   // Is map
 	IsMessage             bool   // Is message (might be repeated in the same time)
@@ -58,6 +58,7 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
 	for _, f := range d.GetField() {
 		typeName := getFieldTypeName(d, f)
 
+		// Ignore field if it is listed in cli arg
 		if slice.Contains(config.ExcludeFields, typeName) {
 			continue
 		}
@@ -72,6 +73,7 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
 // BuildField builds field reflection structure, or returns nil in case field build failed
 func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
 	defer func() {
+		// Ignore field if it has build error (e.g. oneof), report it to log
 		if r := recover(); r != nil {
 			e, ok := r.(*buildError)
 			if !ok {
@@ -212,7 +214,7 @@ func (b *fieldBuilder) resolveType() {
 	}
 }
 
-// Append type suffix to cast type, custom type and message
+// Append type suffix to cast type, custom type or message
 func (b *fieldBuilder) prependPackageName() {
 	d := b.fieldDescriptor
 	f := b.field
@@ -284,6 +286,7 @@ func (b *fieldBuilder) setMessage() {
 		return
 	}
 
+	// Try to analyse it
 	m := BuildMessage(b.generator, desc, false)
 	if m == nil {
 		panic(newBuildError("Nested message is invalid"))

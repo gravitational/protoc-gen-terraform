@@ -5,6 +5,7 @@ type buildError struct {
 	Message string
 }
 
+// newBuildError constructs new build error
 func newBuildError(message string) *buildError {
 	return &buildError{Message: message}
 }

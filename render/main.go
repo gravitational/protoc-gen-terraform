@@ -20,7 +20,7 @@ var (
 	UnmarshalTpl string
 )
 
-// Template renders template from string template
+// Template renders template from string
 func Template(content string, pipeline interface{}) (*bytes.Buffer, error) {
 	var buf bytes.Buffer
 

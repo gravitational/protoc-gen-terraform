@@ -22,10 +22,12 @@ type Message struct {
 }
 
 // BuildMessage builds Message from it's protobuf descriptor
-// checkValiditiy is should be false for nested fields, otherwise we'll have to be over-explicit in allowed type
+// checkValiditiy should be false for nested messages. We do not check them over allowed types,
+// otherwise it will be overexplicit. Use excludeFields to skip fields.
 func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) *Message {
 	typeName := getMessageTypeName(d)
 
+	// Check if message is specified in export type list
 	if !slice.Contains(config.Types, typeName) && checkValidity {
 		return nil
 	}
