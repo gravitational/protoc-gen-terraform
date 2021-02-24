@@ -1,3 +1,4 @@
+// Package test contains protoc-gen-terraform tests
 package test
 
 import (

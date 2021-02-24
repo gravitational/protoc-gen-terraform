@@ -1,3 +1,4 @@
+// Package render is the utility package with embeds templates and render method
 package render
 
 import (

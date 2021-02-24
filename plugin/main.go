@@ -1,3 +1,4 @@
+// Package plugin is gogoprotobuf package for Terraform code generation
 package plugin
 
 import (

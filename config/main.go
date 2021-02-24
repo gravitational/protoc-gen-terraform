@@ -1,3 +1,4 @@
+// Package config contains global configuration variables and methods to parse them
 package config
 
 import (
