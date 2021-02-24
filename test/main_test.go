@@ -71,6 +71,7 @@ var (
 	}
 )
 
+// buildSubject builds Test struct from test fixture data
 func buildSubject(t *testing.T) (*Test, error) {
 	subject := &Test{}
 	data := schema.TestResourceDataRaw(t, SchemaTest(), fixutre)
@@ -78,6 +79,7 @@ func buildSubject(t *testing.T) (*Test, error) {
 	return subject, err
 }
 
+// TestUnmarshal ensures that parsing is done without errors
 func TestUnmarshal(t *testing.T) {
 	_, err := buildSubject(t)
 	if err != nil {
@@ -85,6 +87,7 @@ func TestUnmarshal(t *testing.T) {
 	}
 }
 
+// TestElementaries ensures decoding of elementary types
 func TestElementaries(t *testing.T) {
 	subject, _ := buildSubject(t)
 
@@ -97,6 +100,7 @@ func TestElementaries(t *testing.T) {
 	assert.Equal(t, subject.Bytes, []byte("TestBytes"), "Test.Bytes")
 }
 
+// TestTimes ensures decoding of time and duration fields
 func TestTimes(t *testing.T) {
 	subject, _ := buildSubject(t)
 
@@ -110,6 +114,7 @@ func TestTimes(t *testing.T) {
 	assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
 }
 
+// TestArrays ensures decoding arrays
 func TestArrays(t *testing.T) {
 	subject, _ := buildSubject(t)
 
@@ -123,12 +128,14 @@ func TestArrays(t *testing.T) {
 	assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
 }
 
+// TestNestedMessage ensures decoding of nested messages
 func TestNestedMessage(t *testing.T) {
 	subject, _ := buildSubject(t)
 
 	assert.Equal(t, subject.Nested.Str, "TestString", "Test.Nested.Str")
 }
 
+// TestNestedMessage ensures decoding of array of messages
 func TestNestedMessageArray(t *testing.T) {
 	subject, _ := buildSubject(t)
 
@@ -136,6 +143,7 @@ func TestNestedMessageArray(t *testing.T) {
 	assert.Equal(t, subject.Nested.Nested[1].Str, "TestString2")
 }
 
+// TestMap ensures decoding of a maps
 func TestMap(t *testing.T) {
 	subject, _ := buildSubject(t)
 
@@ -145,6 +153,7 @@ func TestMap(t *testing.T) {
 	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
 }
 
+// TestMap ensures decoding of maps of messages
 func TestObjectMap(t *testing.T) {
 	subject, _ := buildSubject(t)
 

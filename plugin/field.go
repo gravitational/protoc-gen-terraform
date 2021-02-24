@@ -88,6 +88,7 @@ func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProt
 	return getMessageTypeName(d) + "." + f.GetName()
 }
 
+// newFieldBuilder constructs an empty fieldBuilder struct
 func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
 	return &fieldBuilder{
 		generator:       g,

@@ -20,8 +20,8 @@ var (
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
 	DurationCustomType = "Duration"
 
-	// DefaultPkgName default package name, gets appended to type name if it's import path is ".", but the type itself
-	// is located in another package
+	// DefaultPkgName default package name, gets appended to type name if it's import
+	// path is ".", but the type itself is located in another package
 	DefaultPkgName string
 )
 

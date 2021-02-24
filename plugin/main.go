@@ -44,7 +44,7 @@ func (p *Plugin) Name() string {
 	return name
 }
 
-// Generate is the plugin body
+// Generate goes over messages in the file passed from gogo, builds reflection structs and writes a target file
 func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	logrus.Printf("Processing: %s", *file.Name)
 
