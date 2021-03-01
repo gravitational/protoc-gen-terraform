@@ -1,6 +1,6 @@
 # protoc-gen-terraform
 
-Generates Terraform schema and unmarshalling methods from gogo/protobuf .protoc file.
+Generates Terraform schema and unmarshalling methods from gogo/protobuf .proto file.
 
 # Installation
 
