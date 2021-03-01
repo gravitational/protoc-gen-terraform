@@ -66,7 +66,7 @@ If a field has `gogoproto.casttype` flag, it can not be automatically unmarshall
 
 - [ ] Oneof is not supported yet
 - [ ] Extract comments from original protoc file
-- [ ] Add argument to provide custom duration type
+- [x] Add argument to provide custom duration type
 - [ ] Add argument to provide custom imports for target file
 - [ ] Add argument which will represent specific []byte fields as byte lists on Terraform side
 - [ ] Manually replace target package name

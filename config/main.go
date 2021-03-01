@@ -19,7 +19,7 @@ var (
 	ExcludeFields []string
 
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
-	DurationCustomType = "Duration"
+	DurationCustomType = ""
 
 	// DefaultPkgName default package name, gets appended to type name if its import
 	// path is ".", but the type itself is located in another package
@@ -50,5 +50,14 @@ func ParseExcludeFields(arg string) {
 
 // ParseDefaultPkgName parses default package name and import path
 func ParseDefaultPkgName(arg string) {
-	DefaultPkgName = arg
+	if arg != "" {
+		DefaultPkgName = arg
+	}
+}
+
+// ParseDuration parses duration custom class
+func ParseDuration(arg string) {
+	if arg != "" {
+		DurationCustomType = arg
+	}
 }

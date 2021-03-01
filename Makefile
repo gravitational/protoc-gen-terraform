@@ -23,6 +23,7 @@ teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
 types = "types.UserV2+types.RoleV3"
 exclude_fields = "types.UserSpecV2.LocalAuth"
+custom_duration = "Duration"
 
 .PHONY: terraform
 terraform: build
@@ -36,7 +37,7 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types},exclude_fields=${exclude_fields},pkg=types:${out_dir} \
+		--terraform_out=types=${types},exclude_fields=${exclude_fields},pkg=types,custom_duration=Duration:${out_dir} \
 		types.proto
 
 .PHONY: test
@@ -47,7 +48,7 @@ test: build
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=Test:test \
+		--terraform_out=types=Test,custom_duration=Duration:test \
 		--gogo_out=test \
 		test.proto
 	@go test -v ./test

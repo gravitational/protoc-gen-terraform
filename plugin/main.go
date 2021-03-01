@@ -39,6 +39,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 	config.ParseTypes(g.Param["types"])
 	config.ParseExcludeFields(g.Param["exclude_fields"])
 	config.ParseDefaultPkgName(g.Param["pkg"])
+	config.ParseDuration(g.Param["custom_duration"])
 }
 
 // Name returns the name of the plugin
