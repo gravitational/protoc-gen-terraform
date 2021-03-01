@@ -21,7 +21,7 @@ type Message struct {
 	// TODO: Comments
 }
 
-// BuildMessage builds Message from it's protobuf descriptor
+// BuildMessage builds Message from its protobuf descriptor
 // checkValiditiy should be false for nested messages. We do not check them over allowed types,
 // otherwise it will be overexplicit. Use excludeFields to skip fields.
 func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) *Message {
