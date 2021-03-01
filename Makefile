@@ -1,5 +1,4 @@
-# Package version
-version = "0.0.1"
+package_version = "0.0.1"
 
 .PHONY: clean
 
@@ -10,7 +9,7 @@ clean:
 
 .PHONY: build
 build: clean
-	go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(version)"
+	go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(package_version)"
 
 .PHONY: install
 install: build
