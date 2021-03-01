@@ -10,9 +10,6 @@ type Duration int64
 // BoolCustom custom bool array
 type BoolCustom bool
 
-// SomethingCustom some custom value
-type SomethingCustom int
-
 // SchemaBoolCustom returns schema for custom bool array
 func SchemaBoolCustom() *schema.Schema {
 	return &schema.Schema{
