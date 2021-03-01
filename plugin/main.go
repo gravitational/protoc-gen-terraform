@@ -7,7 +7,6 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
-	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
 )
 
@@ -76,7 +75,7 @@ func (p *Plugin) writeSchema() {
 
 		err := render.Template(render.SchemaTpl, message, &buf)
 		if err != nil {
-			p.Generator.Fail(trace.Wrap(err).Error())
+			p.Generator.Fail(err.Error())
 		}
 		p.P(buf.String())
 	}
@@ -89,7 +88,7 @@ func (p *Plugin) writeUnmarshallers() {
 
 		err := render.Template(render.UnmarshalTpl, message, &buf)
 		if err != nil {
-			p.Generator.Fail(trace.Wrap(err).Error())
+			p.Generator.Fail(err.Error())
 		}
 		p.P(buf.String())
 	}
