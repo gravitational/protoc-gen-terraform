@@ -38,7 +38,8 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types},exclude_fields=${exclude_fields},pkg=types,custom_duration=Duration,custom_imports=${custom_imports}:${out_dir} \
+		--terraform_out=types=${types},exclude_fields=${exclude_fields},\
+pkg=types,custom_duration=Duration,custom_imports=${custom_imports}:${out_dir} \
 		types.proto
 
 .PHONY: test

@@ -9,10 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// https://pkg.go.dev/github.com/hashicorp/terraform-plugin-sdk@v1.16.0/helper/resource
-// https://www.terraform.io/docs/extend/best-practices/testing.html
-// schema.TestResourceDataRaw
-
 const (
 	defaultTimestamp = "2022-10-12T07:20:50.52Z"
 )
