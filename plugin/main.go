@@ -36,7 +36,7 @@ func NewPlugin() *Plugin {
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
-	config.ParseTypes(g.Param["types"])
+	config.MustParseTypes(g.Param["types"])
 	config.ParseExcludeFields(g.Param["exclude_fields"])
 	config.ParseDefaultPkgName(g.Param["pkg"])
 	config.ParseDuration(g.Param["custom_duration"])

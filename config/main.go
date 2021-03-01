@@ -34,7 +34,7 @@ const (
 )
 
 // ParseTypes parses and sets Types
-func ParseTypes(arg string) {
+func MustParseTypes(arg string) {
 	Types = strings.Split(arg, paramDelimiter)
 
 	if len(Types) == 0 {
