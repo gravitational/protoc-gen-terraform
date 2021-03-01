@@ -24,6 +24,9 @@ var (
 	// DefaultPkgName default package name, gets appended to type name if its import
 	// path is ".", but the type itself is located in another package
 	DefaultPkgName string
+
+	// CustomImports adds imports required in target file
+	CustomImports []string
 )
 
 const (
@@ -43,6 +46,10 @@ func ParseTypes(arg string) {
 
 // ParseExcludeFields parses and sets ExcludeFields
 func ParseExcludeFields(arg string) {
+	if arg == "" {
+		return
+	}
+
 	ExcludeFields = strings.Split(arg, paramDelimiter)
 
 	logrus.Printf("Excluded fields: %s", ExcludeFields)
@@ -53,6 +60,8 @@ func ParseDefaultPkgName(arg string) {
 	if arg != "" {
 		DefaultPkgName = arg
 	}
+
+	logrus.Printf("Default package name: %s", DefaultPkgName)
 }
 
 // ParseDuration parses duration custom class
@@ -60,4 +69,17 @@ func ParseDuration(arg string) {
 	if arg != "" {
 		DurationCustomType = arg
 	}
+
+	logrus.Printf("Duration custom type: %s", DurationCustomType)
+}
+
+// ParseCustomImports parses custom import packages
+func ParseCustomImports(arg string) {
+	if arg == "" {
+		return
+	}
+
+	CustomImports = strings.Split(arg, paramDelimiter)
+
+	logrus.Printf("Custom imports: %s", CustomImports)
 }

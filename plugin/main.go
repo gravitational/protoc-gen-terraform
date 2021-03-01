@@ -40,6 +40,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 	config.ParseExcludeFields(g.Param["exclude_fields"])
 	config.ParseDefaultPkgName(g.Param["pkg"])
 	config.ParseDuration(g.Param["custom_duration"])
+	config.ParseCustomImports(g.Param["custom_imports"])
 }
 
 // Name returns the name of the plugin
@@ -102,4 +103,8 @@ func (p *Plugin) setImports() {
 	// So those could be referenced via schema. and validation.
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
+
+	for _, i := range config.CustomImports {
+		p.AddImport(generator.GoImportPath(i))
+	}
 }
