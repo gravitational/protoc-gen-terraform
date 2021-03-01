@@ -2,6 +2,8 @@
 package plugin
 
 import (
+	"bytes"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
@@ -70,7 +72,9 @@ func (p *Plugin) reflect(file *generator.FileDescriptor) {
 // writeSchema writes schema definition to target file
 func (p *Plugin) writeSchema() {
 	for _, message := range p.Messages {
-		buf, err := render.Template(render.SchemaTpl, message)
+		var buf bytes.Buffer
+
+		err := render.Template(render.SchemaTpl, message, &buf)
 		if err != nil {
 			p.Generator.Fail(trace.Wrap(err).Error())
 		}
@@ -81,7 +85,9 @@ func (p *Plugin) writeSchema() {
 // writeUnmarshallers writes unmarshallers definition to target file
 func (p *Plugin) writeUnmarshallers() {
 	for _, message := range p.Messages {
-		buf, err := render.Template(render.UnmarshalTpl, message)
+		var buf bytes.Buffer
+
+		err := render.Template(render.UnmarshalTpl, message, &buf)
 		if err != nil {
 			p.Generator.Fail(trace.Wrap(err).Error())
 		}

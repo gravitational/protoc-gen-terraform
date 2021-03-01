@@ -2,7 +2,7 @@
 package render
 
 import (
-	"bytes"
+	"io"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
@@ -22,18 +22,16 @@ var (
 )
 
 // Template renders template from string to bytes.buffer
-func Template(content string, pipeline interface{}) (*bytes.Buffer, error) {
-	var buf bytes.Buffer
-
+func Template(content string, pipeline interface{}, w io.Writer) error {
 	tpl, err := template.New("template").Funcs(sprig.TxtFuncMap()).Parse(content)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = tpl.ExecuteTemplate(&buf, "template", pipeline)
+	err = tpl.ExecuteTemplate(w, "template", pipeline)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &buf, nil
+	return nil
 }
