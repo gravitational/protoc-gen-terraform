@@ -62,6 +62,19 @@ Map of arrays of elementary types are not supported as well.
 
 If a field has `gogoproto.casttype` flag, it can not be automatically unmarshalled from `ResourceData`. You need to define your own custom `Schema<type>` and `Unmarshal<type>` methods. See [test/custom_types.go](test/custom_types.go).
 
+# Build and test using Docker
+
+```sh
+cd build.assets
+make build test
+```
+
+On Mac M1 use:
+```sh
+cd build.assets
+make build test PROTOC_PLATFORM=linux-aarch_64
+```
+
 # TODO
 
 - [ ] Oneof is not supported yet
