@@ -16,33 +16,65 @@ import (
 // Field represents field reflection struct
 // This struct and the following methods know about both schema details and target field details
 type Field struct {
-	Name      string // Type name
-	NameSnake string // Type name in snake case
+	// Name type name
+	Name string
 
-	// Schema properties
-	SchemaRawType string // Terraform schema raw value type (float64 for types.Float), used in schema generation
-	SchemaGoType  string // Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
+	// NameSnake type name in snake case (Terraform schema field name)
+	NameSnake string
 
-	// Field properties
-	RawGoType     string // Field type returned by gogoprotobuf with * and []
-	GoType        string // Go type without [] and *, but with package name prepended
-	GoTypeIsSlice bool   // Go type is a slice?
-	GoTypeIsPtr   bool   // Go type is a pointer?
-	GoTypeFull    string // Go type with [] and * and package name prepended
+	// SchemaRawType Terraform schema raw value go type (float64 for types.Float), used in schema generation
+	SchemaRawType string
 
-	// Metadata
-	Kind                  string // Field kind (resulting of combination of flags below, see setKind method)
-	IsRepeated            bool   // Is list
-	IsMap                 bool   // Is map
-	IsMessage             bool   // Is message (might be repeated in the same time)
-	IsRequired            bool   // Is required TODO: implement via param
-	IsTime                bool   // Contains time, value needs to be parsed from string
-	IsDuration            bool   // Contains duration, value needs to be parsed from string
-	IsCustomType          bool   // Custom types require manual marshallers and schemas
-	CustomTypeMethodInfix string // Custom type method name
+	// SchemaGoType Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
+	SchemaGoType string
 
-	Message       *Message // Reference to nested message
-	MapValueField *Field   // Reference to map value field reflection
+	// RawGoType field type returned by gogoprotobuf with * and []
+	RawGoType string
+
+	// GoType Go type without [] and *, but with package name prepended
+	GoType string
+
+	// GoTypeIsSlice Go type is a slice?
+	GoTypeIsSlice bool
+
+	// GoTypeIsPtr Go type is a pointer?
+	GoTypeIsPtr bool
+
+	// GoTypeFull Go type with [] and * and package name prepended
+	GoTypeFull string
+
+	// Kind Field kind (resulting of combination of flags below, see setKind method)
+	Kind string
+
+	// IsRepeated field is list?
+	IsRepeated bool
+
+	// IsMap field is map?
+	IsMap bool
+
+	// IsMessage field is message? (might be map or list in the same time)
+	IsMessage bool
+
+	// IsRequired field is required? TODO: implement via params?
+	IsRequired bool
+
+	// IsTime field contains time? (needs to be parsed from string)
+	IsTime bool
+
+	// IsDuration field contains duration? (needs to be parsed from string)
+	IsDuration bool
+
+	// IsCustomType field has gogo.customtype flag?
+	IsCustomType bool
+
+	// CustomTypeMethodInfix custom type schema and unmarshal method name infix
+	CustomTypeMethodInfix string
+
+	// Message reference to nested message
+	Message *Message
+
+	// MapValueField reference to map value field reflection
+	MapValueField *Field
 }
 
 // fieldBuilder is axilarry struct responsible for building Field
