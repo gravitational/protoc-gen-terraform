@@ -29,8 +29,9 @@ custom_imports = "github.com/gravitational/teleport/api/types"
 .PHONY: terraform
 terraform: build
 ifeq ("$(wildcard $(teleport_dir))", "")
-	@echo "Teleport source code is required to build this example!"
-	@echo "git clone ${teleport_repo} ${teleport_dir} to proceed"
+	$(warning Teleport source code is required to build this example!)
+	$(warning git clone ${teleport_repo} ${teleport_dir} to proceed)
+	$(error Teleport source code is required to build this example)
 endif
 	@mkdir -p ./_out
 	@protoc \
