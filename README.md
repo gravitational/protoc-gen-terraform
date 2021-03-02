@@ -33,10 +33,10 @@ func SchemawrappersLabelValues() *schema.Schema
 
 Unmarshalling method should look like this:
 ```
-func SchemawrappersLabelValues(string path, data *schema.ResourceData, target *types.Traits) error
+func UnmarshalwrappersLabelValues(string path, data *schema.ResourceData, target *types.Traits) error
 ```
 
-Where types.Traits changes according to populated field type.
+Where types.Traits, and wrappers.LabelValues is the type name in proto file.
 
 See [Makefile](Makefile) for details.
 

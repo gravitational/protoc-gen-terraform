@@ -18,7 +18,6 @@ type Message struct {
 	NameSnake  string   // Type name in snake case, schema field name
 	GoTypeName string   // Go type name for this message with package name
 	Fields     []*Field // Collection of fields
-	// TODO: Comments
 }
 
 // BuildMessage builds Message from its protobuf descriptor
