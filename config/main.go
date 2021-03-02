@@ -33,7 +33,8 @@ const (
 	paramDelimiter = "+" // Delimiter for types and ignoreFields
 )
 
-// ParseTypes parses and sets Types
+// MustParseTypes parses and sets Types.
+// Panics if the argument is not a valid type list
 func MustParseTypes(arg string) {
 	Types = strings.Split(arg, paramDelimiter)
 
