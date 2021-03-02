@@ -48,7 +48,7 @@ test: build
 	@protoc \
 		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform/test \
 		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform \
-		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
+		-I$(srcpath)/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
 		--terraform_out=types=Test,custom_duration=Duration:test \
