@@ -56,8 +56,8 @@ func ParseExcludeFields(arg string) {
 	logrus.Printf("Excluded fields: %s", ExcludeFields)
 }
 
-// ParseDefaultPkgName parses default package name and import path
-func ParseDefaultPkgName(arg string) {
+// SetDefaultPkgName parses default package name and import path
+func SetDefaultPkgName(arg string) {
 	if arg != "" {
 		DefaultPkgName = arg
 	}
@@ -65,8 +65,8 @@ func ParseDefaultPkgName(arg string) {
 	logrus.Printf("Default package name: %s", DefaultPkgName)
 }
 
-// ParseDuration parses duration custom class
-func ParseDuration(arg string) {
+// SetDuration parses duration custom class
+func SetDuration(arg string) {
 	if arg != "" {
 		DurationCustomType = arg
 	}

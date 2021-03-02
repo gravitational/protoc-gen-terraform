@@ -38,8 +38,8 @@ func (p *Plugin) Init(g *generator.Generator) {
 
 	config.MustParseTypes(g.Param["types"])
 	config.ParseExcludeFields(g.Param["exclude_fields"])
-	config.ParseDefaultPkgName(g.Param["pkg"])
-	config.ParseDuration(g.Param["custom_duration"])
+	config.SetDefaultPkgName(g.Param["pkg"])
+	config.SetDuration(g.Param["custom_duration"])
 	config.ParseCustomImports(g.Param["custom_imports"])
 }
 
