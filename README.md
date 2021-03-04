@@ -23,7 +23,7 @@ protoc \
     types.proto
 ```
 
-This will generate `types_terraform.go` in _out directory. This file will contain `UnmarshalUserV2` and `UnmarshalRolesV3` along with `SchemaUserV2` and `SchemaRolesV3` methods. Target package name should be changed manually. It also might contain some unused imports.
+This will generate `types_terraform.go` in _out directory. This file will contain `UnmarshalUserV2` and `UnmarshalRolesV3` along with `SchemaUserV2` and `SchemaRolesV3` methods. Target package name should be changed manually. 
 
 Schema method should have the following prototype:
 
