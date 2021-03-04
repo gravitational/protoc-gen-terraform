@@ -58,6 +58,11 @@ func replacePackageName(s string) string {
 	n1 := strings.Index(s, "package")
 	n2 := strings.Index(s[n1:], "\n")
 
+	if n1 == -1 || n2 == -1 {
+		logrus.Println("Warning: package directive not found in target file")
+		return s
+	}
+
 	r := s[0:n1+8] + config.TargetPkgName + s[n1+n2:]
 
 	return r
