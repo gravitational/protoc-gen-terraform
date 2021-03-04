@@ -52,7 +52,7 @@ type Field struct {
 	// IsMap field is map?
 	IsMap bool
 
-	// IsMessage field is message? (might be map or list in the same time)
+	// IsMessage field is message? (might be map or list at the same time)
 	IsMessage bool
 
 	// IsRequired field is required? TODO: implement via params?
