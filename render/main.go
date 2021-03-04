@@ -21,7 +21,7 @@ var (
 	UnmarshalTpl string
 )
 
-// Template renders template from string to bytes.buffer
+// Template renders template from string to the specified writer
 func Template(content string, pipeline interface{}, w io.Writer) error {
 	tpl, err := template.New("template").Funcs(sprig.TxtFuncMap()).Parse(content)
 	if err != nil {
