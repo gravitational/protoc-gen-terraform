@@ -271,7 +271,7 @@ func (b *fieldBuilder) prependPackageName() {
 		f.GoType = gogoproto.GetCustomType(d)
 	}
 
-	// Prepend package name to overriden field type
+	// Prepend package name to overridden field type
 	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) {
 		// If cast type is within current package, append default package name to it
 		if !strings.Contains(f.GoType, ".") && config.DefaultPkgName != "" {
