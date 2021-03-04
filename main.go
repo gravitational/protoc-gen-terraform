@@ -1,8 +1,11 @@
 package main
 
 import (
+	"strings"
+
 	plugin_go "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/gogo/protobuf/vanity/command"
+	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/plugin"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
@@ -39,8 +42,23 @@ func fmt(resp *plugin_go.CodeGeneratorResponse) error {
 		}
 
 		s := string(result)
+		s = replacePackageName(s)
 		file.Content = &s
 	}
 
 	return nil
+}
+
+// replacePackageName replaces package name in target file with provided from cli
+func replacePackageName(s string) string {
+	if config.TargetPkgName == "" {
+		return s
+	}
+
+	n1 := strings.Index(s, "package")
+	n2 := strings.Index(s[n1:], "\n")
+
+	r := s[0:n1+8] + config.TargetPkgName + s[n1+n2:]
+
+	return r
 }

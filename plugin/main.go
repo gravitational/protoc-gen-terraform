@@ -41,6 +41,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 	config.SetDefaultPkgName(g.Param["pkg"])
 	config.SetDuration(g.Param["custom_duration"])
 	config.ParseCustomImports(g.Param["custom_imports"])
+	config.SetTargetPkgName(g.Param["target_pkg"])
 }
 
 // Name returns the name of the plugin

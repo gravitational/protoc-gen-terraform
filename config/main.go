@@ -27,6 +27,9 @@ var (
 
 	// CustomImports adds imports required in target file
 	CustomImports []string
+
+	// TargetPkgName sets the name of the target package
+	TargetPkgName string
 )
 
 const (
@@ -85,4 +88,15 @@ func ParseCustomImports(arg string) {
 	CustomImports = strings.Split(arg, paramDelimiter)
 
 	logrus.Printf("Custom imports: %s", CustomImports)
+}
+
+// SetTargetPkgName sets the target package name
+func SetTargetPkgName(arg string) {
+	if arg == "" {
+		return
+	}
+
+	TargetPkgName = arg
+
+	logrus.Printf("Target package name: %v", TargetPkgName)
 }

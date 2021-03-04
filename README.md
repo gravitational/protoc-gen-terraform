@@ -23,7 +23,7 @@ protoc \
     types.proto
 ```
 
-This will generate `types_terraform.go` in _out directory. This file will contain `UnmarshalUserV2` and `UnmarshalRolesV3` along with `SchemaUserV2` and `SchemaRolesV3` methods. Target package name should be changed manually. 
+This will generate `types_terraform.go` in _out directory. This file will contain `UnmarshalUserV2` and `UnmarshalRolesV3` along with `SchemaUserV2` and `SchemaRolesV3` methods.
 
 Schema method should have the following prototype:
 
@@ -45,6 +45,9 @@ Options:
 * `types` - the list of top level types to export (with namespace).
 * `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`).
 * `pkg` - default package name to prepend to type names with no package reference. This option is required if the target package of Terraform generated code is different from package of original protobuf generated code.
+* `target_pkg` - the name of the target package
+* `custom_duration` - the name of custom Duration type, if used
+* `custom_imports` - comma-separated package list to add into target file
 
 # Testing
 
@@ -82,5 +85,5 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 - [x] Add argument to provide custom duration type
 - [x] Add argument to provide custom imports for target file
 - [ ] Add argument which will represent specific []byte fields as byte lists on Terraform side
-- [ ] Manually replace target package name
+- [x] Manually replace target package name
 - [x] Run goimports to remove unused packages
