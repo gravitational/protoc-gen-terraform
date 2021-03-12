@@ -27,9 +27,14 @@ import (
 )
 
 const (
-	name          = "terraform"                                                      // Plugin name
-	schemaPkg     = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"     // Terraform schema package
-	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation" // Terraform validation package
+	// name contains plugin name
+	name = "terraform"
+
+	// schemaPkg contains name of Terraform schema package
+	schemaPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	// validationPkg contains name of Terraform validation package
+	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 // Plugin is terraform generator plugin

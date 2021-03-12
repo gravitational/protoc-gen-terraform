@@ -17,7 +17,6 @@ limitations under the License.
 package plugin
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
@@ -207,12 +206,12 @@ func (b *fieldBuilder) isDuration() bool {
 	return isStdDuration || isGoogleDuration || isCastToDuration || isCastToCustomDuration
 }
 
-// isMessage returns true if field is message
+// isMessage returns true if field is a message
 func (b *fieldBuilder) isMessage() bool {
 	return b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
 }
 
-// setTypes sets SchemaType and SchemaGoType
+// setTypes sets SchemaRawType and SchemaGoType
 func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
 	b.field.SchemaRawType = schemaRawType
 	b.field.SchemaGoType = goTypeCast
@@ -276,7 +275,7 @@ func (b *fieldBuilder) resolveType() error {
 	return nil
 }
 
-// Append type suffix to cast type, custom type or message
+// prependPackageName prepends package name to cast type, custom type or message type names
 func (b *fieldBuilder) prependPackageName() {
 	d := b.fieldDescriptor
 	f := b.field
@@ -302,10 +301,10 @@ func (b *fieldBuilder) prependPackageName() {
 	}
 }
 
-// setGoType Sets go type with gogoprotobuf standard method, sets type information flags
-// It deconstructs type returned by gogo, and than reconstructs it back using type with prepend package.
+// setGoType Sets go type with gogo/protobuf standard method, sets type information flags
+// It deconstructs type returned by the gogo package, and then builds a new type string with the package name prepended.
 func (b *fieldBuilder) setGoType() {
-	f := b.field // shortrut
+	f := b.field // shortrut to b.field internals
 
 	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
 	goType, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
@@ -336,6 +335,7 @@ func (b *fieldBuilder) setGoType() {
 		return
 	}
 
+	// At this point, GoTypeFull will contain [], *, []* and type name will be appended
 	f.GoTypeFull = f.GoTypeFull + f.GoType
 }
 
@@ -351,7 +351,7 @@ func (b *fieldBuilder) setMessage() error {
 	// Try to analyse it
 	m := BuildMessage(b.generator, desc, false)
 	if m == nil {
-		return fmt.Errorf("Nested message is invalid for field %v", b.field.Name)
+		return trace.Errorf("nested message is invalid for field %v", b.field.Name)
 	}
 
 	// Nested message schema, or nil if message is not whitelisted
@@ -398,7 +398,7 @@ func (b *fieldBuilder) setMap() error {
 
 	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
 	if valueField == nil {
-		return fmt.Errorf("Failed to reflect map field %s %s", b.field.GoType, b.field.Name)
+		return trace.Errorf("failed to reflect map field %s %s", b.field.GoType, b.field.Name)
 	}
 	b.field.MapValueField = valueField
 
