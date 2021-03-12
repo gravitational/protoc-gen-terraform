@@ -39,7 +39,7 @@ const (
 
 // MustParseTypes parses and sets Types.
 // Panics if the argument is not a valid type list
-func MustParseTypes(arg string) {
+func MustSetTypes(arg string) {
 	Types = strings.Split(arg, paramDelimiter)
 
 	if len(Types) == 0 {
@@ -50,7 +50,7 @@ func MustParseTypes(arg string) {
 }
 
 // ParseExcludeFields parses and sets ExcludeFields
-func ParseExcludeFields(arg string) {
+func SetExcludeFields(arg string) {
 	if arg == "" {
 		return
 	}
@@ -82,7 +82,7 @@ func SetDuration(arg string) {
 }
 
 // ParseCustomImports parses custom import packages
-func ParseCustomImports(arg string) {
+func SetCustomImports(arg string) {
 	if arg == "" {
 		return
 	}

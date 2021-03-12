@@ -52,11 +52,11 @@ func NewPlugin() *Plugin {
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
-	config.MustParseTypes(g.Param["types"])
-	config.ParseExcludeFields(g.Param["exclude_fields"])
+	config.MustSetTypes(g.Param["types"])
+	config.SetExcludeFields(g.Param["exclude_fields"])
 	config.SetDefaultPkgName(g.Param["pkg"])
 	config.SetDuration(g.Param["custom_duration"])
-	config.ParseCustomImports(g.Param["custom_imports"])
+	config.SetCustomImports(g.Param["custom_imports"])
 	config.SetTargetPkgName(g.Param["target_pkg"])
 }
 

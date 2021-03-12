@@ -194,7 +194,7 @@ func (b *fieldBuilder) isTime() bool {
 	return isStdTime || isGoogleTime || isCastToTime
 }
 
-// isDuration return true if field stores duration (is standard duration, or casted to duration)
+// isDuration returns true if field stores a duration value (protobuf or cast to a standard library type)
 func (b *fieldBuilder) isDuration() bool {
 	ct := gogoproto.GetCastType(b.fieldDescriptor)
 	t := b.fieldDescriptor.TypeName
@@ -218,8 +218,7 @@ func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
 	b.field.SchemaGoType = goTypeCast
 }
 
-// resolveType analyses field type and sets required fields in Field structure
-// This method is pretty much copy & paste from gogo/protobuf generator.GoType
+// resolveType analyses field type and sets required fields in Field structure.
 func (b *fieldBuilder) resolveType() error {
 	d := b.fieldDescriptor // shortcut
 	f := b.field           // shortcut
