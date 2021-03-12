@@ -17,14 +17,21 @@ limitations under the License.
 package main
 
 import (
+	"regexp"
 	"strings"
 
 	plugin_go "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/gogo/protobuf/vanity/command"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/plugin"
+	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
+)
+
+var (
+	// packageReplacementRegexp is used to replace package name in a target file
+	packageReplacementRegexp = regexp.MustCompile("package (.*)\n")
 )
 
 func main() {
@@ -54,7 +61,7 @@ func fmt(resp *plugin_go.CodeGeneratorResponse) error {
 	for _, file := range resp.GetFile() {
 		result, err := imports.Process("", []byte(*file.Content), &opts)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 
 		s := string(result)
@@ -71,15 +78,12 @@ func replacePackageName(s string) string {
 		return s
 	}
 
-	n1 := strings.Index(s, "package")
-	n2 := strings.Index(s[n1:], "\n")
-
-	if n1 == -1 || n2 == -1 {
+	// Replace one string
+	pkg := packageReplacementRegexp.FindString(s)
+	if pkg == "" {
 		logrus.Warning("Package directive not found in target file, can't replace package name, skipping")
 		return s
 	}
 
-	r := s[0:n1+8] + config.TargetPkgName + s[n1+n2:]
-
-	return r
+	return strings.Replace(s, pkg, "package "+config.TargetPkgName, 1)
 }

@@ -2,7 +2,6 @@
 // source: test.proto
 
 package test
-
 import (
 	fmt "fmt"
 	math "math"

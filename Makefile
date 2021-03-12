@@ -52,7 +52,7 @@ test: build
 		-I./vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=Test,custom_duration=Duration:test \
+		--terraform_out=target_pkg=test,types=Test,custom_duration=Duration:test \
 		--gogo_out=test \
 		test.proto
 	@go test -v ./test

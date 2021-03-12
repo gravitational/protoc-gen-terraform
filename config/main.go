@@ -2,6 +2,7 @@
 package config
 
 import (
+	"path/filepath"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -42,7 +43,7 @@ func MustParseTypes(arg string) {
 	Types = strings.Split(arg, paramDelimiter)
 
 	if len(Types) == 0 {
-		logrus.Fatal("Please, specify explicit top level type list, eg. --terraform-out=types=UserV2+UserSpecV2:./_out")
+		logrus.Fatal("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
 	}
 
 	logrus.Printf("Types: %s", Types)
@@ -65,7 +66,8 @@ func SetDefaultPkgName(arg string) {
 		return
 	}
 
-	DefaultPkgName = arg
+	_, name := filepath.Split(arg)
+	DefaultPkgName = name
 
 	logrus.Printf("Default package name: %v", DefaultPkgName)
 }
@@ -96,7 +98,8 @@ func SetTargetPkgName(arg string) {
 		return
 	}
 
-	TargetPkgName = arg
+	_, name := filepath.Split(arg)
+	TargetPkgName = name
 
 	logrus.Printf("Target package name: %v", TargetPkgName)
 }
