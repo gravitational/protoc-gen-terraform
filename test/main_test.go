@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -76,17 +77,10 @@ func buildSubject(t *testing.T) (*Test, error) {
 	return subject, err
 }
 
-// TestUnmarshal ensures that parsing is done without errors
-func TestUnmarshal(t *testing.T) {
-	_, err := buildSubject(t)
-	if err != nil {
-		panic(err)
-	}
-}
-
 // TestElementaries ensures decoding of elementary types
 func TestElementaries(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.Str, "TestString", "Test.Str")
 	assert.Equal(t, subject.Int32, int32(999), "Test.Int32")
@@ -99,11 +93,17 @@ func TestElementaries(t *testing.T) {
 
 // TestTimes ensures decoding of time and duration fields
 func TestTimes(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-	timestamp, _ := time.Parse(time.RFC3339, defaultTimestamp)
-	durationStd, _ := time.ParseDuration("1h")
-	durationCustom, _ := time.ParseDuration("1m")
+	timestamp, err := time.Parse(time.RFC3339, defaultTimestamp)
+	require.NoError(t, err, "failed to parse example timestamp")
+
+	durationStd, err := time.ParseDuration("1h")
+	require.NoError(t, err, "failed to parse example duration")
+
+	durationCustom, err := time.ParseDuration("1m")
+	require.NoError(t, err, "failed to parse example duration")
 
 	assert.Equal(t, subject.Timestamp, timestamp, "Test.Timestamp")
 	assert.Equal(t, subject.DurationStd, durationStd, "Test.DurationStd")
@@ -113,10 +113,14 @@ func TestTimes(t *testing.T) {
 
 // TestArrays ensures decoding arrays
 func TestArrays(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-	timestamp, _ := time.Parse(time.RFC3339, defaultTimestamp)
-	duration, _ := time.ParseDuration("1m")
+	timestamp, err := time.Parse(time.RFC3339, defaultTimestamp)
+	require.NoError(t, err, "failed to parse example timestamp")
+
+	duration, err := time.ParseDuration("1m")
+	require.NoError(t, err, "failed to parse example duration")
 
 	assert.Equal(t, subject.StringA, []string{"TestString1", "TestString2"})
 	assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
@@ -127,14 +131,16 @@ func TestArrays(t *testing.T) {
 
 // TestNestedMessage ensures decoding of nested messages
 func TestNestedMessage(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.Nested.Str, "TestString", "Test.Nested.Str")
 }
 
 // TestNestedMessage ensures decoding of array of messages
 func TestNestedMessageArray(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.Nested.Nested[0].Str, "TestString1")
 	assert.Equal(t, subject.Nested.Nested[1].Str, "TestString2")
@@ -142,7 +148,8 @@ func TestNestedMessageArray(t *testing.T) {
 
 // TestMap ensures decoding of a maps
 func TestMap(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.NestedM["k1"], "v1")
 	assert.Equal(t, subject.NestedM["k2"], "v2")
@@ -152,7 +159,8 @@ func TestMap(t *testing.T) {
 
 // TestMap ensures decoding of maps of messages
 func TestObjectMap(t *testing.T) {
-	subject, _ := buildSubject(t)
+	subject, err := buildSubject(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.NestedMObj["obj1"].Str, "TestString1")
 }
