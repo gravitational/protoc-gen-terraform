@@ -10,6 +10,7 @@ option (gogoproto.unmarshaler_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 
 // Test message definition.
+//
 // It contains:
 //   - elementary fields
 //   - repeated elementary fields
