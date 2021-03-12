@@ -9,96 +9,98 @@ option (gogoproto.marshaler_all) = false;
 option (gogoproto.unmarshaler_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 
-message Nested {
-    // Nested field
+// Test message definition.
+// It contains:
+//   - elementary fields
+//   - repeated elementary fields
+//   - maps of elementary fields
+//   - other messages (nested)
+//   - repeated messages
+//   - message maps
+//   - custom types
+//   - custom duration type
+//   - standard google protobuf timestamps
+//   - byte arrays, which are treated as strings by default
+//
+message Test {
+    // Str string field
     string Str = 1;
 
-    // Nested message
+    // Int32 int32 field
+    int32 Int32 = 2;
+
+    // Int64 int64 field
+    int64 Int64 = 3;
+
+    // Float float field
+    float Float = 4;
+
+    // Double double field
+    double Double = 5;
+
+    // Bool bool field
+    bool Bool = 6;
+
+    // Bytest byte[] field
+    bytes Bytes = 7;
+
+    // Timestamp time.Time field
+    google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+
+    // DurationStd time.Duration field (standard)
+    int64 DurationStd = 9 [ (gogoproto.stdduration) = true ];
+
+    // DurationCustom time.Duration field (custom)
+    int64 DurationCustom = 10 [ (gogoproto.casttype) = "Duration" ];
+    
+    // TimestampN *time.Time field
+    google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+
+    // StringA []string field
+    repeated string StringA = 13;
+
+    // BoolA []bool field
+    repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustom" ];
+
+    // BytesA [][]byte field
+    repeated bytes BytesA = 15;
+
+    // TimestampA []time.Time field
+    repeated google.protobuf.Timestamp TimestampA = 16 [ (gogoproto.stdtime) = true ];
+
+    // DurationCustomA []time.Duration field
+    repeated int64 DurationCustomA = 17 [ (gogoproto.casttype) = "Duration" ];
+
+    // Nested nested message field
+    Nested Nested = 18;   
+
+    // NestedA nested message array
+    repeated Nested NestedA = 19;
+
+    // NestedM normal map
+    map<string, string> NestedM = 20;
+
+    // NestedMObj object map
+    map<string, Nested> NestedMObj = 21;
+}
+
+// Nested message definition
+message Nested {
+    // Str string field
+    string Str = 1;
+
+    // Nested repeated nested messages
     repeated NestedLevel2 Nested = 2;
 
-    // --- Nested maps ----------------------------------------------------------------------
-    
-    // Normal map
+    // Nested map repeated nested messages
     map<string, string> NestedM = 3;
 
-    // Object map
+    // NestedMObj nested object map
     map<string, NestedLevel2> NestedMObj = 4;
 }
 
+// Message nested into nested message
 message NestedLevel2 {
+    // Str string field
     string Str = 1;
-}
-
-message Test {
-    // --- Elementary fields ----------------------------------------------------------------
-
-    // string field
-    string Str = 1;
-
-    // int32 field
-    int32 Int32 = 2;
-
-    // int64 field
-    int64 Int64 = 3;
-
-    // float field
-    float Float = 4;
-
-    // double field
-    double Double = 5;
-
-    // bool field
-    bool Bool = 6;
-
-    // byte[] field
-    bytes Bytes = 7;
-
-    // time.Time field
-    google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
-
-    // time.Duration field (standard)
-    int64 DurationStd = 9 [ (gogoproto.stdduration) = true ];
-
-    // time.Duration field (custom)
-    int64 DurationCustom = 10 [ (gogoproto.casttype) = "Duration" ];
-
-    // --- Elementary nullable fields -------------------------------------------------------
-    
-    // *time.Time field
-    google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
-
-    // --- Elementary arrays (+ cast and custom types) ----------------------------------------
-
-    // []string field
-    repeated string StringA = 13;
-
-    // []bool field
-    repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustom" ];
-
-    // [][]byte field
-    repeated bytes BytesA = 15;
-
-    // []time.Time field
-    repeated google.protobuf.Timestamp TimestampA = 16 [ (gogoproto.stdtime) = true ];
-
-    // []time.Duration field
-    repeated int64 DurationCustomA = 17 [ (gogoproto.casttype) = "Duration" ];
-
-    // --- Nested messages ---------------------------------------------------------------------
-
-    // Nested field
-    Nested Nested = 18;   
-
-    // --- Message arrays ----------------------------------------------------------------------
-
-    // Nested array
-    repeated Nested NestedA = 19;
-
-    // --- Maps --------------------------------------------------------------------------------
-
-    // Normal map
-    map<string, string> NestedM = 20;
-
-    // Object map
-    map<string, Nested> NestedMObj = 21;
 }
