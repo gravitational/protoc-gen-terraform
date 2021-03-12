@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
+	"github.com/gravitational/trace"
 
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
@@ -132,12 +133,12 @@ func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.F
 	return b.field
 }
 
-// getFieldTypeName returns field name with package
+// getFieldTypeName returns field type name with package
 func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) string {
 	return getMessageTypeName(d) + "." + f.GetName()
 }
 
-// newFieldBuilder constructs an empty fieldBuilder struct
+// newFieldBuilder constructs an empty fieldBuilder value
 func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
 	return &fieldBuilder{
 		generator:       g,
@@ -153,7 +154,7 @@ func (b *fieldBuilder) build() error {
 
 	err := b.resolveType()
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	b.setGoType()
@@ -177,12 +178,12 @@ func (b *fieldBuilder) setName() {
 	b.field.NameSnake = strcase.SnakeCase(name)
 }
 
-// isTypeEq returns true if type
+// isTypeEq returns true if type equals current field descriptor type
 func (b *fieldBuilder) isTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
 	return *b.fieldDescriptor.Type == t
 }
 
-// isTime returns true if field stores time (is standard, google or golang time)
+// isTime returns true if field stores a time value (protobuf or standard library)
 func (b *fieldBuilder) isTime() bool {
 	t := b.fieldDescriptor.TypeName
 
