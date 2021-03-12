@@ -17,6 +17,7 @@ limitations under the License.
 package plugin
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
@@ -121,15 +122,15 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) er
 
 		f, err := BuildField(g, d, f)
 		if err != nil {
-			err, ok := err.(*invalidFieldError)
+			invErr, ok := trace.Unwrap(err).(*invalidFieldError)
 
-			// invalidFieldError is not considered fatal, we just need to report it to user
-			if ok {
-				logrus.Warning("%+v", err)
-				continue
+			// invalidFieldError is not considered fatal, we just need to report it to the user and skip it
+			if !ok {
+				return err
 			}
 
-			return err
+			logrus.Warning(invErr.Error())
+			continue
 		}
 
 		if f != nil {
@@ -373,7 +374,7 @@ func (b *fieldBuilder) prependPackageName(t string) (result string) {
 	return result
 }
 
-// setMessage sets reference to nested message
+// setMessage sets reference to a nested message
 func (b *fieldBuilder) setMessage() error {
 	// Resolve underlying message via protobuf
 	x := b.generator.ObjectNamed(b.fieldDescriptor.GetTypeName())
@@ -383,9 +384,19 @@ func (b *fieldBuilder) setMessage() error {
 	}
 
 	// Try to analyse it
-	m := BuildMessage(b.generator, desc, false)
-	if m == nil {
-		return trace.Wrap(newInvalidFieldError(b, "failed to reflect message type information"))
+	m, err := BuildMessage(b.generator, desc, false)
+	if err != nil {
+		// If underlying message is invalid, we must consider current field as invalid and not stop
+		_, ok := trace.Unwrap(err).(*invalidMessageError)
+		if ok {
+			return trace.Wrap(
+				newInvalidFieldError(b, fmt.Sprintf("failed to reflect message type information: %v", err.Error())),
+			)
+		}
+
+		return trace.Wrap(err)
+	} else if m == nil {
+		return trace.Wrap(newInvalidFieldError(b, "field marked as skipped"))
 	}
 
 	// Nested message schema, or nil if message is not whitelisted
@@ -427,7 +438,7 @@ func (b *fieldBuilder) setMap() error {
 
 	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
 	if keyGoType != "string" {
-		return trace.Wrap(newInvalidFieldError(b, "oneOf is not supported"))
+		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
 	}
 
 	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField)

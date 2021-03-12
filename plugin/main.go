@@ -23,6 +23,7 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
+	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
 )
 
@@ -78,14 +79,28 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	p.setImports()
 
 	p.reflect(file)
-	p.writeSchema()
-	p.writeUnmarshallers()
+
+	err := p.writeSchema()
+	if err != nil {
+		p.Generator.Fail(err.Error())
+	}
+
+	err = p.writeUnmarshallers()
+	if err != nil {
+		p.Generator.Fail(err.Error())
+	}
 }
 
 // reflect builds message dictionary from a messages in protoc file
 func (p *Plugin) reflect(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
-		m := BuildMessage(p.Generator, message, true)
+		m, err := BuildMessage(p.Generator, message, true)
+
+		if err != nil {
+			logrus.Warning(err)
+			continue
+		}
+
 		if m != nil {
 			p.Messages[m.GoTypeName] = m
 		}
@@ -93,29 +108,33 @@ func (p *Plugin) reflect(file *generator.FileDescriptor) {
 }
 
 // writeSchema writes schema definition to target file
-func (p *Plugin) writeSchema() {
+func (p *Plugin) writeSchema() error {
 	for _, message := range p.Messages {
 		var buf bytes.Buffer
 
 		err := render.Template(render.SchemaTpl, message, &buf)
 		if err != nil {
-			p.Generator.Fail(err.Error())
+			return trace.Wrap(err)
 		}
 		p.P(buf.String())
 	}
+
+	return nil
 }
 
 // writeUnmarshallers writes unmarshallers definition to target file
-func (p *Plugin) writeUnmarshallers() {
+func (p *Plugin) writeUnmarshallers() error {
 	for _, message := range p.Messages {
 		var buf bytes.Buffer
 
 		err := render.Template(render.UnmarshalTpl, message, &buf)
 		if err != nil {
-			p.Generator.Fail(err.Error())
+			return trace.Wrap(err)
 		}
 		p.P(buf.String())
 	}
+
+	return nil
 }
 
 // setImports sets import definitions for current file

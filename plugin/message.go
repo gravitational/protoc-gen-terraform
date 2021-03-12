@@ -19,7 +19,6 @@ package plugin
 import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
-	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -42,26 +41,30 @@ type Message struct {
 	Fields []*Field
 }
 
-// BuildMessage builds Message from its protobuf descriptor
+// BuildMessage builds Message from its protobuf descriptor and
+//
 // checkValiditiy should be false for nested messages. We do not check them over allowed types,
 // otherwise it will be overexplicit. Use excludeFields to skip fields.
-func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) *Message {
+//
+// It might return nil, nil which means that operation was successful, but message should be skipped.
+func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) (*Message, error) {
 	typeName := getMessageTypeName(d)
 
 	// Check if message is specified in export type list
 	_, ok := config.Types[typeName]
 	if !ok && checkValidity {
-		return nil
+		// This is not an error, we must just skip this message
+		return nil, nil
 	}
 
-	if cache[typeName] != nil {
-		return cache[typeName]
+	c, ok := cache[typeName]
+	if ok {
+		return c, nil
 	}
 
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
-			logrus.Warning("Oneof messages are not supported yet")
-			return nil
+			return nil, newInvalidMessageError(typeName, "oneOf messages are not supported yet")
 		}
 	}
 
@@ -73,9 +76,12 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 		GoTypeName: typeName,
 	}
 
-	BuildFields(message, g, d)
+	err := BuildFields(message, g, d)
+	if err != nil {
+		return nil, err
+	}
 
-	return message
+	return message, nil
 }
 
 // getMessageTypeName returns full message name, with prepended DefaultPkgName if needed

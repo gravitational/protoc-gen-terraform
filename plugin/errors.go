@@ -18,7 +18,7 @@ package plugin
 
 import "fmt"
 
-// invalidFieldError is generated when field failed to reflect (unsupported type)
+// invalidFieldError is generated when there is something wrong with struct field
 type invalidFieldError struct {
 	msg    string
 	field  string
@@ -33,4 +33,20 @@ func newInvalidFieldError(b *fieldBuilder, reason string) *invalidFieldError {
 // Error returns error message
 func (e *invalidFieldError) Error() string {
 	return fmt.Sprintf("%v (%v.%v)", e.reason, e.msg, e.field)
+}
+
+// invalidMessageError is generated when message is invalid (oneOf)
+type invalidMessageError struct {
+	name   string
+	reason string
+}
+
+// newInvalidMessageError creates unknown type error
+func newInvalidMessageError(name string, reason string) *invalidMessageError {
+	return &invalidMessageError{name: name, reason: reason}
+}
+
+// Error returns error message
+func (e *invalidMessageError) Error() string {
+	return fmt.Sprintf("%v (%v)", e.reason, e.name)
 }
