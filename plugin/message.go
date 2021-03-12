@@ -29,16 +29,16 @@ var (
 
 // Message holds reflection information about message
 type Message struct {
-	// Name type name
+	// Name contains type name
 	Name string
 
-	// NameSnake type name in snake case (Terraform schema field name)
+	// NameSnake contains type name in snake case (Terraform schema field name)
 	NameSnake string
 
-	// GoTypeName Go type name for this message with package name
+	// GoTypeName contains Go type name for this message with package name
 	GoTypeName string
 
-	// Fields Collection of fields
+	// Fields contains the collection of fields
 	Fields []*Field
 }
 
