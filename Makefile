@@ -23,7 +23,6 @@ teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
 types = "types.UserV2+types.RoleV3"
 exclude_fields = "types.UserSpecV2.LocalAuth"
-# exclude_fields = ""
 custom_duration = "Duration"
 custom_imports = "github.com/gravitational/teleport/api/types"
 target_pkg = "tfschema"
