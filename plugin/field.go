@@ -160,7 +160,7 @@ func (b *fieldBuilder) build() error {
 
 	err = b.setAggregate()
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	b.setCustomType()
@@ -262,7 +262,7 @@ func (b *fieldBuilder) resolveType() error {
 	case b.isMessage():
 		err := b.setMessage()
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 		f.IsMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
@@ -368,7 +368,7 @@ func (b *fieldBuilder) setAggregate() error {
 		f.IsMap = true
 		err := b.setMap()
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 	} else if b.fieldDescriptor.IsRepeated() {
 		f.IsRepeated = true
