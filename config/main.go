@@ -50,7 +50,7 @@ func MustSetTypes(arg string) {
 		Types[n] = struct{}{}
 	}
 
-	logrus.Printf("Types: %s", Types)
+	logrus.Printf("Types: %s", t)
 }
 
 // ParseExcludeFields parses and sets ExcludeFields

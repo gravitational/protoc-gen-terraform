@@ -21,11 +21,11 @@ import (
 
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/trace"
+	"github.com/sirupsen/logrus"
 
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -95,14 +95,21 @@ type Field struct {
 
 // fieldBuilder creates valid Field values
 type fieldBuilder struct {
-	generator       *generator.Generator
-	descriptor      *generator.Descriptor
+	// generator is the generator instance
+	generator *generator.Generator
+
+	// descriptor is the message descriptor
+	descriptor *generator.Descriptor
+
+	// fieldDescriptor is the field descriptor
 	fieldDescriptor *descriptor.FieldDescriptorProto
-	field           *Field
+
+	// field is the target Field value
+	field *Field
 }
 
 // BuildFields builds []*Field from descriptors of specified message
-func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
+func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) error {
 	for _, f := range d.GetField() {
 		typeName := getFieldTypeName(d, f)
 
@@ -112,24 +119,32 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
 			continue
 		}
 
-		f := BuildField(g, d, f)
+		f, err := BuildField(g, d, f)
+		if err != nil {
+			err, ok := err.(*invalidFieldError)
+
+			// invalidFieldError is not considered fatal, we just need to report it to user
+			if ok {
+				logrus.Warning("%+v", err)
+				continue
+			}
+
+			return err
+		}
+
 		if f != nil {
 			m.Fields = append(m.Fields, f)
 		}
 	}
+
+	return nil
 }
 
 // BuildField builds field reflection structure, or returns nil in case field build failed
-func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *Field {
+func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) (*Field, error) {
 	b := newFieldBuilder(g, d, f)
 	err := b.build()
-
-	if err != nil {
-		// Display error in the log, proceed further
-		logrus.Printf("%+v", err)
-		return nil
-	}
-	return b.field
+	return b.field, err
 }
 
 // getFieldTypeName returns field type name with package
@@ -149,7 +164,7 @@ func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descrip
 
 // build fills in a Field structure
 func (b *fieldBuilder) build() error {
-	b.setName()
+	b.resolveName()
 
 	err := b.resolveType()
 	if err != nil {
@@ -164,17 +179,54 @@ func (b *fieldBuilder) build() error {
 	}
 
 	b.setCustomType()
-	b.setKind()
+	b.resolveKind()
 
 	return nil
 }
 
 // setName sets the field name
-func (b *fieldBuilder) setName() {
+func (b *fieldBuilder) resolveName() {
 	name := b.fieldDescriptor.GetName()
 
 	b.field.Name = name
 	b.field.NameSnake = strcase.SnakeCase(name)
+}
+
+// setGoType sets go type with gogo/protobuf standard method, sets type information flags
+// It deconstructs type returned by the gogo package, and then builds a new type string with the package name prepended.
+func (b *fieldBuilder) setGoType() {
+	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
+	t, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
+
+	b.field.RawGoType = t
+	prefix := ""
+
+	// This is an exception: we get all []byte arrays from strings, it is an elementary type on the protobuf side
+	// TODO: Param containing list of fields that need to be transformed into byte arrays
+	if t == "[]byte" || t == "[]*byte" {
+		b.field.GoType = t
+		b.field.GoTypeFull = t
+		return
+	}
+
+	// If type is a slice, mark as slice
+	if t[0] == '[' {
+		t = t[2:]
+		prefix = prefix + "[]"
+		b.field.GoTypeIsSlice = true
+	}
+
+	// If type is a pointer, mark as pointer
+	if t[0] == '*' {
+		t = t[1:]
+		prefix = prefix + "*"
+		b.field.GoTypeIsPtr = true
+	}
+
+	t = b.prependPackageName(t)
+
+	b.field.GoType = t
+	b.field.GoTypeFull = prefix + t
 }
 
 // isTypeEq returns true if type equals current field descriptor type
@@ -188,14 +240,14 @@ func (b *fieldBuilder) isTime() bool {
 
 	isStdTime := gogoproto.IsStdTime(b.fieldDescriptor)
 	isGoogleTime := (t != nil && strings.HasSuffix(*t, "google.protobuf.Timestamp"))
-	isCastToTime := gogoproto.GetCastType(b.fieldDescriptor) == "time.Time"
+	isCastToTime := b.getCastType() == "time.Time"
 
 	return isStdTime || isGoogleTime || isCastToTime
 }
 
 // isDuration returns true if field stores a duration value (protobuf or cast to a standard library type)
 func (b *fieldBuilder) isDuration() bool {
-	ct := gogoproto.GetCastType(b.fieldDescriptor)
+	ct := b.getCastType()
 	t := b.fieldDescriptor.TypeName
 
 	isStdDuration := gogoproto.IsStdDuration(b.fieldDescriptor)
@@ -211,6 +263,26 @@ func (b *fieldBuilder) isMessage() bool {
 	return b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
 }
 
+// isCastType returns true if field has gogoprotobuf.casttype flag
+func (b *fieldBuilder) isCastType() bool {
+	return gogoproto.IsCastType(b.fieldDescriptor)
+}
+
+// isCastType returns true if field has gogoprotobuf.customtype flag
+func (b *fieldBuilder) isCustomType() bool {
+	return gogoproto.IsCustomType(b.fieldDescriptor)
+}
+
+// getCastType returns field cast type name
+func (b *fieldBuilder) getCastType() string {
+	return gogoproto.GetCastType(b.fieldDescriptor)
+}
+
+// getCustomType returns field custom type name
+func (b *fieldBuilder) getCustomType() string {
+	return gogoproto.GetCustomType(b.fieldDescriptor)
+}
+
 // setTypes sets SchemaRawType and SchemaGoType
 func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
 	b.field.SchemaRawType = schemaRawType
@@ -219,16 +291,15 @@ func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
 
 // resolveType analyses field type and sets required fields in Field structure.
 func (b *fieldBuilder) resolveType() error {
-	d := b.fieldDescriptor // shortcut
-	f := b.field           // shortcut
+	d := b.fieldDescriptor // syntax shortcut for gogoproto.IsStd* methods
 
 	switch {
 	case b.isTime():
 		b.setSchemaTypes("string", "time.Time")
-		f.IsTime = true
+		b.field.IsTime = true
 	case b.isDuration():
 		b.setSchemaTypes("string", "time.Duration")
-		f.IsDuration = true
+		b.field.IsDuration = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
 		b.setSchemaTypes("float64", "float64")
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(d):
@@ -264,79 +335,42 @@ func (b *fieldBuilder) resolveType() error {
 		if err != nil {
 			return trace.Wrap(err)
 		}
-		f.IsMessage = true
+		b.field.IsMessage = true
 	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		b.setSchemaTypes("string", "string")
 	default:
-		b.generator.Fail("unknown type for", b.descriptor.GetName(), b.fieldDescriptor.GetName())
-		return nil
+		return trace.Wrap(newInvalidFieldError(b, "unknown field type"))
 	}
 
 	return nil
 }
 
 // prependPackageName prepends package name to cast type, custom type or message type names
-func (b *fieldBuilder) prependPackageName() {
-	d := b.fieldDescriptor
-	f := b.field
+func (b *fieldBuilder) prependPackageName(t string) (result string) {
+	result = t
 
-	// Override field type
-	if gogoproto.IsCastType(d) {
-		f.GoType = gogoproto.GetCastType(d)
-	} else if gogoproto.IsCustomType(d) {
-		f.GoType = gogoproto.GetCustomType(d)
+	if b.isCastType() {
+		result = b.getCastType()
+	}
+
+	if b.isCustomType() {
+		result = b.getCustomType()
 	}
 
 	// Prepend package name to overridden field type
-	if gogoproto.IsCastType(d) || gogoproto.IsCustomType(d) {
+	if b.isCastType() || b.isCustomType() {
 		// If cast type is within current package, append default package name to it
-		if !strings.Contains(f.GoType, ".") && config.DefaultPkgName != "" {
-			f.GoType = config.DefaultPkgName + "." + f.GoType
+		if !strings.Contains(result, ".") && config.DefaultPkgName != "" {
+			result = config.DefaultPkgName + "." + result
 		}
 	} else {
 		// Get go type from a message
 		if b.isMessage() && b.field.Message != nil {
-			f.GoType = b.field.Message.GoTypeName
+			result = b.field.Message.GoTypeName
 		}
 	}
-}
 
-// setGoType Sets go type with gogo/protobuf standard method, sets type information flags
-// It deconstructs type returned by the gogo package, and then builds a new type string with the package name prepended.
-func (b *fieldBuilder) setGoType() {
-	f := b.field // shortrut to b.field internals
-
-	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
-	goType, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
-	f.RawGoType = goType
-	f.GoType = goType
-
-	// If type is a slice, mark as slice
-	if f.GoType[0] == '[' {
-		f.GoType = f.GoType[2:]
-		f.GoTypeIsSlice = true
-		f.GoTypeFull = "[]"
-	}
-
-	// If type is a pointer, mark as pointer
-	if f.GoType[0] == '*' {
-		f.GoType = f.GoType[1:]
-		f.GoTypeIsPtr = true
-		f.GoTypeFull = f.GoTypeFull + "*"
-	}
-
-	b.prependPackageName()
-
-	// This is an exception: we get all []byte arrays from strings, it is an elementary type on the protobuf side
-	// TODO: Param containing list of fields that need to be transformed into byte arrays
-	if goType == "[]byte" || goType == "[]*byte" {
-		f.GoType = goType
-		f.GoTypeFull = goType
-		return
-	}
-
-	// At this point, GoTypeFull will contain [], *, []* and type name will be appended
-	f.GoTypeFull = f.GoTypeFull + f.GoType
+	return result
 }
 
 // setMessage sets reference to nested message
@@ -351,7 +385,7 @@ func (b *fieldBuilder) setMessage() error {
 	// Try to analyse it
 	m := BuildMessage(b.generator, desc, false)
 	if m == nil {
-		return trace.BadParameter("nested message is invalid for field %v", b.field.Name)
+		return trace.Wrap(newInvalidFieldError(b, "failed to reflect message type information"))
 	}
 
 	// Nested message schema, or nil if message is not whitelisted
@@ -377,7 +411,7 @@ func (b *fieldBuilder) setAggregate() error {
 	return nil
 }
 
-// setCustomType sets gogo.customtype flag
+// setCustomType sets detects and set IsCustomType flag and custom type method infix
 func (b *fieldBuilder) setCustomType() {
 	if !gogoproto.IsCustomType(b.fieldDescriptor) {
 		return
@@ -393,37 +427,42 @@ func (b *fieldBuilder) setMap() error {
 
 	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
 	if keyGoType != "string" {
-		b.generator.Fail("Maps with non-string keys are not supported")
+		return trace.Wrap(newInvalidFieldError(b, "oneOf is not supported"))
 	}
 
-	valueField := BuildField(b.generator, b.descriptor, m.ValueField)
-	if valueField == nil {
-		return trace.Errorf("failed to reflect map field %s %s", b.field.GoType, b.field.Name)
+	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField)
+	if err != nil {
+		return err
 	}
 	b.field.MapValueField = valueField
 
 	return nil
 }
 
+// setKind sets field kind
+func (b *fieldBuilder) setKind(kind string) {
+	b.field.Kind = kind
+}
+
 // setKind sets field kind which represents field meta type for generation
-func (b *fieldBuilder) setKind() {
-	f := b.field
+func (b *fieldBuilder) resolveKind() {
+	f := b.field // shortcut to field flags used in conditions
 
 	switch {
 	case f.IsCustomType:
-		f.Kind = "CUSTOM_TYPE"
+		b.setKind("CUSTOM_TYPE")
 	case f.IsMap && f.MapValueField.IsMessage:
 		// Terraform does not support map of objects. We replace such field with list of objects having key and value fields.
-		f.Kind = "OBJECT_MAP" // ex: map[string]struct, requires additional steps to unmarshal
+		b.setKind("OBJECT_MAP") // ex: map[string]struct, requires additional steps to unmarshal
 	case f.IsMap:
-		f.Kind = "MAP" // ex: map[string]string
+		b.setKind("MAP") // ex: map[string]string
 	case f.IsRepeated && f.IsMessage:
-		f.Kind = "REPEATED_MESSAGE" // ex: []struct
+		b.setKind("REPEATED_MESSAGE") // ex: []struct
 	case f.IsRepeated:
-		f.Kind = "REPEATED_ELEMENTARY" // ex: []string
+		b.setKind("REPEATED_ELEMENTARY") // ex: []string
 	case f.IsMessage:
-		f.Kind = "SINGULAR_MESSAGE" // ex: struct
+		b.setKind("SINGULAR_MESSAGE") // ex: struct
 	default:
-		f.Kind = "SINGULAR_ELEMENTARY" // ex: string
+		b.setKind("SINGULAR_ELEMENTARY") // ex: string
 	}
 }
