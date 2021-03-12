@@ -20,10 +20,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gravitational/protoc-gen-terraform/config"
+
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
 	"github.com/stretchr/stew/slice"
