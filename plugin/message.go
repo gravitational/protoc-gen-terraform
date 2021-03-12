@@ -21,7 +21,6 @@ import (
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
-	"github.com/stretchr/stew/slice"
 )
 
 var (
@@ -50,7 +49,8 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 	typeName := getMessageTypeName(d)
 
 	// Check if message is specified in export type list
-	if !slice.Contains(config.Types, typeName) && checkValidity {
+	_, ok := config.Types[typeName]
+	if !ok && checkValidity {
 		return nil
 	}
 
@@ -60,7 +60,7 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
-			logrus.Println("Oneof messages are not supported yet")
+			logrus.Warning("Oneof messages are not supported yet")
 			return nil
 		}
 	}

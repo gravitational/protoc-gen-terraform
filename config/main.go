@@ -12,12 +12,12 @@ var (
 	// Types is the list of top level types to export. This list must be explicit.
 	//
 	// Passed from command line (--terraform_out=types=types.UserV2:./_out)
-	Types []string
+	Types map[string]struct{} = make(map[string]struct{})
 
 	// ExcludeFields is the list of fields to ignore.
 	//
 	// Passed from command line (--terraform_out=excludeFields=types.UserV2.Expires:./_out)
-	ExcludeFields []string
+	ExcludeFields map[string]struct{} = make(map[string]struct{})
 
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
 	DurationCustomType = ""
@@ -40,10 +40,14 @@ const (
 // MustParseTypes parses and sets Types.
 // Panics if the argument is not a valid type list
 func MustSetTypes(arg string) {
-	Types = strings.Split(arg, paramDelimiter)
+	t := strings.Split(arg, paramDelimiter)
 
-	if len(Types) == 0 {
+	if len(t) == 0 {
 		logrus.Fatal("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
+	}
+
+	for _, n := range t {
+		Types[n] = struct{}{}
 	}
 
 	logrus.Printf("Types: %s", Types)
@@ -55,9 +59,13 @@ func SetExcludeFields(arg string) {
 		return
 	}
 
-	ExcludeFields = strings.Split(arg, paramDelimiter)
+	f := strings.Split(arg, paramDelimiter)
 
-	logrus.Printf("Excluded fields: %s", ExcludeFields)
+	for _, n := range f {
+		ExcludeFields[n] = struct{}{}
+	}
+
+	logrus.Printf("Excluded fields: %s", f)
 }
 
 // SetDefaultPkgName sets the default package name

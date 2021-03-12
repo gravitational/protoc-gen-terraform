@@ -28,7 +28,6 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/sirupsen/logrus"
 	"github.com/stoewer/go-strcase"
-	"github.com/stretchr/stew/slice"
 )
 
 // Field represents field reflection struct
@@ -109,7 +108,8 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) {
 		typeName := getFieldTypeName(d, f)
 
 		// Ignore field if it is listed in cli arg
-		if slice.Contains(config.ExcludeFields, typeName) {
+		_, ok := config.ExcludeFields[typeName]
+		if ok {
 			continue
 		}
 
