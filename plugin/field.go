@@ -51,10 +51,10 @@ type Field struct {
 	// GoType Go type without [] and *, but with package name prepended
 	GoType string
 
-	// GoTypeIsSlice Go type is a slice?
+	// GoTypeIsSlice specifies whether Go type is a slice
 	GoTypeIsSlice bool
 
-	// GoTypeIsPtr Go type is a pointer?
+	// GoTypeIsPtr specifies whether Go type is a pointer
 	GoTypeIsPtr bool
 
 	// GoTypeFull Go type with [] and * and package name prepended
@@ -94,7 +94,7 @@ type Field struct {
 	MapValueField *Field
 }
 
-// fieldBuilder is axilarry struct responsible for building Field
+// fieldBuilder creates valid Field values
 type fieldBuilder struct {
 	generator       *generator.Generator
 	descriptor      *generator.Descriptor
