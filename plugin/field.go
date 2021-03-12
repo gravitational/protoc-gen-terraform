@@ -327,8 +327,8 @@ func (b *fieldBuilder) setGoType() {
 
 	b.prependPackageName()
 
-	// This is an exception: we get all []byte arrays from strings, it is an elementary type on protobuf side
-	// TODO: Param containing list of fields which want to be real byte arrays
+	// This is an exception: we get all []byte arrays from strings, it is an elementary type on the protobuf side
+	// TODO: Param containing list of fields that need to be transformed into byte arrays
 	if goType == "[]byte" || goType == "[]*byte" {
 		f.GoType = goType
 		f.GoTypeFull = goType
@@ -351,7 +351,7 @@ func (b *fieldBuilder) setMessage() error {
 	// Try to analyse it
 	m := BuildMessage(b.generator, desc, false)
 	if m == nil {
-		return trace.Errorf("nested message is invalid for field %v", b.field.Name)
+		return trace.BadParameter("nested message is invalid for field %v", b.field.Name)
 	}
 
 	// Nested message schema, or nil if message is not whitelisted
@@ -360,7 +360,7 @@ func (b *fieldBuilder) setMessage() error {
 	return nil
 }
 
-// Sets IsList and IsMap flags
+// setAggregate detects and sets IsList and IsMap flags.
 func (b *fieldBuilder) setAggregate() error {
 	f := b.field
 
@@ -377,7 +377,7 @@ func (b *fieldBuilder) setAggregate() error {
 	return nil
 }
 
-// Sets gogo.customtype flag
+// setCustomType sets gogo.customtype flag
 func (b *fieldBuilder) setCustomType() {
 	if !gogoproto.IsCustomType(b.fieldDescriptor) {
 		return
@@ -387,7 +387,7 @@ func (b *fieldBuilder) setCustomType() {
 	b.field.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(b.field.GoType, "/", ""), ".", "")
 }
 
-// reflectMap sets map value properties
+// setMap sets map value properties
 func (b *fieldBuilder) setMap() error {
 	m := b.generator.GoMapType(nil, b.fieldDescriptor)
 

@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	fixutre map[string]interface{} = map[string]interface{}{
+	fixture map[string]interface{} = map[string]interface{}{
 		"str":               "TestString",
 		"int32":             999,
 		"int64":             998,
@@ -88,7 +88,7 @@ var (
 // buildSubject builds Test struct from test fixture data
 func buildSubject(t *testing.T) (*Test, error) {
 	subject := &Test{}
-	data := schema.TestResourceDataRaw(t, SchemaTest(), fixutre)
+	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
 	err := UnmarshalTest(data, subject)
 	return subject, err
 }
