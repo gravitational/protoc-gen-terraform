@@ -71,7 +71,7 @@ func MustSetTypes(arg string) {
 
 // SetExcludeFields parses and sets ExcludeFields
 func SetExcludeFields(arg string) {
-	if arg == "" {
+	if trimArg(arg) == "" {
 		return
 	}
 
@@ -86,7 +86,7 @@ func SetExcludeFields(arg string) {
 
 // SetDefaultPackageName sets the default package name
 func SetDefaultPackageName(arg string) {
-	if arg == "" {
+	if trimArg(arg) == "" {
 		return
 	}
 
@@ -98,7 +98,7 @@ func SetDefaultPackageName(arg string) {
 
 // SetDuration sets the custom duration type
 func SetDuration(arg string) {
-	if arg != "" {
+	if trimArg(arg) != "" {
 		DurationCustomType = arg
 	}
 
@@ -107,7 +107,7 @@ func SetDuration(arg string) {
 
 // SetCustomImports parses custom import packages
 func SetCustomImports(arg string) {
-	if arg == "" {
+	if trimArg(arg) == "" {
 		return
 	}
 
@@ -118,7 +118,7 @@ func SetCustomImports(arg string) {
 
 // SetTargetPackageName sets the target package name
 func SetTargetPackageName(arg string) {
-	if arg == "" {
+	if trimArg(arg) == "" {
 		return
 	}
 
@@ -126,4 +126,9 @@ func SetTargetPackageName(arg string) {
 	TargetPackageName = name
 
 	logrus.Printf("Target package name: %v", TargetPackageName)
+}
+
+// trimArg returns argument value without spaces and line breaks
+func trimArg(s string) string {
+	return strings.Trim(s, " \n\r")
 }
