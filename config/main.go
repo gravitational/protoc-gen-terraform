@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2020 Gravitational, Inc.
+Copyright 2015-2021 Gravitational, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ const (
 	paramDelimiter = "+" // Delimiter for types and ignoreFields
 )
 
-// MustParseTypes parses and sets Types.
+// MustSetTypes parses and sets Types.
 // Panics if the argument is not a valid type list
 func MustSetTypes(arg string) {
 	t := strings.Split(arg, paramDelimiter)
@@ -69,7 +69,7 @@ func MustSetTypes(arg string) {
 	logrus.Printf("Types: %s", t)
 }
 
-// ParseExcludeFields parses and sets ExcludeFields
+// SetExcludeFields parses and sets ExcludeFields
 func SetExcludeFields(arg string) {
 	if arg == "" {
 		return
@@ -105,7 +105,7 @@ func SetDuration(arg string) {
 	logrus.Printf("Duration custom type: %s", DurationCustomType)
 }
 
-// ParseCustomImports parses custom import packages
+// SetCustomImports parses custom import packages
 func SetCustomImports(arg string) {
 	if arg == "" {
 		return

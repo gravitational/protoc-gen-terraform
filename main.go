@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2020 Gravitational, Inc.
+Copyright 2015-2021 Gravitational, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ func fmt(resp *plugin_go.CodeGeneratorResponse) error {
 		}
 
 		s := string(result)
-		s, err = prependLicense(s)
 
+		s, err = prependLicense(s)
 		if err != nil {
 			return err
 		}
