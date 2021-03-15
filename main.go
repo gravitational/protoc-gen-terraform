@@ -109,5 +109,5 @@ func replacePackageName(s string) string {
 		return s
 	}
 
-	return strings.Replace(s, pkg, "package "+config.TargetPackageName, 1)
+	return strings.Replace(s, pkg, "package "+config.TargetPackageName+"\n", 1)
 }

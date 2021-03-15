@@ -18,6 +18,7 @@ limitations under the License.
 // source: test.proto
 
 package test
+
 import (
 	fmt "fmt"
 	math "math"
