@@ -45,7 +45,7 @@ func main() {
 	req := command.Read()
 	resp := command.GeneratePlugin(req, p, "_terraform.go")
 
-	err := fmt(resp)
+	err := runGoImports(resp)
 	if err != nil {
 		p.Fail(err.Error())
 	}
@@ -53,8 +53,8 @@ func main() {
 	command.Write(resp)
 }
 
-// fmt removes unused imports from the resulting code
-func fmt(resp *plugin_go.CodeGeneratorResponse) error {
+// runGoImports formats code and removes unused imports from the resulting code using goimports tool
+func runGoImports(resp *plugin_go.CodeGeneratorResponse) error {
 	opts := imports.Options{
 		FormatOnly: false,
 		Comments:   true,
