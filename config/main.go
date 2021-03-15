@@ -38,15 +38,15 @@ var (
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
 	DurationCustomType = ""
 
-	// DefaultPkgName default package name, gets appended to type name if its import
+	// DefaultPackageName default package name, gets appended to type name if its import
 	// path is ".", but the type itself is located in another package
-	DefaultPkgName string
+	DefaultPackageName string
 
 	// CustomImports adds imports required in target file
 	CustomImports []string
 
-	// TargetPkgName sets the name of the target package
-	TargetPkgName string
+	// TargetPackageName sets the name of the target package
+	TargetPackageName string
 )
 
 const (
@@ -84,16 +84,16 @@ func SetExcludeFields(arg string) {
 	logrus.Printf("Excluded fields: %s", f)
 }
 
-// SetDefaultPkgName sets the default package name
-func SetDefaultPkgName(arg string) {
+// SetDefaultPackageName sets the default package name
+func SetDefaultPackageName(arg string) {
 	if arg == "" {
 		return
 	}
 
 	_, name := filepath.Split(arg)
-	DefaultPkgName = name
+	DefaultPackageName = name
 
-	logrus.Printf("Default package name: %v", DefaultPkgName)
+	logrus.Printf("Default package name: %v", DefaultPackageName)
 }
 
 // SetDuration sets the custom duration type
@@ -116,14 +116,14 @@ func SetCustomImports(arg string) {
 	logrus.Printf("Custom imports: %s", CustomImports)
 }
 
-// SetTargetPkgName sets the target package name
-func SetTargetPkgName(arg string) {
+// SetTargetPackageName sets the target package name
+func SetTargetPackageName(arg string) {
 	if arg == "" {
 		return
 	}
 
 	_, name := filepath.Split(arg)
-	TargetPkgName = name
+	TargetPackageName = name
 
-	logrus.Printf("Target package name: %v", TargetPkgName)
+	logrus.Printf("Target package name: %v", TargetPackageName)
 }

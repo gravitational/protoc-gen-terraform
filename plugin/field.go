@@ -361,8 +361,8 @@ func (b *fieldBuilder) prependPackageName(t string) (result string) {
 	// Prepend package name to overridden field type
 	if b.isCastType() || b.isCustomType() {
 		// If cast type is within current package, append default package name to it
-		if !strings.Contains(result, ".") && config.DefaultPkgName != "" {
-			result = config.DefaultPkgName + "." + result
+		if !strings.Contains(result, ".") && config.DefaultPackageName != "" {
+			result = config.DefaultPackageName + "." + result
 		}
 	} else {
 		// Get go type from a message

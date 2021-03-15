@@ -94,7 +94,7 @@ func prependLicense(s string) (string, error) {
 
 // replacePackageName replaces package name in target file with provided from cli
 func replacePackageName(s string) string {
-	if config.TargetPkgName == "" {
+	if config.TargetPackageName == "" {
 		return s
 	}
 
@@ -105,5 +105,5 @@ func replacePackageName(s string) string {
 		return s
 	}
 
-	return strings.Replace(s, pkg, "package "+config.TargetPkgName, 1)
+	return strings.Replace(s, pkg, "package "+config.TargetPackageName, 1)
 }

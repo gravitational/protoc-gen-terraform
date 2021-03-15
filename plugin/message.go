@@ -89,8 +89,8 @@ func getMessageTypeName(d *generator.Descriptor) string {
 	if d.GoImportPath() != "." {
 		return d.File().GetPackage() + "." + d.GetName()
 	}
-	if config.DefaultPkgName != "" {
-		return config.DefaultPkgName + "." + d.GetName()
+	if config.DefaultPackageName != "" {
+		return config.DefaultPackageName + "." + d.GetName()
 	}
 	return d.GetName()
 }
