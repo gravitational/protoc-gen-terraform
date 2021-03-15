@@ -22,6 +22,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/gravitational/trace"
 
 	// go:embed won't work otherwise
 	_ "embed"
@@ -41,16 +42,16 @@ var (
 	LicenseTpl string
 )
 
-// emplate renders template from string to the specified writer
+// Template renders template from string to the specified writer
 func Template(content string, pipeline interface{}, w io.Writer) error {
 	tpl, err := template.New("template").Funcs(sprig.TxtFuncMap()).Parse(content)
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	err = tpl.ExecuteTemplate(w, "template", pipeline)
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	return nil

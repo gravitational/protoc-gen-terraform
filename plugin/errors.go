@@ -25,7 +25,7 @@ type invalidFieldError struct {
 	reason string
 }
 
-// newInvalidFieldError creates unknown type error
+// newInvalidFieldError creates new invalid field error
 func newInvalidFieldError(b *fieldBuilder, reason string) *invalidFieldError {
 	return &invalidFieldError{msg: b.descriptor.GetName(), field: b.fieldDescriptor.GetName(), reason: reason}
 }
@@ -41,7 +41,7 @@ type invalidMessageError struct {
 	reason string
 }
 
-// newInvalidMessageError creates unknown type error
+// newInvalidMessageError creates invalid message error
 func newInvalidMessageError(name string, reason string) *invalidMessageError {
 	return &invalidMessageError{name: name, reason: reason}
 }

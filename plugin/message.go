@@ -19,6 +19,7 @@ package plugin
 import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
+	"github.com/gravitational/trace"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -41,7 +42,7 @@ type Message struct {
 	Fields []*Field
 }
 
-// BuildMessage builds Message from its protobuf descriptor and
+// BuildMessage builds Message from its protobuf descriptor.
 //
 // checkValiditiy should be false for nested messages. We do not check them over allowed types,
 // otherwise it will be overexplicit. Use excludeFields to skip fields.
@@ -78,7 +79,7 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 
 	err := BuildFields(message, g, d)
 	if err != nil {
-		return nil, err
+		return nil, trace.Wrap(err)
 	}
 
 	return message, nil
