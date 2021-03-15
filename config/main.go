@@ -96,8 +96,8 @@ func SetDefaultPackageName(arg string) {
 	logrus.Printf("Default package name: %v", DefaultPackageName)
 }
 
-// SetDuration sets the custom duration type
-func SetDuration(arg string) {
+// SetDurationType sets the custom duration type
+func SetDurationType(arg string) {
 	if trimArg(arg) != "" {
 		DurationCustomType = arg
 	}

@@ -61,7 +61,7 @@ func (p *Plugin) Init(g *generator.Generator) {
 	config.MustSetTypes(g.Param["types"])
 	config.SetExcludeFields(g.Param["exclude_fields"])
 	config.SetDefaultPackageName(g.Param["pkg"])
-	config.SetDuration(g.Param["custom_duration"])
+	config.SetDurationType(g.Param["custom_duration"])
 	config.SetCustomImports(g.Param["custom_imports"])
 	config.SetTargetPackageName(g.Param["target_pkg"])
 }
