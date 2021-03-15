@@ -35,9 +35,13 @@ var (
 	// UnmarshalTpl is unmarshaller template
 	//go:embed _tpl/message_unmarshal.tpl
 	UnmarshalTpl string
+
+	// LicenseTpl is license message template
+	//go:embed _tpl/license.tpl
+	LicenseTpl string
 )
 
-// Template renders template from string to the specified writer
+// emplate renders template from string to the specified writer
 func Template(content string, pipeline interface{}, w io.Writer) error {
 	tpl, err := template.New("template").Funcs(sprig.TxtFuncMap()).Parse(content)
 	if err != nil {

@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"bytes"
 	"regexp"
 	"strings"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/gogo/protobuf/vanity/command"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/plugin"
+	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
@@ -65,11 +67,29 @@ func fmt(resp *plugin_go.CodeGeneratorResponse) error {
 		}
 
 		s := string(result)
+		s, err = prependLicense(s)
+
+		if err != nil {
+			return err
+		}
+
 		s = replacePackageName(s)
 		file.Content = &s
 	}
 
 	return nil
+}
+
+// prependLicense prepends license information
+func prependLicense(s string) (string, error) {
+	var buf bytes.Buffer
+
+	err := render.Template(render.LicenseTpl, nil, &buf)
+	if err != nil {
+		return "", trace.Wrap(err)
+	}
+
+	return buf.String() + s, nil
 }
 
 // replacePackageName replaces package name in target file with provided from cli
