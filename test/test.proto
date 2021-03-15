@@ -72,31 +72,31 @@ message Test {
     google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
 
     // StringA []string field
-    repeated string StringA = 13;
+    repeated string StringA = 12;
 
     // BoolA []bool field
-    repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustom" ];
+    repeated bool BoolA = 13 [ (gogoproto.customtype) = "BoolCustom" ];
 
     // BytesA [][]byte field
-    repeated bytes BytesA = 15;
+    repeated bytes BytesA = 14;
 
     // TimestampA []time.Time field
-    repeated google.protobuf.Timestamp TimestampA = 16 [ (gogoproto.stdtime) = true ];
+    repeated google.protobuf.Timestamp TimestampA = 15 [ (gogoproto.stdtime) = true ];
 
     // DurationCustomA []time.Duration field
-    repeated int64 DurationCustomA = 17 [ (gogoproto.casttype) = "Duration" ];
+    repeated int64 DurationCustomA = 16 [ (gogoproto.casttype) = "Duration" ];
 
     // Nested nested message field
-    Nested Nested = 18;   
+    Nested Nested = 17;   
 
     // NestedA nested message array
-    repeated Nested NestedA = 19;
+    repeated Nested NestedA = 18;
 
     // NestedM normal map
-    map<string, string> NestedM = 20;
+    map<string, string> NestedM = 19;
 
     // NestedMObj object map
-    map<string, Nested> NestedMObj = 21;
+    map<string, Nested> NestedMObj = 20;
 }
 
 // Nested message definition
