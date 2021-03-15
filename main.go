@@ -61,6 +61,10 @@ func runGoImports(resp *plugin_go.CodeGeneratorResponse) error {
 	}
 
 	for _, file := range resp.GetFile() {
+		if file.Content == nil {
+			continue
+		}
+
 		result, err := imports.Process("", []byte(*file.Content), &opts)
 		if err != nil {
 			return trace.Wrap(err)
