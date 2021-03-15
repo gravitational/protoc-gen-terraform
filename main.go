@@ -33,7 +33,7 @@ import (
 
 var (
 	// packageReplacementRegexp is used to replace package name in a target file
-	packageReplacementRegexp = regexp.MustCompile("package (.*)\n")
+	packageReplacementRegexp = regexp.MustCompile("package (.+)\n")
 )
 
 func main() {
