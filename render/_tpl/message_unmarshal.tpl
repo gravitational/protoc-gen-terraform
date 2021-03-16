@@ -93,20 +93,25 @@ if err != nil {
 {{/* Converts elementary value from raw form to target struct type */}}
 {{/* Input: _raw */}}
 {{/* Output: _value */}}
-{{- define "rawToValue" -}}
+{{- define "rawToValue" }}
+_raws, ok := _raw.({{.SchemaRawType}})
+if !ok {
+    return fmt.Errorf("can not convert %T to {{.SchemaRawType}}", _raws)
+}
+
 {{- if .IsTime }}
-_value, err := time.Parse(time.RFC3339, _raw.({{.SchemaRawType}}))
+_value, err := time.Parse(time.RFC3339, _raws)
 if err != nil {
-    return fmt.Errorf("Malformed time value for field {{.Name}} : %w", err)
+    return fmt.Errorf("malformed time value for field {{.Name}} : %w", err)
 }
 {{- else if .IsDuration }}
-_valued, err := time.ParseDuration(_raw.({{.SchemaRawType}}))
+_valued, err := time.ParseDuration(_raws)
 if err != nil {
-    return fmt.Errorf("Malformed duration value for field {{.Name}} : %w", err)
+    return fmt.Errorf("malformed duration value for field {{.Name}} : %w", err)
 }
 _value := {{.GoType}}(_valued)
 {{- else }}
-_value := {{.GoType}}({{.SchemaGoType}}(_raw.({{.SchemaRawType}})))
+_value := {{.GoType}}({{.SchemaGoType}}(_raws))
 {{- end }}
 {{- end -}}
 

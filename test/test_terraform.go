@@ -352,7 +352,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "str")
 		if ok {
-			_value := string(string(_raw.(string)))
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_value := string(string(_raws))
 			t.Str = _value
 		}
 	}
@@ -360,7 +364,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "int32")
 		if ok {
-			_value := int32(int32(_raw.(int)))
+			_raws, ok := _raw.(int)
+			if !ok {
+				return fmt.Errorf("can not convert %T to int", _raws)
+			}
+			_value := int32(int32(_raws))
 			t.Int32 = _value
 		}
 	}
@@ -368,7 +376,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "int64")
 		if ok {
-			_value := int64(int64(_raw.(int)))
+			_raws, ok := _raw.(int)
+			if !ok {
+				return fmt.Errorf("can not convert %T to int", _raws)
+			}
+			_value := int64(int64(_raws))
 			t.Int64 = _value
 		}
 	}
@@ -376,7 +388,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "float")
 		if ok {
-			_value := float32(float32(_raw.(float64)))
+			_raws, ok := _raw.(float64)
+			if !ok {
+				return fmt.Errorf("can not convert %T to float64", _raws)
+			}
+			_value := float32(float32(_raws))
 			t.Float = _value
 		}
 	}
@@ -384,7 +400,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "double")
 		if ok {
-			_value := float64(float64(_raw.(float64)))
+			_raws, ok := _raw.(float64)
+			if !ok {
+				return fmt.Errorf("can not convert %T to float64", _raws)
+			}
+			_value := float64(float64(_raws))
 			t.Double = _value
 		}
 	}
@@ -392,7 +412,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOkExists(p + "bool")
 		if ok {
-			_value := bool(bool(_raw.(bool)))
+			_raws, ok := _raw.(bool)
+			if !ok {
+				return fmt.Errorf("can not convert %T to bool", _raws)
+			}
+			_value := bool(bool(_raws))
 			t.Bool = _value
 		}
 	}
@@ -400,7 +424,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "bytes")
 		if ok {
-			_value := []byte([]byte(_raw.(string)))
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_value := []byte([]byte(_raws))
 			t.Bytes = _value
 		}
 	}
@@ -408,9 +436,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "timestamp")
 		if ok {
-			_value, err := time.Parse(time.RFC3339, _raw.(string))
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_value, err := time.Parse(time.RFC3339, _raws)
 			if err != nil {
-				return fmt.Errorf("Malformed time value for field Timestamp : %w", err)
+				return fmt.Errorf("malformed time value for field Timestamp : %w", err)
 			}
 			t.Timestamp = _value
 		}
@@ -419,9 +451,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "duration_std")
 		if ok {
-			_valued, err := time.ParseDuration(_raw.(string))
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_valued, err := time.ParseDuration(_raws)
 			if err != nil {
-				return fmt.Errorf("Malformed duration value for field DurationStd : %w", err)
+				return fmt.Errorf("malformed duration value for field DurationStd : %w", err)
 			}
 			_value := time.Duration(_valued)
 			t.DurationStd = _value
@@ -431,9 +467,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "duration_custom")
 		if ok {
-			_valued, err := time.ParseDuration(_raw.(string))
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_valued, err := time.ParseDuration(_raws)
 			if err != nil {
-				return fmt.Errorf("Malformed duration value for field DurationCustom : %w", err)
+				return fmt.Errorf("malformed duration value for field DurationCustom : %w", err)
 			}
 			_value := Duration(_valued)
 			t.DurationCustom = _value
@@ -443,9 +483,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 		_raw, ok := d.GetOk(p + "timestamp_n")
 		if ok {
-			_value, err := time.Parse(time.RFC3339, _raw.(string))
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_value, err := time.Parse(time.RFC3339, _raws)
 			if err != nil {
-				return fmt.Errorf("Malformed time value for field TimestampN : %w", err)
+				return fmt.Errorf("malformed time value for field TimestampN : %w", err)
 			}
 			t.TimestampN = &_value
 		}
@@ -460,7 +504,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.StringA = make([]string, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
-				_value := string(string(_raw.(string)))
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
 				t.StringA[i] = _value
 			}
 		}
@@ -481,7 +529,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.BytesA = make([][]byte, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
-				_value := []byte([]byte(_raw.(string)))
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := []byte([]byte(_raws))
 				t.BytesA[i] = _value
 			}
 		}
@@ -496,9 +548,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.TimestampA = make([]*time.Time, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
-				_value, err := time.Parse(time.RFC3339, _raw.(string))
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value, err := time.Parse(time.RFC3339, _raws)
 				if err != nil {
-					return fmt.Errorf("Malformed time value for field TimestampA : %w", err)
+					return fmt.Errorf("malformed time value for field TimestampA : %w", err)
 				}
 				t.TimestampA[i] = &_value
 			}
@@ -514,9 +570,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.DurationCustomA = make([]Duration, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
-				_valued, err := time.ParseDuration(_raw.(string))
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_valued, err := time.ParseDuration(_raws)
 				if err != nil {
-					return fmt.Errorf("Malformed duration value for field DurationCustomA : %w", err)
+					return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
 				}
 				_value := Duration(_valued)
 				t.DurationCustomA[i] = _value
@@ -534,7 +594,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 			_raw, ok := d.GetOk(p + "str")
 			if ok {
-				_value := string(string(_raw.(string)))
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
 				t.Str = _value
 			}
 		}
@@ -557,7 +621,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 							_raw, ok := d.GetOk(p + "str")
 							if ok {
-								_value := string(string(_raw.(string)))
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
 								t.Str = _value
 							}
 						}
@@ -578,7 +646,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				t.NestedM = make(map[string]string, len(_rawmi))
 				for _k, _v := range _rawmi {
 					_raw := _v
-					_value := string(string(_raw.(string)))
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
 					t.NestedM[_k] = _value
 				}
 			}
@@ -611,7 +683,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 							_raw, ok := d.GetOk(p + "str")
 							if ok {
-								_value := string(string(_raw.(string)))
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
 								t.Str = _value
 							}
 						}
@@ -643,7 +719,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 						_raw, ok := d.GetOk(p + "str")
 						if ok {
-							_value := string(string(_raw.(string)))
+							_raws, ok := _raw.(string)
+							if !ok {
+								return fmt.Errorf("can not convert %T to string", _raws)
+							}
+							_value := string(string(_raws))
 							t.Str = _value
 						}
 					}
@@ -666,7 +746,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := string(string(_raw.(string)))
+											_raws, ok := _raw.(string)
+											if !ok {
+												return fmt.Errorf("can not convert %T to string", _raws)
+											}
+											_value := string(string(_raws))
 											t.Str = _value
 										}
 									}
@@ -687,7 +771,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							t.NestedM = make(map[string]string, len(_rawmi))
 							for _k, _v := range _rawmi {
 								_raw := _v
-								_value := string(string(_raw.(string)))
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
 								t.NestedM[_k] = _value
 							}
 						}
@@ -720,7 +808,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := string(string(_raw.(string)))
+											_raws, ok := _raw.(string)
+											if !ok {
+												return fmt.Errorf("can not convert %T to string", _raws)
+											}
+											_value := string(string(_raws))
 											t.Str = _value
 										}
 									}
@@ -748,7 +840,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			t.NestedM = make(map[string]string, len(_rawmi))
 			for _k, _v := range _rawmi {
 				_raw := _v
-				_value := string(string(_raw.(string)))
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
 				t.NestedM[_k] = _value
 			}
 		}
@@ -781,7 +877,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 						_raw, ok := d.GetOk(p + "str")
 						if ok {
-							_value := string(string(_raw.(string)))
+							_raws, ok := _raw.(string)
+							if !ok {
+								return fmt.Errorf("can not convert %T to string", _raws)
+							}
+							_value := string(string(_raws))
 							t.Str = _value
 						}
 					}
@@ -804,7 +904,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := string(string(_raw.(string)))
+											_raws, ok := _raw.(string)
+											if !ok {
+												return fmt.Errorf("can not convert %T to string", _raws)
+											}
+											_value := string(string(_raws))
 											t.Str = _value
 										}
 									}
@@ -825,7 +929,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							t.NestedM = make(map[string]string, len(_rawmi))
 							for _k, _v := range _rawmi {
 								_raw := _v
-								_value := string(string(_raw.(string)))
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
 								t.NestedM[_k] = _value
 							}
 						}
@@ -858,7 +966,11 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 										_raw, ok := d.GetOk(p + "str")
 										if ok {
-											_value := string(string(_raw.(string)))
+											_raws, ok := _raw.(string)
+											if !ok {
+												return fmt.Errorf("can not convert %T to string", _raws)
+											}
+											_value := string(string(_raws))
 											t.Str = _value
 										}
 									}
