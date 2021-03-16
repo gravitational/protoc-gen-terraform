@@ -69,7 +69,10 @@ if ok {
 {{- define "repeatedElementary" -}}
 _rawi, ok := d.GetOk(p + {{ .NameSnake | quote }})
 if ok {
-    _rawi := _rawi.([]interface{})
+    _rawi, ok := _rawi.([]interface{})
+    if !ok {
+        return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+    }
     t.{{.Name}} = make({{.GoTypeFull}}, len(_rawi))
     for i := 0; i < len(_rawi); i++ {
         _raw := _rawi[i]
@@ -162,9 +165,12 @@ if ok {
 p := p + {{.NameSnake | quote }}
 _rawm, ok := d.GetOk(p)
 if ok {
-    _rawm := _rawm.(map[string]interface{})
-    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawm))
-    for _k, _v := range _rawm {
+    _rawmi, ok := _rawm.(map[string]interface{})
+    if !ok {
+        return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
+    }
+    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawmi))
+    for _k, _v := range _rawmi {
         _raw := _v
         {{- template "rawToValue" $m }}
         t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
@@ -183,18 +189,21 @@ if ok {
     _value := make(map[string]{{$m.GoTypeFull}})
 
     for i, _ := range _rawi {
-        key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
-        
-        if key == "" {
-            return fmt.Errorf("Missing key field in object map {{.Name}}")
+        _rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+        _key, ok := _rawkey.(string)
+        if !ok {
+            return fmt.Errorf("can not convert %T to string", _rawkey)
+        }
+        if _key == "" {
+            return fmt.Errorf("missing key field in object map {{.Name}}")
         }
 
         {{ if $m.GoTypeIsPtr }}
         _obj := {{$m.GoType}}{}
-        _value[key] = &_obj
+        _value[_key] = &_obj
         t := &_obj
         {{ else }}
-        t := &_value[key]
+        t := &_value[_key]
         {{ end }}
 
         {

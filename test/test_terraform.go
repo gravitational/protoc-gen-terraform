@@ -453,7 +453,10 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	{
 		_rawi, ok := d.GetOk(p + "string_a")
 		if ok {
-			_rawi := _rawi.([]interface{})
+			_rawi, ok := _rawi.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+			}
 			t.StringA = make([]string, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
@@ -471,7 +474,10 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	{
 		_rawi, ok := d.GetOk(p + "bytes_a")
 		if ok {
-			_rawi := _rawi.([]interface{})
+			_rawi, ok := _rawi.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+			}
 			t.BytesA = make([][]byte, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
@@ -483,7 +489,10 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	{
 		_rawi, ok := d.GetOk(p + "timestamp_a")
 		if ok {
-			_rawi := _rawi.([]interface{})
+			_rawi, ok := _rawi.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+			}
 			t.TimestampA = make([]*time.Time, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
@@ -498,7 +507,10 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	{
 		_rawi, ok := d.GetOk(p + "duration_custom_a")
 		if ok {
-			_rawi := _rawi.([]interface{})
+			_rawi, ok := _rawi.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+			}
 			t.DurationCustomA = make([]Duration, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
@@ -559,9 +571,12 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			p := p + "nested_m"
 			_rawm, ok := d.GetOk(p)
 			if ok {
-				_rawm := _rawm.(map[string]interface{})
-				t.NestedM = make(map[string]string, len(_rawm))
-				for _k, _v := range _rawm {
+				_rawmi, ok := _rawm.(map[string]interface{})
+				if !ok {
+					return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
+				}
+				t.NestedM = make(map[string]string, len(_rawmi))
+				for _k, _v := range _rawmi {
 					_raw := _v
 					_value := string(string(_raw.(string)))
 					t.NestedM[_k] = _value
@@ -577,14 +592,17 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 				_value := make(map[string]*NestedLevel2)
 
 				for i, _ := range _rawi {
-					key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
-
-					if key == "" {
-						return fmt.Errorf("Missing key field in object map NestedMObj")
+					_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+					_key, ok := _rawkey.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _rawkey)
+					}
+					if _key == "" {
+						return fmt.Errorf("missing key field in object map NestedMObj")
 					}
 
 					_obj := NestedLevel2{}
-					_value[key] = &_obj
+					_value[_key] = &_obj
 					t := &_obj
 
 					{
@@ -662,9 +680,12 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 						p := p + "nested_m"
 						_rawm, ok := d.GetOk(p)
 						if ok {
-							_rawm := _rawm.(map[string]interface{})
-							t.NestedM = make(map[string]string, len(_rawm))
-							for _k, _v := range _rawm {
+							_rawmi, ok := _rawm.(map[string]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
+							}
+							t.NestedM = make(map[string]string, len(_rawmi))
+							for _k, _v := range _rawmi {
 								_raw := _v
 								_value := string(string(_raw.(string)))
 								t.NestedM[_k] = _value
@@ -680,14 +701,17 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							_value := make(map[string]*NestedLevel2)
 
 							for i, _ := range _rawi {
-								key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
-
-								if key == "" {
-									return fmt.Errorf("Missing key field in object map NestedMObj")
+								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+								_key, ok := _rawkey.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _rawkey)
+								}
+								if _key == "" {
+									return fmt.Errorf("missing key field in object map NestedMObj")
 								}
 
 								_obj := NestedLevel2{}
-								_value[key] = &_obj
+								_value[_key] = &_obj
 								t := &_obj
 
 								{
@@ -717,9 +741,12 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 		p := p + "nested_m"
 		_rawm, ok := d.GetOk(p)
 		if ok {
-			_rawm := _rawm.(map[string]interface{})
-			t.NestedM = make(map[string]string, len(_rawm))
-			for _k, _v := range _rawm {
+			_rawmi, ok := _rawm.(map[string]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
+			}
+			t.NestedM = make(map[string]string, len(_rawmi))
+			for _k, _v := range _rawmi {
 				_raw := _v
 				_value := string(string(_raw.(string)))
 				t.NestedM[_k] = _value
@@ -735,14 +762,17 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 			_value := make(map[string]*Nested)
 
 			for i, _ := range _rawi {
-				key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
-
-				if key == "" {
-					return fmt.Errorf("Missing key field in object map NestedMObj")
+				_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+				_key, ok := _rawkey.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _rawkey)
+				}
+				if _key == "" {
+					return fmt.Errorf("missing key field in object map NestedMObj")
 				}
 
 				_obj := Nested{}
-				_value[key] = &_obj
+				_value[_key] = &_obj
 				t := &_obj
 
 				{
@@ -788,9 +818,12 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 						p := p + "nested_m"
 						_rawm, ok := d.GetOk(p)
 						if ok {
-							_rawm := _rawm.(map[string]interface{})
-							t.NestedM = make(map[string]string, len(_rawm))
-							for _k, _v := range _rawm {
+							_rawmi, ok := _rawm.(map[string]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
+							}
+							t.NestedM = make(map[string]string, len(_rawmi))
+							for _k, _v := range _rawmi {
 								_raw := _v
 								_value := string(string(_raw.(string)))
 								t.NestedM[_k] = _value
@@ -806,14 +839,17 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 							_value := make(map[string]*NestedLevel2)
 
 							for i, _ := range _rawi {
-								key := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key").(string)
-
-								if key == "" {
-									return fmt.Errorf("Missing key field in object map NestedMObj")
+								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+								_key, ok := _rawkey.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _rawkey)
+								}
+								if _key == "" {
+									return fmt.Errorf("missing key field in object map NestedMObj")
 								}
 
 								_obj := NestedLevel2{}
-								_value[key] = &_obj
+								_value[_key] = &_obj
 								t := &_obj
 
 								{

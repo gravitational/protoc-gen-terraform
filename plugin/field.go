@@ -30,8 +30,8 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-// Field represents field reflection struct
-// This struct and the following methods know about both schema details and target field details
+// Field represents metadata about protobuf message field descriptor.
+// This struct and the following methods know about both schema details and target field details.
 type Field struct {
 	// Name type name
 	Name string

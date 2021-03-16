@@ -27,7 +27,7 @@ var (
 	cache map[string]*Message = make(map[string]*Message)
 )
 
-// Message holds reflection information about message
+// Message represents metadata about protobuf message
 type Message struct {
 	// Name contains type name
 	Name string
