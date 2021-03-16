@@ -145,9 +145,13 @@ t := &t.{{.Name}}
 {{- define "repeatedMessage" -}}
 p := p + {{.NameSnake | quote }}
 
-_rawi, ok := d.GetOk(p)
+_raw, ok := d.GetOk(p)
 if ok {
-    _rawi := _rawi.([]interface{})
+    _rawi, ok := _raw.([]interface{})
+    if !ok {
+        return fmt.Errorf("can not convert %T to []interface{}", _raw)
+    }
+
     t.{{.Name}} = make({{.GoTypeFull}}, len(_rawi))
     for i := 0; i < len(_rawi); i++ {
         {{ if .GoTypeIsPtr }}
@@ -188,9 +192,13 @@ if ok {
 p := p + {{.NameSnake | quote }}
 
 {{ $m := .MapValueField }}
-_rawi, ok := d.GetOk(p)
+_raw, ok := d.GetOk(p)
 if ok {
-    _rawi := _rawi.([]interface{})
+    _rawi, ok := _raw.([]interface{})
+    if !ok {
+        return fmt.Errorf("can not convert %T to []interface{}", _raw)
+    }
+
     _value := make(map[string]{{$m.GoTypeFull}})
 
     for i, _ := range _rawi {

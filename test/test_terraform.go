@@ -605,9 +605,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 		{
 			p := p + "nested"
 
-			_rawi, ok := d.GetOk(p)
+			_raw, ok := d.GetOk(p)
 			if ok {
-				_rawi := _rawi.([]interface{})
+				_rawi, ok := _raw.([]interface{})
+				if !ok {
+					return fmt.Errorf("can not convert %T to []interface{}", _raw)
+				}
+
 				t.Nested = make([]*NestedLevel2, len(_rawi))
 				for i := 0; i < len(_rawi); i++ {
 
@@ -658,9 +662,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 		{
 			p := p + "nested_m_obj"
 
-			_rawi, ok := d.GetOk(p)
+			_raw, ok := d.GetOk(p)
 			if ok {
-				_rawi := _rawi.([]interface{})
+				_rawi, ok := _raw.([]interface{})
+				if !ok {
+					return fmt.Errorf("can not convert %T to []interface{}", _raw)
+				}
+
 				_value := make(map[string]*NestedLevel2)
 
 				for i, _ := range _rawi {
@@ -703,9 +711,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	{
 		p := p + "nested_a"
 
-		_rawi, ok := d.GetOk(p)
+		_raw, ok := d.GetOk(p)
 		if ok {
-			_rawi := _rawi.([]interface{})
+			_rawi, ok := _raw.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _raw)
+			}
+
 			t.NestedA = make([]*Nested, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 
@@ -730,9 +742,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 					{
 						p := p + "nested"
 
-						_rawi, ok := d.GetOk(p)
+						_raw, ok := d.GetOk(p)
 						if ok {
-							_rawi := _rawi.([]interface{})
+							_rawi, ok := _raw.([]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to []interface{}", _raw)
+							}
+
 							t.Nested = make([]*NestedLevel2, len(_rawi))
 							for i := 0; i < len(_rawi); i++ {
 
@@ -783,9 +799,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 					{
 						p := p + "nested_m_obj"
 
-						_rawi, ok := d.GetOk(p)
+						_raw, ok := d.GetOk(p)
 						if ok {
-							_rawi := _rawi.([]interface{})
+							_rawi, ok := _raw.([]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to []interface{}", _raw)
+							}
+
 							_value := make(map[string]*NestedLevel2)
 
 							for i, _ := range _rawi {
@@ -852,9 +872,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 	{
 		p := p + "nested_m_obj"
 
-		_rawi, ok := d.GetOk(p)
+		_raw, ok := d.GetOk(p)
 		if ok {
-			_rawi := _rawi.([]interface{})
+			_rawi, ok := _raw.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _raw)
+			}
+
 			_value := make(map[string]*Nested)
 
 			for i, _ := range _rawi {
@@ -888,9 +912,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 					{
 						p := p + "nested"
 
-						_rawi, ok := d.GetOk(p)
+						_raw, ok := d.GetOk(p)
 						if ok {
-							_rawi := _rawi.([]interface{})
+							_rawi, ok := _raw.([]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to []interface{}", _raw)
+							}
+
 							t.Nested = make([]*NestedLevel2, len(_rawi))
 							for i := 0; i < len(_rawi); i++ {
 
@@ -941,9 +969,13 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 					{
 						p := p + "nested_m_obj"
 
-						_rawi, ok := d.GetOk(p)
+						_raw, ok := d.GetOk(p)
 						if ok {
-							_rawi := _rawi.([]interface{})
+							_rawi, ok := _raw.([]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to []interface{}", _raw)
+							}
+
 							_value := make(map[string]*NestedLevel2)
 
 							for i, _ := range _rawi {
