@@ -172,7 +172,10 @@ func (b *fieldBuilder) build() error {
 		return trace.Wrap(err)
 	}
 
-	b.setGoType()
+	err = b.setGoType()
+	if err != nil {
+		return trace.Wrap(err)
+	}
 
 	err = b.setAggregate()
 	if err != nil {
@@ -195,9 +198,13 @@ func (b *fieldBuilder) resolveName() {
 
 // setGoType sets go type with gogo/protobuf standard method, sets type information flags
 // It deconstructs type returned by the gogo package, and then builds a new type string with the package name prepended.
-func (b *fieldBuilder) setGoType() {
+func (b *fieldBuilder) setGoType() error {
 	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
 	t, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
+
+	if t == "" {
+		return newInvalidFieldError(b, "invalid field go type")
+	}
 
 	b.field.RawGoType = t
 	prefix := ""
@@ -207,7 +214,7 @@ func (b *fieldBuilder) setGoType() {
 	if t == "[]byte" || t == "[]*byte" {
 		b.field.GoType = t
 		b.field.GoTypeFull = t
-		return
+		return nil
 	}
 
 	// If type is a slice, mark as slice
@@ -228,6 +235,8 @@ func (b *fieldBuilder) setGoType() {
 
 	b.field.GoType = t
 	b.field.GoTypeFull = prefix + t
+
+	return nil
 }
 
 // isTypeEq returns true if type equals current field descriptor type
