@@ -1,4 +1,4 @@
-func Unmarshal{{.Name}}(d *schema.ResourceData, t *{{.GoTypeName}}) error {
+func Get{{.Name}}FromResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     p := ""
 
     {{ template "fields" .Fields }}
@@ -84,7 +84,7 @@ if ok {
 
 {{/* Renders custom unmarshaller custom type */}}
 {{- define "custom" -}}
-err := Unmarshal{{.CustomTypeMethodInfix}}(p + {{.NameSnake | quote}}, d, &t.{{.Name}})
+err := Get{{.CustomTypeMethodInfix}}FromResourceData(p + {{.NameSnake | quote}}, d, &t.{{.Name}})
 if err != nil {
     return err
 }
@@ -201,7 +201,7 @@ if ok {
 
     _value := make(map[string]{{$m.GoTypeFull}})
 
-    for i, _ := range _rawi {
+    for i := range _rawi {
         _rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
         _key, ok := _rawkey.(string)
         if !ok {

@@ -37,8 +37,8 @@ func SchemaBoolCustom() *schema.Schema {
 	}
 }
 
-// UnmarshalBoolCustom custom unmarshaller
-func UnmarshalBoolCustom(path string, data *schema.ResourceData, target *[]BoolCustom) error {
+// GetBoolCustomFromResourceData custom unmarshaller
+func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, target *[]BoolCustom) error {
 	rawi, ok := data.GetOk(path)
 	if ok {
 		arr := rawi.([]interface{})

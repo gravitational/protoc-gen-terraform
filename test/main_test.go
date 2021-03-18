@@ -89,7 +89,7 @@ var (
 func buildSubject(t *testing.T) (*Test, error) {
 	subject := &Test{}
 	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
-	err := UnmarshalTest(data, subject)
+	err := GetTestFromResourceData(data, subject)
 	return subject, err
 }
 

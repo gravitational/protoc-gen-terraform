@@ -345,7 +345,7 @@ func SchemaTest() map[string]*schema.Schema {
 		},
 	}
 }
-func UnmarshalTest(d *schema.ResourceData, t *Test) error {
+func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	p := ""
 
 	{
@@ -514,7 +514,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		err := UnmarshalBoolCustom(p+"bool_a", d, &t.BoolA)
+		err := GetBoolCustomFromResourceData(p+"bool_a", d, &t.BoolA)
 		if err != nil {
 			return err
 		}
@@ -671,7 +671,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 				_value := make(map[string]*NestedLevel2)
 
-				for i, _ := range _rawi {
+				for i := range _rawi {
 					_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
 					_key, ok := _rawkey.(string)
 					if !ok {
@@ -808,7 +808,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 							_value := make(map[string]*NestedLevel2)
 
-							for i, _ := range _rawi {
+							for i := range _rawi {
 								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
 								_key, ok := _rawkey.(string)
 								if !ok {
@@ -881,7 +881,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 			_value := make(map[string]*Nested)
 
-			for i, _ := range _rawi {
+			for i := range _rawi {
 				_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
 				_key, ok := _rawkey.(string)
 				if !ok {
@@ -978,7 +978,7 @@ func UnmarshalTest(d *schema.ResourceData, t *Test) error {
 
 							_value := make(map[string]*NestedLevel2)
 
-							for i, _ := range _rawi {
+							for i := range _rawi {
 								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
 								_key, ok := _rawkey.(string)
 								if !ok {
