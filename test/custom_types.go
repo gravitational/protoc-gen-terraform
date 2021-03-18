@@ -37,7 +37,8 @@ func SchemaBoolCustom() *schema.Schema {
 	}
 }
 
-// GetBoolCustomFromResourceData custom unmarshaller
+// UnmarshalBoolCustom interprets data at path as an array of boolean values.
+// The values are returned in target
 func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, target *[]BoolCustom) error {
 	rawi, ok := data.GetOk(path)
 	if ok {

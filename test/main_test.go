@@ -127,7 +127,7 @@ func TestTimes(t *testing.T) {
 	assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
 }
 
-// TestArrays ensures decoding arrays
+// TestArrays ensures decoding of arrays
 func TestArrays(t *testing.T) {
 	subject, err := buildSubject(t)
 	require.NoError(t, err, "failed to unmarshal test data")
