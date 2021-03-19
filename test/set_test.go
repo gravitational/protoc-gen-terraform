@@ -18,6 +18,8 @@ limitations under the License.
 package test
 
 import (
+	fmt "fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -28,15 +30,31 @@ import (
 
 var (
 	test = Test{
-		Str:    "TestString",
-		Int32:  2,
-		Int64:  3,
-		Float:  18.5,
-		Double: 19.21,
-		Bool:   true,
-		Bytes:  []byte("TestBytes"),
+		Str:     "TestString",
+		Int32:   2,
+		Int64:   3,
+		Float:   18.5,
+		Double:  19.21,
+		Bool:    true,
+		Bytes:   []byte("TestBytes"),
+		StringA: []string{"TestString1", "TestString2"},
 	}
 )
+
+// toSlice is a helper method which takes a slice of any type and converts it to []interface{}
+func toSlice(s interface{}) ([]interface{}, error) {
+	v := reflect.ValueOf(s)
+	switch v.Kind() {
+	case reflect.Slice, reflect.Array:
+		result := make([]interface{}, v.Len())
+		for i := 0; i < v.Len(); i++ {
+			result[i] = v.Index(i).Interface()
+		}
+		return result, nil
+	default:
+		return nil, fmt.Errorf("failed to convert %T to []interface{}", s)
+	}
+}
 
 // fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
 func fillTimestamps(t *Test) error {
@@ -99,10 +117,10 @@ func TestArraysSet(t *testing.T) {
 	subject, err := buildSubjectSet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
-	a := subject.Get("string_a")
-	s := []string(a.([]string))
+	stringA, err := toSlice(test.StringA)
+	require.NoError(t, err, "failed to convert string_a to []interface{}")
 
-	assert.Equal(t, test.StringA, s)
+	assert.Equal(t, stringA, subject.Get("string_a"), "Test.StringA")
 	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
 	// assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
 	// assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
