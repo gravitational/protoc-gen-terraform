@@ -1170,7 +1170,22 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 				}
 
-				obj["nested"] = arr
+				if len(arr) > 0 {
+					obj["nested"] = arr
+				}
+			}
+			{
+
+				m := make(map[string]interface{})
+
+				for key, _v := range t.NestedM {
+					_value := string(_v)
+					m[key] = _value
+				}
+
+				if len(m) > 0 {
+					obj["nested_m"] = m
+				}
 			}
 
 		}
@@ -1202,12 +1217,42 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 				}
 
-				obj["nested"] = arr
+				if len(arr) > 0 {
+					obj["nested"] = arr
+				}
+			}
+			{
+
+				m := make(map[string]interface{})
+
+				for key, _v := range t.NestedM {
+					_value := string(_v)
+					m[key] = _value
+				}
+
+				if len(m) > 0 {
+					obj["nested_m"] = m
+				}
 			}
 
 		}
 
-		obj["nested_a"] = arr
+		if len(arr) > 0 {
+			obj["nested_a"] = arr
+		}
+	}
+	{
+
+		m := make(map[string]interface{})
+
+		for key, _v := range t.NestedM {
+			_value := string(_v)
+			m[key] = _value
+		}
+
+		if len(m) > 0 {
+			obj["nested_m"] = m
+		}
 	}
 
 	for key, value := range obj {

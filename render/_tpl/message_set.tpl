@@ -49,6 +49,12 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
     {{ template "repeatedMessage" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "MAP" -}}
+{
+    {{ template "map" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders setter for singular value of any type */}}
@@ -119,5 +125,22 @@ for i, t := range t.{{.Name}} {
     {{ template "fields" .Message.Fields }}
 }
 
-obj[{{.NameSnake | quote }}] = arr
+if len(arr) > 0 {
+    obj[{{.NameSnake | quote }}] = arr
+}
+{{- end -}}
+
+{{/* String -> elementary value map */}}
+{{- define "map" -}}
+{{ $m := .MapValueField }}
+m := make(map[string]interface{})
+
+for key, _v := range t.{{.Name}} {
+    {{- template "rawToValue" $m }}
+    m[key] = _value
+}
+
+if len(m) > 0 {
+    obj[{{.NameSnake | quote}}] = m
+}
 {{- end -}}

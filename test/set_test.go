@@ -41,6 +41,14 @@ var (
 		Nested: &Nested{
 			Str:    "TestStringA",
 			Nested: []*NestedLevel2{{Str: "NestedString1"}, {Str: "NestedString2"}},
+			NestedM: map[string]string{
+				"kn1": "vn1",
+				"kn2": "vn2",
+			},
+		},
+		NestedM: map[string]string{
+			"k1": "v1",
+			"k2": "v2",
 		},
 	}
 )
@@ -139,4 +147,15 @@ func TestNestedMessageArraySet(t *testing.T) {
 
 	assert.Equal(t, test.Nested.Nested[0].Str, subject.Get("nested.0.nested.0.str"))
 	assert.Equal(t, test.Nested.Nested[1].Str, subject.Get("nested.0.nested.1.str"))
+}
+
+// TestMapGet ensures decoding of a maps
+func TestMapSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
+
+	assert.Equal(t, test.NestedM["k1"], subject.Get("nested_m.k1"))
+	assert.Equal(t, test.NestedM["k2"], subject.Get("nested_m.k2"))
+	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
+	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
 }
