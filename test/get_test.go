@@ -32,7 +32,7 @@ const (
 )
 
 var (
-	// fixture raw data to build schema.ResourceData using schema.TestResourceDataRaw
+	// fixture raw source data for schema.ResourceData
 	fixture map[string]interface{} = map[string]interface{}{
 		"str":               "TestString",
 		"int32":             999,

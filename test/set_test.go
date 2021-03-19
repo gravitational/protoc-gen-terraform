@@ -19,6 +19,7 @@ package test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
@@ -37,10 +38,34 @@ var (
 	}
 )
 
+// fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
+func fillTimestamps(t *Test) error {
+	ti, err := time.Parse(time.RFC3339, defaultTimestamp)
+	if err != nil {
+		return err
+	}
+
+	d, err := time.ParseDuration("1h")
+	if err != nil {
+		return err
+	}
+
+	t.Timestamp = ti
+	t.DurationStd = d
+	t.DurationCustom = Duration(d)
+	t.TimestampN = &ti
+
+	return nil
+}
+
 // buildSubjectSet builds Test struct from test fixture data
 func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
 	subject := schema.TestResourceDataRaw(t, SchemaTest(), map[string]interface{}{})
-	err := SetTestToResourceData(subject, &test)
+	err := fillTimestamps(&test)
+	if err != nil {
+		return nil, err
+	}
+	err = SetTestToResourceData(subject, &test)
 	return subject, err
 }
 
@@ -49,25 +74,22 @@ func TestElementariesSet(t *testing.T) {
 	subject, err := buildSubjectSet(t)
 	require.NoError(t, err, "failed to marshal test data")
 
-	str := subject.Get("str")
-	assert.Equal(t, str, "TestString", "schema.ResourceData['str']")
+	assert.Equal(t, subject.Get("str"), "TestString", "schema.ResourceData['str']")
+	assert.Equal(t, subject.Get("int32"), 2, "schema.ResourceData['int32']")
+	assert.Equal(t, subject.Get("int64"), 3, "schema.ResourceData['int64']")
+	assert.Equal(t, subject.Get("float"), 18.5, "schema.ResourceData['float']")
+	assert.Equal(t, subject.Get("double"), 19.21, "schema.ResourceData['d']")
+	assert.Equal(t, subject.Get("bool"), true, "schema.ResourceData['bool']")
+	assert.Equal(t, subject.Get("bytes"), "TestBytes", "schema.ResourceData['bytes']")
+}
 
-	i32 := subject.Get("int32")
-	assert.Equal(t, i32, 2, "schema.ResourceData['int32']")
+// TestTimesGet ensures decoding of time and duration fields
+func TestTimesSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-	i64 := subject.Get("int64")
-	assert.Equal(t, i64, 3, "schema.ResourceData['int64']")
-
-	f := subject.Get("float")
-	assert.Equal(t, f, 18.5, "schema.ResourceData['float']")
-
-	d := subject.Get("double")
-	assert.Equal(t, d, 19.21, "schema.ResourceData['d']")
-
-	b := subject.Get("bool")
-	assert.Equal(t, b, true, "schema.ResourceData['bool']")
-
-	by := subject.Get("bytes")
-	assert.Equal(t, by, "TestBytes", "schema.ResourceData['bytes']")
-
+	assert.Equal(t, test.Timestamp.Format(time.RFC3339), subject.Get("timestamp"), "Test.Timestamp")
+	assert.Equal(t, test.DurationStd.String(), subject.Get("duration_std"), "Test.DurationStd")
+	assert.Equal(t, test.DurationCustom.String(), subject.Get("duration_custom"), "Test.DurationCustom")
+	assert.Equal(t, test.TimestampN.Format(time.RFC3339), subject.Get("timestamp_n"), "Test.TimestampN")
 }
