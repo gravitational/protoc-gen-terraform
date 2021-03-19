@@ -1,7 +1,14 @@
 func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) error {
-    p := ""
+    obj := make(map[string]interface{})
 
     {{ template "fields" .Fields }}
+
+    for key, value := range obj {
+        err := d.Set(key, value)
+        if err != nil {
+            return err
+        }
+    }
 
     return nil
 }
@@ -29,6 +36,13 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
 {
     {{ template "custom" . }}
 }
+
+{{- if eq .Kind "SINGULAR_MESSAGE" -}}
+{
+    {{ template "singularMessage" . }}
+}
+{{- end -}}
+
 {{- end -}}
 {{- end -}}
 
@@ -41,10 +55,7 @@ if _v != nil {
 {{- end }}
 
 {{ template "rawToValue" . }}
-err := d.Set(p+{{.NameSnake | quote }}, _value)
-if err != nil {
-    return err
-}
+obj[{{.NameSnake | quote}}] = _value
 {{- if .GoTypeIsPtr }}
 }
 {{- end }}
@@ -60,15 +71,12 @@ for i, _v := range _arr {
     _raw[i] = _value
 }
 
-d.Set(p+{{ .NameSnake | quote }}, _raw)
+obj[{{.NameSnake | quote}}] = _raw
 {{- end -}}
 
 {{/* Renders custom getter custom type */}}
 {{- define "custom" -}}
-err := Set{{.CustomTypeMethodInfix}}ToResourceData(p+{{.NameSnake | quote}}, d, &t.{{.Name}})
-if err != nil {
-    return err
-}
+obj[{{.NameSnake | quote}}] = Set{{.CustomTypeMethodInfix}}ToResourceData(&t.{{.Name}})
 {{- end -}}
 
 {{/* Converts elementary value from from target struct type to raw data type */}}
@@ -82,4 +90,19 @@ _value := _v.String()
 {{- else }}
 _value := {{.SchemaRawType}}({{if .GoTypeIsPtr}}*{{end}}_v)
 {{- end }}
+{{- end -}}
+
+{{/* Singular message */}}
+{{- define "singularMessage" -}}
+{{/* p := p + {{.NameSnake | quote }} + ".0."
+
+{{ if .GoTypeIsPtr }}
+_obj := {{.GoType}}{}
+t.{{ .Name }} = &_obj
+t := &_obj
+{{ else }}
+t := &t.{{.Name}}
+{{ end }}
+
+{{ template "fields" .Message.Fields }} */}}
 {{- end -}}

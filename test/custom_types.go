@@ -61,12 +61,12 @@ func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, targe
 }
 
 // SetBoolCustomToResourceData sets
-func SetBoolCustomToResourceData(path string, data *schema.ResourceData, source *[]BoolCustom) error {
-	r := make([]interface{}, len(*source))
+func SetBoolCustomToResourceData(value *[]BoolCustom) interface{} {
+	r := make([]interface{}, len(*value))
 
-	for i, v := range *source {
+	for i, v := range *value {
 		r[i] = v
 	}
 
-	return data.Set(path, r)
+	return r
 }

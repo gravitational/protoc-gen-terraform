@@ -1025,107 +1025,74 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 }
 
 func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
-	p := ""
+	obj := make(map[string]interface{})
 
 	{
 		_v := t.Str
 
 		_value := string(_v)
-		err := d.Set(p+"str", _value)
-		if err != nil {
-			return err
-		}
+		obj["str"] = _value
 	}
 	{
 		_v := t.Int32
 
 		_value := int(_v)
-		err := d.Set(p+"int32", _value)
-		if err != nil {
-			return err
-		}
+		obj["int32"] = _value
 	}
 	{
 		_v := t.Int64
 
 		_value := int(_v)
-		err := d.Set(p+"int64", _value)
-		if err != nil {
-			return err
-		}
+		obj["int64"] = _value
 	}
 	{
 		_v := t.Float
 
 		_value := float64(_v)
-		err := d.Set(p+"float", _value)
-		if err != nil {
-			return err
-		}
+		obj["float"] = _value
 	}
 	{
 		_v := t.Double
 
 		_value := float64(_v)
-		err := d.Set(p+"double", _value)
-		if err != nil {
-			return err
-		}
+		obj["double"] = _value
 	}
 	{
 		_v := t.Bool
 
 		_value := bool(_v)
-		err := d.Set(p+"bool", _value)
-		if err != nil {
-			return err
-		}
+		obj["bool"] = _value
 	}
 	{
 		_v := t.Bytes
 
 		_value := string(_v)
-		err := d.Set(p+"bytes", _value)
-		if err != nil {
-			return err
-		}
+		obj["bytes"] = _value
 	}
 	{
 		_v := t.Timestamp
 
 		_value := _v.Format(time.RFC3339)
-		err := d.Set(p+"timestamp", _value)
-		if err != nil {
-			return err
-		}
+		obj["timestamp"] = _value
 	}
 	{
 		_v := t.DurationStd
 
 		_value := _v.String()
-		err := d.Set(p+"duration_std", _value)
-		if err != nil {
-			return err
-		}
+		obj["duration_std"] = _value
 	}
 	{
 		_v := t.DurationCustom
 
 		_value := _v.String()
-		err := d.Set(p+"duration_custom", _value)
-		if err != nil {
-			return err
-		}
+		obj["duration_custom"] = _value
 	}
 	{
 		_v := t.TimestampN
 		if _v != nil {
 
 			_value := _v.Format(time.RFC3339)
-			err := d.Set(p+"timestamp_n", _value)
-			if err != nil {
-				return err
-			}
+			obj["timestamp_n"] = _value
 		}
 	}
 	{
@@ -1137,13 +1104,10 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			_raw[i] = _value
 		}
 
-		d.Set(p+"string_a", _raw)
+		obj["string_a"] = _raw
 	}
 	{
-		err := SetBoolCustomToResourceData(p+"bool_a", d, &t.BoolA)
-		if err != nil {
-			return err
-		}
+		obj["bool_a"] = SetBoolCustomToResourceData(&t.BoolA)
 	}
 	{
 		_arr := t.BytesA
@@ -1154,7 +1118,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			_raw[i] = _value
 		}
 
-		d.Set(p+"bytes_a", _raw)
+		obj["bytes_a"] = _raw
 	}
 	{
 		_arr := t.TimestampA
@@ -1165,7 +1129,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			_raw[i] = _value
 		}
 
-		d.Set(p+"timestamp_a", _raw)
+		obj["timestamp_a"] = _raw
 	}
 	{
 		_arr := t.DurationCustomA
@@ -1176,7 +1140,14 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			_raw[i] = _value
 		}
 
-		d.Set(p+"duration_custom_a", _raw)
+		obj["duration_custom_a"] = _raw
+	}
+
+	for key, value := range obj {
+		err := d.Set(key, value)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
