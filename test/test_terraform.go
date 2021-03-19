@@ -1030,7 +1030,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Str
 
-		_value := string(string(_v))
+		_value := string(_v)
 		err := d.Set(p+"str", _value)
 		if err != nil {
 			return err
@@ -1039,7 +1039,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Int32
 
-		_value := int(int32(_v))
+		_value := int(_v)
 		err := d.Set(p+"int32", _value)
 		if err != nil {
 			return err
@@ -1048,7 +1048,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Int64
 
-		_value := int(int64(_v))
+		_value := int(_v)
 		err := d.Set(p+"int64", _value)
 		if err != nil {
 			return err
@@ -1057,7 +1057,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Float
 
-		_value := float64(float32(_v))
+		_value := float64(_v)
 		err := d.Set(p+"float", _value)
 		if err != nil {
 			return err
@@ -1066,7 +1066,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Double
 
-		_value := float64(float64(_v))
+		_value := float64(_v)
 		err := d.Set(p+"double", _value)
 		if err != nil {
 			return err
@@ -1075,7 +1075,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Bool
 
-		_value := bool(bool(_v))
+		_value := bool(_v)
 		err := d.Set(p+"bool", _value)
 		if err != nil {
 			return err
@@ -1084,7 +1084,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Bytes
 
-		_value := string([]byte(_v))
+		_value := string(_v)
 		err := d.Set(p+"bytes", _value)
 		if err != nil {
 			return err

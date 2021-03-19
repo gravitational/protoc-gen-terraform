@@ -23,6 +23,7 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
 {{/* Renders unmarshaller for singular value of any type */}}
 {{- define "singularElementary" -}}
 _v := t.{{.Name}}
+
 {{- if .GoTypeIsPtr }}
 if _v != nil {
 {{- end }}
@@ -35,6 +36,7 @@ if err != nil {
 {{- if .GoTypeIsPtr }}
 }
 {{- end }}
+
 {{- end -}}
 
 {{/* Converts elementary value from from target struct type to raw data type */}}
@@ -46,6 +48,6 @@ _value := _v.Format(time.RFC3339)
 {{- else if .IsDuration }}
 _value := _v.String()
 {{- else }}
-_value := {{.SchemaRawType}}({{.SchemaGoType}}(_v))
+_value := {{.SchemaRawType}}({{if .GoTypeIsPtr}}*{{end}}_v)
 {{- end }}
 {{- end -}}

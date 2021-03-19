@@ -30,7 +30,7 @@ var (
 		Str:    "TestString",
 		Int32:  2,
 		Int64:  3,
-		Float:  18.99,
+		Float:  18.5,
 		Double: 19.21,
 		Bool:   true,
 		Bytes:  []byte("TestBytes"),
@@ -56,6 +56,18 @@ func TestElementariesSet(t *testing.T) {
 	assert.Equal(t, i32, 2, "schema.ResourceData['int32']")
 
 	i64 := subject.Get("int64")
-	assert.Equal(t, i64, 3, "schema.ResourceData['int32']")
+	assert.Equal(t, i64, 3, "schema.ResourceData['int64']")
+
+	f := subject.Get("float")
+	assert.Equal(t, f, 18.5, "schema.ResourceData['float']")
+
+	d := subject.Get("double")
+	assert.Equal(t, d, 19.21, "schema.ResourceData['d']")
+
+	b := subject.Get("bool")
+	assert.Equal(t, b, true, "schema.ResourceData['bool']")
+
+	by := subject.Get("bytes")
+	assert.Equal(t, by, "TestBytes", "schema.ResourceData['bytes']")
 
 }
