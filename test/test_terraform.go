@@ -1187,6 +1187,10 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 					obj["nested_m"] = m
 				}
 			}
+			{
+
+				// make([]interface{}, len(t.NestedMObj))
+			}
 
 		}
 	}
@@ -1234,6 +1238,10 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 					obj["nested_m"] = m
 				}
 			}
+			{
+
+				// make([]interface{}, len(t.NestedMObj))
+			}
 
 		}
 
@@ -1253,6 +1261,10 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		if len(m) > 0 {
 			obj["nested_m"] = m
 		}
+	}
+	{
+
+		// make([]interface{}, len(t.NestedMObj))
 	}
 
 	for key, value := range obj {

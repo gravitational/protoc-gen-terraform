@@ -55,6 +55,12 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
     {{ template "map" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "OBJECT_MAP" -}}
+{
+    {{ template "objectMap" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders setter for singular value of any type */}}
@@ -143,4 +149,11 @@ for key, _v := range t.{{.Name}} {
 if len(m) > 0 {
     obj[{{.NameSnake | quote}}] = m
 }
+{{- end -}}
+
+{{/* String -> object map */}}
+{{- define "objectMap" -}}
+{{ $m := .MapValueField }}
+
+// make([]interface{}, len(t.{{.Name}}))
 {{- end -}}
