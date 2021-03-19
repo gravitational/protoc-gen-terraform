@@ -36,13 +36,12 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
 {
     {{ template "custom" . }}
 }
+{{- end -}}
 
 {{- if eq .Kind "SINGULAR_MESSAGE" -}}
 {
     {{ template "singularMessage" . }}
 }
-{{- end -}}
-
 {{- end -}}
 {{- end -}}
 
@@ -94,15 +93,12 @@ _value := {{.SchemaRawType}}({{if .GoTypeIsPtr}}*{{end}}_v)
 
 {{/* Singular message */}}
 {{- define "singularMessage" -}}
-{{/* p := p + {{.NameSnake | quote }} + ".0."
+msg := make(map[string]interface{})
+obj[{{.NameSnake | quote }}] = []interface{}{msg}
+{
+    obj := msg
+    t := t.{{.Name}}
 
-{{ if .GoTypeIsPtr }}
-_obj := {{.GoType}}{}
-t.{{ .Name }} = &_obj
-t := &_obj
-{{ else }}
-t := &t.{{.Name}}
-{{ end }}
-
-{{ template "fields" .Message.Fields }} */}}
+    {{ template "fields" .Message.Fields }}
+}
 {{- end -}}

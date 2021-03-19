@@ -38,6 +38,9 @@ var (
 		StringA: []string{"TestString1", "TestString2"},
 		BoolA:   []BoolCustom{false, true, false},
 		BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
+		Nested: &Nested{
+			Str: "TestStringA",
+		},
 	}
 )
 
@@ -118,4 +121,12 @@ func TestArraysSet(t *testing.T) {
 	for n, v := range a {
 		assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339), "Test.TimestampA[]")
 	}
+}
+
+// TestNestedMessageSet ensures decoding of nested messages
+func TestNestedMessageSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
+
+	assert.Equal(t, test.Nested.Str, subject.Get("nested.0.str"), "Test.Nested.Str")
 }

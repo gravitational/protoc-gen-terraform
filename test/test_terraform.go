@@ -1142,6 +1142,22 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 		obj["duration_custom_a"] = _raw
 	}
+	{
+		msg := make(map[string]interface{})
+		obj["nested"] = []interface{}{msg}
+		{
+			obj := msg
+			t := t.Nested
+
+			{
+				_v := t.Str
+
+				_value := string(_v)
+				obj["str"] = _value
+			}
+
+		}
+	}
 
 	for key, value := range obj {
 		err := d.Set(key, value)
