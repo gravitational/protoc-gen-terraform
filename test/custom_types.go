@@ -25,6 +25,7 @@ import (
 // Duration custom duration type
 type Duration int64
 
+// String returns duration string representation, must be implemented for custom duration type
 func (d Duration) String() string {
 	return time.Duration(d).String()
 }
