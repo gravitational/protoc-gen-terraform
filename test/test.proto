@@ -1,0 +1,121 @@
+// Copyright 2015-2021 Gravitational, Inc.
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package test;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+// Test message definition.
+//
+// It contains:
+//   - elementary fields
+//   - repeated elementary fields
+//   - maps of elementary fields
+//   - other messages (nested)
+//   - repeated messages
+//   - message maps
+//   - custom types
+//   - custom duration type
+//   - standard google protobuf timestamps
+//   - byte arrays, which are treated as strings by default
+//
+message Test {
+    // Str string field
+    string Str = 1;
+
+    // Int32 int32 field
+    int32 Int32 = 2;
+
+    // Int64 int64 field
+    int64 Int64 = 3;
+
+    // Float float field
+    float Float = 4;
+
+    // Double double field
+    double Double = 5;
+
+    // Bool bool field
+    bool Bool = 6;
+
+    // Bytest byte[] field
+    bytes Bytes = 7;
+
+    // Timestamp time.Time field
+    google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+
+    // DurationStd time.Duration field (standard)
+    int64 DurationStd = 9 [ (gogoproto.stdduration) = true ];
+
+    // DurationCustom time.Duration field (custom)
+    int64 DurationCustom = 10 [ (gogoproto.casttype) = "Duration" ];
+    
+    // TimestampN *time.Time field
+    google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+
+    // StringA []string field
+    repeated string StringA = 12;
+
+    // BoolA []bool field
+    repeated bool BoolA = 13 [ (gogoproto.customtype) = "BoolCustom" ];
+
+    // BytesA [][]byte field
+    repeated bytes BytesA = 14;
+
+    // TimestampA []time.Time field
+    repeated google.protobuf.Timestamp TimestampA = 15 [ (gogoproto.stdtime) = true ];
+
+    // DurationCustomA []time.Duration field
+    repeated int64 DurationCustomA = 16 [ (gogoproto.casttype) = "Duration" ];
+
+    // Nested nested message field
+    Nested Nested = 17;   
+
+    // NestedA nested message array
+    repeated Nested NestedA = 18;
+
+    // NestedM normal map
+    map<string, string> NestedM = 19;
+
+    // NestedMObj object map
+    map<string, Nested> NestedMObj = 20;
+}
+
+// Nested message definition
+message Nested {
+    // Str string field
+    string Str = 1;
+
+    // Nested repeated nested messages
+    repeated NestedLevel2 Nested = 2;
+
+    // Nested map repeated nested messages
+    map<string, string> NestedM = 3;
+
+    // NestedMObj nested object map
+    map<string, NestedLevel2> NestedMObj = 4;
+}
+
+// Message nested into nested message
+message NestedLevel2 {
+    // Str string field
+    string Str = 1;
+}
