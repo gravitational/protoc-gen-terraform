@@ -18,8 +18,6 @@ limitations under the License.
 package test
 
 import (
-	fmt "fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -38,23 +36,10 @@ var (
 		Bool:    true,
 		Bytes:   []byte("TestBytes"),
 		StringA: []string{"TestString1", "TestString2"},
+		BoolA:   []BoolCustom{false, true, false},
+		BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
 	}
 )
-
-// toSlice is a helper method which takes a slice of any type and converts it to []interface{}
-func toSlice(s interface{}) ([]interface{}, error) {
-	v := reflect.ValueOf(s)
-	switch v.Kind() {
-	case reflect.Slice, reflect.Array:
-		result := make([]interface{}, v.Len())
-		for i := 0; i < v.Len(); i++ {
-			result[i] = v.Index(i).Interface()
-		}
-		return result, nil
-	default:
-		return nil, fmt.Errorf("failed to convert %T to []interface{}", s)
-	}
-}
 
 // fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
 func fillTimestamps(t *Test) error {
@@ -117,12 +102,10 @@ func TestArraysSet(t *testing.T) {
 	subject, err := buildSubjectSet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
-	stringA, err := toSlice(test.StringA)
-	require.NoError(t, err, "failed to convert string_a to []interface{}")
+	assert.Equal(t, []interface{}{"TestString1", "TestString2"}, subject.Get("string_a"), "Test.StringA")
+	assert.Equal(t, []interface{}{BoolCustom(false), BoolCustom(true), BoolCustom(false)}, subject.Get("bool_a"), "Test.BoolA")
+	assert.Equal(t, []interface{}{"TestBytes1", "TestBytes2"}, subject.Get("bytes_a"), "Test.BytesA")
 
-	assert.Equal(t, stringA, subject.Get("string_a"), "Test.StringA")
-	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
-	// assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
 	// assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
 	// assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
 }

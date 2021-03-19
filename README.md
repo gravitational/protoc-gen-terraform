@@ -31,9 +31,9 @@ Schema method should have the following prototype:
 func SchemawrappersLabelValues() *schema.Schema
 ```
 
-Unmarshalling method should look like this:
+Getter method should look like this:
 ```
-func UnmarshalwrappersLabelValues(string path, data *schema.ResourceData, target *types.Traits) error
+func GetwrappersLabelValuesFromResourceData(string path, data *schema.ResourceData, target *types.Traits) error
 ```
 
 Where types.Traits, and wrappers.LabelValues is the type name in proto file.
@@ -63,7 +63,7 @@ Map of arrays of elementary types are not supported as well.
 
 # Note on gogoproto.customtype
 
-If a field has `gogoproto.casttype` flag, it can not be automatically unmarshalled from `ResourceData`. You need to define your own custom `Schema<type>` and `Unmarshal<type>` methods. See [test/custom_types.go](test/custom_types.go).
+If a field has `gogoproto.casttype` flag, it can not be automatically unmarshalled from `ResourceData`. You need to define your own custom `Schema<type>` and `Get<type>FromResourceData` methods. See [test/custom_types.go](test/custom_types.go).
 
 # Build and test using Docker
 
