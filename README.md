@@ -23,7 +23,7 @@ protoc \
     types.proto
 ```
 
-This will generate `types_terraform.go` in _out directory. This file will contain `UnmarshalUserV2` and `UnmarshalRolesV3` along with `SchemaUserV2` and `SchemaRolesV3` methods.
+This will generate `types_terraform.go` in _out directory. This file will contain `GetUserV2FromResourceData` and `GetRoleV3FromResourceData` along with `SchemaUserV2` and `SchemaRolesV3` methods.
 
 Schema method should have the following prototype:
 

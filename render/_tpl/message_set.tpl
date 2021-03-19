@@ -18,9 +18,15 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
     {{ template "singularElementary" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "REPEATED_ELEMENTARY" -}}
+{
+    {{ template "repeatedElementary" . }}
+}
+{{- end -}}
 {{- end -}}
 
-{{/* Renders unmarshaller for singular value of any type */}}
+{{/* Renders setter for singular value of any type */}}
 {{- define "singularElementary" -}}
 _v := t.{{.Name}}
 
@@ -36,7 +42,19 @@ if err != nil {
 {{- if .GoTypeIsPtr }}
 }
 {{- end }}
+{{- end -}}
 
+{{/* Renders setter for elementary array of any type */}}
+{{- define "repeatedElementary" -}}
+_arr := t.{{.Name}}
+_raw := make([]{{.SchemaRawType}}, len(_arr))
+
+for i, _v := range _arr {
+    {{- template "rawToValue" . }}
+    _raw[i] = _value
+}
+
+d.Set(p+{{ .NameSnake | quote }}, _raw)
 {{- end -}}
 
 {{/* Converts elementary value from from target struct type to raw data type */}}

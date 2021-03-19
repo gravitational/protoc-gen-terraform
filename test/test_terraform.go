@@ -1128,6 +1128,51 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			}
 		}
 	}
+	{
+		_arr := t.StringA
+		_raw := make([]string, len(_arr))
+
+		for i, _v := range _arr {
+			_value := string(_v)
+			_raw[i] = _value
+		}
+
+		d.Set(p+"string_a", _raw)
+	}
+
+	{
+		_arr := t.BytesA
+		_raw := make([]string, len(_arr))
+
+		for i, _v := range _arr {
+			_value := string(_v)
+			_raw[i] = _value
+		}
+
+		d.Set(p+"bytes_a", _raw)
+	}
+	{
+		_arr := t.TimestampA
+		_raw := make([]string, len(_arr))
+
+		for i, _v := range _arr {
+			_value := _v.Format(time.RFC3339)
+			_raw[i] = _value
+		}
+
+		d.Set(p+"timestamp_a", _raw)
+	}
+	{
+		_arr := t.DurationCustomA
+		_raw := make([]string, len(_arr))
+
+		for i, _v := range _arr {
+			_value := _v.String()
+			_raw[i] = _value
+		}
+
+		d.Set(p+"duration_custom_a", _raw)
+	}
 
 	return nil
 }
