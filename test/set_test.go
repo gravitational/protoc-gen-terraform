@@ -83,7 +83,7 @@ func TestElementariesSet(t *testing.T) {
 	assert.Equal(t, subject.Get("bytes"), "TestBytes", "schema.ResourceData['bytes']")
 }
 
-// TestTimesGet ensures decoding of time and duration fields
+// TestTimesSet ensures decoding of time and duration fields
 func TestTimesSet(t *testing.T) {
 	subject, err := buildSubjectSet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
@@ -92,4 +92,19 @@ func TestTimesSet(t *testing.T) {
 	assert.Equal(t, test.DurationStd.String(), subject.Get("duration_std"), "Test.DurationStd")
 	assert.Equal(t, test.DurationCustom.String(), subject.Get("duration_custom"), "Test.DurationCustom")
 	assert.Equal(t, test.TimestampN.Format(time.RFC3339), subject.Get("timestamp_n"), "Test.TimestampN")
+}
+
+// TestArraysSet ensures decoding of arrays
+func TestArraysSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
+
+	a := subject.Get("string_a")
+	s := []string(a.([]string))
+
+	assert.Equal(t, test.StringA, s)
+	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
+	// assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
+	// assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
+	// assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
 }
