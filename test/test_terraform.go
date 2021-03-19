@@ -1155,8 +1155,59 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 				_value := string(_v)
 				obj["str"] = _value
 			}
+			{
+				arr := make([]map[string]interface{}, len(t.Nested))
+
+				for i, t := range t.Nested {
+					arr[i] = make(map[string]interface{})
+					obj := arr[i]
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+				}
+
+				obj["nested"] = arr
+			}
 
 		}
+	}
+	{
+		arr := make([]map[string]interface{}, len(t.NestedA))
+
+		for i, t := range t.NestedA {
+			arr[i] = make(map[string]interface{})
+			obj := arr[i]
+			{
+				_v := t.Str
+
+				_value := string(_v)
+				obj["str"] = _value
+			}
+			{
+				arr := make([]map[string]interface{}, len(t.Nested))
+
+				for i, t := range t.Nested {
+					arr[i] = make(map[string]interface{})
+					obj := arr[i]
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+				}
+
+				obj["nested"] = arr
+			}
+
+		}
+
+		obj["nested_a"] = arr
 	}
 
 	for key, value := range obj {

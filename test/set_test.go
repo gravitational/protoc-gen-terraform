@@ -39,7 +39,8 @@ var (
 		BoolA:   []BoolCustom{false, true, false},
 		BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
 		Nested: &Nested{
-			Str: "TestStringA",
+			Str:    "TestStringA",
+			Nested: []*NestedLevel2{{Str: "NestedString1"}, {Str: "NestedString2"}},
 		},
 	}
 )
@@ -129,4 +130,13 @@ func TestNestedMessageSet(t *testing.T) {
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, test.Nested.Str, subject.Get("nested.0.str"), "Test.Nested.Str")
+}
+
+// TestNestedMessageArraySet ensures decoding of array of messages
+func TestNestedMessageArraySet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
+
+	assert.Equal(t, test.Nested.Nested[0].Str, subject.Get("nested.0.nested.0.str"))
+	assert.Equal(t, test.Nested.Nested[1].Str, subject.Get("nested.0.nested.1.str"))
 }

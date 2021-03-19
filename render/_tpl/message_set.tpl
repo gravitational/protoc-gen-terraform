@@ -43,6 +43,12 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
     {{ template "singularMessage" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "REPEATED_MESSAGE" -}}
+{
+    {{ template "repeatedMessage" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders setter for singular value of any type */}}
@@ -101,4 +107,17 @@ obj[{{.NameSnake | quote }}] = []interface{}{msg}
 
     {{ template "fields" .Message.Fields }}
 }
+{{- end -}}
+
+{{/* Repeated message */}}
+{{- define "repeatedMessage" -}}
+arr := make([]map[string]interface{}, len(t.{{.Name}}))
+
+for i, t := range t.{{.Name}} {
+    arr[i] = make(map[string]interface{})
+    obj := arr[i]
+    {{ template "fields" .Message.Fields }}
+}
+
+obj[{{.NameSnake | quote }}] = arr
 {{- end -}}
