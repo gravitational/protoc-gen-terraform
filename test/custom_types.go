@@ -17,11 +17,17 @@ limitations under the License.
 package test
 
 import (
+	time "time"
+
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // Duration custom duration type
 type Duration int64
+
+func (d Duration) String() string {
+	return time.Duration(d).String()
+}
 
 // BoolCustom custom bool array
 type BoolCustom bool

@@ -51,4 +51,11 @@ func TestElementariesSet(t *testing.T) {
 
 	str := subject.Get("str")
 	assert.Equal(t, str, "TestString", "schema.ResourceData['str']")
+
+	i32 := subject.Get("int32")
+	assert.Equal(t, i32, 2, "schema.ResourceData['int32']")
+
+	i64 := subject.Get("int64")
+	assert.Equal(t, i64, 3, "schema.ResourceData['int32']")
+
 }

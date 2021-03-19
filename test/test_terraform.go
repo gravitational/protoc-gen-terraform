@@ -1028,71 +1028,106 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	p := ""
 
 	{
-		err := d.Set(p+"str", t.Str)
+		_v := t.Str
+
+		_value := string(string(_v))
+		err := d.Set(p+"str", _value)
 		if err != nil {
 			return err
 		}
 	}
-	// {
-	// 	err := d.Set(p+"int32", t.Int32)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"int64", t.Int64)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"float", t.Float)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"double", t.Double)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"bool", t.Bool)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"bytes", t.Bytes)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"timestamp", t.Timestamp)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"duration_std", t.DurationStd)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"duration_custom", t.DurationCustom)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// {
-	// 	err := d.Set(p+"timestamp_n", t.TimestampN)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
+	{
+		_v := t.Int32
+
+		_value := int(int32(_v))
+		err := d.Set(p+"int32", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.Int64
+
+		_value := int(int64(_v))
+		err := d.Set(p+"int64", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.Float
+
+		_value := float64(float32(_v))
+		err := d.Set(p+"float", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.Double
+
+		_value := float64(float64(_v))
+		err := d.Set(p+"double", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.Bool
+
+		_value := bool(bool(_v))
+		err := d.Set(p+"bool", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.Bytes
+
+		_value := string([]byte(_v))
+		err := d.Set(p+"bytes", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.Timestamp
+
+		_value := _v.Format(time.RFC3339)
+		err := d.Set(p+"timestamp", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.DurationStd
+
+		_value := _v.String()
+		err := d.Set(p+"duration_std", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.DurationCustom
+
+		_value := _v.String()
+		err := d.Set(p+"duration_custom", _value)
+		if err != nil {
+			return err
+		}
+	}
+	{
+		_v := t.TimestampN
+		if _v != nil {
+
+			_value := _v.Format(time.RFC3339)
+			err := d.Set(p+"timestamp_n", _value)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }
