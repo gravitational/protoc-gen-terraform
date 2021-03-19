@@ -85,7 +85,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		p.Generator.Fail(err.Error())
 	}
 
-	err = p.writeUnmarshallers()
+	err = p.writeGettersSetters()
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
@@ -122,15 +122,21 @@ func (p *Plugin) writeSchema() error {
 	return nil
 }
 
-// writeUnmarshallers writes unmarshallers definition to target file
-func (p *Plugin) writeUnmarshallers() error {
+// writeGetters writes unmarshallers definition to target file
+func (p *Plugin) writeGettersSetters() error {
 	for _, message := range p.Messages {
 		var buf bytes.Buffer
 
-		err := render.Template(render.UnmarshalTpl, message, &buf)
+		err := render.Template(render.GetTpl, message, &buf)
 		if err != nil {
 			return trace.Wrap(err)
 		}
+
+		err = render.Template(render.SetTpl, message, &buf)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+
 		p.P(buf.String())
 	}
 

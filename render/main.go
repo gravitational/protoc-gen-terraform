@@ -33,9 +33,13 @@ var (
 	//go:embed _tpl/message_schema.tpl
 	SchemaTpl string
 
-	// UnmarshalTpl is unmarshaller template
-	//go:embed _tpl/message_unmarshal.tpl
-	UnmarshalTpl string
+	// GetTpl is unmarshaller template
+	//go:embed _tpl/message_get.tpl
+	GetTpl string
+
+	// SetTpl is unmarshaller template
+	//go:embed _tpl/message_set.tpl
+	SetTpl string
 
 	// LicenseTpl is license message template
 	//go:embed _tpl/license.tpl

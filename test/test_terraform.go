@@ -1023,3 +1023,76 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 	return nil
 }
+
+func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
+	p := ""
+
+	{
+		err := d.Set(p+"str", t.Str)
+		if err != nil {
+			return err
+		}
+	}
+	// {
+	// 	err := d.Set(p+"int32", t.Int32)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"int64", t.Int64)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"float", t.Float)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"double", t.Double)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"bool", t.Bool)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"bytes", t.Bytes)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"timestamp", t.Timestamp)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"duration_std", t.DurationStd)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"duration_custom", t.DurationCustom)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// {
+	// 	err := d.Set(p+"timestamp_n", t.TimestampN)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+
+	return nil
+}

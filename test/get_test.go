@@ -27,10 +27,12 @@ import (
 )
 
 const (
+	// defaultTimestamp predefined timestamp used in tests
 	defaultTimestamp = "2022-10-12T07:20:50.52Z"
 )
 
 var (
+	// fixture raw data to build schema.ResourceData using schema.TestResourceDataRaw
 	fixture map[string]interface{} = map[string]interface{}{
 		"str":               "TestString",
 		"int32":             999,
@@ -85,17 +87,17 @@ var (
 	}
 )
 
-// buildSubject builds Test struct from test fixture data
-func buildSubject(t *testing.T) (*Test, error) {
+// buildSubjectGet builds Test struct from test fixture data
+func buildSubjectGet(t *testing.T) (*Test, error) {
 	subject := &Test{}
 	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
 	err := GetTestFromResourceData(data, subject)
 	return subject, err
 }
 
-// TestElementaries ensures decoding of elementary types
-func TestElementaries(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestElementariesGet ensures decoding of elementary types
+func TestElementariesGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.Str, "TestString", "Test.Str")
@@ -107,9 +109,9 @@ func TestElementaries(t *testing.T) {
 	assert.Equal(t, subject.Bytes, []byte("TestBytes"), "Test.Bytes")
 }
 
-// TestTimes ensures decoding of time and duration fields
-func TestTimes(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestTimesGet ensures decoding of time and duration fields
+func TestTimesGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	timestamp, err := time.Parse(time.RFC3339, defaultTimestamp)
@@ -127,9 +129,9 @@ func TestTimes(t *testing.T) {
 	assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
 }
 
-// TestArrays ensures decoding of arrays
-func TestArrays(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestArraysGet ensures decoding of arrays
+func TestArraysGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	timestamp, err := time.Parse(time.RFC3339, defaultTimestamp)
@@ -145,26 +147,26 @@ func TestArrays(t *testing.T) {
 	assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
 }
 
-// TestNestedMessage ensures decoding of nested messages
-func TestNestedMessage(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestNestedMessageGet ensures decoding of nested messages
+func TestNestedMessageGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.Nested.Str, "TestString", "Test.Nested.Str")
 }
 
-// TestNestedMessage ensures decoding of array of messages
-func TestNestedMessageArray(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestNestedMessageArrayGet ensures decoding of array of messages
+func TestNestedMessageArrayGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.Nested.Nested[0].Str, "TestString1")
 	assert.Equal(t, subject.Nested.Nested[1].Str, "TestString2")
 }
 
-// TestMap ensures decoding of a maps
-func TestMap(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestMapGet ensures decoding of a maps
+func TestMapGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.NestedM["k1"], "v1")
@@ -173,9 +175,9 @@ func TestMap(t *testing.T) {
 	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
 }
 
-// TestMap ensures decoding of maps of messages
-func TestObjectMap(t *testing.T) {
-	subject, err := buildSubject(t)
+// TestObjectMapGet ensures decoding of maps of messages
+func TestObjectMapGet(t *testing.T) {
+	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.NestedMObj["obj1"].Str, "TestString1")
