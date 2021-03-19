@@ -50,6 +50,14 @@ var (
 			"k1": "v1",
 			"k2": "v2",
 		},
+		NestedMObj: map[string]*Nested{
+			"n1": {
+				Str: "NestedObjString1",
+			},
+			"n2": {
+				Str: "NestedObjString2",
+			},
+		},
 	}
 )
 
@@ -158,4 +166,13 @@ func TestMapSet(t *testing.T) {
 	assert.Equal(t, test.NestedM["k2"], subject.Get("nested_m.k2"))
 	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
 	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
+}
+
+// TestObjectMapGet ensures decoding of maps of messages
+func TestObjectMapSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
+
+	assert.Equal(t, test.NestedMObj["n1"].Str, subject.Get("nested_m_obj.0.value.0.str"))
+	assert.Equal(t, test.NestedMObj["n2"].Str, subject.Get("nested_m_obj.1.value.0.str"))
 }

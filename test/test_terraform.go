@@ -1156,11 +1156,10 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 				obj["str"] = _value
 			}
 			{
-				arr := make([]map[string]interface{}, len(t.Nested))
+				arr := make([]interface{}, len(t.Nested))
 
 				for i, t := range t.Nested {
-					arr[i] = make(map[string]interface{})
-					obj := arr[i]
+					obj := make(map[string]interface{})
 					{
 						_v := t.Str
 
@@ -1168,6 +1167,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 						obj["str"] = _value
 					}
 
+					arr[i] = obj
 				}
 
 				if len(arr) > 0 {
@@ -1189,17 +1189,40 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			}
 			{
 
-				// make([]interface{}, len(t.NestedMObj))
+				a := make([]interface{}, len(t.NestedMObj))
+				n := 0
+
+				for k, v := range t.NestedMObj {
+					i := make(map[string]interface{})
+					i["key"] = k
+
+					obj := make(map[string]interface{})
+					t := v
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+					i["value"] = []interface{}{obj}
+
+					a[n] = i
+					n++
+				}
+
+				if len(a) > 0 {
+					obj["nested_m_obj"] = a
+				}
 			}
 
 		}
 	}
 	{
-		arr := make([]map[string]interface{}, len(t.NestedA))
+		arr := make([]interface{}, len(t.NestedA))
 
 		for i, t := range t.NestedA {
-			arr[i] = make(map[string]interface{})
-			obj := arr[i]
+			obj := make(map[string]interface{})
 			{
 				_v := t.Str
 
@@ -1207,11 +1230,10 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 				obj["str"] = _value
 			}
 			{
-				arr := make([]map[string]interface{}, len(t.Nested))
+				arr := make([]interface{}, len(t.Nested))
 
 				for i, t := range t.Nested {
-					arr[i] = make(map[string]interface{})
-					obj := arr[i]
+					obj := make(map[string]interface{})
 					{
 						_v := t.Str
 
@@ -1219,6 +1241,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 						obj["str"] = _value
 					}
 
+					arr[i] = obj
 				}
 
 				if len(arr) > 0 {
@@ -1240,9 +1263,34 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			}
 			{
 
-				// make([]interface{}, len(t.NestedMObj))
+				a := make([]interface{}, len(t.NestedMObj))
+				n := 0
+
+				for k, v := range t.NestedMObj {
+					i := make(map[string]interface{})
+					i["key"] = k
+
+					obj := make(map[string]interface{})
+					t := v
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+					i["value"] = []interface{}{obj}
+
+					a[n] = i
+					n++
+				}
+
+				if len(a) > 0 {
+					obj["nested_m_obj"] = a
+				}
 			}
 
+			arr[i] = obj
 		}
 
 		if len(arr) > 0 {
@@ -1264,7 +1312,91 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	}
 	{
 
-		// make([]interface{}, len(t.NestedMObj))
+		a := make([]interface{}, len(t.NestedMObj))
+		n := 0
+
+		for k, v := range t.NestedMObj {
+			i := make(map[string]interface{})
+			i["key"] = k
+
+			obj := make(map[string]interface{})
+			t := v
+			{
+				_v := t.Str
+
+				_value := string(_v)
+				obj["str"] = _value
+			}
+			{
+				arr := make([]interface{}, len(t.Nested))
+
+				for i, t := range t.Nested {
+					obj := make(map[string]interface{})
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+					arr[i] = obj
+				}
+
+				if len(arr) > 0 {
+					obj["nested"] = arr
+				}
+			}
+			{
+
+				m := make(map[string]interface{})
+
+				for key, _v := range t.NestedM {
+					_value := string(_v)
+					m[key] = _value
+				}
+
+				if len(m) > 0 {
+					obj["nested_m"] = m
+				}
+			}
+			{
+
+				a := make([]interface{}, len(t.NestedMObj))
+				n := 0
+
+				for k, v := range t.NestedMObj {
+					i := make(map[string]interface{})
+					i["key"] = k
+
+					obj := make(map[string]interface{})
+					t := v
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+					i["value"] = []interface{}{obj}
+
+					a[n] = i
+					n++
+				}
+
+				if len(a) > 0 {
+					obj["nested_m_obj"] = a
+				}
+			}
+
+			i["value"] = []interface{}{obj}
+
+			a[n] = i
+			n++
+		}
+
+		if len(a) > 0 {
+			obj["nested_m_obj"] = a
+		}
 	}
 
 	for key, value := range obj {

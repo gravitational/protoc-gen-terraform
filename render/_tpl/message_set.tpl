@@ -123,12 +123,12 @@ obj[{{.NameSnake | quote }}] = []interface{}{msg}
 
 {{/* Repeated message */}}
 {{- define "repeatedMessage" -}}
-arr := make([]map[string]interface{}, len(t.{{.Name}}))
+arr := make([]interface{}, len(t.{{.Name}}))
 
 for i, t := range t.{{.Name}} {
-    arr[i] = make(map[string]interface{})
-    obj := arr[i]
+    obj := make(map[string]interface{})
     {{ template "fields" .Message.Fields }}
+    arr[i] = obj
 }
 
 if len(arr) > 0 {
@@ -154,6 +154,23 @@ if len(m) > 0 {
 {{/* String -> object map */}}
 {{- define "objectMap" -}}
 {{ $m := .MapValueField }}
+a := make([]interface{}, len(t.{{.Name}}))
+n := 0
 
-// make([]interface{}, len(t.{{.Name}}))
+for k, v := range t.{{.Name}} {
+    i := make(map[string]interface{})
+    i["key"] = k
+    
+    obj := make(map[string]interface{})
+    t := v
+    {{ template "fields" $m.Message.Fields }}
+    i["value"] = []interface{}{obj}
+
+    a[n] = i
+    n++
+}
+
+if len(a) > 0 {
+    obj[{{.NameSnake | quote}}] = a
+}
 {{- end -}}
