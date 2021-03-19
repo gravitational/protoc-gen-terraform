@@ -1139,7 +1139,12 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 		d.Set(p+"string_a", _raw)
 	}
-
+	{
+		err := SetBoolCustomToResourceData(p+"bool_a", d, &t.BoolA)
+		if err != nil {
+			return err
+		}
+	}
 	{
 		_arr := t.BytesA
 		_raw := make([]string, len(_arr))

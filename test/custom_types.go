@@ -58,3 +58,14 @@ func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, targe
 
 	return nil
 }
+
+// SetBoolCustomToResourceData sets
+func SetBoolCustomToResourceData(path string, data *schema.ResourceData, source *[]BoolCustom) error {
+	r := make([]interface{}, len(*source))
+
+	for i, v := range *source {
+		r[i] = v
+	}
+
+	return data.Set(path, r)
+}

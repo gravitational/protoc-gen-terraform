@@ -28,7 +28,7 @@ import (
 
 const (
 	// defaultTimestamp predefined timestamp used in tests
-	defaultTimestamp = "2022-10-12T07:20:50.52Z"
+	defaultTimestamp = "2022-10-12T07:20:50Z"
 )
 
 var (

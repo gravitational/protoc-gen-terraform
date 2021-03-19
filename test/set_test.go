@@ -57,6 +57,8 @@ func fillTimestamps(t *Test) error {
 	t.DurationStd = d
 	t.DurationCustom = Duration(d)
 	t.TimestampN = &ti
+	t.TimestampA = []*time.Time{&ti, &ti}
+	t.DurationCustomA = []Duration{Duration(d), Duration(d)}
 
 	return nil
 }
@@ -103,9 +105,17 @@ func TestArraysSet(t *testing.T) {
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, []interface{}{"TestString1", "TestString2"}, subject.Get("string_a"), "Test.StringA")
-	assert.Equal(t, []interface{}{BoolCustom(false), BoolCustom(true), BoolCustom(false)}, subject.Get("bool_a"), "Test.BoolA")
+	assert.Equal(t, []interface{}{false, true, false}, subject.Get("bool_a"), "Test.BoolA")
 	assert.Equal(t, []interface{}{"TestBytes1", "TestBytes2"}, subject.Get("bytes_a"), "Test.BytesA")
+	assert.Equal(t, []interface{}{"1h0m0s", "1h0m0s"}, subject.Get("duration_custom_a"))
 
-	// assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
-	// assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
+	raw := subject.Get("timestamp_a")
+	a, ok := raw.([]interface{})
+	if !ok {
+		assert.Fail(t, "can not convert %T to []interface{}", raw)
+	}
+
+	for n, v := range a {
+		assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339), "Test.TimestampA[]")
+	}
 }

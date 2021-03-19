@@ -24,6 +24,12 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
     {{ template "repeatedElementary" . }}
 }
 {{- end -}}
+
+{{- if eq .Kind "CUSTOM_TYPE" -}}
+{
+    {{ template "custom" . }}
+}
+{{- end -}}
 {{- end -}}
 
 {{/* Renders setter for singular value of any type */}}
@@ -55,6 +61,14 @@ for i, _v := range _arr {
 }
 
 d.Set(p+{{ .NameSnake | quote }}, _raw)
+{{- end -}}
+
+{{/* Renders custom getter custom type */}}
+{{- define "custom" -}}
+err := Set{{.CustomTypeMethodInfix}}ToResourceData(p+{{.NameSnake | quote}}, d, &t.{{.Name}})
+if err != nil {
+    return err
+}
 {{- end -}}
 
 {{/* Converts elementary value from from target struct type to raw data type */}}
