@@ -17,6 +17,7 @@ limitations under the License.
 package test
 
 import (
+	fmt "fmt"
 	time "time"
 
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -49,7 +50,10 @@ func SchemaBoolCustom() *schema.Schema {
 func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, target *[]BoolCustom) error {
 	rawi, ok := data.GetOk(path)
 	if ok {
-		arr := rawi.([]interface{})
+		arr, ok := rawi.([]interface{})
+		if !ok {
+			return fmt.Errorf("cat not convert %T to []interface{}", rawi)
+		}
 		*target = make([]BoolCustom, len(arr))
 
 		for i := 0; i < len(arr); i++ {
