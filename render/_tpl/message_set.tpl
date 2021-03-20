@@ -115,6 +115,10 @@ _value := {{.SchemaRawType}}({{if .GoTypeIsPtr}}*{{end}}_v)
 
 {{/* Singular message */}}
 {{- define "singularMessage" -}}
+{{if .GoTypeIsPtr}}
+if t.{{.Name}} != nil {
+{{end}}
+
 msg := make(map[string]interface{})
 obj[{{.NameSnake | quote }}] = []interface{}{msg}
 {
@@ -123,6 +127,9 @@ obj[{{.NameSnake | quote }}] = []interface{}{msg}
 
     {{ template "fields" .Message.Fields }}
 }
+{{if .GoTypeIsPtr}}
+}
+{{end}}
 {{- end -}}
 
 {{/* Repeated message */}}
