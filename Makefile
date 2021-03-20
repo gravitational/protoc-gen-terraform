@@ -26,6 +26,7 @@ exclude_fields = "types.UserSpecV2.LocalAuth"
 custom_duration = "Duration"
 custom_imports = "github.com/gravitational/teleport/api/types"
 target_pkg = "tfschema"
+pwd = $(shell pwd)
 
 .PHONY: terraform
 terraform: build
@@ -47,8 +48,8 @@ pkg=types,custom_duration=Duration,custom_imports=${custom_imports},target_pkg=$
 .PHONY: test
 test: build
 	@protoc \
-		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform/test \
-		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform \
+		-I$(pwd)/test \
+		-I$(pwd) \
 		-I./vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \

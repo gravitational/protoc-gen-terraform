@@ -1078,13 +1078,13 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.DurationStd
 
-		_value := _v.String()
+		_value := time.Duration(_v).String()
 		obj["duration_std"] = _value
 	}
 	{
 		_v := t.DurationCustom
 
-		_value := _v.String()
+		_value := time.Duration(_v).String()
 		obj["duration_custom"] = _value
 	}
 	{
@@ -1136,7 +1136,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		_raw := make([]string, len(_arr))
 
 		for i, _v := range _arr {
-			_value := _v.String()
+			_value := time.Duration(_v).String()
 			_raw[i] = _value
 		}
 

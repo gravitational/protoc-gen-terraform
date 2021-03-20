@@ -103,7 +103,7 @@ obj[{{.NameSnake | quote}}] = Set{{.CustomTypeMethodInfix}}ToResourceData(&t.{{.
 {{- if .IsTime }}
 _value := _v.Format(time.RFC3339)
 {{- else if .IsDuration }}
-_value := _v.String()
+_value := time.Duration(_v).String()
 {{- else }}
 _value := {{.SchemaRawType}}({{if .GoTypeIsPtr}}*{{end}}_v)
 {{- end }}

@@ -46,7 +46,7 @@ Options:
 * `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`).
 * `pkg` - default package name to prepend to type names with no package reference. This option is required if the target package of Terraform generated code is different from package of original protobuf generated code.
 * `target_pkg` - the name of the target package
-* `custom_duration` - the name of custom Duration type, if used. Must support String() method.
+* `custom_duration` - the name of custom Duration type, if used.
 * `custom_imports` - comma-separated package list to add into target file
 
 # Testing
