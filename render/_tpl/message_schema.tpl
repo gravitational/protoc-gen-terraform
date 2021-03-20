@@ -7,7 +7,6 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
-	// {{ .Name }} {{ .Kind }}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }

@@ -41,64 +41,52 @@ var _ = time.Kitchen
 // Type full name: Test
 func SchemaTest() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		// Str SINGULAR_ELEMENTARY
 		"str": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// Int32 SINGULAR_ELEMENTARY
 		"int32": {
 			Type:     schema.TypeInt,
 			Optional: true,
 		},
-		// Int64 SINGULAR_ELEMENTARY
 		"int64": {
 			Type:     schema.TypeInt,
 			Optional: true,
 		},
-		// Float SINGULAR_ELEMENTARY
 		"float": {
 			Type:     schema.TypeFloat,
 			Optional: true,
 		},
-		// Double SINGULAR_ELEMENTARY
 		"double": {
 			Type:     schema.TypeFloat,
 			Optional: true,
 		},
-		// Bool SINGULAR_ELEMENTARY
 		"bool": {
 			Type:     schema.TypeBool,
 			Optional: true,
 		},
-		// Bytes SINGULAR_ELEMENTARY
 		"bytes": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// Timestamp SINGULAR_ELEMENTARY
 		"timestamp": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		// DurationStd SINGULAR_ELEMENTARY
 		"duration_std": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// DurationCustom SINGULAR_ELEMENTARY
 		"duration_custom": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// TimestampN SINGULAR_ELEMENTARY
 		"timestamp_n": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		// StringA REPEATED_ELEMENTARY
 		"string_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -106,9 +94,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// BoolA CUSTOM_TYPE
 		"bool_a": SchemaBoolCustom(),
-		// BytesA REPEATED_ELEMENTARY
 		"bytes_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -116,7 +102,6 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// TimestampA REPEATED_ELEMENTARY
 		"timestamp_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -124,7 +109,6 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// DurationCustomA REPEATED_ELEMENTARY
 		"duration_custom_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -132,25 +116,21 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// Nested SINGULAR_MESSAGE
 		"nested": {
 			Optional: true,
 			Type:     schema.TypeList,
 			MaxItems: 1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					// Str SINGULAR_ELEMENTARY
 					"str": {
 						Type:     schema.TypeString,
 						Optional: true,
 					},
-					// Nested REPEATED_MESSAGE
 					"nested": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str SINGULAR_ELEMENTARY
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
@@ -158,7 +138,6 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
-					// NestedM MAP
 					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
@@ -166,7 +145,6 @@ func SchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj OBJECT_MAP
 					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
@@ -182,7 +160,6 @@ func SchemaTest() map[string]*schema.Schema {
 									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str SINGULAR_ELEMENTARY
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -196,24 +173,20 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedA REPEATED_MESSAGE
 		"nested_a": {
 			Optional: true,
 			Type:     schema.TypeList,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					// Str SINGULAR_ELEMENTARY
 					"str": {
 						Type:     schema.TypeString,
 						Optional: true,
 					},
-					// Nested REPEATED_MESSAGE
 					"nested": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str SINGULAR_ELEMENTARY
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
@@ -221,7 +194,6 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
-					// NestedM MAP
 					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
@@ -229,7 +201,6 @@ func SchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj OBJECT_MAP
 					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
@@ -245,7 +216,6 @@ func SchemaTest() map[string]*schema.Schema {
 									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str SINGULAR_ELEMENTARY
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -259,7 +229,6 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedM MAP
 		"nested_m": {
 			Optional: true,
 			Type:     schema.TypeMap,
@@ -267,7 +236,6 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// NestedMObj OBJECT_MAP
 		"nested_m_obj": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -283,18 +251,15 @@ func SchemaTest() map[string]*schema.Schema {
 						MaxItems: 1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str SINGULAR_ELEMENTARY
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
 								},
-								// Nested REPEATED_MESSAGE
 								"nested": {
 									Optional: true,
 									Type:     schema.TypeList,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str SINGULAR_ELEMENTARY
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -302,7 +267,6 @@ func SchemaTest() map[string]*schema.Schema {
 										},
 									},
 								},
-								// NestedM MAP
 								"nested_m": {
 									Optional: true,
 									Type:     schema.TypeMap,
@@ -310,7 +274,6 @@ func SchemaTest() map[string]*schema.Schema {
 										Type: schema.TypeString,
 									},
 								},
-								// NestedMObj OBJECT_MAP
 								"nested_m_obj": {
 									Optional: true,
 									Type:     schema.TypeList,
@@ -326,7 +289,6 @@ func SchemaTest() map[string]*schema.Schema {
 												MaxItems: 1,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
-														// Str SINGULAR_ELEMENTARY
 														"str": {
 															Type:     schema.TypeString,
 															Optional: true,
