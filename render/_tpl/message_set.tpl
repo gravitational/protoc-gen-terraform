@@ -93,7 +93,11 @@ obj[{{.NameSnake | quote}}] = _raw
 
 {{/* Renders custom getter custom type */}}
 {{- define "custom" -}}
-obj[{{.NameSnake | quote}}] = Set{{.CustomTypeMethodInfix}}ToResourceData(&t.{{.Name}})
+_v, err := Set{{.CustomTypeMethodInfix}}ToResourceData(&t.{{.Name}})
+if err != nil {
+    return err
+}
+obj[{{.NameSnake | quote}}] = _v
 {{- end -}}
 
 {{/* Converts elementary value from from target struct type to raw data type */}}
