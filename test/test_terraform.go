@@ -313,6 +313,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "str")
+
 		if ok {
 			_raws, ok := _raw.(string)
 			if !ok {
@@ -325,6 +326,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "int32")
+
 		if ok {
 			_raws, ok := _raw.(int)
 			if !ok {
@@ -337,6 +339,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "int64")
+
 		if ok {
 			_raws, ok := _raw.(int)
 			if !ok {
@@ -349,6 +352,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "float")
+
 		if ok {
 			_raws, ok := _raw.(float64)
 			if !ok {
@@ -361,6 +365,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "double")
+
 		if ok {
 			_raws, ok := _raw.(float64)
 			if !ok {
@@ -373,6 +378,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOkExists(p + "bool")
+
 		if ok {
 			_raws, ok := _raw.(bool)
 			if !ok {
@@ -385,6 +391,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "bytes")
+
 		if ok {
 			_raws, ok := _raw.(string)
 			if !ok {
@@ -397,6 +404,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "timestamp")
+
 		if ok {
 			_raws, ok := _raw.(string)
 			if !ok {
@@ -412,6 +420,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "duration_std")
+
 		if ok {
 			_raws, ok := _raw.(string)
 			if !ok {
@@ -428,6 +437,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "duration_custom")
+
 		if ok {
 			_raws, ok := _raw.(string)
 			if !ok {
@@ -444,6 +454,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	{
 
 		_raw, ok := d.GetOk(p + "timestamp_n")
+
 		if ok {
 			_raws, ok := _raw.(string)
 			if !ok {
@@ -555,6 +566,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 		{
 
 			_raw, ok := d.GetOk(p + "str")
+
 			if ok {
 				_raws, ok := _raw.(string)
 				if !ok {
@@ -586,6 +598,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 						{
 
 							_raw, ok := d.GetOk(p + "str")
+
 							if ok {
 								_raws, ok := _raw.(string)
 								if !ok {
@@ -652,6 +665,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 						{
 
 							_raw, ok := d.GetOk(p + "str")
+
 							if ok {
 								_raws, ok := _raw.(string)
 								if !ok {
@@ -692,6 +706,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					{
 
 						_raw, ok := d.GetOk(p + "str")
+
 						if ok {
 							_raws, ok := _raw.(string)
 							if !ok {
@@ -723,6 +738,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 									{
 
 										_raw, ok := d.GetOk(p + "str")
+
 										if ok {
 											_raws, ok := _raw.(string)
 											if !ok {
@@ -789,6 +805,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 									{
 
 										_raw, ok := d.GetOk(p + "str")
+
 										if ok {
 											_raws, ok := _raw.(string)
 											if !ok {
@@ -862,6 +879,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					{
 
 						_raw, ok := d.GetOk(p + "str")
+
 						if ok {
 							_raws, ok := _raw.(string)
 							if !ok {
@@ -893,6 +911,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 									{
 
 										_raw, ok := d.GetOk(p + "str")
+
 										if ok {
 											_raws, ok := _raw.(string)
 											if !ok {
@@ -959,6 +978,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 									{
 
 										_raw, ok := d.GetOk(p + "str")
+
 										if ok {
 											_raws, ok := _raw.(string)
 											if !ok {
@@ -1109,80 +1129,86 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		obj["duration_custom_a"] = _raw
 	}
 	{
-		msg := make(map[string]interface{})
-		obj["nested"] = []interface{}{msg}
-		{
-			obj := msg
-			t := t.Nested
 
+		if t.Nested != nil {
+
+			msg := make(map[string]interface{})
+			obj["nested"] = []interface{}{msg}
 			{
-				_v := t.Str
+				obj := msg
+				t := t.Nested
 
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
+				{
+					_v := t.Str
 
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
 					_value := string(_v)
-					m[key] = _value
+					obj["str"] = _value
 				}
+				{
+					arr := make([]interface{}, len(t.Nested))
 
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
-			}
-			{
+					for i, t := range t.Nested {
+						obj := make(map[string]interface{})
+						{
+							_v := t.Str
 
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
+							_value := string(_v)
+							obj["str"] = _value
+						}
 
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
-
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
+						arr[i] = obj
 					}
 
-					i["value"] = []interface{}{obj}
+					if len(arr) > 0 {
+						obj["nested"] = arr
+					}
+				}
+				{
 
-					a[n] = i
-					n++
+					m := make(map[string]interface{})
+
+					for key, _v := range t.NestedM {
+						_value := string(_v)
+						m[key] = _value
+					}
+
+					if len(m) > 0 {
+						obj["nested_m"] = m
+					}
+				}
+				{
+
+					a := make([]interface{}, len(t.NestedMObj))
+					n := 0
+
+					for k, v := range t.NestedMObj {
+						i := make(map[string]interface{})
+						i["key"] = k
+
+						obj := make(map[string]interface{})
+						t := v
+						{
+							_v := t.Str
+
+							_value := string(_v)
+							obj["str"] = _value
+						}
+
+						i["value"] = []interface{}{obj}
+
+						a[n] = i
+						n++
+					}
+
+					if len(a) > 0 {
+						obj["nested_m_obj"] = a
+					}
 				}
 
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
 			}
 
 		}
+
 	}
 	{
 		arr := make([]interface{}, len(t.NestedA))

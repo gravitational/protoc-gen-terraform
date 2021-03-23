@@ -58,7 +58,12 @@ func Get{{.Name}}FromResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) er
 
 {{/* Renders unmarshaller for singular value of any type */}}
 {{- define "singularElementary" -}}
-{{- template "getOk" . }}
+{{- if eq .SchemaRawType "bool" }}
+_raw, ok := d.GetOkExists(p + {{ .NameSnake | quote }})
+{{- else }}
+_raw, ok := d.GetOk(p + {{ .NameSnake | quote  }})
+{{- end }}
+
 if ok {
     {{- template "rawToValue" . }}
     t.{{.Name}} = {{if .GoTypeIsPtr }}&{{end}}_value
@@ -114,17 +119,6 @@ _value := {{.GoType}}(_valued)
 _value := {{.GoType}}({{.SchemaGoType}}(_raws))
 {{- end }}
 {{- end -}}
-
-{{/* Generates schema getter statement with an exception for bool, which must not be parsed if not set */}}
-{{/* Input: p */}}
-{{/* Output: _raw */}}
-{{- define "getOk" -}}
-{{- if eq .SchemaRawType "bool" }}
-_raw, ok := d.GetOkExists(p + {{ .NameSnake | quote }})
-{{- else }}
-_raw, ok := d.GetOk(p + {{ .NameSnake | quote  }})
-{{- end }}
-{{- end }}
 
 {{/* Singular message */}}
 {{- define "singularMessage" -}}
