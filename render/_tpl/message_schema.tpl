@@ -1,5 +1,7 @@
 {{/* ---- Schema rendering ---------------------------------------------------------------*/}}
-// Type full name: {{ .Name }}
+// Schema{{ .Name }} returns schema for {{.Name}}
+//
+{{.Comment}}
 func Schema{{ .Name }}() map[string]*schema.Schema {
 	return {{ template "fieldsSchema" .Fields -}}
 }
@@ -7,6 +9,7 @@ func Schema{{ .Name }}() map[string]*schema.Schema {
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
+    {{if .Message}}{{.Message.Comment}}{{end}}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }

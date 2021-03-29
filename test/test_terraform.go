@@ -38,55 +38,80 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-// Type full name: Test
+// SchemaTest returns schema for Test
+//
+// Test message definition.
+// It contains:
+//   - elementary fields
+//   - repeated elementary fields
+//   - maps of elementary fields
+//   - other messages (nested)
+//   - repeated messages
+//   - message maps
+//   - custom types
+//   - custom duration type
+//   - standard google protobuf timestamps
+//   - byte arrays, which are treated as strings by default
 func SchemaTest() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
+
 		"str": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
+
 		"int32": {
 			Type:     schema.TypeInt,
 			Optional: true,
 		},
+
 		"int64": {
 			Type:     schema.TypeInt,
 			Optional: true,
 		},
+
 		"float": {
 			Type:     schema.TypeFloat,
 			Optional: true,
 		},
+
 		"double": {
 			Type:     schema.TypeFloat,
 			Optional: true,
 		},
+
 		"bool": {
 			Type:     schema.TypeBool,
 			Optional: true,
 		},
+
 		"bytes": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
+
 		"timestamp": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
+
 		"duration_std": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
+
 		"duration_custom": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
+
 		"timestamp_n": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
+
 		"string_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -94,7 +119,9 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+
 		"bool_a": SchemaBoolCustom(),
+
 		"bytes_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -102,6 +129,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+
 		"timestamp_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -109,6 +137,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+
 		"duration_custom_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -116,21 +145,25 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+		// Nested message definition
 		"nested": {
 			Optional: true,
 			Type:     schema.TypeList,
 			MaxItems: 1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
+
 					"str": {
 						Type:     schema.TypeString,
 						Optional: true,
 					},
+					// Message nested into nested message
 					"nested": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
+
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
@@ -138,6 +171,7 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
+
 					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
@@ -145,6 +179,7 @@ func SchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
+
 					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
@@ -160,6 +195,7 @@ func SchemaTest() map[string]*schema.Schema {
 									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
+
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -173,20 +209,24 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
+		// Nested message definition
 		"nested_a": {
 			Optional: true,
 			Type:     schema.TypeList,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
+
 					"str": {
 						Type:     schema.TypeString,
 						Optional: true,
 					},
+					// Message nested into nested message
 					"nested": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
+
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
@@ -194,6 +234,7 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
+
 					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
@@ -201,6 +242,7 @@ func SchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
+
 					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
@@ -216,6 +258,7 @@ func SchemaTest() map[string]*schema.Schema {
 									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
+
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -229,6 +272,7 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
+
 		"nested_m": {
 			Optional: true,
 			Type:     schema.TypeMap,
@@ -236,6 +280,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+
 		"nested_m_obj": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -251,15 +296,18 @@ func SchemaTest() map[string]*schema.Schema {
 						MaxItems: 1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
+
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
 								},
+								// Message nested into nested message
 								"nested": {
 									Optional: true,
 									Type:     schema.TypeList,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
+
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -267,6 +315,7 @@ func SchemaTest() map[string]*schema.Schema {
 										},
 									},
 								},
+
 								"nested_m": {
 									Optional: true,
 									Type:     schema.TypeMap,
@@ -274,6 +323,7 @@ func SchemaTest() map[string]*schema.Schema {
 										Type: schema.TypeString,
 									},
 								},
+
 								"nested_m_obj": {
 									Optional: true,
 									Type:     schema.TypeList,
@@ -289,6 +339,7 @@ func SchemaTest() map[string]*schema.Schema {
 												MaxItems: 1,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
+
 														"str": {
 															Type:     schema.TypeString,
 															Optional: true,
