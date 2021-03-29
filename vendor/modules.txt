@@ -13,6 +13,9 @@ github.com/agext/levenshtein
 github.com/apparentlymart/go-textseg/textseg
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
+# github.com/disiqueira/gotree v1.0.0
+## explicit
+github.com/disiqueira/gotree
 # github.com/gogo/protobuf v1.3.2
 ## explicit
 github.com/gogo/protobuf/gogoproto
@@ -119,9 +122,6 @@ github.com/sirupsen/logrus
 # github.com/stoewer/go-strcase v1.2.0
 ## explicit
 github.com/stoewer/go-strcase
-# github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
-## explicit
-github.com/stretchr/stew/slice
 # github.com/stretchr/testify v1.6.1
 ## explicit
 github.com/stretchr/testify/assert

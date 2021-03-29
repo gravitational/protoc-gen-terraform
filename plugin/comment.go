@@ -24,14 +24,19 @@ import (
 )
 
 // appendSlashSlash appends "//" to comment
-func appendSlashSlash(s string) string {
+func appendSlashSlash(s string, space bool) string {
 	var r []string
 
 	l := strings.Split(s, "\n")
 
 	for _, s := range l {
 		if strings.Trim(s, " \n") != "" {
-			r = append(r, "//"+s)
+			v := "//"
+			if space {
+				v = v + " "
+			}
+			v = v + s
+			r = append(r, v)
 		}
 	}
 
@@ -47,4 +52,9 @@ func getLocationPath(l *descriptor.SourceCodeInfo_Location) string {
 	}
 
 	return strings.Join(s, ",")
+}
+
+// commentToSingleLine returns multiline comment as a single string
+func commentToSingleLine(s string) string {
+	return strings.TrimSpace(strings.Join(strings.Split(s, "\n"), " "))
 }

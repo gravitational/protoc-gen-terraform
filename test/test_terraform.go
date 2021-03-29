@@ -38,80 +38,117 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
+// Test (Test message definition.)
+// └── str:string (Str string field)
+// └── int32:int (Int32 int32 field)
+// └── int64:int (Int64 int64 field)
+// └── float:float64 (Float float field)
+// └── double:float64 (Double double field)
+// └── bool:bool (Bool bool field)
+// └── bytes:string (Bytest byte[] field)
+// └── timestamp:string (Timestamp time.Time field)
+// └── duration_std:string (DurationStd time.Duration field (standard))
+// └── duration_custom:string (DurationCustom time.Duration field (custom))
+// └── timestamp_n:string (TimestampN *time.Time field)
+// └── [string_a:string] (StringA []string field)
+// └── bool_a !custom schema, see target code! (BoolA []bool field)
+// └── [bytes_a:string] (BytesA [][]byte field)
+// └── [timestamp_a:string] (TimestampA []time.Time field)
+// └── [duration_custom_a:string] (DurationCustomA []time.Duration field)
+// └── nested (Nested nested message field)
+// │   ├── str:string (Str string field)
+// │   ├── [nested] (Nested repeated nested messages)
+// │   │   ├── str:string (Str string field)
+// │   ├── nested_m:map (Nested map repeated nested messages)
+// │   ├── [nested_m_obj] (NestedMObj nested object map)
+// │       └── key:string
+// │       └── value
+// │           └── str:string (Str string field)
+// └── [nested_a] (NestedA nested message array)
+// │   ├── str:string (Str string field)
+// │   ├── [nested] (Nested repeated nested messages)
+// │   │   ├── str:string (Str string field)
+// │   ├── nested_m:map (Nested map repeated nested messages)
+// │   ├── [nested_m_obj] (NestedMObj nested object map)
+// │       └── key:string
+// │       └── value
+// │           └── str:string (Str string field)
+// └── nested_m:map (NestedM normal map)
+// └── [nested_m_obj] (NestedMObj object map)
+//     └── key:string
+//     └── value
+//         └── str:string (Str string field)
+//         └── [nested] (Nested repeated nested messages)
+//         │   ├── str:string (Str string field)
+//         └── nested_m:map (Nested map repeated nested messages)
+//         └── [nested_m_obj] (NestedMObj nested object map)
+//             └── key:string
+//             └── value
+//                 └── str:string (Str string field)
+
 // SchemaTest returns schema for Test
 //
-// Test message definition.
-// It contains:
-//   - elementary fields
-//   - repeated elementary fields
-//   - maps of elementary fields
-//   - other messages (nested)
-//   - repeated messages
-//   - message maps
-//   - custom types
-//   - custom duration type
-//   - standard google protobuf timestamps
-//   - byte arrays, which are treated as strings by default
+//Test message definition.
 func SchemaTest() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		// Str string field
+		//Str string field
 		"str": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// Int32 int32 field
+		//Int32 int32 field
 		"int32": {
 			Type:     schema.TypeInt,
 			Optional: true,
 		},
-		// Int64 int64 field
+		//Int64 int64 field
 		"int64": {
 			Type:     schema.TypeInt,
 			Optional: true,
 		},
-		// Float float field
+		//Float float field
 		"float": {
 			Type:     schema.TypeFloat,
 			Optional: true,
 		},
-		// Double double field
+		//Double double field
 		"double": {
 			Type:     schema.TypeFloat,
 			Optional: true,
 		},
-		// Bool bool field
+		//Bool bool field
 		"bool": {
 			Type:     schema.TypeBool,
 			Optional: true,
 		},
-		// Bytest byte[] field
+		//Bytest byte[] field
 		"bytes": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// Timestamp time.Time field
+		//Timestamp time.Time field
 		"timestamp": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		// DurationStd time.Duration field (standard)
+		//DurationStd time.Duration field (standard)
 		"duration_std": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// DurationCustom time.Duration field (custom)
+		//DurationCustom time.Duration field (custom)
 		"duration_custom": {
 			Type:     schema.TypeString,
 			Optional: true,
 		},
-		// TimestampN *time.Time field
+		//TimestampN *time.Time field
 		"timestamp_n": {
 			Type:         schema.TypeString,
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		// StringA []string field
+		//StringA []string field
 		"string_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -119,9 +156,9 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// BoolA []bool field
+		//BoolA []bool field
 		"bool_a": SchemaBoolCustom(),
-		// BytesA [][]byte field
+		//BytesA [][]byte field
 		"bytes_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -129,7 +166,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// TimestampA []time.Time field
+		//TimestampA []time.Time field
 		"timestamp_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -137,7 +174,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// DurationCustomA []time.Duration field
+		//DurationCustomA []time.Duration field
 		"duration_custom_a": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -145,25 +182,25 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// Nested nested message field
+		//Nested nested message field
 		"nested": {
 			Optional: true,
 			Type:     schema.TypeList,
 			MaxItems: 1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					// Str string field
+					//Str string field
 					"str": {
 						Type:     schema.TypeString,
 						Optional: true,
 					},
-					// Nested repeated nested messages
+					//Nested repeated nested messages
 					"nested": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str string field
+								//Str string field
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
@@ -171,7 +208,7 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
-					// Nested map repeated nested messages
+					//Nested map repeated nested messages
 					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
@@ -179,7 +216,7 @@ func SchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					//NestedMObj nested object map
 					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
@@ -195,7 +232,7 @@ func SchemaTest() map[string]*schema.Schema {
 									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str string field
+											//Str string field
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -209,24 +246,24 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedA nested message array
+		//NestedA nested message array
 		"nested_a": {
 			Optional: true,
 			Type:     schema.TypeList,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					// Str string field
+					//Str string field
 					"str": {
 						Type:     schema.TypeString,
 						Optional: true,
 					},
-					// Nested repeated nested messages
+					//Nested repeated nested messages
 					"nested": {
 						Optional: true,
 						Type:     schema.TypeList,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str string field
+								//Str string field
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
@@ -234,7 +271,7 @@ func SchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
-					// Nested map repeated nested messages
+					//Nested map repeated nested messages
 					"nested_m": {
 						Optional: true,
 						Type:     schema.TypeMap,
@@ -242,7 +279,7 @@ func SchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					//NestedMObj nested object map
 					"nested_m_obj": {
 						Optional: true,
 						Type:     schema.TypeList,
@@ -258,7 +295,7 @@ func SchemaTest() map[string]*schema.Schema {
 									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str string field
+											//Str string field
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -272,7 +309,7 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedM normal map
+		//NestedM normal map
 		"nested_m": {
 			Optional: true,
 			Type:     schema.TypeMap,
@@ -280,7 +317,7 @@ func SchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
-		// NestedMObj object map
+		//NestedMObj object map
 		"nested_m_obj": {
 			Optional: true,
 			Type:     schema.TypeList,
@@ -296,18 +333,18 @@ func SchemaTest() map[string]*schema.Schema {
 						MaxItems: 1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str string field
+								//Str string field
 								"str": {
 									Type:     schema.TypeString,
 									Optional: true,
 								},
-								// Nested repeated nested messages
+								//Nested repeated nested messages
 								"nested": {
 									Optional: true,
 									Type:     schema.TypeList,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str string field
+											//Str string field
 											"str": {
 												Type:     schema.TypeString,
 												Optional: true,
@@ -315,7 +352,7 @@ func SchemaTest() map[string]*schema.Schema {
 										},
 									},
 								},
-								// Nested map repeated nested messages
+								//Nested map repeated nested messages
 								"nested_m": {
 									Optional: true,
 									Type:     schema.TypeMap,
@@ -323,7 +360,7 @@ func SchemaTest() map[string]*schema.Schema {
 										Type: schema.TypeString,
 									},
 								},
-								// NestedMObj nested object map
+								//NestedMObj nested object map
 								"nested_m_obj": {
 									Optional: true,
 									Type:     schema.TypeList,
@@ -339,7 +376,7 @@ func SchemaTest() map[string]*schema.Schema {
 												MaxItems: 1,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
-														// Str string field
+														//Str string field
 														"str": {
 															Type:     schema.TypeString,
 															Optional: true,

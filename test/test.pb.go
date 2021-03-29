@@ -26,19 +26,6 @@ var _ = time.Kitchen
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Test message definition.
-//
-// It contains:
-//   - elementary fields
-//   - repeated elementary fields
-//   - maps of elementary fields
-//   - other messages (nested)
-//   - repeated messages
-//   - message maps
-//   - custom types
-//   - custom duration type
-//   - standard google protobuf timestamps
-//   - byte arrays, which are treated as strings by default
-//
 type Test struct {
 	// Str string field
 	Str string `protobuf:"bytes,1,opt,name=Str,proto3" json:"Str,omitempty"`

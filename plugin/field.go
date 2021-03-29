@@ -94,7 +94,10 @@ type Field struct {
 	// MapValueField reference to map value field reflection
 	MapValueField *Field
 
-	// Comment is field comment in proto file
+	// RawComment is field comment in proto file without // prepended
+	RawComment string
+
+	// Comment is field comment in proto file with // prepended
 	Comment string
 }
 
@@ -498,7 +501,8 @@ func (b *fieldBuilder) setComment() {
 
 	for _, l := range b.descriptor.File().GetSourceCodeInfo().GetLocation() {
 		if getLocationPath(l) == p {
-			b.field.Comment = appendSlashSlash(l.GetLeadingComments())
+			b.field.RawComment = strings.Trim(l.GetLeadingComments(), " \n")
+			b.field.Comment = appendSlashSlash(b.field.RawComment, false)
 		}
 	}
 }

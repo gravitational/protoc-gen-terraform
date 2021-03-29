@@ -23,9 +23,7 @@ option (gogoproto.marshaler_all) = false;
 option (gogoproto.unmarshaler_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 
-// Test message definition.
-//
-// It contains:
+// Test message contains:
 //   - elementary fields
 //   - repeated elementary fields
 //   - maps of elementary fields
@@ -37,6 +35,8 @@ option (gogoproto.goproto_getters_all) = false;
 //   - standard google protobuf timestamps
 //   - byte arrays, which are treated as strings by default
 //
+
+// Test message definition.
 message Test {
     // Str string field
     string Str = 1;

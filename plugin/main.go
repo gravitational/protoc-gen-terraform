@@ -19,11 +19,14 @@ package plugin
 
 import (
 	"bytes"
+	"fmt"
 
-	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
+
+	"github.com/disiqueira/gotree"
+	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/sirupsen/logrus"
 )
 
@@ -79,6 +82,8 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	p.setImports()
 
 	p.reflect(file)
+
+	p.writeSchemaStructureComment()
 
 	err := p.writeSchema()
 	if err != nil {
@@ -153,5 +158,55 @@ func (p *Plugin) setImports() {
 
 	for _, i := range config.CustomImports {
 		p.AddImport(generator.GoImportPath(i))
+	}
+}
+
+// writeSchemaComment writes comment with message structure
+func (p *Plugin) writeSchemaStructureComment() {
+	for _, m := range p.Messages {
+		t := gotree.New(fmt.Sprintf("%s (%s)", m.Name, commentToSingleLine(m.RawComment)))
+		p.writeMessageComment(m, t)
+		p.P(appendSlashSlash(t.Print(), true))
+		p.P()
+	}
+}
+
+// writeMessageComment generates message structure comment part for a message
+func (p *Plugin) writeMessageComment(m *Message, t gotree.Tree) {
+	for _, f := range m.Fields {
+		s := f.NameSnake
+
+		if f.Kind == "SINGULAR_ELEMENTARY" || f.Kind == "REPEATED_ELEMENTARY" {
+			s = s + ":" + f.SchemaRawType
+		}
+
+		if f.Kind == "REPEATED_ELEMENTARY" || f.Kind == "OBJECT_MAP" || f.Kind == "REPEATED_MESSAGE" {
+			s = "[" + s + "]"
+		}
+
+		if f.Kind == "MAP" {
+			s = s + ":map"
+		}
+
+		if f.Kind == "CUSTOM_TYPE" {
+			s = s + " !custom schema, see target code!"
+		}
+
+		if f.RawComment != "" {
+			s = s + " (" + commentToSingleLine(f.RawComment) + ")"
+		}
+
+		i := t.Add(s)
+
+		if f.Kind == "OBJECT_MAP" {
+			i.Add("key:string")
+			if f.MapValueField.Kind == "CUSTOM_TYPE" {
+				i.Add("value !custom schema, see target code!")
+			} else {
+				p.writeMessageComment(f.MapValueField.Message, i.Add("value"))
+			}
+		} else if f.Kind == "REPEATED_MESSAGE" || f.Kind == "SINGULAR_MESSAGE" {
+			p.writeMessageComment(f.Message, i)
+		}
 	}
 }

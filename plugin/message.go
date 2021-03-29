@@ -17,6 +17,8 @@ limitations under the License.
 package plugin
 
 import (
+	"strings"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/trace"
@@ -41,7 +43,10 @@ type Message struct {
 	// Fields contains the collection of fields
 	Fields []*Field
 
-	// Comment leading comment for message definition
+	// RawComment is field comment in proto file without // prepended
+	RawComment string
+
+	// Comment is field comment in proto file with // prepended
 	Comment string
 }
 
@@ -73,12 +78,13 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 	}
 
 	name := d.GetName()
-	comment := findMessageComment(d)
+	rawComment, comment := findMessageComment(d)
 
 	message := &Message{
 		Name:       name,
 		NameSnake:  strcase.SnakeCase(name),
 		GoTypeName: typeName,
+		RawComment: rawComment,
 		Comment:    comment,
 	}
 
@@ -102,14 +108,15 @@ func getMessageTypeName(d *generator.Descriptor) string {
 }
 
 // findComment locates leading comment for this message using file source code information
-func findMessageComment(m *generator.Descriptor) string {
+func findMessageComment(m *generator.Descriptor) (string, string) {
 	p := m.Path()
 
 	for _, l := range m.File().GetSourceCodeInfo().GetLocation() {
 		if getLocationPath(l) == p {
-			return appendSlashSlash(l.GetLeadingComments())
+			c := strings.Trim(l.GetLeadingComments(), " \n")
+			return c, appendSlashSlash(c, false)
 		}
 	}
 
-	return ""
+	return "", ""
 }
