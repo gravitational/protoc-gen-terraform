@@ -501,8 +501,9 @@ func (b *fieldBuilder) setComment() {
 
 	for _, l := range b.descriptor.File().GetSourceCodeInfo().GetLocation() {
 		if getLocationPath(l) == p {
-			b.field.RawComment = strings.Trim(l.GetLeadingComments(), " \n")
-			b.field.Comment = appendSlashSlash(b.field.RawComment, false)
+			c := strings.Trim(l.GetLeadingComments(), "\n")
+			b.field.RawComment = commentToSingleLine(strings.TrimSpace(c))
+			b.field.Comment = appendSlashSlash(c, false)
 		}
 	}
 }

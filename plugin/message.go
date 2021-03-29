@@ -113,8 +113,8 @@ func findMessageComment(m *generator.Descriptor) (string, string) {
 
 	for _, l := range m.File().GetSourceCodeInfo().GetLocation() {
 		if getLocationPath(l) == p {
-			c := strings.Trim(l.GetLeadingComments(), " \n")
-			return c, appendSlashSlash(c, false)
+			c := strings.Trim(l.GetLeadingComments(), "\n")
+			return commentToSingleLine(c), appendSlashSlash(c, false)
 		}
 	}
 

@@ -48,6 +48,7 @@ map[string]*schema.Schema {
 {
     {{ template "required" . }}
     Type: schema.TypeList,
+    Description: {{ .Message.RawComment | quote }},
     MaxItems: 1,
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
@@ -69,6 +70,7 @@ Schema{{.CustomTypeMethodInfix}}(),
 
 {{- define "singularElementary" -}}
 Type: {{ template "type" .SchemaRawType }},
+Description: {{ .RawComment | quote }},
 {{- if .IsTime }}
 ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
@@ -76,6 +78,7 @@ ValidateFunc: validation.IsRFC3339Time,
 
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
+Description: {{ .Message.RawComment | quote }},
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
@@ -83,6 +86,7 @@ Elem: &schema.Resource {
 
 {{- define "repeatedElementary" -}}
 Type: schema.TypeList,
+Description: {{ .RawComment | quote }},
 Elem: &schema.Schema {
     Type: {{ template "type" .SchemaRawType }},
 },
@@ -90,6 +94,7 @@ Elem: &schema.Schema {
 
 {{- define "map" -}}
 Type: schema.TypeMap,
+Description: {{ .RawComment | quote }},
 Elem: &schema.Schema {
     Type: {{ template "type" .MapValueField.SchemaRawType }},
 },
@@ -97,6 +102,7 @@ Elem: &schema.Schema {
 
 {{- define "objectMap" -}}
 Type: schema.TypeList,
+Description: {{ .MapValueField.RawComment | quote }},
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{
         "key": {

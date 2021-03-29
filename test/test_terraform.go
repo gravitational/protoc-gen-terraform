@@ -88,138 +88,159 @@ var _ = time.Kitchen
 
 // SchemaTest returns schema for Test
 //
-//Test message definition.
+// Test message definition.
 func SchemaTest() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		//Str string field
+		// Str string field
 		"str": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Description: "Str string field",
+			Optional:    true,
 		},
-		//Int32 int32 field
+		// Int32 int32 field
 		"int32": {
-			Type:     schema.TypeInt,
-			Optional: true,
+			Type:        schema.TypeInt,
+			Description: "Int32 int32 field",
+			Optional:    true,
 		},
-		//Int64 int64 field
+		// Int64 int64 field
 		"int64": {
-			Type:     schema.TypeInt,
-			Optional: true,
+			Type:        schema.TypeInt,
+			Description: "Int64 int64 field",
+			Optional:    true,
 		},
-		//Float float field
+		// Float float field
 		"float": {
-			Type:     schema.TypeFloat,
-			Optional: true,
+			Type:        schema.TypeFloat,
+			Description: "Float float field",
+			Optional:    true,
 		},
-		//Double double field
+		// Double double field
 		"double": {
-			Type:     schema.TypeFloat,
-			Optional: true,
+			Type:        schema.TypeFloat,
+			Description: "Double double field",
+			Optional:    true,
 		},
-		//Bool bool field
+		// Bool bool field
 		"bool": {
-			Type:     schema.TypeBool,
-			Optional: true,
+			Type:        schema.TypeBool,
+			Description: "Bool bool field",
+			Optional:    true,
 		},
-		//Bytest byte[] field
+		// Bytest byte[] field
 		"bytes": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Description: "Bytest byte[] field",
+			Optional:    true,
 		},
-		//Timestamp time.Time field
+		// Timestamp time.Time field
 		"timestamp": {
 			Type:         schema.TypeString,
+			Description:  "Timestamp time.Time field",
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		//DurationStd time.Duration field (standard)
+		// DurationStd time.Duration field (standard)
 		"duration_std": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Description: "DurationStd time.Duration field (standard)",
+			Optional:    true,
 		},
-		//DurationCustom time.Duration field (custom)
+		// DurationCustom time.Duration field (custom)
 		"duration_custom": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Description: "DurationCustom time.Duration field (custom)",
+			Optional:    true,
 		},
-		//TimestampN *time.Time field
+		// TimestampN *time.Time field
 		"timestamp_n": {
 			Type:         schema.TypeString,
+			Description:  "TimestampN *time.Time field",
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		//StringA []string field
+		// StringA []string field
 		"string_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "StringA []string field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		//BoolA []bool field
+		// BoolA []bool field
 		"bool_a": SchemaBoolCustom(),
-		//BytesA [][]byte field
+		// BytesA [][]byte field
 		"bytes_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "BytesA [][]byte field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		//TimestampA []time.Time field
+		// TimestampA []time.Time field
 		"timestamp_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "TimestampA []time.Time field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		//DurationCustomA []time.Duration field
+		// DurationCustomA []time.Duration field
 		"duration_custom_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "DurationCustomA []time.Duration field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		//Nested nested message field
+		// Nested nested message field
 		"nested": {
-			Optional: true,
-			Type:     schema.TypeList,
-			MaxItems: 1,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "Nested message definition",
+			MaxItems:    1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					//Str string field
+					// Str string field
 					"str": {
-						Type:     schema.TypeString,
-						Optional: true,
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
 					},
-					//Nested repeated nested messages
+					// Nested repeated nested messages
 					"nested": {
-						Optional: true,
-						Type:     schema.TypeList,
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Message nested into nested message",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								//Str string field
+								// Str string field
 								"str": {
-									Type:     schema.TypeString,
-									Optional: true,
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
 								},
 							},
 						},
 					},
-					//Nested map repeated nested messages
+					// Nested map repeated nested messages
 					"nested_m": {
-						Optional: true,
-						Type:     schema.TypeMap,
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
 						},
 					},
-					//NestedMObj nested object map
+					// NestedMObj nested object map
 					"nested_m_obj": {
-						Optional: true,
-						Type:     schema.TypeList,
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -227,15 +248,17 @@ func SchemaTest() map[string]*schema.Schema {
 									Required: true,
 								},
 								"value": {
-									Optional: true,
-									Type:     schema.TypeList,
-									MaxItems: 1,
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Message nested into nested message",
+									MaxItems:    1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											//Str string field
+											// Str string field
 											"str": {
-												Type:     schema.TypeString,
-												Optional: true,
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
 											},
 										},
 									},
@@ -246,43 +269,49 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		//NestedA nested message array
+		// NestedA nested message array
 		"nested_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "Nested message definition",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					//Str string field
+					// Str string field
 					"str": {
-						Type:     schema.TypeString,
-						Optional: true,
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
 					},
-					//Nested repeated nested messages
+					// Nested repeated nested messages
 					"nested": {
-						Optional: true,
-						Type:     schema.TypeList,
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Message nested into nested message",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								//Str string field
+								// Str string field
 								"str": {
-									Type:     schema.TypeString,
-									Optional: true,
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
 								},
 							},
 						},
 					},
-					//Nested map repeated nested messages
+					// Nested map repeated nested messages
 					"nested_m": {
-						Optional: true,
-						Type:     schema.TypeMap,
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
 						},
 					},
-					//NestedMObj nested object map
+					// NestedMObj nested object map
 					"nested_m_obj": {
-						Optional: true,
-						Type:     schema.TypeList,
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -290,15 +319,17 @@ func SchemaTest() map[string]*schema.Schema {
 									Required: true,
 								},
 								"value": {
-									Optional: true,
-									Type:     schema.TypeList,
-									MaxItems: 1,
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Message nested into nested message",
+									MaxItems:    1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											//Str string field
+											// Str string field
 											"str": {
-												Type:     schema.TypeString,
-												Optional: true,
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
 											},
 										},
 									},
@@ -309,18 +340,20 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		//NestedM normal map
+		// NestedM normal map
 		"nested_m": {
-			Optional: true,
-			Type:     schema.TypeMap,
+			Optional:    true,
+			Type:        schema.TypeMap,
+			Description: "NestedM normal map",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		//NestedMObj object map
+		// NestedMObj object map
 		"nested_m_obj": {
-			Optional: true,
-			Type:     schema.TypeList,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "Int32 int32 field",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
@@ -328,42 +361,48 @@ func SchemaTest() map[string]*schema.Schema {
 						Required: true,
 					},
 					"value": {
-						Optional: true,
-						Type:     schema.TypeList,
-						MaxItems: 1,
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested message definition",
+						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								//Str string field
+								// Str string field
 								"str": {
-									Type:     schema.TypeString,
-									Optional: true,
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
 								},
-								//Nested repeated nested messages
+								// Nested repeated nested messages
 								"nested": {
-									Optional: true,
-									Type:     schema.TypeList,
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Message nested into nested message",
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											//Str string field
+											// Str string field
 											"str": {
-												Type:     schema.TypeString,
-												Optional: true,
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
 											},
 										},
 									},
 								},
-								//Nested map repeated nested messages
+								// Nested map repeated nested messages
 								"nested_m": {
-									Optional: true,
-									Type:     schema.TypeMap,
+									Optional:    true,
+									Type:        schema.TypeMap,
+									Description: "Nested map repeated nested messages",
 									Elem: &schema.Schema{
 										Type: schema.TypeString,
 									},
 								},
-								//NestedMObj nested object map
+								// NestedMObj nested object map
 								"nested_m_obj": {
-									Optional: true,
-									Type:     schema.TypeList,
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Nested repeated nested messages",
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											"key": {
@@ -371,15 +410,17 @@ func SchemaTest() map[string]*schema.Schema {
 												Required: true,
 											},
 											"value": {
-												Optional: true,
-												Type:     schema.TypeList,
-												MaxItems: 1,
+												Optional:    true,
+												Type:        schema.TypeList,
+												Description: "Message nested into nested message",
+												MaxItems:    1,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
-														//Str string field
+														// Str string field
 														"str": {
-															Type:     schema.TypeString,
-															Optional: true,
+															Type:        schema.TypeString,
+															Description: "Str string field",
+															Optional:    true,
 														},
 													},
 												},
