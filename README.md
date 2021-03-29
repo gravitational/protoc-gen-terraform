@@ -81,7 +81,7 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 # TODO
 
 - [ ] Oneof is not supported yet
-- [ ] Extract comments from original protoc file
+- [x] Extract comments from original protoc file
 - [x] Add argument to provide custom duration type
 - [x] Add argument to provide custom imports for target file
 - [ ] Add argument which will represent specific []byte fields as byte lists on Terraform side
