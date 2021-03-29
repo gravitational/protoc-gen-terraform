@@ -16,7 +16,12 @@ limitations under the License.
 
 package plugin
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+
+	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
+)
 
 // appendSlashSlash appends "//" to comment
 func appendSlashSlash(s string) string {
@@ -31,4 +36,15 @@ func appendSlashSlash(s string) string {
 	}
 
 	return strings.Join(r, "\n")
+}
+
+// getLocationPath returns location path converted to string
+func getLocationPath(l *descriptor.SourceCodeInfo_Location) string {
+	s := make([]string, len(l.GetPath()))
+
+	for i, v := range l.GetPath() {
+		s[i] = strconv.Itoa(int(v))
+	}
+
+	return strings.Join(s, ",")
 }

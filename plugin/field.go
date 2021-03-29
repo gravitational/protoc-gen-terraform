@@ -18,6 +18,7 @@ package plugin
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
@@ -92,6 +93,9 @@ type Field struct {
 
 	// MapValueField reference to map value field reflection
 	MapValueField *Field
+
+	// Comment is field comment in proto file
+	Comment string
 }
 
 // fieldBuilder creates valid Field values
@@ -184,6 +188,7 @@ func (b *fieldBuilder) build() error {
 
 	b.setCustomType()
 	b.resolveKind()
+	b.setComment()
 
 	return nil
 }
@@ -484,5 +489,16 @@ func (b *fieldBuilder) resolveKind() {
 		b.setKind("SINGULAR_MESSAGE") // ex: struct
 	default:
 		b.setKind("SINGULAR_ELEMENTARY") // ex: string
+	}
+}
+
+// setComment resolves leading comment for this field
+func (b *fieldBuilder) setComment() {
+	p := b.descriptor.Path() + ",2," + strconv.Itoa(int(b.fieldDescriptor.GetNumber()-1))
+
+	for _, l := range b.descriptor.File().GetSourceCodeInfo().GetLocation() {
+		if getLocationPath(l) == p {
+			b.field.Comment = appendSlashSlash(l.GetLeadingComments())
+		}
 	}
 }
