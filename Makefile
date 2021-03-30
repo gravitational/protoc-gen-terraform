@@ -22,7 +22,7 @@ teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
 out_dir := "./_out"
 types = "types.UserV2+types.RoleV3+types.GithubConnectorV3+types.SAMLConnectorV2+types.OIDCConnectorV2+types.TrustedClusterV2+types.ProvisionTokenV2"
-exclude_fields = "types.UserSpecV2.LocalAuth+types.Metadata.ID+types.Metadata.Expires+types.UserSpecV2.Expires+types.UserSpecV2.CreatedBy+types.UserSpecV2.Status+types.GithubConnectorV3.Version"
+exclude_fields = "types.UserSpecV2.LocalAuth+types.Metadata.ID+types.UserSpecV2.Expires+types.UserSpecV2.CreatedBy+types.UserSpecV2.Status+types.UserV2.Version+types.GithubConnectorV3.Version"
 computed="types.UserV2.Kind+types.UserV2.SubKind+types.Metadata.Namespace"
 required="types.Metadata.Name"
 
