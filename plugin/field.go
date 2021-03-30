@@ -73,8 +73,11 @@ type Field struct {
 	// IsMessage field is message? (might be map or list at the same time)
 	IsMessage bool
 
-	// IsRequired field is required? TODO: implement via params?
+	// IsRequired field is required
 	IsRequired bool
+
+	// IsComputed field is computed
+	IsComputed bool
 
 	// IsTime field contains time? (needs to be parsed from string)
 	IsTime bool
@@ -99,6 +102,9 @@ type Field struct {
 
 	// Comment is field comment in proto file with // prepended
 	Comment string
+
+	// typeName represents full field type name
+	typeName string
 }
 
 // fieldBuilder creates valid Field values
@@ -192,6 +198,8 @@ func (b *fieldBuilder) build() error {
 	b.setCustomType()
 	b.resolveKind()
 	b.setComment()
+	b.setRequired()
+	b.setComputed()
 
 	return nil
 }
@@ -202,6 +210,7 @@ func (b *fieldBuilder) resolveName() {
 
 	b.field.Name = name
 	b.field.NameSnake = strcase.SnakeCase(name)
+	b.field.typeName = getFieldTypeName(b.descriptor, b.fieldDescriptor)
 }
 
 // setGoType sets go type with gogo/protobuf standard method, sets type information flags
@@ -505,5 +514,21 @@ func (b *fieldBuilder) setComment() {
 			b.field.RawComment = commentToSingleLine(strings.TrimSpace(c))
 			b.field.Comment = appendSlashSlash(c, false)
 		}
+	}
+}
+
+// setRequired sets IsRequired flag
+func (b *fieldBuilder) setRequired() {
+	_, ok := config.RequiredFields[b.field.typeName]
+	if ok {
+		b.field.IsRequired = true
+	}
+}
+
+// setComputed sets IsComputed flag
+func (b *fieldBuilder) setComputed() {
+	_, ok := config.ComputedFields[b.field.typeName]
+	if ok {
+		b.field.IsComputed = true
 	}
 }

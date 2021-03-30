@@ -87,3 +87,4 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 - [ ] Add argument which will represent specific []byte fields as byte lists on Terraform side
 - [x] Manually replace target package name
 - [x] Run goimports to remove unused packages
+- [ ] Separate config file

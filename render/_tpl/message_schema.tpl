@@ -127,9 +127,13 @@ schema.TypeString
 {{- end -}}
 
 {{- define "required" -}}
+{{- if .IsComputed -}}
+Computed: true,
+{{- else -}}
 {{- if .IsRequired -}}
 Required: true,
 {{- else -}}
 Optional: true,
+{{- end }}
 {{- end -}}
 {{- end -}}
