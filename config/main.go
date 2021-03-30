@@ -47,15 +47,35 @@ var (
 
 	// TargetPackageName sets the name of the target package
 	TargetPackageName string
+
+	// ComputedFields is the list of fields to mark as 'Computed: true'
+	//
+	// Passed from command line (--terraform_out=computed=types.UserV2.Kind:./_out)
+	ComputedFields []string
+
+	// RequiredFields is the list of fields to mark as 'Required: true'
+	//
+	// Passed from command line (--terraform_out=required=types.Metadata.Name:./_out)
+	RequiredFields []string
 )
 
 const (
 	paramDelimiter = "+" // Delimiter for types and ignoreFields
 )
 
-// MustSetTypes parses and sets Types.
+// MustSet sets config variables from command line
+func MustSet(p map[string]string) {
+	mustSetTypes(p["types"])
+	setExcludeFields(p["exclude_fields"])
+	setDefaultPackageName(p["pkg"])
+	setDurationType(p["custom_duration"])
+	setCustomImports(p["custom_imports"])
+	setTargetPackageName(p["target_pkg"])
+}
+
+// mustSetTypes parses and sets Types.
 // Panics if the argument is not a valid type list
-func MustSetTypes(arg string) {
+func mustSetTypes(arg string) {
 	t := strings.Split(arg, paramDelimiter)
 
 	if len(t) == 0 {
@@ -69,8 +89,8 @@ func MustSetTypes(arg string) {
 	logrus.Printf("Types: %s", t)
 }
 
-// SetExcludeFields parses and sets ExcludeFields
-func SetExcludeFields(arg string) {
+// setExcludeFields parses and sets ExcludeFields
+func setExcludeFields(arg string) {
 	if trimArg(arg) == "" {
 		return
 	}
@@ -84,8 +104,8 @@ func SetExcludeFields(arg string) {
 	logrus.Printf("Excluded fields: %s", f)
 }
 
-// SetDefaultPackageName sets the default package name
-func SetDefaultPackageName(arg string) {
+// setDefaultPackageName sets the default package name
+func setDefaultPackageName(arg string) {
 	if trimArg(arg) == "" {
 		return
 	}
@@ -96,8 +116,8 @@ func SetDefaultPackageName(arg string) {
 	logrus.Printf("Default package name: %v", DefaultPackageName)
 }
 
-// SetDurationType sets the custom duration type
-func SetDurationType(arg string) {
+// setDurationType sets the custom duration type
+func setDurationType(arg string) {
 	if trimArg(arg) != "" {
 		DurationCustomType = arg
 	}
@@ -105,8 +125,8 @@ func SetDurationType(arg string) {
 	logrus.Printf("Duration custom type: %s", DurationCustomType)
 }
 
-// SetCustomImports parses custom import packages
-func SetCustomImports(arg string) {
+// setCustomImports parses custom import packages
+func setCustomImports(arg string) {
 	if trimArg(arg) == "" {
 		return
 	}
@@ -116,8 +136,8 @@ func SetCustomImports(arg string) {
 	logrus.Printf("Custom imports: %s", CustomImports)
 }
 
-// SetTargetPackageName sets the target package name
-func SetTargetPackageName(arg string) {
+// setTargetPackageName sets the target package name
+func setTargetPackageName(arg string) {
 	if trimArg(arg) == "" {
 		return
 	}

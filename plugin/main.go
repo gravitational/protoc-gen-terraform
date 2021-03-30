@@ -61,12 +61,7 @@ func NewPlugin() *Plugin {
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
-	config.MustSetTypes(g.Param["types"])
-	config.SetExcludeFields(g.Param["exclude_fields"])
-	config.SetDefaultPackageName(g.Param["pkg"])
-	config.SetDurationType(g.Param["custom_duration"])
-	config.SetCustomImports(g.Param["custom_imports"])
-	config.SetTargetPackageName(g.Param["target_pkg"])
+	config.MustSet(g.Param)
 }
 
 // Name returns the name of the plugin
