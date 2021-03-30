@@ -51,12 +51,12 @@ var (
 	// ComputedFields is the list of fields to mark as 'Computed: true'
 	//
 	// Passed from command line (--terraform_out=computed=types.UserV2.Kind:./_out)
-	ComputedFields []string
+	ComputedFields map[string]struct{} = make(map[string]struct{})
 
 	// RequiredFields is the list of fields to mark as 'Required: true'
 	//
 	// Passed from command line (--terraform_out=required=types.Metadata.Name:./_out)
-	RequiredFields []string
+	RequiredFields map[string]struct{} = make(map[string]struct{})
 )
 
 const (
@@ -67,6 +67,8 @@ const (
 func MustSet(p map[string]string) {
 	mustSetTypes(p["types"])
 	setExcludeFields(p["exclude_fields"])
+	setComputedFields(p["computed"])
+	setRequiredFields(p["required"])
 	setDefaultPackageName(p["pkg"])
 	setDurationType(p["custom_duration"])
 	setCustomImports(p["custom_imports"])
@@ -91,17 +93,11 @@ func mustSetTypes(arg string) {
 
 // setExcludeFields parses and sets ExcludeFields
 func setExcludeFields(arg string) {
-	if trimArg(arg) == "" {
-		return
+	f := getSetFromArg(arg, ExcludeFields)
+
+	if len(f) > 0 {
+		logrus.Printf("Excluded fields: %s", f)
 	}
-
-	f := strings.Split(arg, paramDelimiter)
-
-	for _, n := range f {
-		ExcludeFields[n] = struct{}{}
-	}
-
-	logrus.Printf("Excluded fields: %s", f)
 }
 
 // setDefaultPackageName sets the default package name
@@ -148,7 +144,40 @@ func setTargetPackageName(arg string) {
 	logrus.Printf("Target package name: %v", TargetPackageName)
 }
 
+// setComputedFields parses and sets ExcludeFields
+func setComputedFields(arg string) {
+	f := getSetFromArg(arg, ComputedFields)
+
+	if len(f) > 0 {
+		logrus.Printf("Computed fields: %s", f)
+	}
+}
+
+// setRequiredFields parses and sets ExcludeFields
+func setRequiredFields(arg string) {
+	f := getSetFromArg(arg, RequiredFields)
+
+	if len(f) > 0 {
+		logrus.Printf("Required fields: %s", f)
+	}
+}
+
 // trimArg returns argument value without spaces and line breaks
 func trimArg(s string) string {
 	return strings.Trim(s, " \n\r")
+}
+
+// getSetFromArg parses array argument and converts it to set
+func getSetFromArg(arg string, r map[string]struct{}) []string {
+	if trimArg(arg) == "" {
+		return nil
+	}
+
+	f := strings.Split(arg, paramDelimiter)
+
+	for _, n := range f {
+		r[n] = struct{}{}
+	}
+
+	return f
 }
