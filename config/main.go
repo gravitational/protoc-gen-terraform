@@ -61,6 +61,11 @@ var (
 	// Passed from command line (--terraform_out=required=types.Metadata.Name:./_out)
 	RequiredFields map[string]struct{} = make(map[string]struct{})
 
+	// Defaults is the map of default values for a fields
+	//
+	// Can be set in config file only
+	Defaults map[string]interface{} = make(map[string]interface{})
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -143,10 +148,9 @@ func setVarsFromConfig() error {
 	setComputedFields(cfg.ComputedFields)
 	setRequiredFields(cfg.RequiredFields)
 	setCustomImports(cfg.CustomImports)
+	setDefaults(cfg.Defaults)
 
 	return nil
-	// TODO:
-	// Defaults           map[string]interface{}
 }
 
 // setTypes sets Types variable from a string slice, returns error if slice is empty
@@ -231,6 +235,22 @@ func setRequiredFields(f []string) {
 	if len(f) > 0 {
 		logrus.Printf("Required fields: %s", f)
 	}
+}
+
+func setDefaults(m map[string]interface{}) {
+	if len(m) == 0 {
+		return
+	}
+
+	Defaults = m
+
+	var s []string
+
+	for k, _ := range m {
+		s = append(s, k)
+	}
+
+	logrus.Printf("Defaults set for: %v", s)
 }
 
 // trimArg returns argument value without spaces and line breaks
