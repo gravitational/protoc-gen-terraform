@@ -48,8 +48,9 @@ Options:
 * `target_pkg` - the name of the target package
 * `custom_duration` - the name of custom Duration type, if used.
 * `custom_imports` - comma-separated package list to add into target file
-* `required` - list of a filds to mark as required
-* `computed` - list of a filds to mark as computed
+* `required` - list of a fields to mark as required
+* `computed` - list of a fields to mark as computed
+* `defaults` - map of default values for a fields
 
 # Testing
 

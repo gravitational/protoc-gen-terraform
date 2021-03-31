@@ -61,7 +61,10 @@ func NewPlugin() *Plugin {
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
-	config.MustSet(g.Param)
+	err := config.Read(g.Param)
+	if err != nil {
+		p.Generator.Fail(err.Error())
+	}
 }
 
 // Name returns the name of the plugin

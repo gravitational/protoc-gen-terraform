@@ -1,0 +1,32 @@
+---
+target_pkg: "tfschema"
+custom_duration: "Duration"
+custom_imports:
+    - "github.com/gravitational/teleport/api/types"
+
+types:
+    - "types.UserV2"
+    - "types.RoleV3"
+    - "types.GithubConnectorV3"
+    - "types.SAMLConnectorV2"
+    - "types.OIDCConnectorV2"
+    - "types.TrustedClusterV2"
+    - "types.ProvisionTokenV2"
+
+exclude_fields:
+    - "types.UserSpecV2.LocalAuth"
+    - "types.Metadata.ID"
+    - "types.UserSpecV2.Expires"
+    - "types.UserSpecV2.CreatedBy"
+    - "types.UserSpecV2.Status"
+    - "types.UserV2.Version"
+    - "types.GithubConnectorV3.Version"
+
+required:
+    - "types.UserV2.Kind"
+    - "types.UserV2.SubKind"
+    - "types.Metadata.Namespace"
+
+defaults:
+    "types.UserV2.Kind": "user"
+    "types.Metadata.Namespace": "default"

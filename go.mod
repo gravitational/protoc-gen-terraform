@@ -20,4 +20,6 @@ require (
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/tools v0.0.0-20210106214847-113979e3529a
 	google.golang.org/protobuf v1.25.0
+	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )

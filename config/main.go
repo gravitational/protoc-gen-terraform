@@ -18,10 +18,13 @@ limitations under the License.
 package config
 
 import (
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 
+	"github.com/gravitational/trace"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -57,43 +60,109 @@ var (
 	//
 	// Passed from command line (--terraform_out=required=types.Metadata.Name:./_out)
 	RequiredFields map[string]struct{} = make(map[string]struct{})
+
+	// config is yaml config unmarshal struct
+	cfg config
 )
 
 const (
 	paramDelimiter = "+" // Delimiter for types and ignoreFields
 )
 
-// MustSet sets config variables from command line
-func MustSet(p map[string]string) {
-	mustSetTypes(p["types"])
-	setExcludeFields(p["exclude_fields"])
-	setComputedFields(p["computed"])
-	setRequiredFields(p["required"])
-	setDefaultPackageName(p["pkg"])
-	setDurationType(p["custom_duration"])
-	setCustomImports(p["custom_imports"])
-	setTargetPackageName(p["target_pkg"])
+// config is yaml config unmarshalling helper struct
+type config struct {
+	Types              []string
+	DurationCustomType string
+	TargetPkg          string
+	Pkg                string
+	ExcludeFields      []string
+	Computed           []string
+	Required           []string
+	CustomImports      []string
+	Defaults           map[string]interface{}
 }
 
-// mustSetTypes parses and sets Types.
-// Panics if the argument is not a valid type list
-func mustSetTypes(arg string) {
-	t := strings.Split(arg, paramDelimiter)
+// Read reads config variables from command line or config file
+func Read(p map[string]string) error {
+	err := readConfigFromYaml(p["config"])
 
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	err = setTypes(splitArg(p["types"]))
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	setExcludeFields(splitArg(p["exclude_fields"]))
+	setComputedFields(splitArg(p["computed"]))
+	setRequiredFields(splitArg(p["required"]))
+	setCustomImports(splitArg(p["custom_imports"]))
+
+	setDefaultPackageName(p["pkg"])
+	setDurationType(p["custom_duration"])
+	setTargetPackageName(p["target_pkg"])
+
+	return nil
+}
+
+// readConfigFromYaml reads config from YAML file if specified
+func readConfigFromYaml(arg string) error {
+	p := trimArg(arg)
+	if p == "" {
+		return nil
+	}
+
+	c, err := ioutil.ReadFile(p)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	err = yaml.Unmarshal(c, &cfg)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	return setVarsFromConfig()
+}
+
+// setVarsFromConfig sets config variables from parsed yaml
+func setVarsFromConfig() error {
+	err := setTypes(cfg.Types)
+	if err != nil {
+		return err
+	}
+
+	setDurationType(cfg.DurationCustomType)
+	setTargetPackageName(cfg.TargetPkg)
+	setDefaultPackageName(cfg.Pkg)
+	setExcludeFields(cfg.ExcludeFields)
+	setComputedFields(cfg.Computed)
+	setRequiredFields(cfg.Required)
+	setCustomImports(cfg.CustomImports)
+
+	return nil
+	// TODO:
+	// Defaults           map[string]interface{}
+}
+
+// setTypes sets Types variable from a string slice, returns error if slice is empty
+func setTypes(t []string) error {
 	if len(t) == 0 {
-		logrus.Fatal("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
+		return trace.Errorf("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
 	}
 
-	for _, n := range t {
-		Types[n] = struct{}{}
-	}
+	setSet(Types, t)
 
 	logrus.Printf("Types: %s", t)
+
+	return nil
 }
 
 // setExcludeFields parses and sets ExcludeFields
-func setExcludeFields(arg string) {
-	f := getSetFromArg(arg, ExcludeFields)
+func setExcludeFields(f []string) {
+	setSet(ExcludeFields, f)
 
 	if len(f) > 0 {
 		logrus.Printf("Excluded fields: %s", f)
@@ -114,22 +183,22 @@ func setDefaultPackageName(arg string) {
 
 // setDurationType sets the custom duration type
 func setDurationType(arg string) {
-	if trimArg(arg) != "" {
-		DurationCustomType = arg
+	if trimArg(arg) == "" {
+		return
 	}
+
+	DurationCustomType = arg
 
 	logrus.Printf("Duration custom type: %s", DurationCustomType)
 }
 
 // setCustomImports parses custom import packages
-func setCustomImports(arg string) {
-	if trimArg(arg) == "" {
-		return
+func setCustomImports(i []string) {
+	CustomImports = i
+
+	if len(i) > 0 {
+		logrus.Printf("Custom imports: %s", CustomImports)
 	}
-
-	CustomImports = strings.Split(arg, paramDelimiter)
-
-	logrus.Printf("Custom imports: %s", CustomImports)
 }
 
 // setTargetPackageName sets the target package name
@@ -145,8 +214,8 @@ func setTargetPackageName(arg string) {
 }
 
 // setComputedFields parses and sets ExcludeFields
-func setComputedFields(arg string) {
-	f := getSetFromArg(arg, ComputedFields)
+func setComputedFields(f []string) {
+	setSet(ComputedFields, f)
 
 	if len(f) > 0 {
 		logrus.Printf("Computed fields: %s", f)
@@ -154,8 +223,8 @@ func setComputedFields(arg string) {
 }
 
 // setRequiredFields parses and sets ExcludeFields
-func setRequiredFields(arg string) {
-	f := getSetFromArg(arg, RequiredFields)
+func setRequiredFields(f []string) {
+	setSet(RequiredFields, f)
 
 	if len(f) > 0 {
 		logrus.Printf("Required fields: %s", f)
@@ -164,20 +233,24 @@ func setRequiredFields(arg string) {
 
 // trimArg returns argument value without spaces and line breaks
 func trimArg(s string) string {
-	return strings.Trim(s, " \n\r")
+	return strings.TrimSpace(s)
 }
 
-// getSetFromArg parses array argument and converts it to set
-func getSetFromArg(arg string, r map[string]struct{}) []string {
-	if trimArg(arg) == "" {
-		return nil
+// splitArg splits array arg by delimiter
+func splitArg(arg string) []string {
+	a := trimArg(arg)
+
+	// Prevents returning slice with an empty single element
+	if a == "" {
+		return []string{}
 	}
 
-	f := strings.Split(arg, paramDelimiter)
+	return strings.Split(a, paramDelimiter)
+}
 
-	for _, n := range f {
-		r[n] = struct{}{}
+// setSet sets map[string]struct{} set from a keys array
+func setSet(s map[string]struct{}, a []string) {
+	for _, n := range a {
+		s[n] = struct{}{}
 	}
-
-	return f
 }
