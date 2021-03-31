@@ -25,9 +25,20 @@ exclude_fields:
 
 required_fields:
     - "types.UserV2.Kind"
-    - "types.UserV2.SubKind"
+    - "types.RoleV3.Kind"
+    - "types.GithubConnectorV3.Kind"
+    - "types.SAMLConnectorV2.Kind"
+    - "types.OIDCConnectorV2.Kind"
+    - "types.TrustedClusterV2.Kind"
+    - "types.ProvisionTokenV2.Kind"
     - "types.Metadata.Namespace"
 
 defaults:
     "types.UserV2.Kind": "user"
+    "types.RoleV3.Kind": "role"
+    "types.GithubConnectorV3.Kind": "github_connector"
+    "types.SAMLConnectorV2.Kind": "saml_connector"
+    "types.OIDCConnectorV2.Kind": "oidc_connector"
+    "types.TrustedClusterV2.Kind": "trusted_cluster"
+    "types.ProvisionTokenV2.Kind": "token"
     "types.Metadata.Namespace": "default"

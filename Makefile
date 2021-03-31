@@ -44,7 +44,7 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=config=example/terraform.yaml:${out_dir} \
+		--terraform_out=config=example/teleport.yaml:${out_dir} \
 		types.proto
 
 .PHONY: test
