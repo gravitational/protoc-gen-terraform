@@ -515,7 +515,7 @@ func (b *fieldBuilder) resolveKind() {
 
 // setComment resolves leading comment for this field
 func (b *fieldBuilder) setComment() {
-	p := b.descriptor.Path() + ",2," + strconv.Itoa(int(b.field.index))
+	p := b.descriptor.Path() + ",2," + strconv.Itoa(b.field.index)
 
 	for _, l := range b.descriptor.File().GetSourceCodeInfo().GetLocation() {
 		if getLocationPath(l) == p {
