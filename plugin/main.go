@@ -97,7 +97,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 // reflect builds message dictionary from a messages in protoc file
 func (p *Plugin) reflect(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
-		m, err := BuildMessage(p.Generator, message, true)
+		m, err := BuildMessage(p.Generator, message, true, "")
 
 		if err != nil {
 			logrus.Warning(err)

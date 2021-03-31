@@ -108,6 +108,9 @@ type Field struct {
 
 	// typeName represents full field type name
 	typeName string
+
+	// path represents path to current field in schema
+	path string
 }
 
 // fieldBuilder creates valid Field values
@@ -126,17 +129,24 @@ type fieldBuilder struct {
 }
 
 // BuildFields builds []*Field from descriptors of specified message
-func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) error {
+func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, path string) error {
 	for _, f := range d.GetField() {
 		typeName := getFieldTypeName(d, f)
+		path := path + "." + d.GetName()
 
-		// Ignore field if it is listed in cli arg
+		// Ignore field if it is listed in cli arg (top level)
 		_, ok := config.ExcludeFields[typeName]
 		if ok {
 			continue
 		}
 
-		f, err := BuildField(g, d, f)
+		// Ignore field if it's path is listed in cli arg
+		_, ok = config.ExcludeFields[path]
+		if ok {
+			continue
+		}
+
+		f, err := BuildField(g, d, f, path)
 		if err != nil {
 			invErr, ok := trace.Unwrap(err).(*invalidFieldError)
 
@@ -158,8 +168,8 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) er
 }
 
 // BuildField builds field reflection structure, or returns nil in case field build failed
-func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) (*Field, error) {
-	b := newFieldBuilder(g, d, f)
+func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto, path string) (*Field, error) {
+	b := newFieldBuilder(g, d, f, path)
 	err := b.build()
 	return b.field, err
 }
@@ -170,12 +180,12 @@ func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProt
 }
 
 // newFieldBuilder constructs an empty fieldBuilder value
-func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto) *fieldBuilder {
+func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto, path string) *fieldBuilder {
 	return &fieldBuilder{
 		generator:       g,
 		descriptor:      d,
 		fieldDescriptor: f,
-		field:           &Field{},
+		field:           &Field{path: path},
 	}
 }
 
@@ -414,7 +424,7 @@ func (b *fieldBuilder) setMessage() error {
 	}
 
 	// Try to analyse it
-	m, err := BuildMessage(b.generator, desc, false)
+	m, err := BuildMessage(b.generator, desc, false, b.field.path)
 	if err != nil {
 		// If underlying message is invalid, we must consider current field as invalid and not stop
 		_, ok := trace.Unwrap(err).(*invalidMessageError)
@@ -471,7 +481,7 @@ func (b *fieldBuilder) setMap() error {
 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
 	}
 
-	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField)
+	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField, b.field.path)
 	if err != nil {
 		return err
 	}

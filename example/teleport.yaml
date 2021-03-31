@@ -25,6 +25,7 @@ exclude_fields:
     - "types.GithubConnectorV3.Version"
 
 required_fields:
+    - "types.Metadata.Name"
     - "types.ProvisionTokenV2.Metadata.Expires"    
 
 defaults:

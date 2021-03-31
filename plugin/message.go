@@ -48,6 +48,9 @@ type Message struct {
 
 	// Comment is field comment in proto file with // prepended
 	Comment string
+
+	// Path in schema to current message (types.UserV2.Metadata.ID)
+	path string
 }
 
 // BuildMessage builds Message from its protobuf descriptor.
@@ -56,7 +59,7 @@ type Message struct {
 // otherwise it will be overexplicit. Use excludeFields to skip fields.
 //
 // It might return nil, nil which means that operation was successful, but message should be skipped.
-func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) (*Message, error) {
+func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool, path string) (*Message, error) {
 	typeName := getMessageTypeName(d)
 
 	// Check if message is specified in export type list
@@ -66,10 +69,10 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 		return nil, nil
 	}
 
-	c, ok := cache[typeName]
-	if ok {
-		return c, nil
-	}
+	// c, ok := cache[typeName]
+	// if ok {
+	// 	return c, nil
+	// }
 
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
@@ -80,15 +83,20 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 	name := d.GetName()
 	rawComment, comment := findMessageComment(d)
 
+	if path == "" {
+		path = typeName
+	}
+
 	message := &Message{
 		Name:       name,
 		NameSnake:  strcase.SnakeCase(name),
 		GoTypeName: typeName,
 		RawComment: rawComment,
 		Comment:    comment,
+		path:       path,
 	}
 
-	err := BuildFields(message, g, d)
+	err := BuildFields(message, g, d, path)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
