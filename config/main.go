@@ -246,7 +246,7 @@ func setDefaults(m map[string]interface{}) {
 
 	var s []string
 
-	for k, _ := range m {
+	for k := range m {
 		s = append(s, k)
 	}
 
