@@ -25,10 +25,6 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-var (
-	cache map[string]*Message = make(map[string]*Message)
-)
-
 // Message represents metadata about protobuf message
 type Message struct {
 	// Name contains type name
@@ -68,11 +64,6 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 		// This is not an error, we must just skip this message
 		return nil, nil
 	}
-
-	// c, ok := cache[typeName]
-	// if ok {
-	// 	return c, nil
-	// }
 
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
