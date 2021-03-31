@@ -1,6 +1,7 @@
 ---
-target_pkg: "tfschema"
-custom_duration: "Duration"
+target_package_name: "tfschema"
+default_package_name: "types"
+duration_custom_type: "Duration"
 custom_imports:
     - "github.com/gravitational/teleport/api/types"
 
@@ -22,7 +23,7 @@ exclude_fields:
     - "types.UserV2.Version"
     - "types.GithubConnectorV3.Version"
 
-required:
+required_fields:
     - "types.UserV2.Kind"
     - "types.UserV2.SubKind"
     - "types.Metadata.Namespace"

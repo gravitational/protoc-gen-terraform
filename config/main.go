@@ -71,28 +71,31 @@ const (
 
 // config is yaml config unmarshalling helper struct
 type config struct {
-	Types              []string
-	DurationCustomType string
-	TargetPkg          string
-	Pkg                string
-	ExcludeFields      []string
-	Computed           []string
-	Required           []string
-	CustomImports      []string
-	Defaults           map[string]interface{}
+	Types              []string               `yaml:"types"`
+	DurationCustomType string                 `yaml:"duration_custom_type"`
+	TargetPackageName  string                 `yaml:"target_package_name"`
+	DefaultPackageName string                 `yaml:"default_package_name"`
+	ExcludeFields      []string               `yaml:"exclude_fields"`
+	ComputedFields     []string               `yaml:"computed_fields"`
+	RequiredFields     []string               `yaml:"required_fields"`
+	CustomImports      []string               `yaml:"custom_imports"`
+	Defaults           map[string]interface{} `yaml:"defaults"`
 }
 
 // Read reads config variables from command line or config file
 func Read(p map[string]string) error {
-	err := readConfigFromYaml(p["config"])
+	c := trimArg(p["config"])
 
-	if err != nil {
-		return trace.Wrap(err)
-	}
-
-	err = setTypes(splitArg(p["types"]))
-	if err != nil {
-		return trace.Wrap(err)
+	if c != "" {
+		err := readConfigFromYaml(c)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+	} else {
+		err := setTypes(splitArg(p["types"]))
+		if err != nil {
+			return trace.Wrap(err)
+		}
 	}
 
 	setExcludeFields(splitArg(p["exclude_fields"]))
@@ -108,8 +111,7 @@ func Read(p map[string]string) error {
 }
 
 // readConfigFromYaml reads config from YAML file if specified
-func readConfigFromYaml(arg string) error {
-	p := trimArg(arg)
+func readConfigFromYaml(p string) error {
 	if p == "" {
 		return nil
 	}
@@ -135,11 +137,11 @@ func setVarsFromConfig() error {
 	}
 
 	setDurationType(cfg.DurationCustomType)
-	setTargetPackageName(cfg.TargetPkg)
-	setDefaultPackageName(cfg.Pkg)
+	setTargetPackageName(cfg.TargetPackageName)
+	setDefaultPackageName(cfg.DefaultPackageName)
 	setExcludeFields(cfg.ExcludeFields)
-	setComputedFields(cfg.Computed)
-	setRequiredFields(cfg.Required)
+	setComputedFields(cfg.ComputedFields)
+	setRequiredFields(cfg.RequiredFields)
 	setCustomImports(cfg.CustomImports)
 
 	return nil
