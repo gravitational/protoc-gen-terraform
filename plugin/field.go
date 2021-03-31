@@ -111,6 +111,9 @@ type Field struct {
 
 	// path represents path to current field in schema
 	path string
+
+	// field index in the field array, used for comment extraction
+	index int
 }
 
 // fieldBuilder creates valid Field values
@@ -130,10 +133,10 @@ type fieldBuilder struct {
 
 // BuildFields builds []*Field from descriptors of specified message
 func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, path string) error {
-	for _, f := range d.GetField() {
+	for i, f := range d.GetField() {
 		path := path + "." + f.GetName()
 
-		f, err := BuildField(g, d, f, path)
+		f, err := BuildField(g, d, f, path, i)
 		if err != nil {
 			invErr, ok := trace.Unwrap(err).(*invalidFieldError)
 
@@ -155,24 +158,26 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, pa
 }
 
 // BuildField builds field reflection structure, or returns nil in case field build failed
-func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto, path string) (*Field, error) {
-	b := newFieldBuilder(g, d, f, path)
+func BuildField(
+	g *generator.Generator,
+	d *generator.Descriptor,
+	f *descriptor.FieldDescriptorProto,
+	path string,
+	index int,
+) (*Field, error) {
+	b := &fieldBuilder{
+		generator:       g,
+		descriptor:      d,
+		fieldDescriptor: f,
+		field:           &Field{path: path, index: index},
+	}
+
 	return b.build()
 }
 
 // getFieldTypeName returns field type name with package
 func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) string {
 	return getMessageTypeName(d) + "." + f.GetName()
-}
-
-// newFieldBuilder constructs an empty fieldBuilder value
-func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto, path string) *fieldBuilder {
-	return &fieldBuilder{
-		generator:       g,
-		descriptor:      d,
-		fieldDescriptor: f,
-		field:           &Field{path: path},
-	}
 }
 
 // build fills in a Field structure
@@ -471,7 +476,7 @@ func (b *fieldBuilder) setMap() error {
 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
 	}
 
-	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField, b.field.path)
+	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField, b.field.path, 0)
 	if err != nil {
 		return err
 	}
@@ -510,7 +515,7 @@ func (b *fieldBuilder) resolveKind() {
 
 // setComment resolves leading comment for this field
 func (b *fieldBuilder) setComment() {
-	p := b.descriptor.Path() + ",2," + strconv.Itoa(int(b.fieldDescriptor.GetNumber()-1))
+	p := b.descriptor.Path() + ",2," + strconv.Itoa(int(b.field.index))
 
 	for _, l := range b.descriptor.File().GetSourceCodeInfo().GetLocation() {
 		if getLocationPath(l) == p {
