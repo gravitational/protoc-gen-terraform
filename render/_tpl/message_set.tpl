@@ -105,7 +105,7 @@ obj[{{.NameSnake | quote}}] = _v
 {{/* Output: _value */}}
 {{- define "rawToValue" }}
 {{- if .IsTime }}
-_value := _v.Format(time.RFC3339)
+_value := _v.Format(time.RFC3339Nano)
 {{- else if .IsDuration }}
 _value := time.Duration(_v).String()
 {{- else }}

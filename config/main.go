@@ -200,11 +200,13 @@ func setDurationType(arg string) {
 
 // setCustomImports parses custom import packages
 func setCustomImports(i []string) {
+	if len(i) == 0 {
+		return
+	}
+
 	CustomImports = i
 
-	if len(i) > 0 {
-		logrus.Printf("Custom imports: %s", CustomImports)
-	}
+	logrus.Printf("Custom imports: %s", CustomImports)
 }
 
 // setTargetPackageName sets the target package name

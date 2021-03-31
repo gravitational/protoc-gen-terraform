@@ -23,16 +23,6 @@ exclude_fields:
     - "types.UserV2.Version"
     - "types.GithubConnectorV3.Version"
 
-required_fields:
-    - "types.UserV2.Kind"
-    - "types.RoleV3.Kind"
-    - "types.GithubConnectorV3.Kind"
-    - "types.SAMLConnectorV2.Kind"
-    - "types.OIDCConnectorV2.Kind"
-    - "types.TrustedClusterV2.Kind"
-    - "types.ProvisionTokenV2.Kind"
-    - "types.Metadata.Namespace"
-
 defaults:
     "types.UserV2.Kind": "user"
     "types.RoleV3.Kind": "role"

@@ -63,7 +63,7 @@ var (
 
 // fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
 func fillTimestamps(t *Test) error {
-	ti, err := time.Parse(time.RFC3339, defaultTimestamp)
+	ti, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
 	if err != nil {
 		return err
 	}
@@ -113,10 +113,10 @@ func TestTimesSet(t *testing.T) {
 	subject, err := buildSubjectSet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
-	assert.Equal(t, test.Timestamp.Format(time.RFC3339), subject.Get("timestamp"), "Test.Timestamp")
+	assert.Equal(t, test.Timestamp.Format(time.RFC3339Nano), subject.Get("timestamp"), "Test.Timestamp")
 	assert.Equal(t, test.DurationStd.String(), subject.Get("duration_std"), "Test.DurationStd")
 	assert.Equal(t, time.Duration(test.DurationCustom).String(), subject.Get("duration_custom"), "Test.DurationCustom")
-	assert.Equal(t, test.TimestampN.Format(time.RFC3339), subject.Get("timestamp_n"), "Test.TimestampN")
+	assert.Equal(t, test.TimestampN.Format(time.RFC3339Nano), subject.Get("timestamp_n"), "Test.TimestampN")
 }
 
 // TestArraysSet ensures decoding of arrays
@@ -136,7 +136,7 @@ func TestArraysSet(t *testing.T) {
 	}
 
 	for n, v := range a {
-		assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339), "Test.TimestampA[]")
+		assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339Nano), "Test.TimestampA[]")
 	}
 }
 

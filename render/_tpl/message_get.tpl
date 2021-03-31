@@ -105,7 +105,7 @@ if !ok {
 }
 
 {{- if .IsTime }}
-_value, err := time.Parse(time.RFC3339, _raws)
+_value, err := time.Parse(time.RFC3339Nano, _raws)
 if err != nil {
     return fmt.Errorf("malformed time value for field {{.Name}} : %w", err)
 }

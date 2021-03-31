@@ -28,7 +28,7 @@ import (
 
 const (
 	// defaultTimestamp predefined timestamp used in tests
-	defaultTimestamp = "2022-10-12T07:20:50Z"
+	defaultTimestamp = "2022-10-12T07:20:50.5Z"
 )
 
 var (
@@ -114,7 +114,7 @@ func TestTimesGet(t *testing.T) {
 	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
-	timestamp, err := time.Parse(time.RFC3339, defaultTimestamp)
+	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
 	require.NoError(t, err, "failed to parse example timestamp")
 
 	durationStd, err := time.ParseDuration("1h")
@@ -134,7 +134,7 @@ func TestArraysGet(t *testing.T) {
 	subject, err := buildSubjectGet(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
-	timestamp, err := time.Parse(time.RFC3339, defaultTimestamp)
+	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
 	require.NoError(t, err, "failed to parse example timestamp")
 
 	duration, err := time.ParseDuration("1m")

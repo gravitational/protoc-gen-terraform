@@ -539,7 +539,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			if !ok {
 				return fmt.Errorf("can not convert %T to string", _raws)
 			}
-			_value, err := time.Parse(time.RFC3339, _raws)
+			_value, err := time.Parse(time.RFC3339Nano, _raws)
 			if err != nil {
 				return fmt.Errorf("malformed time value for field Timestamp : %w", err)
 			}
@@ -589,7 +589,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			if !ok {
 				return fmt.Errorf("can not convert %T to string", _raws)
 			}
-			_value, err := time.Parse(time.RFC3339, _raws)
+			_value, err := time.Parse(time.RFC3339Nano, _raws)
 			if err != nil {
 				return fmt.Errorf("malformed time value for field TimestampN : %w", err)
 			}
@@ -654,7 +654,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 				if !ok {
 					return fmt.Errorf("can not convert %T to string", _raws)
 				}
-				_value, err := time.Parse(time.RFC3339, _raws)
+				_value, err := time.Parse(time.RFC3339Nano, _raws)
 				if err != nil {
 					return fmt.Errorf("malformed time value for field TimestampA : %w", err)
 				}
@@ -1183,7 +1183,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		_v := t.Timestamp
 
-		_value := _v.Format(time.RFC3339)
+		_value := _v.Format(time.RFC3339Nano)
 		obj["timestamp"] = _value
 	}
 	{
@@ -1202,7 +1202,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		_v := t.TimestampN
 		if _v != nil {
 
-			_value := _v.Format(time.RFC3339)
+			_value := _v.Format(time.RFC3339Nano)
 			obj["timestamp_n"] = _value
 		}
 	}
@@ -1240,7 +1240,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		_raw := make([]string, len(_arr))
 
 		for i, _v := range _arr {
-			_value := _v.Format(time.RFC3339)
+			_value := _v.Format(time.RFC3339Nano)
 			_raw[i] = _value
 		}
 
