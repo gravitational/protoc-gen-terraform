@@ -8,27 +8,31 @@ custom_imports:
 types:
     - "types.UserV2"
     - "types.RoleV3"
+    - "types.ProvisionTokenV2"    
     - "types.GithubConnectorV3"
     - "types.SAMLConnectorV2"
     - "types.OIDCConnectorV2"
     - "types.TrustedClusterV2"
-    - "types.ProvisionTokenV2"
 
 exclude_fields:
-    - "types.UserSpecV2.LocalAuth"
     - "types.Metadata.ID"
+    - "types.UserV2.Version"    
+    - "types.UserSpecV2.LocalAuth"
     - "types.UserSpecV2.Expires"
     - "types.UserSpecV2.CreatedBy"
     - "types.UserSpecV2.Status"
-    - "types.UserV2.Version"
+    - "types.ProvisionTokenV2.Version" 
     - "types.GithubConnectorV3.Version"
 
+required_fields:
+    - "types.ProvisionTokenV2.Metadata.Expires"    
+
 defaults:
+    "types.Metadata.Namespace": "default"    
     "types.UserV2.Kind": "user"
+    "types.ProvisionTokenV2.Kind": "token"    
     "types.RoleV3.Kind": "role"
     "types.GithubConnectorV3.Kind": "github_connector"
     "types.SAMLConnectorV2.Kind": "saml_connector"
     "types.OIDCConnectorV2.Kind": "oidc_connector"
     "types.TrustedClusterV2.Kind": "trusted_cluster"
-    "types.ProvisionTokenV2.Kind": "token"
-    "types.Metadata.Namespace": "default"
