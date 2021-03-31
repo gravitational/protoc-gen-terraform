@@ -16,17 +16,21 @@ types:
 
 exclude_fields:
     - "types.Metadata.ID"
-    - "types.UserV2.Version"    
+    - "types.UserV2.Version"
     - "types.UserSpecV2.LocalAuth"
     - "types.UserSpecV2.Expires"
     - "types.UserSpecV2.CreatedBy"
     - "types.UserSpecV2.Status"
+    - "types.RoleV3.Version"
     - "types.ProvisionTokenV2.Version" 
     - "types.GithubConnectorV3.Version"
+    - "types.SAMLConnectorV2.Version"
+    - "types.OIDCConnectorV2.Version"
+    - "types.TrustedClusterV2.Version"
 
 required_fields:
     - "types.Metadata.Name"
-    - "types.ProvisionTokenV2.Metadata.Expires"    
+    - "types.ProvisionTokenV2.Metadata.Expires"
 
 defaults:
     "types.Metadata.Namespace": "default"    

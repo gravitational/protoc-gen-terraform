@@ -131,20 +131,7 @@ type fieldBuilder struct {
 // BuildFields builds []*Field from descriptors of specified message
 func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, path string) error {
 	for _, f := range d.GetField() {
-		typeName := getFieldTypeName(d, f)
-		path := path + "." + d.GetName()
-
-		// Ignore field if it is listed in cli arg (top level)
-		_, ok := config.ExcludeFields[typeName]
-		if ok {
-			continue
-		}
-
-		// Ignore field if it's path is listed in cli arg
-		_, ok = config.ExcludeFields[path]
-		if ok {
-			continue
-		}
+		path := path + "." + f.GetName()
 
 		f, err := BuildField(g, d, f, path)
 		if err != nil {
@@ -170,8 +157,7 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, pa
 // BuildField builds field reflection structure, or returns nil in case field build failed
 func BuildField(g *generator.Generator, d *generator.Descriptor, f *descriptor.FieldDescriptorProto, path string) (*Field, error) {
 	b := newFieldBuilder(g, d, f, path)
-	err := b.build()
-	return b.field, err
+	return b.build()
 }
 
 // getFieldTypeName returns field type name with package
@@ -190,22 +176,26 @@ func newFieldBuilder(g *generator.Generator, d *generator.Descriptor, f *descrip
 }
 
 // build fills in a Field structure
-func (b *fieldBuilder) build() error {
+func (b *fieldBuilder) build() (*Field, error) {
 	b.resolveName()
+
+	if hasFieldInSet(config.ExcludeFields, b.field) {
+		return nil, nil
+	}
 
 	err := b.resolveType()
 	if err != nil {
-		return trace.Wrap(err)
+		return nil, trace.Wrap(err)
 	}
 
 	err = b.setGoType()
 	if err != nil {
-		return trace.Wrap(err)
+		return nil, trace.Wrap(err)
 	}
 
 	err = b.setAggregate()
 	if err != nil {
-		return trace.Wrap(err)
+		return nil, trace.Wrap(err)
 	}
 
 	b.setCustomType()
@@ -215,7 +205,7 @@ func (b *fieldBuilder) build() error {
 	b.setComputed()
 	b.setDefault()
 
-	return nil
+	return b.field, nil
 }
 
 // setName sets the field name
@@ -533,16 +523,14 @@ func (b *fieldBuilder) setComment() {
 
 // setRequired sets IsRequired flag
 func (b *fieldBuilder) setRequired() {
-	_, ok := config.RequiredFields[b.field.typeName]
-	if ok {
+	if hasFieldInSet(config.RequiredFields, b.field) {
 		b.field.IsRequired = true
 	}
 }
 
 // setComputed sets IsComputed flag
 func (b *fieldBuilder) setComputed() {
-	_, ok := config.ComputedFields[b.field.typeName]
-	if ok {
+	if hasFieldInSet(config.ComputedFields, b.field) {
 		b.field.IsComputed = true
 	}
 }
@@ -553,4 +541,15 @@ func (b *fieldBuilder) setDefault() {
 	if ok {
 		b.field.Default = fmt.Sprintf("%s", v)
 	}
+}
+
+// hasFieldInSet checks field existence in set
+func hasFieldInSet(m map[string]struct{}, f *Field) bool {
+	_, ok := m[f.typeName]
+	if ok {
+		return true
+	}
+
+	_, ok = m[f.path]
+	return ok
 }
