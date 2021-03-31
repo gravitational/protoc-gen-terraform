@@ -23,7 +23,7 @@ protoc \
     types.proto
 ```
 
-This will generate `types_terraform.go` in _out directory. This file will contain `GetUserV2FromResourceData` and `GetRoleV3FromResourceData` along with `SchemaUserV2` and `SchemaRolesV3` methods.
+This will generate `types_terraform.go` in _out directory. This file will contain `GetUserV2FromResourceData` and `GetRoleV3FromResourceData` along with `SchemaUserV2`, `SchemaRolesV3`, `SetUserV2ToResourceData`, `SetRoleV3ToResourceData` methods.
 
 Schema method should have the following prototype:
 
@@ -48,6 +48,8 @@ Options:
 * `target_pkg` - the name of the target package
 * `custom_duration` - the name of custom Duration type, if used.
 * `custom_imports` - comma-separated package list to add into target file
+* `required` - list of a filds to mark as required
+* `computed` - list of a filds to mark as computed
 
 # Testing
 
