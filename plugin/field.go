@@ -103,6 +103,9 @@ type Field struct {
 	// Comment is field comment in proto file with // prepended
 	Comment string
 
+	// Default is field default value
+	Default string
+
 	// typeName represents full field type name
 	typeName string
 }
@@ -200,6 +203,7 @@ func (b *fieldBuilder) build() error {
 	b.setComment()
 	b.setRequired()
 	b.setComputed()
+	b.setDefault()
 
 	return nil
 }
@@ -530,5 +534,13 @@ func (b *fieldBuilder) setComputed() {
 	_, ok := config.ComputedFields[b.field.typeName]
 	if ok {
 		b.field.IsComputed = true
+	}
+}
+
+// setDefault sets default value
+func (b *fieldBuilder) setDefault() {
+	v, ok := config.Defaults[b.field.typeName]
+	if ok {
+		b.field.Default = fmt.Sprintf("%s", v)
 	}
 }

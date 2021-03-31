@@ -74,6 +74,9 @@ Description: {{ .RawComment | quote }},
 {{- if .IsTime }}
 ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
+{{- if .Default }}
+Default: {{.Default | quote}},
+{{- end }}
 {{- end -}}
 
 {{- define "repeatedMessage" -}}
