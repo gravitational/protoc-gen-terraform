@@ -140,6 +140,11 @@ func (c *FieldBuildContext) IsMessage() bool {
 	return c.f.IsMessage()
 }
 
+// IsCustomType returns true if fields has gogo.custom_type flag
+func (c *FieldBuildContext) IsCustomType() bool {
+	return c.f.IsCustomType()
+}
+
 // GetComment returns field comment as a single line and as a block comment
 func (c *FieldBuildContext) GetComment() (string, string) {
 	p := c.d.Path() + ",2," + strconv.Itoa(c.index)
@@ -208,4 +213,30 @@ func (c *FieldBuildContext) GetMessageDescriptor() (*generator.Descriptor, error
 	}
 
 	return desc, nil
+}
+
+// IsRepeated returns true if field is repeated
+func (c *FieldBuildContext) IsRepeated() bool {
+	return !c.g.IsMap(c.f.FieldDescriptorProto) && c.f.IsRepeated()
+}
+
+// IsMap returns true if field is map
+func (c *FieldBuildContext) IsMap() bool {
+	return c.g.IsMap(c.f.FieldDescriptorProto) && !c.f.IsRepeated()
+}
+
+// GetMapValueFieldDescriptor returns field descriptor for a map field
+func (c *FieldBuildContext) GetMapValueFieldDescriptor() (*FieldDescriptorProtoExt, error) {
+	m := c.g.GoMapType(nil, c.f.FieldDescriptorProto)
+
+	k, _ := c.g.GoType(c.d, m.KeyField)
+	if k != "string" {
+		return nil, trace.Errorf("non-string map keys are not supported" + c.GetPath())
+	}
+
+	if m.ValueField == nil {
+		return nil, trace.Errorf("map value descriptor is nil" + c.GetPath())
+	}
+
+	return &FieldDescriptorProtoExt{m.ValueField}, nil
 }

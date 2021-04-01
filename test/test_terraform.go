@@ -50,14 +50,14 @@ var _ = time.Kitchen
 // └── duration_std:string (DurationStd time.Duration field (standard))
 // └── duration_custom:string (DurationCustom time.Duration field (custom))
 // └── timestamp_n:string (TimestampN *time.Time field)
-// └── string_a:string (StringA []string field)
-// └── bool_a:bool (BoolA []bool field)
-// └── bytes_a:string (BytesA [][]byte field)
-// └── timestamp_a:string (TimestampA []time.Time field)
-// └── duration_custom_a:string (DurationCustomA []time.Duration field)
+// └── [string_a:string] (StringA []string field)
+// └── bool_a !custom schema, see target code! (BoolA []bool field)
+// └── [bytes_a:string] (BytesA [][]byte field)
+// └── [timestamp_a:string] (TimestampA []time.Time field)
+// └── [duration_custom_a:string] (DurationCustomA []time.Duration field)
 // └── nested (Nested nested message field)
 // │   ├── str:string (Str string field)
-// │   ├── nested (Nested repeated nested messages)
+// │   ├── [nested] (Nested repeated nested messages)
 // │   │   ├── str:string (Str string field)
 // │   ├── nested_m (Nested map repeated nested messages)
 // │   │   ├── key:string
@@ -66,9 +66,9 @@ var _ = time.Kitchen
 // │       └── key:string
 // │       └── value
 // │           └── str:string (Str string field)
-// └── nested_a (NestedA nested message array)
+// └── [nested_a] (NestedA nested message array)
 // │   ├── str:string (Str string field)
-// │   ├── nested (Nested repeated nested messages)
+// │   ├── [nested] (Nested repeated nested messages)
 // │   │   ├── str:string (Str string field)
 // │   ├── nested_m (Nested map repeated nested messages)
 // │   │   ├── key:string
@@ -84,7 +84,7 @@ var _ = time.Kitchen
 //     └── key:string
 //     └── value
 //         └── str:string (Str string field)
-//         └── nested (Nested repeated nested messages)
+//         └── [nested] (Nested repeated nested messages)
 //         │   ├── str:string (Str string field)
 //         └── nested_m (Nested map repeated nested messages)
 //         │   ├── key:string
@@ -195,47 +195,41 @@ func SchemaTest() map[string]*schema.Schema {
 		},
 		// StringA []string field
 		"string_a": {
-			Type:        schema.TypeString,
-			Description: "StringA []string field",
 			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "StringA []string field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
 		// BoolA []bool field
-		"bool_a": {
-			Type:        schema.TypeBool,
-			Description: "BoolA []bool field",
-			Optional:    true,
-		},
+		"bool_a": SchemaBoolCustom(),
 		// BytesA [][]byte field
 		"bytes_a": {
-			Type:        schema.TypeString,
-			Description: "BytesA [][]byte field",
 			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "BytesA [][]byte field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
 		// TimestampA []time.Time field
 		"timestamp_a": {
-			Type:         schema.TypeString,
-			Description:  "TimestampA []time.Time field",
-			ValidateFunc: validation.IsRFC3339Time,
-			Optional:     true,
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "TimestampA []time.Time field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
 		// DurationCustomA []time.Duration field
 		"duration_custom_a": {
-			Type:        schema.TypeString,
+			Optional:    true,
+			Type:        schema.TypeList,
 			Description: "DurationCustomA []time.Duration field",
-			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
-				o, err := time.ParseDuration(old)
-				if err != nil {
-					return false
-				}
-
-				n, err := time.ParseDuration(new)
-				if err != nil {
-					return false
-				}
-
-				return o == n
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
 			},
-			Optional: true,
 		},
 		// Nested nested message field
 		"nested": {
@@ -256,7 +250,6 @@ func SchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeList,
 						Description: "Message nested into nested message",
-						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -333,7 +326,6 @@ func SchemaTest() map[string]*schema.Schema {
 			Optional:    true,
 			Type:        schema.TypeList,
 			Description: "Nested message definition",
-			MaxItems:    1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -347,7 +339,6 @@ func SchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeList,
 						Description: "Message nested into nested message",
-						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -475,7 +466,6 @@ func SchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 									Type:        schema.TypeList,
 									Description: "Message nested into nested message",
-									MaxItems:    1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -713,75 +703,92 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-
-		_raw, ok := d.GetOk(p + "string_a")
-
+		_rawi, ok := d.GetOk(p + "string_a")
 		if ok {
-			_raws, ok := _raw.(string)
+			_rawi, ok := _rawi.([]interface{})
 			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
 			}
-			_value := string(string(_raws))
-			t.StringA = _value
+			t.StringA = make([]string, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
+				t.StringA[i] = _value
+			}
 		}
 	}
 	{
-
-		_raw, ok := d.GetOkExists(p + "bool_a")
-
-		if ok {
-			_raws, ok := _raw.(bool)
-			if !ok {
-				return fmt.Errorf("can not convert %T to bool", _raws)
-			}
-			_value := BoolCustom(bool(_raws))
-			t.BoolA = _value
+		err := GetBoolCustomFromResourceData(p+"bool_a", d, &t.BoolA)
+		if err != nil {
+			return err
 		}
 	}
 	{
-
-		_raw, ok := d.GetOk(p + "bytes_a")
-
+		_rawi, ok := d.GetOk(p + "bytes_a")
 		if ok {
-			_raws, ok := _raw.(string)
+			_rawi, ok := _rawi.([]interface{})
 			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
 			}
-			_value := byte([]byte(_raws))
-			t.BytesA = _value
+			t.BytesA = make([]byte, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := byte([]byte(_raws))
+				t.BytesA[i] = _value
+			}
 		}
 	}
 	{
-
-		_raw, ok := d.GetOk(p + "timestamp_a")
-
+		_rawi, ok := d.GetOk(p + "timestamp_a")
 		if ok {
-			_raws, ok := _raw.(string)
+			_rawi, ok := _rawi.([]interface{})
 			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
 			}
-			_value, err := time.Parse(time.RFC3339Nano, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field TimestampA : %w", err)
+			t.TimestampA = make([]*time.Time, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value, err := time.Parse(time.RFC3339Nano, _raws)
+				if err != nil {
+					return fmt.Errorf("malformed time value for field TimestampA : %w", err)
+				}
+				t.TimestampA[i] = &_value
 			}
-			t.TimestampA = &_value
 		}
 	}
 	{
-
-		_raw, ok := d.GetOk(p + "duration_custom_a")
-
+		_rawi, ok := d.GetOk(p + "duration_custom_a")
 		if ok {
-			_raws, ok := _raw.(string)
+			_rawi, ok := _rawi.([]interface{})
 			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
+				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
 			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
+			t.DurationCustomA = make([]Duration, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
+				_raw := _rawi[i]
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_valued, err := time.ParseDuration(_raws)
+				if err != nil {
+					return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
+				}
+				_value := Duration(_valued)
+				t.DurationCustomA[i] = _value
 			}
-			_value := Duration(_valued)
-			t.DurationCustomA = _value
 		}
 	}
 	{
@@ -805,26 +812,41 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			}
 		}
 		{
-			p := p + "nested" + ".0."
+			p := p + "nested"
 
-			_obj := NestedLevel2{}
-			t.Nested = &_obj
-			t := &_obj
+			_raw, ok := d.GetOk(p)
+			if ok {
+				_rawi, ok := _raw.([]interface{})
+				if !ok {
+					return fmt.Errorf("can not convert %T to []interface{}", _raw)
+				}
 
-			{
+				t.Nested = make([]*NestedLevel2, len(_rawi))
+				for i := 0; i < len(_rawi); i++ {
 
-				_raw, ok := d.GetOk(p + "str")
+					_obj := NestedLevel2{}
+					t.Nested[i] = &_obj
 
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
+					{
+						t := t.Nested[i]
+						p := p + fmt.Sprintf(".%v.", i)
+						{
+
+							_raw, ok := d.GetOk(p + "str")
+
+							if ok {
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
+								t.Str = _value
+							}
+						}
+
 					}
-					_value := string(string(_raws))
-					t.Str = _value
 				}
 			}
-
 		}
 		{
 			p := p + "nested_m" + ".0."
@@ -908,127 +930,157 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 	}
 	{
-		p := p + "nested_a" + ".0."
+		p := p + "nested_a"
 
-		_obj := Nested{}
-		t.NestedA = &_obj
-		t := &_obj
-
-		{
-
-			_raw, ok := d.GetOk(p + "str")
-
-			if ok {
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := string(string(_raws))
-				t.Str = _value
-			}
-		}
-		{
-			p := p + "nested" + ".0."
-
-			_obj := NestedLevel2{}
-			t.Nested = &_obj
-			t := &_obj
-
-			{
-
-				_raw, ok := d.GetOk(p + "str")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.Str = _value
-				}
+		_raw, ok := d.GetOk(p)
+		if ok {
+			_rawi, ok := _raw.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _raw)
 			}
 
-		}
-		{
-			p := p + "nested_m" + ".0."
+			t.NestedA = make([]*Nested, len(_rawi))
+			for i := 0; i < len(_rawi); i++ {
 
-			_obj := NestedMEntry{}
-			t.NestedM = &_obj
-			t := &_obj
-
-			{
-
-				_raw, ok := d.GetOk(p + "key")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.key = _value
-				}
-			}
-			{
-
-				_raw, ok := d.GetOk(p + "value")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.value = _value
-				}
-			}
-
-		}
-		{
-			p := p + "nested_m_obj" + ".0."
-
-			_obj := NestedMObjEntry{}
-			t.NestedMObj = &_obj
-			t := &_obj
-
-			{
-
-				_raw, ok := d.GetOk(p + "key")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.key = _value
-				}
-			}
-			{
-				p := p + "value" + ".0."
-
-				_obj := NestedLevel2{}
-				t.value = &_obj
-				t := &_obj
+				_obj := Nested{}
+				t.NestedA[i] = &_obj
 
 				{
+					t := t.NestedA[i]
+					p := p + fmt.Sprintf(".%v.", i)
+					{
 
-					_raw, ok := d.GetOk(p + "str")
+						_raw, ok := d.GetOk(p + "str")
 
-					if ok {
-						_raws, ok := _raw.(string)
-						if !ok {
-							return fmt.Errorf("can not convert %T to string", _raws)
+						if ok {
+							_raws, ok := _raw.(string)
+							if !ok {
+								return fmt.Errorf("can not convert %T to string", _raws)
+							}
+							_value := string(string(_raws))
+							t.Str = _value
 						}
-						_value := string(string(_raws))
-						t.Str = _value
 					}
+					{
+						p := p + "nested"
+
+						_raw, ok := d.GetOk(p)
+						if ok {
+							_rawi, ok := _raw.([]interface{})
+							if !ok {
+								return fmt.Errorf("can not convert %T to []interface{}", _raw)
+							}
+
+							t.Nested = make([]*NestedLevel2, len(_rawi))
+							for i := 0; i < len(_rawi); i++ {
+
+								_obj := NestedLevel2{}
+								t.Nested[i] = &_obj
+
+								{
+									t := t.Nested[i]
+									p := p + fmt.Sprintf(".%v.", i)
+									{
+
+										_raw, ok := d.GetOk(p + "str")
+
+										if ok {
+											_raws, ok := _raw.(string)
+											if !ok {
+												return fmt.Errorf("can not convert %T to string", _raws)
+											}
+											_value := string(string(_raws))
+											t.Str = _value
+										}
+									}
+
+								}
+							}
+						}
+					}
+					{
+						p := p + "nested_m" + ".0."
+
+						_obj := NestedMEntry{}
+						t.NestedM = &_obj
+						t := &_obj
+
+						{
+
+							_raw, ok := d.GetOk(p + "key")
+
+							if ok {
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
+								t.key = _value
+							}
+						}
+						{
+
+							_raw, ok := d.GetOk(p + "value")
+
+							if ok {
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
+								t.value = _value
+							}
+						}
+
+					}
+					{
+						p := p + "nested_m_obj" + ".0."
+
+						_obj := NestedMObjEntry{}
+						t.NestedMObj = &_obj
+						t := &_obj
+
+						{
+
+							_raw, ok := d.GetOk(p + "key")
+
+							if ok {
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
+								t.key = _value
+							}
+						}
+						{
+							p := p + "value" + ".0."
+
+							_obj := NestedLevel2{}
+							t.value = &_obj
+							t := &_obj
+
+							{
+
+								_raw, ok := d.GetOk(p + "str")
+
+								if ok {
+									_raws, ok := _raw.(string)
+									if !ok {
+										return fmt.Errorf("can not convert %T to string", _raws)
+									}
+									_value := string(string(_raws))
+									t.Str = _value
+								}
+							}
+
+						}
+
+					}
+
 				}
-
 			}
-
 		}
-
 	}
 	{
 		p := p + "nested_m" + ".0."
@@ -1106,26 +1158,41 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 				}
 			}
 			{
-				p := p + "nested" + ".0."
+				p := p + "nested"
 
-				_obj := NestedLevel2{}
-				t.Nested = &_obj
-				t := &_obj
+				_raw, ok := d.GetOk(p)
+				if ok {
+					_rawi, ok := _raw.([]interface{})
+					if !ok {
+						return fmt.Errorf("can not convert %T to []interface{}", _raw)
+					}
 
-				{
+					t.Nested = make([]*NestedLevel2, len(_rawi))
+					for i := 0; i < len(_rawi); i++ {
 
-					_raw, ok := d.GetOk(p + "str")
+						_obj := NestedLevel2{}
+						t.Nested[i] = &_obj
 
-					if ok {
-						_raws, ok := _raw.(string)
-						if !ok {
-							return fmt.Errorf("can not convert %T to string", _raws)
+						{
+							t := t.Nested[i]
+							p := p + fmt.Sprintf(".%v.", i)
+							{
+
+								_raw, ok := d.GetOk(p + "str")
+
+								if ok {
+									_raws, ok := _raw.(string)
+									if !ok {
+										return fmt.Errorf("can not convert %T to string", _raws)
+									}
+									_value := string(string(_raws))
+									t.Str = _value
+								}
+							}
+
 						}
-						_value := string(string(_raws))
-						t.Str = _value
 					}
 				}
-
 			}
 			{
 				p := p + "nested_m" + ".0."
@@ -1286,36 +1353,55 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		_v := t.StringA
+		_arr := t.StringA
+		_raw := make([]string, len(_arr))
 
-		_value := string(_v)
-		obj["string_a"] = _value
-	}
-	{
-		_v := t.BoolA
-
-		_value := bool(_v)
-		obj["bool_a"] = _value
-	}
-	{
-		_v := t.BytesA
-
-		_value := string(_v)
-		obj["bytes_a"] = _value
-	}
-	{
-		_v := t.TimestampA
-		if _v != nil {
-
-			_value := _v.Format(time.RFC3339Nano)
-			obj["timestamp_a"] = _value
+		for i, _v := range _arr {
+			_value := string(_v)
+			_raw[i] = _value
 		}
+
+		obj["string_a"] = _raw
 	}
 	{
-		_v := t.DurationCustomA
+		_v, err := SetBoolCustomToResourceData(&t.BoolA)
+		if err != nil {
+			return err
+		}
+		obj["bool_a"] = _v
+	}
+	{
+		_arr := t.BytesA
+		_raw := make([]string, len(_arr))
 
-		_value := time.Duration(_v).String()
-		obj["duration_custom_a"] = _value
+		for i, _v := range _arr {
+			_value := string(_v)
+			_raw[i] = _value
+		}
+
+		obj["bytes_a"] = _raw
+	}
+	{
+		_arr := t.TimestampA
+		_raw := make([]string, len(_arr))
+
+		for i, _v := range _arr {
+			_value := _v.Format(time.RFC3339Nano)
+			_raw[i] = _value
+		}
+
+		obj["timestamp_a"] = _raw
+	}
+	{
+		_arr := t.DurationCustomA
+		_raw := make([]string, len(_arr))
+
+		for i, _v := range _arr {
+			_value := time.Duration(_v).String()
+			_raw[i] = _value
+		}
+
+		obj["duration_custom_a"] = _raw
 	}
 	{
 
@@ -1334,26 +1420,23 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 					obj["str"] = _value
 				}
 				{
+					arr := make([]interface{}, len(t.Nested))
 
-					if t.Nested != nil {
-
-						msg := make(map[string]interface{})
-						obj["nested"] = []interface{}{msg}
+					for i, t := range t.Nested {
+						obj := make(map[string]interface{})
 						{
-							obj := msg
-							t := t.Nested
+							_v := t.Str
 
-							{
-								_v := t.Str
-
-								_value := string(_v)
-								obj["str"] = _value
-							}
-
+							_value := string(_v)
+							obj["str"] = _value
 						}
 
+						arr[i] = obj
 					}
 
+					if len(arr) > 0 {
+						obj["nested"] = arr
+					}
 				}
 				{
 
@@ -1434,104 +1517,94 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 	}
 	{
+		arr := make([]interface{}, len(t.NestedA))
 
-		if t.NestedA != nil {
-
-			msg := make(map[string]interface{})
-			obj["nested_a"] = []interface{}{msg}
+		for i, t := range t.NestedA {
+			obj := make(map[string]interface{})
 			{
-				obj := msg
-				t := t.NestedA
+				_v := t.Str
 
-				{
-					_v := t.Str
+				_value := string(_v)
+				obj["str"] = _value
+			}
+			{
+				arr := make([]interface{}, len(t.Nested))
 
-					_value := string(_v)
-					obj["str"] = _value
+				for i, t := range t.Nested {
+					obj := make(map[string]interface{})
+					{
+						_v := t.Str
+
+						_value := string(_v)
+						obj["str"] = _value
+					}
+
+					arr[i] = obj
 				}
-				{
 
-					if t.Nested != nil {
+				if len(arr) > 0 {
+					obj["nested"] = arr
+				}
+			}
+			{
 
-						msg := make(map[string]interface{})
-						obj["nested"] = []interface{}{msg}
+				if t.NestedM != nil {
+
+					msg := make(map[string]interface{})
+					obj["nested_m"] = []interface{}{msg}
+					{
+						obj := msg
+						t := t.NestedM
+
 						{
-							obj := msg
-							t := t.Nested
+							_v := t.key
 
-							{
-								_v := t.Str
+							_value := string(_v)
+							obj["key"] = _value
+						}
+						{
+							_v := t.value
 
-								_value := string(_v)
-								obj["str"] = _value
-							}
-
+							_value := string(_v)
+							obj["value"] = _value
 						}
 
 					}
 
 				}
-				{
 
-					if t.NestedM != nil {
+			}
+			{
 
-						msg := make(map[string]interface{})
-						obj["nested_m"] = []interface{}{msg}
+				if t.NestedMObj != nil {
+
+					msg := make(map[string]interface{})
+					obj["nested_m_obj"] = []interface{}{msg}
+					{
+						obj := msg
+						t := t.NestedMObj
+
 						{
-							obj := msg
-							t := t.NestedM
+							_v := t.key
 
-							{
-								_v := t.key
-
-								_value := string(_v)
-								obj["key"] = _value
-							}
-							{
-								_v := t.value
-
-								_value := string(_v)
-								obj["value"] = _value
-							}
-
+							_value := string(_v)
+							obj["key"] = _value
 						}
-
-					}
-
-				}
-				{
-
-					if t.NestedMObj != nil {
-
-						msg := make(map[string]interface{})
-						obj["nested_m_obj"] = []interface{}{msg}
 						{
-							obj := msg
-							t := t.NestedMObj
 
-							{
-								_v := t.key
+							if t.value != nil {
 
-								_value := string(_v)
-								obj["key"] = _value
-							}
-							{
+								msg := make(map[string]interface{})
+								obj["value"] = []interface{}{msg}
+								{
+									obj := msg
+									t := t.value
 
-								if t.value != nil {
-
-									msg := make(map[string]interface{})
-									obj["value"] = []interface{}{msg}
 									{
-										obj := msg
-										t := t.value
+										_v := t.Str
 
-										{
-											_v := t.Str
-
-											_value := string(_v)
-											obj["str"] = _value
-										}
-
+										_value := string(_v)
+										obj["str"] = _value
 									}
 
 								}
@@ -1546,8 +1619,12 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 			}
 
+			arr[i] = obj
 		}
 
+		if len(arr) > 0 {
+			obj["nested_a"] = arr
+		}
 	}
 	{
 
@@ -1610,26 +1687,23 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 								obj["str"] = _value
 							}
 							{
+								arr := make([]interface{}, len(t.Nested))
 
-								if t.Nested != nil {
-
-									msg := make(map[string]interface{})
-									obj["nested"] = []interface{}{msg}
+								for i, t := range t.Nested {
+									obj := make(map[string]interface{})
 									{
-										obj := msg
-										t := t.Nested
+										_v := t.Str
 
-										{
-											_v := t.Str
-
-											_value := string(_v)
-											obj["str"] = _value
-										}
-
+										_value := string(_v)
+										obj["str"] = _value
 									}
 
+									arr[i] = obj
 								}
 
+								if len(arr) > 0 {
+									obj["nested"] = arr
+								}
 							}
 							{
 

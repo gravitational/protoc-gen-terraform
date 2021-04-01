@@ -17,7 +17,10 @@ limitations under the License.
 package plugin
 
 import (
+	"strings"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gravitational/trace"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -101,12 +104,12 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) er
 
 		c, err := NewFieldBuildContext(m, g, d, fd, i)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 
 		f, err := BuildField(c)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 
 		if f != nil {
@@ -135,7 +138,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.RawComment, f.Comment = c.GetComment()
 	f.SchemaRawType, f.SchemaGoType, f.IsMessage, err = c.GetTypeAndIsMessage()
 	if err != nil {
-		return nil, err
+		return nil, trace.Wrap(err)
 	}
 
 	f.IsTime = c.IsTime()
@@ -152,12 +155,12 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		if f.IsMessage {
 			d, err := c.GetMessageDescriptor()
 			if err != nil {
-				return nil, err
+				return nil, trace.Wrap(err)
 			}
 
 			m, err := BuildMessage(c.g, d, false, c.path)
 			if err != nil {
-				return nil, err
+				return nil, trace.Wrap(err)
 			}
 			if m == nil {
 				return nil, nil
@@ -170,6 +173,33 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		}
 
 		f.setGoTypeFull()
+	}
+
+	f.IsRepeated = c.IsRepeated()
+	if c.IsMap() {
+		f.IsMap = true
+
+		d, err := c.GetMapValueFieldDescriptor()
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		ctx, err := NewFieldBuildContext(c.m, c.g, c.d, d, -1)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		vf, err := BuildField(ctx)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		f.MapValueField = vf
+	}
+
+	if c.IsCustomType() {
+		f.IsCustomType = true
+		f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
 	}
 
 	f.setKind()
@@ -211,6 +241,36 @@ func (f *Field) setKind() {
 		f.Kind = "SINGULAR_ELEMENTARY" // ex: string
 	}
 }
+
+// // setCustomType sets detects and set IsCustomType flag and custom type method infix
+// func (f *Field) setCustomType(fd *FieldDescriptorProtoExt) {
+// 	if !fd.IsCustomType() {
+// 		return
+// 	}
+
+// 	f.IsCustomType = true
+// 	f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
+// }
+
+// // setMap sets map value properties
+// func (f *Field) setMap(ctx *context) error {
+// 	m := ctx.g.GoMapType(nil, ctx.f.FieldDescriptorProto)
+
+// 	keyGoType, _ := ctx.g.GoType(ctx.d, m.KeyField)
+// 	if keyGoType != "string" {
+// 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
+// 	}
+
+// 	c := &context{m: ctx.m, g: ctx.g, d: ctx.d, f: &FieldDescriptorProtoExt{m.ValueField}}
+
+// 	valueField, err := BuildField(c, 0)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	f.MapValueField = valueField
+
+// 	return nil
+// }
 
 // err := f.setMessage(ctx)
 // if err != nil {
@@ -276,57 +336,6 @@ func (f *Field) setKind() {
 // 	return nil
 // }
 
-// // setAggregate detects and sets IsList and IsMap flags.
-// func (f *Field) setAggregate(ctx *context) error {
-// 	if ctx.g.IsMap(ctx.f.FieldDescriptorProto) {
-// 		f.IsMap = true
-// 		err := f.setMap(ctx)
-// 		if err != nil {
-// 			return trace.Wrap(err)
-// 		}
-// 	} else if ctx.f.IsRepeated() {
-// 		f.IsRepeated = true
-// 	}
-
-// 	return nil
-// }
-
-// // setCustomType sets detects and set IsCustomType flag and custom type method infix
-// func (f *Field) setCustomType(fd *FieldDescriptorProtoExt) {
-// 	if !fd.IsCustomType() {
-// 		return
-// 	}
-
-// 	f.IsCustomType = true
-// 	f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
-// }
-
-// // setMap sets map value properties
-// func (f *Field) setMap(ctx *context) error {
-// 	m := ctx.g.GoMapType(nil, ctx.f.FieldDescriptorProto)
-
-// 	keyGoType, _ := ctx.g.GoType(ctx.d, m.KeyField)
-// 	if keyGoType != "string" {
-// 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
-// 	}
-
-// 	c := &context{m: ctx.m, g: ctx.g, d: ctx.d, f: &FieldDescriptorProtoExt{m.ValueField}}
-
-// 	valueField, err := BuildField(c, 0)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	f.MapValueField = valueField
-
-// 	return nil
-// }
-
-// // setSchemaTypes sets SchemaRawType and SchemaGoType
-// func (f *Field) setSchemaTypes(schemaRawType string, goTypeCast string) {
-// 	f.SchemaRawType = schemaRawType
-// 	f.SchemaGoType = goTypeCast
-// }
-
 // // isInSet returns true if that field name or path is in set
 // func isInSet(f *Field, m map[string]struct{}) bool {
 // 	_, ok := m[f.TypeName]
@@ -336,20 +345,6 @@ func (f *Field) setKind() {
 
 // 	_, ok = m[f.Path]
 // 	return ok
-// }
-
-// // setComment resolves leading comment for this field
-// func (f *Field) setComment(d *generator.Descriptor) {
-// 	p := d.Path() + ",2," + strconv.Itoa(f.Index)
-
-// 	for _, l := range d.File().GetSourceCodeInfo().GetLocation() {
-// 		if getLocationPath(l) == p {
-// 			c := strings.Trim(l.GetLeadingComments(), "\n")
-
-// 			f.RawComment = commentToSingleLine(strings.TrimSpace(c))
-// 			f.Comment = appendSlashSlash(c, false)
-// 		}
-// 	}
 // }
 
 // // setRequired sets IsRequired flag
@@ -460,16 +455,6 @@ func (f *Field) setKind() {
 // // 	}
 
 // // 	return nil
-// // }
-
-// // // setCustomType sets detects and set IsCustomType flag and custom type method infix
-// // func (b *fieldBuilder) setCustomType() {
-// // 	if !gogoproto.IsCustomType(b.fieldDescriptor) {
-// // 		return
-// // 	}
-
-// // 	b.field.IsCustomType = true
-// // 	b.field.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(b.field.GoType, "/", ""), ".", "")
 // // }
 
 // // // setMap sets map value properties
