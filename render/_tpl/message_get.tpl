@@ -172,7 +172,7 @@ if ok {
     if !ok {
         return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
     }
-    t.{{.Name}} = make(map[string]{{$m.GoType}}, len(_rawmi))
+    t.{{.Name}} = make(map[string]{{$m.GoTypeFull}}, len(_rawmi))
     for _k, _v := range _rawmi {
         _raw := _v
         {{- template "rawToValue" $m }}

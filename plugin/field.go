@@ -17,9 +17,11 @@ limitations under the License.
 package plugin
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/trace"
 	"github.com/stoewer/go-strcase"
 )
@@ -146,7 +148,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 
 	// Byte slice is an exception, should not be treated as normal array
 	if c.IsByteSlice() {
-		f.GoType = c.GetRawGoType() // []byte
+		f.GoType = c.GetBytesExceptionGoType()
 		f.GoTypeFull = c.GetRawGoType()
 	} else {
 		f.GoTypeIsPtr = c.GetGoTypeIsPtr()
@@ -176,6 +178,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	}
 
 	f.IsRepeated = c.IsRepeated()
+
 	if c.IsMap() {
 		f.IsMap = true
 
@@ -201,6 +204,10 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		f.IsCustomType = true
 		f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
 	}
+
+	f.setRequired(c)
+	f.setComputed(c)
+	f.setDefault(c)
 
 	f.setKind()
 
@@ -242,235 +249,30 @@ func (f *Field) setKind() {
 	}
 }
 
-// // setCustomType sets detects and set IsCustomType flag and custom type method infix
-// func (f *Field) setCustomType(fd *FieldDescriptorProtoExt) {
-// 	if !fd.IsCustomType() {
-// 		return
-// 	}
+// setRequired sets IsRequired flag
+func (f *Field) setRequired(c *FieldBuildContext) {
+	_, ok1 := config.RequiredFields[c.GetTypeName()]
+	_, ok2 := config.RequiredFields[c.GetPath()]
 
-// 	f.IsCustomType = true
-// 	f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
-// }
+	if ok1 || ok2 {
+		f.IsRequired = true
+	}
+}
 
-// // setMap sets map value properties
-// func (f *Field) setMap(ctx *context) error {
-// 	m := ctx.g.GoMapType(nil, ctx.f.FieldDescriptorProto)
+// setComputed sets IsComputed flag
+func (f *Field) setComputed(c *FieldBuildContext) {
+	_, ok1 := config.ComputedFields[c.GetTypeName()]
+	_, ok2 := config.ComputedFields[c.GetPath()]
 
-// 	keyGoType, _ := ctx.g.GoType(ctx.d, m.KeyField)
-// 	if keyGoType != "string" {
-// 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
-// 	}
+	if ok1 || ok2 {
+		f.IsComputed = true
+	}
+}
 
-// 	c := &context{m: ctx.m, g: ctx.g, d: ctx.d, f: &FieldDescriptorProtoExt{m.ValueField}}
-
-// 	valueField, err := BuildField(c, 0)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	f.MapValueField = valueField
-
-// 	return nil
-// }
-
-// err := f.setMessage(ctx)
-// if err != nil {
-// 	return trace.Wrap(err)
-// }
-
-// f.setGoType(ctx)
-// f.setAggregate(ctx)
-// // // if err != nil {
-// // // 	return nil, trace.Wrap(err)
-// // // }
-
-// f.setCustomType(ctx.f)
-
-// f.setComment(ctx.d)
-// f.setRequired()
-// f.setComputed()
-// f.setDefault()
-// f.setKind()
-
-// f, err := BuildField(g, d, f, path, i)
-// if err != nil {
-// 	invErr, ok := trace.Unwrap(err).(*invalidFieldError)
-
-// 	// invalidFieldError is not considered fatal, we just need to report it to the user and skip it
-// 	if !ok {
-// 		return err
-// 	}
-
-// 	logrus.Warning(invErr.Error())
-// 	continue
-// }
-//}
-
-// setMessage sets reference to a nested message
-// func (f *Field) setMessage(ctx *context) error {
-// 	// Resolve underlying message via protobuf
-// 	x := ctx.g.ObjectNamed(ctx.f.GetTypeName())
-// 	desc, ok := x.(*generator.Descriptor)
-// 	if desc == nil || !ok {
-// 		return nil
-// 	}
-
-// 	// Try to analyse it
-// 	m, err := BuildMessage(g, d, false, f.Path)
-// 	if err != nil {
-// 		// If underlying message is invalid, we must consider current field as invalid and not stop
-// 		_, ok := trace.Unwrap(err).(*invalidMessageError)
-// 		if ok {
-// 			return trace.Wrap(
-// 				newInvalidFieldError(b, fmt.Sprintf("failed to reflect message type information: %v", err.Error())),
-// 			)
-// 		}
-
-// 		return trace.Wrap(err)
-// 	} else if m == nil {
-// 		return trace.Wrap(newInvalidFieldError(b, "field marked as skipped"))
-// 	}
-
-// 	// Nested message schema, or nil if message is not whitelisted
-// 	f.Message = m
-
-// 	return nil
-// }
-
-// // isInSet returns true if that field name or path is in set
-// func isInSet(f *Field, m map[string]struct{}) bool {
-// 	_, ok := m[f.TypeName]
-// 	if ok {
-// 		return true
-// 	}
-
-// 	_, ok = m[f.Path]
-// 	return ok
-// }
-
-// // setRequired sets IsRequired flag
-// func (f *Field) setRequired() {
-// 	if f.isInSet(config.RequiredFields) {
-// 		f.IsRequired = true
-// 	}
-// }
-
-// // setComputed sets IsComputed flag
-// func (f *Field) setComputed() {
-// 	if f.isInSet(config.ComputedFields) {
-// 		f.IsComputed = true
-// 	}
-// }
-
-// // setDefault sets default value
-// func (f *Field) setDefault() {
-// 	v, ok := config.Defaults[f.TypeName]
-// 	if ok {
-// 		f.Default = fmt.Sprintf("%s", v)
-// 	}
-// }
-
-// // setKind sets field kind which represents field meta type for generation
-
-// // getFieldTypeName returns field type name with package
-// func getFieldTypeName(d *generator.Descriptor, f *FieldDescriptorProtoExt) string {
-// 	return getMessageTypeName(d) + "." + f.GetName()
-// }
-
-// // // build fills in a Field structure
-// // func (b *fieldBuilder) build() (*Field, error) {
-// // 	// b.resolveName()
-
-// // 	// if hasFieldInSet(config.ExcludeFields, b.field) {
-// // 	// 	return nil, nil
-// // 	// }
-
-// // 	// err := b.resolveType()
-// // 	// if err != nil {
-// // 	// 	return nil, trace.Wrap(err)
-// // 	// }
-
-// // 	// err = b.setGoType()
-// // 	// if err != nil {
-// // 	// 	return nil, trace.Wrap(err)
-// // 	// }
-
-// // 	// // err = b.setAggregate()
-// // 	// // if err != nil {
-// // 	// // 	return nil, trace.Wrap(err)
-// // 	// // }
-
-// // 	// b.setCustomType()
-// // 	//b.resolveKind()
-// // 	//b.setComment()
-// // 	// b.setRequired()
-// // 	// b.setComputed()
-// // 	// b.setDefault()
-
-// // 	return b.field, nil
-// // }
-
-// // // setMessage sets reference to a nested message
-// // func (b *fieldBuilder) setMessage() error {
-// // 	// Resolve underlying message via protobuf
-// // 	x := b.generator.ObjectNamed(b.fieldDescriptor.GetTypeName())
-// // 	desc, ok := x.(*generator.Descriptor)
-// // 	if desc == nil || !ok {
-// // 		return nil
-// // 	}
-
-// // 	// Try to analyse it
-// // 	m, err := BuildMessage(b.generator, desc, false, b.field.path)
-// // 	if err != nil {
-// // 		// If underlying message is invalid, we must consider current field as invalid and not stop
-// // 		_, ok := trace.Unwrap(err).(*invalidMessageError)
-// // 		if ok {
-// // 			return trace.Wrap(
-// // 				newInvalidFieldError(b, fmt.Sprintf("failed to reflect message type information: %v", err.Error())),
-// // 			)
-// // 		}
-
-// // 		return trace.Wrap(err)
-// // 	} else if m == nil {
-// // 		return trace.Wrap(newInvalidFieldError(b, "field marked as skipped"))
-// // 	}
-
-// // 	// Nested message schema, or nil if message is not whitelisted
-// // 	b.field.Message = m
-
-// // 	return nil
-// // }
-
-// // // setAggregate detects and sets IsList and IsMap flags.
-// // func (b *fieldBuilder) setAggregate() error {
-// // 	f := b.field
-
-// // 	if b.generator.IsMap(b.fieldDescriptor) {
-// // 		f.IsMap = true
-// // 		err := b.setMap()
-// // 		if err != nil {
-// // 			return trace.Wrap(err)
-// // 		}
-// // 	} else if b.fieldDescriptor.IsRepeated() {
-// // 		f.IsRepeated = true
-// // 	}
-
-// // 	return nil
-// // }
-
-// // // setMap sets map value properties
-// // func (b *fieldBuilder) setMap() error {
-// // 	m := b.generator.GoMapType(nil, b.fieldDescriptor)
-
-// // 	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
-// // 	if keyGoType != "string" {
-// // 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
-// // 	}
-
-// // 	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField, b.field.path, 0)
-// // 	if err != nil {
-// // 		return err
-// // 	}
-// // 	b.field.MapValueField = valueField
-
-// // 	return nil
-// // }
+// setDefault returns a field default value
+func (f *Field) setDefault(c *FieldBuildContext) {
+	v, ok := config.Defaults[c.GetTypeName()]
+	if ok {
+		f.Default = fmt.Sprintf("%v", v)
+	}
+}

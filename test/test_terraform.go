@@ -654,14 +654,14 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			if !ok {
 				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
 			}
-			t.BytesA = make([]byte, len(_rawi))
+			t.BytesA = make([][]byte, len(_rawi))
 			for i := 0; i < len(_rawi); i++ {
 				_raw := _rawi[i]
 				_raws, ok := _raw.(string)
 				if !ok {
 					return fmt.Errorf("can not convert %T to string", _raws)
 				}
-				_value := byte([]byte(_raws))
+				_value := []byte([]byte(_raws))
 				t.BytesA[i] = _value
 			}
 		}
