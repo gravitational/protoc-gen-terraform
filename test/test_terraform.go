@@ -50,38 +50,46 @@ var _ = time.Kitchen
 // └── duration_std:string (DurationStd time.Duration field (standard))
 // └── duration_custom:string (DurationCustom time.Duration field (custom))
 // └── timestamp_n:string (TimestampN *time.Time field)
-// └── [string_a:string] (StringA []string field)
-// └── bool_a !custom schema, see target code! (BoolA []bool field)
-// └── [bytes_a:string] (BytesA [][]byte field)
-// └── [timestamp_a:string] (TimestampA []time.Time field)
-// └── [duration_custom_a:string] (DurationCustomA []time.Duration field)
+// └── string_a:string (StringA []string field)
+// └── bool_a:bool (BoolA []bool field)
+// └── bytes_a:string (BytesA [][]byte field)
+// └── timestamp_a:string (TimestampA []time.Time field)
+// └── duration_custom_a:string (DurationCustomA []time.Duration field)
 // └── nested (Nested nested message field)
 // │   ├── str:string (Str string field)
-// │   ├── [nested] (Nested repeated nested messages)
+// │   ├── nested (Nested repeated nested messages)
 // │   │   ├── str:string (Str string field)
-// │   ├── nested_m:map (Nested map repeated nested messages)
-// │   ├── [nested_m_obj] (NestedMObj nested object map)
+// │   ├── nested_m (Nested map repeated nested messages)
+// │   │   ├── key:string
+// │   │   ├── value:string
+// │   ├── nested_m_obj (NestedMObj nested object map)
 // │       └── key:string
 // │       └── value
 // │           └── str:string (Str string field)
-// └── [nested_a] (NestedA nested message array)
+// └── nested_a (NestedA nested message array)
 // │   ├── str:string (Str string field)
-// │   ├── [nested] (Nested repeated nested messages)
+// │   ├── nested (Nested repeated nested messages)
 // │   │   ├── str:string (Str string field)
-// │   ├── nested_m:map (Nested map repeated nested messages)
-// │   ├── [nested_m_obj] (NestedMObj nested object map)
+// │   ├── nested_m (Nested map repeated nested messages)
+// │   │   ├── key:string
+// │   │   ├── value:string
+// │   ├── nested_m_obj (NestedMObj nested object map)
 // │       └── key:string
 // │       └── value
 // │           └── str:string (Str string field)
-// └── nested_m:map (NestedM normal map)
-// └── [nested_m_obj] (NestedMObj object map)
+// └── nested_m (NestedM normal map)
+// │   ├── key:string
+// │   ├── value:string
+// └── nested_m_obj (NestedMObj object map)
 //     └── key:string
 //     └── value
 //         └── str:string (Str string field)
-//         └── [nested] (Nested repeated nested messages)
+//         └── nested (Nested repeated nested messages)
 //         │   ├── str:string (Str string field)
-//         └── nested_m:map (Nested map repeated nested messages)
-//         └── [nested_m_obj] (NestedMObj nested object map)
+//         └── nested_m (Nested map repeated nested messages)
+//         │   ├── key:string
+//         │   ├── value:string
+//         └── nested_m_obj (NestedMObj nested object map)
 //             └── key:string
 //             └── value
 //                 └── str:string (Str string field)
@@ -144,13 +152,39 @@ func SchemaTest() map[string]*schema.Schema {
 		"duration_std": {
 			Type:        schema.TypeString,
 			Description: "DurationStd time.Duration field (standard)",
-			Optional:    true,
+			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
+				o, err := time.ParseDuration(old)
+				if err != nil {
+					return false
+				}
+
+				n, err := time.ParseDuration(new)
+				if err != nil {
+					return false
+				}
+
+				return o == n
+			},
+			Optional: true,
 		},
 		// DurationCustom time.Duration field (custom)
 		"duration_custom": {
 			Type:        schema.TypeString,
 			Description: "DurationCustom time.Duration field (custom)",
-			Optional:    true,
+			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
+				o, err := time.ParseDuration(old)
+				if err != nil {
+					return false
+				}
+
+				n, err := time.ParseDuration(new)
+				if err != nil {
+					return false
+				}
+
+				return o == n
+			},
+			Optional: true,
 		},
 		// TimestampN *time.Time field
 		"timestamp_n": {
@@ -161,41 +195,47 @@ func SchemaTest() map[string]*schema.Schema {
 		},
 		// StringA []string field
 		"string_a": {
-			Optional:    true,
-			Type:        schema.TypeList,
+			Type:        schema.TypeString,
 			Description: "StringA []string field",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
+			Optional:    true,
 		},
 		// BoolA []bool field
-		"bool_a": SchemaBoolCustom(),
+		"bool_a": {
+			Type:        schema.TypeBool,
+			Description: "BoolA []bool field",
+			Optional:    true,
+		},
 		// BytesA [][]byte field
 		"bytes_a": {
-			Optional:    true,
-			Type:        schema.TypeList,
+			Type:        schema.TypeString,
 			Description: "BytesA [][]byte field",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
+			Optional:    true,
 		},
 		// TimestampA []time.Time field
 		"timestamp_a": {
-			Optional:    true,
-			Type:        schema.TypeList,
-			Description: "TimestampA []time.Time field",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
+			Type:         schema.TypeString,
+			Description:  "TimestampA []time.Time field",
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
 		},
 		// DurationCustomA []time.Duration field
 		"duration_custom_a": {
-			Optional:    true,
-			Type:        schema.TypeList,
+			Type:        schema.TypeString,
 			Description: "DurationCustomA []time.Duration field",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
+			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
+				o, err := time.ParseDuration(old)
+				if err != nil {
+					return false
+				}
+
+				n, err := time.ParseDuration(new)
+				if err != nil {
+					return false
+				}
+
+				return o == n
 			},
+			Optional: true,
 		},
 		// Nested nested message field
 		"nested": {
@@ -216,6 +256,7 @@ func SchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeList,
 						Description: "Message nested into nested message",
+						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -230,23 +271,41 @@ func SchemaTest() map[string]*schema.Schema {
 					// Nested map repeated nested messages
 					"nested_m": {
 						Optional:    true,
-						Type:        schema.TypeMap,
-						Description: "Nested map repeated nested messages",
-						Elem: &schema.Schema{
-							Type: schema.TypeString,
+						Type:        schema.TypeList,
+						Description: "",
+						MaxItems:    1,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+
+								"key": {
+									Type:        schema.TypeString,
+									Description: "",
+									Optional:    true,
+								},
+
+								"value": {
+									Type:        schema.TypeString,
+									Description: "",
+									Optional:    true,
+								},
+							},
 						},
 					},
 					// NestedMObj nested object map
 					"nested_m_obj": {
 						Optional:    true,
 						Type:        schema.TypeList,
-						Description: "Nested repeated nested messages",
+						Description: "",
+						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
+
 								"key": {
-									Type:     schema.TypeString,
-									Required: true,
+									Type:        schema.TypeString,
+									Description: "",
+									Optional:    true,
 								},
+								// Message nested into nested message
 								"value": {
 									Optional:    true,
 									Type:        schema.TypeList,
@@ -274,6 +333,7 @@ func SchemaTest() map[string]*schema.Schema {
 			Optional:    true,
 			Type:        schema.TypeList,
 			Description: "Nested message definition",
+			MaxItems:    1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -287,6 +347,7 @@ func SchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeList,
 						Description: "Message nested into nested message",
+						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -301,23 +362,41 @@ func SchemaTest() map[string]*schema.Schema {
 					// Nested map repeated nested messages
 					"nested_m": {
 						Optional:    true,
-						Type:        schema.TypeMap,
-						Description: "Nested map repeated nested messages",
-						Elem: &schema.Schema{
-							Type: schema.TypeString,
+						Type:        schema.TypeList,
+						Description: "",
+						MaxItems:    1,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+
+								"key": {
+									Type:        schema.TypeString,
+									Description: "",
+									Optional:    true,
+								},
+
+								"value": {
+									Type:        schema.TypeString,
+									Description: "",
+									Optional:    true,
+								},
+							},
 						},
 					},
 					// NestedMObj nested object map
 					"nested_m_obj": {
 						Optional:    true,
 						Type:        schema.TypeList,
-						Description: "Nested repeated nested messages",
+						Description: "",
+						MaxItems:    1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
+
 								"key": {
-									Type:     schema.TypeString,
-									Required: true,
+									Type:        schema.TypeString,
+									Description: "",
+									Optional:    true,
 								},
+								// Message nested into nested message
 								"value": {
 									Optional:    true,
 									Type:        schema.TypeList,
@@ -343,23 +422,41 @@ func SchemaTest() map[string]*schema.Schema {
 		// NestedM normal map
 		"nested_m": {
 			Optional:    true,
-			Type:        schema.TypeMap,
-			Description: "NestedM normal map",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
+			Type:        schema.TypeList,
+			Description: "",
+			MaxItems:    1,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"key": {
+						Type:        schema.TypeString,
+						Description: "",
+						Optional:    true,
+					},
+
+					"value": {
+						Type:        schema.TypeString,
+						Description: "",
+						Optional:    true,
+					},
+				},
 			},
 		},
 		// NestedMObj object map
 		"nested_m_obj": {
 			Optional:    true,
 			Type:        schema.TypeList,
-			Description: "Int32 int32 field",
+			Description: "",
+			MaxItems:    1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
+
 					"key": {
-						Type:     schema.TypeString,
-						Required: true,
+						Type:        schema.TypeString,
+						Description: "",
+						Optional:    true,
 					},
+					// Nested message definition
 					"value": {
 						Optional:    true,
 						Type:        schema.TypeList,
@@ -378,6 +475,7 @@ func SchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 									Type:        schema.TypeList,
 									Description: "Message nested into nested message",
+									MaxItems:    1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -392,23 +490,41 @@ func SchemaTest() map[string]*schema.Schema {
 								// Nested map repeated nested messages
 								"nested_m": {
 									Optional:    true,
-									Type:        schema.TypeMap,
-									Description: "Nested map repeated nested messages",
-									Elem: &schema.Schema{
-										Type: schema.TypeString,
+									Type:        schema.TypeList,
+									Description: "",
+									MaxItems:    1,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+
+											"key": {
+												Type:        schema.TypeString,
+												Description: "",
+												Optional:    true,
+											},
+
+											"value": {
+												Type:        schema.TypeString,
+												Description: "",
+												Optional:    true,
+											},
+										},
 									},
 								},
 								// NestedMObj nested object map
 								"nested_m_obj": {
 									Optional:    true,
 									Type:        schema.TypeList,
-									Description: "Nested repeated nested messages",
+									Description: "",
+									MaxItems:    1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
+
 											"key": {
-												Type:     schema.TypeString,
-												Required: true,
+												Type:        schema.TypeString,
+												Description: "",
+												Optional:    true,
 											},
+											// Message nested into nested message
 											"value": {
 												Optional:    true,
 												Type:        schema.TypeList,
@@ -597,92 +713,75 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "string_a")
+
+		_raw, ok := d.GetOk(p + "string_a")
+
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			_raws, ok := _raw.(string)
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("can not convert %T to string", _raws)
 			}
-			t.StringA = make([]string, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := string(string(_raws))
-				t.StringA[i] = _value
-			}
+			_value := string(string(_raws))
+			t.StringA = _value
 		}
 	}
 	{
-		err := GetBoolCustomFromResourceData(p+"bool_a", d, &t.BoolA)
-		if err != nil {
-			return err
+
+		_raw, ok := d.GetOkExists(p + "bool_a")
+
+		if ok {
+			_raws, ok := _raw.(bool)
+			if !ok {
+				return fmt.Errorf("can not convert %T to bool", _raws)
+			}
+			_value := BoolCustom(bool(_raws))
+			t.BoolA = _value
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "bytes_a")
+
+		_raw, ok := d.GetOk(p + "bytes_a")
+
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			_raws, ok := _raw.(string)
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("can not convert %T to string", _raws)
 			}
-			t.BytesA = make([][]byte, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := []byte([]byte(_raws))
-				t.BytesA[i] = _value
-			}
+			_value := byte([]byte(_raws))
+			t.BytesA = _value
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "timestamp_a")
+
+		_raw, ok := d.GetOk(p + "timestamp_a")
+
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			_raws, ok := _raw.(string)
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("can not convert %T to string", _raws)
 			}
-			t.TimestampA = make([]*time.Time, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value, err := time.Parse(time.RFC3339Nano, _raws)
-				if err != nil {
-					return fmt.Errorf("malformed time value for field TimestampA : %w", err)
-				}
-				t.TimestampA[i] = &_value
+			_value, err := time.Parse(time.RFC3339Nano, _raws)
+			if err != nil {
+				return fmt.Errorf("malformed time value for field TimestampA : %w", err)
 			}
+			t.TimestampA = &_value
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "duration_custom_a")
+
+		_raw, ok := d.GetOk(p + "duration_custom_a")
+
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			_raws, ok := _raw.(string)
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("can not convert %T to string", _raws)
 			}
-			t.DurationCustomA = make([]Duration, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_valued, err := time.ParseDuration(_raws)
-				if err != nil {
-					return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
-				}
-				_value := Duration(_valued)
-				t.DurationCustomA[i] = _value
+			_valued, err := time.ParseDuration(_raws)
+			if err != nil {
+				return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
 			}
+			_value := Duration(_valued)
+			t.DurationCustomA = _value
 		}
 	}
 	{
@@ -706,305 +805,390 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			}
 		}
 		{
-			p := p + "nested"
+			p := p + "nested" + ".0."
 
-			_raw, ok := d.GetOk(p)
-			if ok {
-				_rawi, ok := _raw.([]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to []interface{}", _raw)
-				}
+			_obj := NestedLevel2{}
+			t.Nested = &_obj
+			t := &_obj
 
-				t.Nested = make([]*NestedLevel2, len(_rawi))
-				for i := 0; i < len(_rawi); i++ {
+			{
 
-					_obj := NestedLevel2{}
-					t.Nested[i] = &_obj
+				_raw, ok := d.GetOk(p + "str")
 
-					{
-						t := t.Nested[i]
-						p := p + fmt.Sprintf(".%v.", i)
-						{
-
-							_raw, ok := d.GetOk(p + "str")
-
-							if ok {
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.Str = _value
-							}
-						}
-
-					}
-				}
-			}
-		}
-		{
-
-			p := p + "nested_m"
-			_rawm, ok := d.GetOk(p)
-			if ok {
-				_rawmi, ok := _rawm.(map[string]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-				}
-				t.NestedM = make(map[string]string, len(_rawmi))
-				for _k, _v := range _rawmi {
-					_raw := _v
+				if ok {
 					_raws, ok := _raw.(string)
 					if !ok {
 						return fmt.Errorf("can not convert %T to string", _raws)
 					}
 					_value := string(string(_raws))
-					t.NestedM[_k] = _value
+					t.Str = _value
 				}
 			}
+
 		}
 		{
-			p := p + "nested_m_obj"
+			p := p + "nested_m" + ".0."
 
-			_raw, ok := d.GetOk(p)
-			if ok {
-				_rawi, ok := _raw.([]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to []interface{}", _raw)
-				}
+			_obj := NestedMEntry{}
+			t.NestedM = &_obj
+			t := &_obj
 
-				_value := make(map[string]*NestedLevel2)
+			{
 
-				for i := range _rawi {
-					_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-					_key, ok := _rawkey.(string)
+				_raw, ok := d.GetOk(p + "key")
+
+				if ok {
+					_raws, ok := _raw.(string)
 					if !ok {
-						return fmt.Errorf("can not convert %T to string", _rawkey)
+						return fmt.Errorf("can not convert %T to string", _raws)
 					}
-					if _key == "" {
-						return fmt.Errorf("missing key field in object map NestedMObj")
-					}
-
-					_obj := NestedLevel2{}
-					_value[_key] = &_obj
-					t := &_obj
-
-					{
-						p := fmt.Sprintf("%v.%v.value.0.", p, i)
-						{
-
-							_raw, ok := d.GetOk(p + "str")
-
-							if ok {
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.Str = _value
-							}
-						}
-
-					}
+					_value := string(string(_raws))
+					t.key = _value
 				}
-
-				t.NestedMObj = _value
 			}
+			{
+
+				_raw, ok := d.GetOk(p + "value")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.value = _value
+				}
+			}
+
 		}
+		{
+			p := p + "nested_m_obj" + ".0."
 
-	}
-	{
-		p := p + "nested_a"
+			_obj := NestedMObjEntry{}
+			t.NestedMObj = &_obj
+			t := &_obj
 
-		_raw, ok := d.GetOk(p)
-		if ok {
-			_rawi, ok := _raw.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _raw)
+			{
+
+				_raw, ok := d.GetOk(p + "key")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.key = _value
+				}
 			}
+			{
+				p := p + "value" + ".0."
 
-			t.NestedA = make([]*Nested, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-
-				_obj := Nested{}
-				t.NestedA[i] = &_obj
+				_obj := NestedLevel2{}
+				t.value = &_obj
+				t := &_obj
 
 				{
-					t := t.NestedA[i]
-					p := p + fmt.Sprintf(".%v.", i)
-					{
 
-						_raw, ok := d.GetOk(p + "str")
+					_raw, ok := d.GetOk(p + "str")
 
-						if ok {
-							_raws, ok := _raw.(string)
-							if !ok {
-								return fmt.Errorf("can not convert %T to string", _raws)
-							}
-							_value := string(string(_raws))
-							t.Str = _value
+					if ok {
+						_raws, ok := _raw.(string)
+						if !ok {
+							return fmt.Errorf("can not convert %T to string", _raws)
 						}
+						_value := string(string(_raws))
+						t.Str = _value
 					}
-					{
-						p := p + "nested"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							t.Nested = make([]*NestedLevel2, len(_rawi))
-							for i := 0; i < len(_rawi); i++ {
-
-								_obj := NestedLevel2{}
-								t.Nested[i] = &_obj
-
-								{
-									t := t.Nested[i]
-									p := p + fmt.Sprintf(".%v.", i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-						}
-					}
-					{
-
-						p := p + "nested_m"
-						_rawm, ok := d.GetOk(p)
-						if ok {
-							_rawmi, ok := _rawm.(map[string]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-							}
-							t.NestedM = make(map[string]string, len(_rawmi))
-							for _k, _v := range _rawmi {
-								_raw := _v
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.NestedM[_k] = _value
-							}
-						}
-					}
-					{
-						p := p + "nested_m_obj"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							_value := make(map[string]*NestedLevel2)
-
-							for i := range _rawi {
-								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-								_key, ok := _rawkey.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _rawkey)
-								}
-								if _key == "" {
-									return fmt.Errorf("missing key field in object map NestedMObj")
-								}
-
-								_obj := NestedLevel2{}
-								_value[_key] = &_obj
-								t := &_obj
-
-								{
-									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-
-							t.NestedMObj = _value
-						}
-					}
-
 				}
+
 			}
+
 		}
+
 	}
 	{
+		p := p + "nested_a" + ".0."
 
-		p := p + "nested_m"
-		_rawm, ok := d.GetOk(p)
-		if ok {
-			_rawmi, ok := _rawm.(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-			}
-			t.NestedM = make(map[string]string, len(_rawmi))
-			for _k, _v := range _rawmi {
-				_raw := _v
+		_obj := Nested{}
+		t.NestedA = &_obj
+		t := &_obj
+
+		{
+
+			_raw, ok := d.GetOk(p + "str")
+
+			if ok {
 				_raws, ok := _raw.(string)
 				if !ok {
 					return fmt.Errorf("can not convert %T to string", _raws)
 				}
 				_value := string(string(_raws))
-				t.NestedM[_k] = _value
+				t.Str = _value
 			}
 		}
-	}
-	{
-		p := p + "nested_m_obj"
+		{
+			p := p + "nested" + ".0."
 
-		_raw, ok := d.GetOk(p)
-		if ok {
-			_rawi, ok := _raw.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _raw)
+			_obj := NestedLevel2{}
+			t.Nested = &_obj
+			t := &_obj
+
+			{
+
+				_raw, ok := d.GetOk(p + "str")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.Str = _value
+				}
 			}
 
-			_value := make(map[string]*Nested)
+		}
+		{
+			p := p + "nested_m" + ".0."
 
-			for i := range _rawi {
-				_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-				_key, ok := _rawkey.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _rawkey)
-				}
-				if _key == "" {
-					return fmt.Errorf("missing key field in object map NestedMObj")
-				}
+			_obj := NestedMEntry{}
+			t.NestedM = &_obj
+			t := &_obj
 
-				_obj := Nested{}
-				_value[_key] = &_obj
+			{
+
+				_raw, ok := d.GetOk(p + "key")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.key = _value
+				}
+			}
+			{
+
+				_raw, ok := d.GetOk(p + "value")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.value = _value
+				}
+			}
+
+		}
+		{
+			p := p + "nested_m_obj" + ".0."
+
+			_obj := NestedMObjEntry{}
+			t.NestedMObj = &_obj
+			t := &_obj
+
+			{
+
+				_raw, ok := d.GetOk(p + "key")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.key = _value
+				}
+			}
+			{
+				p := p + "value" + ".0."
+
+				_obj := NestedLevel2{}
+				t.value = &_obj
 				t := &_obj
 
 				{
-					p := fmt.Sprintf("%v.%v.value.0.", p, i)
+
+					_raw, ok := d.GetOk(p + "str")
+
+					if ok {
+						_raws, ok := _raw.(string)
+						if !ok {
+							return fmt.Errorf("can not convert %T to string", _raws)
+						}
+						_value := string(string(_raws))
+						t.Str = _value
+					}
+				}
+
+			}
+
+		}
+
+	}
+	{
+		p := p + "nested_m" + ".0."
+
+		_obj := NestedMEntry{}
+		t.NestedM = &_obj
+		t := &_obj
+
+		{
+
+			_raw, ok := d.GetOk(p + "key")
+
+			if ok {
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
+				t.key = _value
+			}
+		}
+		{
+
+			_raw, ok := d.GetOk(p + "value")
+
+			if ok {
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
+				t.value = _value
+			}
+		}
+
+	}
+	{
+		p := p + "nested_m_obj" + ".0."
+
+		_obj := NestedMObjEntry{}
+		t.NestedMObj = &_obj
+		t := &_obj
+
+		{
+
+			_raw, ok := d.GetOk(p + "key")
+
+			if ok {
+				_raws, ok := _raw.(string)
+				if !ok {
+					return fmt.Errorf("can not convert %T to string", _raws)
+				}
+				_value := string(string(_raws))
+				t.key = _value
+			}
+		}
+		{
+			p := p + "value" + ".0."
+
+			_obj := Nested{}
+			t.value = &_obj
+			t := &_obj
+
+			{
+
+				_raw, ok := d.GetOk(p + "str")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.Str = _value
+				}
+			}
+			{
+				p := p + "nested" + ".0."
+
+				_obj := NestedLevel2{}
+				t.Nested = &_obj
+				t := &_obj
+
+				{
+
+					_raw, ok := d.GetOk(p + "str")
+
+					if ok {
+						_raws, ok := _raw.(string)
+						if !ok {
+							return fmt.Errorf("can not convert %T to string", _raws)
+						}
+						_value := string(string(_raws))
+						t.Str = _value
+					}
+				}
+
+			}
+			{
+				p := p + "nested_m" + ".0."
+
+				_obj := NestedMEntry{}
+				t.NestedM = &_obj
+				t := &_obj
+
+				{
+
+					_raw, ok := d.GetOk(p + "key")
+
+					if ok {
+						_raws, ok := _raw.(string)
+						if !ok {
+							return fmt.Errorf("can not convert %T to string", _raws)
+						}
+						_value := string(string(_raws))
+						t.key = _value
+					}
+				}
+				{
+
+					_raw, ok := d.GetOk(p + "value")
+
+					if ok {
+						_raws, ok := _raw.(string)
+						if !ok {
+							return fmt.Errorf("can not convert %T to string", _raws)
+						}
+						_value := string(string(_raws))
+						t.value = _value
+					}
+				}
+
+			}
+			{
+				p := p + "nested_m_obj" + ".0."
+
+				_obj := NestedMObjEntry{}
+				t.NestedMObj = &_obj
+				t := &_obj
+
+				{
+
+					_raw, ok := d.GetOk(p + "key")
+
+					if ok {
+						_raws, ok := _raw.(string)
+						if !ok {
+							return fmt.Errorf("can not convert %T to string", _raws)
+						}
+						_value := string(string(_raws))
+						t.key = _value
+					}
+				}
+				{
+					p := p + "value" + ".0."
+
+					_obj := NestedLevel2{}
+					t.value = &_obj
+					t := &_obj
+
 					{
 
 						_raw, ok := d.GetOk(p + "str")
@@ -1018,118 +1202,13 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 							t.Str = _value
 						}
 					}
-					{
-						p := p + "nested"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							t.Nested = make([]*NestedLevel2, len(_rawi))
-							for i := 0; i < len(_rawi); i++ {
-
-								_obj := NestedLevel2{}
-								t.Nested[i] = &_obj
-
-								{
-									t := t.Nested[i]
-									p := p + fmt.Sprintf(".%v.", i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-						}
-					}
-					{
-
-						p := p + "nested_m"
-						_rawm, ok := d.GetOk(p)
-						if ok {
-							_rawmi, ok := _rawm.(map[string]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-							}
-							t.NestedM = make(map[string]string, len(_rawmi))
-							for _k, _v := range _rawmi {
-								_raw := _v
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.NestedM[_k] = _value
-							}
-						}
-					}
-					{
-						p := p + "nested_m_obj"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							_value := make(map[string]*NestedLevel2)
-
-							for i := range _rawi {
-								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-								_key, ok := _rawkey.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _rawkey)
-								}
-								if _key == "" {
-									return fmt.Errorf("missing key field in object map NestedMObj")
-								}
-
-								_obj := NestedLevel2{}
-								_value[_key] = &_obj
-								t := &_obj
-
-								{
-									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-
-							t.NestedMObj = _value
-						}
-					}
 
 				}
+
 			}
 
-			t.NestedMObj = _value
 		}
+
 	}
 
 	return nil
@@ -1207,55 +1286,36 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		_arr := t.StringA
-		_raw := make([]string, len(_arr))
+		_v := t.StringA
 
-		for i, _v := range _arr {
-			_value := string(_v)
-			_raw[i] = _value
-		}
-
-		obj["string_a"] = _raw
+		_value := string(_v)
+		obj["string_a"] = _value
 	}
 	{
-		_v, err := SetBoolCustomToResourceData(&t.BoolA)
-		if err != nil {
-			return err
-		}
-		obj["bool_a"] = _v
+		_v := t.BoolA
+
+		_value := bool(_v)
+		obj["bool_a"] = _value
 	}
 	{
-		_arr := t.BytesA
-		_raw := make([]string, len(_arr))
+		_v := t.BytesA
 
-		for i, _v := range _arr {
-			_value := string(_v)
-			_raw[i] = _value
-		}
-
-		obj["bytes_a"] = _raw
+		_value := string(_v)
+		obj["bytes_a"] = _value
 	}
 	{
-		_arr := t.TimestampA
-		_raw := make([]string, len(_arr))
+		_v := t.TimestampA
+		if _v != nil {
 
-		for i, _v := range _arr {
 			_value := _v.Format(time.RFC3339Nano)
-			_raw[i] = _value
+			obj["timestamp_a"] = _value
 		}
-
-		obj["timestamp_a"] = _raw
 	}
 	{
-		_arr := t.DurationCustomA
-		_raw := make([]string, len(_arr))
+		_v := t.DurationCustomA
 
-		for i, _v := range _arr {
-			_value := time.Duration(_v).String()
-			_raw[i] = _value
-		}
-
-		obj["duration_custom_a"] = _raw
+		_value := time.Duration(_v).String()
+		obj["duration_custom_a"] = _value
 	}
 	{
 
@@ -1274,64 +1334,98 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 					obj["str"] = _value
 				}
 				{
-					arr := make([]interface{}, len(t.Nested))
 
-					for i, t := range t.Nested {
-						obj := make(map[string]interface{})
+					if t.Nested != nil {
+
+						msg := make(map[string]interface{})
+						obj["nested"] = []interface{}{msg}
 						{
-							_v := t.Str
+							obj := msg
+							t := t.Nested
 
-							_value := string(_v)
-							obj["str"] = _value
+							{
+								_v := t.Str
+
+								_value := string(_v)
+								obj["str"] = _value
+							}
+
 						}
 
-						arr[i] = obj
 					}
 
-					if len(arr) > 0 {
-						obj["nested"] = arr
-					}
 				}
 				{
 
-					m := make(map[string]interface{})
+					if t.NestedM != nil {
 
-					for key, _v := range t.NestedM {
-						_value := string(_v)
-						m[key] = _value
+						msg := make(map[string]interface{})
+						obj["nested_m"] = []interface{}{msg}
+						{
+							obj := msg
+							t := t.NestedM
+
+							{
+								_v := t.key
+
+								_value := string(_v)
+								obj["key"] = _value
+							}
+							{
+								_v := t.value
+
+								_value := string(_v)
+								obj["value"] = _value
+							}
+
+						}
+
 					}
 
-					if len(m) > 0 {
-						obj["nested_m"] = m
-					}
 				}
 				{
 
-					a := make([]interface{}, len(t.NestedMObj))
-					n := 0
+					if t.NestedMObj != nil {
 
-					for k, v := range t.NestedMObj {
-						i := make(map[string]interface{})
-						i["key"] = k
-
-						obj := make(map[string]interface{})
-						t := v
+						msg := make(map[string]interface{})
+						obj["nested_m_obj"] = []interface{}{msg}
 						{
-							_v := t.Str
+							obj := msg
+							t := t.NestedMObj
 
-							_value := string(_v)
-							obj["str"] = _value
+							{
+								_v := t.key
+
+								_value := string(_v)
+								obj["key"] = _value
+							}
+							{
+
+								if t.value != nil {
+
+									msg := make(map[string]interface{})
+									obj["value"] = []interface{}{msg}
+									{
+										obj := msg
+										t := t.value
+
+										{
+											_v := t.Str
+
+											_value := string(_v)
+											obj["str"] = _value
+										}
+
+									}
+
+								}
+
+							}
+
 						}
 
-						i["value"] = []interface{}{obj}
-
-						a[n] = i
-						n++
 					}
 
-					if len(a) > 0 {
-						obj["nested_m_obj"] = a
-					}
 				}
 
 			}
@@ -1340,184 +1434,286 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 	}
 	{
-		arr := make([]interface{}, len(t.NestedA))
 
-		for i, t := range t.NestedA {
-			obj := make(map[string]interface{})
+		if t.NestedA != nil {
+
+			msg := make(map[string]interface{})
+			obj["nested_a"] = []interface{}{msg}
 			{
-				_v := t.Str
+				obj := msg
+				t := t.NestedA
 
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
+				{
+					_v := t.Str
 
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
 					_value := string(_v)
-					m[key] = _value
+					obj["str"] = _value
 				}
+				{
 
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
-			}
-			{
+					if t.Nested != nil {
 
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
+						msg := make(map[string]interface{})
+						obj["nested"] = []interface{}{msg}
+						{
+							obj := msg
+							t := t.Nested
 
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
+							{
+								_v := t.Str
 
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
+								_value := string(_v)
+								obj["str"] = _value
+							}
 
-						_value := string(_v)
-						obj["str"] = _value
+						}
+
 					}
 
-					i["value"] = []interface{}{obj}
+				}
+				{
 
-					a[n] = i
-					n++
+					if t.NestedM != nil {
+
+						msg := make(map[string]interface{})
+						obj["nested_m"] = []interface{}{msg}
+						{
+							obj := msg
+							t := t.NestedM
+
+							{
+								_v := t.key
+
+								_value := string(_v)
+								obj["key"] = _value
+							}
+							{
+								_v := t.value
+
+								_value := string(_v)
+								obj["value"] = _value
+							}
+
+						}
+
+					}
+
+				}
+				{
+
+					if t.NestedMObj != nil {
+
+						msg := make(map[string]interface{})
+						obj["nested_m_obj"] = []interface{}{msg}
+						{
+							obj := msg
+							t := t.NestedMObj
+
+							{
+								_v := t.key
+
+								_value := string(_v)
+								obj["key"] = _value
+							}
+							{
+
+								if t.value != nil {
+
+									msg := make(map[string]interface{})
+									obj["value"] = []interface{}{msg}
+									{
+										obj := msg
+										t := t.value
+
+										{
+											_v := t.Str
+
+											_value := string(_v)
+											obj["str"] = _value
+										}
+
+									}
+
+								}
+
+							}
+
+						}
+
+					}
+
 				}
 
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
 			}
 
-			arr[i] = obj
 		}
 
-		if len(arr) > 0 {
-			obj["nested_a"] = arr
-		}
 	}
 	{
 
-		m := make(map[string]interface{})
+		if t.NestedM != nil {
 
-		for key, _v := range t.NestedM {
-			_value := string(_v)
-			m[key] = _value
-		}
-
-		if len(m) > 0 {
-			obj["nested_m"] = m
-		}
-	}
-	{
-
-		a := make([]interface{}, len(t.NestedMObj))
-		n := 0
-
-		for k, v := range t.NestedMObj {
-			i := make(map[string]interface{})
-			i["key"] = k
-
-			obj := make(map[string]interface{})
-			t := v
+			msg := make(map[string]interface{})
+			obj["nested_m"] = []interface{}{msg}
 			{
-				_v := t.Str
+				obj := msg
+				t := t.NestedM
 
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
+				{
+					_v := t.key
 
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
 					_value := string(_v)
-					m[key] = _value
+					obj["key"] = _value
+				}
+				{
+					_v := t.value
+
+					_value := string(_v)
+					obj["value"] = _value
 				}
 
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
 			}
+
+		}
+
+	}
+	{
+
+		if t.NestedMObj != nil {
+
+			msg := make(map[string]interface{})
+			obj["nested_m_obj"] = []interface{}{msg}
 			{
+				obj := msg
+				t := t.NestedMObj
 
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
+				{
+					_v := t.key
 
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
+					_value := string(_v)
+					obj["key"] = _value
+				}
+				{
 
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
+					if t.value != nil {
 
-						_value := string(_v)
-						obj["str"] = _value
+						msg := make(map[string]interface{})
+						obj["value"] = []interface{}{msg}
+						{
+							obj := msg
+							t := t.value
+
+							{
+								_v := t.Str
+
+								_value := string(_v)
+								obj["str"] = _value
+							}
+							{
+
+								if t.Nested != nil {
+
+									msg := make(map[string]interface{})
+									obj["nested"] = []interface{}{msg}
+									{
+										obj := msg
+										t := t.Nested
+
+										{
+											_v := t.Str
+
+											_value := string(_v)
+											obj["str"] = _value
+										}
+
+									}
+
+								}
+
+							}
+							{
+
+								if t.NestedM != nil {
+
+									msg := make(map[string]interface{})
+									obj["nested_m"] = []interface{}{msg}
+									{
+										obj := msg
+										t := t.NestedM
+
+										{
+											_v := t.key
+
+											_value := string(_v)
+											obj["key"] = _value
+										}
+										{
+											_v := t.value
+
+											_value := string(_v)
+											obj["value"] = _value
+										}
+
+									}
+
+								}
+
+							}
+							{
+
+								if t.NestedMObj != nil {
+
+									msg := make(map[string]interface{})
+									obj["nested_m_obj"] = []interface{}{msg}
+									{
+										obj := msg
+										t := t.NestedMObj
+
+										{
+											_v := t.key
+
+											_value := string(_v)
+											obj["key"] = _value
+										}
+										{
+
+											if t.value != nil {
+
+												msg := make(map[string]interface{})
+												obj["value"] = []interface{}{msg}
+												{
+													obj := msg
+													t := t.value
+
+													{
+														_v := t.Str
+
+														_value := string(_v)
+														obj["str"] = _value
+													}
+
+												}
+
+											}
+
+										}
+
+									}
+
+								}
+
+							}
+
+						}
+
 					}
 
-					i["value"] = []interface{}{obj}
-
-					a[n] = i
-					n++
 				}
 
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
 			}
 
-			i["value"] = []interface{}{obj}
-
-			a[n] = i
-			n++
 		}
 
-		if len(a) > 0 {
-			obj["nested_m_obj"] = a
-		}
 	}
 
 	for key, value := range obj {

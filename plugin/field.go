@@ -17,16 +17,6 @@ limitations under the License.
 package plugin
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-
-	"github.com/gravitational/protoc-gen-terraform/config"
-	"github.com/gravitational/trace"
-	"github.com/sirupsen/logrus"
-
-	"github.com/gogo/protobuf/gogoproto"
-	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/stoewer/go-strcase"
 )
@@ -45,9 +35,6 @@ type Field struct {
 
 	// SchemaGoType Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 	SchemaGoType string
-
-	// RawGoType field type returned by gogoprotobuf with * and []
-	RawGoType string
 
 	// GoType Go type without [] and *, but with package name prepended
 	GoType string
@@ -105,48 +92,21 @@ type Field struct {
 
 	// Default is field default value
 	Default string
-
-	// typeName represents full field type name
-	typeName string
-
-	// path represents path to current field in schema
-	path string
-
-	// field index in the field array, used for comment extraction
-	index int
-}
-
-// fieldBuilder creates valid Field values
-type fieldBuilder struct {
-	// generator is the generator instance
-	generator *generator.Generator
-
-	// descriptor is the message descriptor
-	descriptor *generator.Descriptor
-
-	// fieldDescriptor is the field descriptor
-	fieldDescriptor *descriptor.FieldDescriptorProto
-
-	// field is the target Field value
-	field *Field
 }
 
 // BuildFields builds []*Field from descriptors of specified message
-func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, path string) error {
-	for i, f := range d.GetField() {
-		path := path + "." + f.GetName()
+func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) error {
+	for i, fd := range d.GetField() {
+		fd := &FieldDescriptorProtoExt{fd}
 
-		f, err := BuildField(g, d, f, path, i)
+		c, err := NewFieldBuildContext(m, g, d, fd, i)
 		if err != nil {
-			invErr, ok := trace.Unwrap(err).(*invalidFieldError)
+			return err
+		}
 
-			// invalidFieldError is not considered fatal, we just need to report it to the user and skip it
-			if !ok {
-				return err
-			}
-
-			logrus.Warning(invErr.Error())
-			continue
+		f, err := BuildField(c)
+		if err != nil {
+			return err
 		}
 
 		if f != nil {
@@ -157,404 +117,375 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor, pa
 	return nil
 }
 
-// BuildField builds field reflection structure, or returns nil in case field build failed
-func BuildField(
-	g *generator.Generator,
-	d *generator.Descriptor,
-	f *descriptor.FieldDescriptorProto,
-	path string,
-	index int,
-) (*Field, error) {
-	b := &fieldBuilder{
-		generator:       g,
-		descriptor:      d,
-		fieldDescriptor: f,
-		field:           &Field{path: path, index: index},
-	}
+// BuildField builds Field structure
+func BuildField(c *FieldBuildContext) (*Field, error) {
+	var err error
 
-	return b.build()
-}
-
-// getFieldTypeName returns field type name with package
-func getFieldTypeName(d *generator.Descriptor, f *descriptor.FieldDescriptorProto) string {
-	return getMessageTypeName(d) + "." + f.GetName()
-}
-
-// build fills in a Field structure
-func (b *fieldBuilder) build() (*Field, error) {
-	b.resolveName()
-
-	if hasFieldInSet(config.ExcludeFields, b.field) {
+	if c.IsExcluded() {
 		return nil, nil
 	}
 
-	err := b.resolveType()
+	n := c.GetName()
+
+	f := &Field{
+		Name:      n,
+		NameSnake: strcase.SnakeCase(n),
+	}
+
+	f.RawComment, f.Comment = c.GetComment()
+	f.SchemaRawType, f.SchemaGoType, f.IsMessage, err = c.GetTypeAndIsMessage()
 	if err != nil {
-		return nil, trace.Wrap(err)
+		return nil, err
 	}
 
-	err = b.setGoType()
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
+	f.IsTime = c.IsTime()
+	f.IsDuration = c.IsDuration()
 
-	err = b.setAggregate()
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	b.setCustomType()
-	b.resolveKind()
-	b.setComment()
-	b.setRequired()
-	b.setComputed()
-	b.setDefault()
-
-	return b.field, nil
-}
-
-// setName sets the field name
-func (b *fieldBuilder) resolveName() {
-	name := b.fieldDescriptor.GetName()
-
-	b.field.Name = name
-	b.field.NameSnake = strcase.SnakeCase(name)
-	b.field.typeName = getFieldTypeName(b.descriptor, b.fieldDescriptor)
-}
-
-// setGoType sets go type with gogo/protobuf standard method, sets type information flags
-// It deconstructs type returned by the gogo package, and then builds a new type string with the package name prepended.
-func (b *fieldBuilder) setGoType() error {
-	// This call is necessary to fill in generator internal structures, regardless of following resolveType result
-	t, _ := b.generator.GoType(b.descriptor, b.fieldDescriptor)
-
-	if t == "" {
-		return newInvalidFieldError(b, "invalid field go type")
-	}
-
-	b.field.RawGoType = t
-	prefix := ""
-
-	// This is an exception: we get all []byte arrays from strings, it is an elementary type on the protobuf side
-	// TODO: Param containing list of fields that need to be transformed into byte arrays
-	if t == "[]byte" || t == "[]*byte" {
-		b.field.GoType = t
-		b.field.GoTypeFull = t
-		return nil
-	}
-
-	// If type is a slice, mark as slice
-	if t[0] == '[' {
-		t = t[2:]
-		prefix = prefix + "[]"
-		b.field.GoTypeIsSlice = true
-	}
-
-	// If type is a pointer, mark as pointer
-	if t[0] == '*' {
-		t = t[1:]
-		prefix = prefix + "*"
-		b.field.GoTypeIsPtr = true
-	}
-
-	t = b.prependPackageName(t)
-
-	b.field.GoType = t
-	b.field.GoTypeFull = prefix + t
-
-	return nil
-}
-
-// isTypeEq returns true if type equals current field descriptor type
-func (b *fieldBuilder) isTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
-	return *b.fieldDescriptor.Type == t
-}
-
-// isTime returns true if field stores a time value (protobuf or standard library)
-func (b *fieldBuilder) isTime() bool {
-	t := b.fieldDescriptor.TypeName
-
-	isStdTime := gogoproto.IsStdTime(b.fieldDescriptor)
-	isGoogleTime := (t != nil && strings.HasSuffix(*t, "google.protobuf.Timestamp"))
-	isCastToTime := b.getCastType() == "time.Time"
-
-	return isStdTime || isGoogleTime || isCastToTime
-}
-
-// isDuration returns true if field stores a duration value (protobuf or cast to a standard library type)
-func (b *fieldBuilder) isDuration() bool {
-	ct := b.getCastType()
-	t := b.fieldDescriptor.TypeName
-
-	isStdDuration := gogoproto.IsStdDuration(b.fieldDescriptor)
-	isGoogleDuration := (t != nil && strings.HasSuffix(*t, "google.protobuf.Duration"))
-	isCastToCustomDuration := ct == config.DurationCustomType
-	isCastToDuration := ct == "time.Duration"
-
-	return isStdDuration || isGoogleDuration || isCastToDuration || isCastToCustomDuration
-}
-
-// isMessage returns true if field is a message
-func (b *fieldBuilder) isMessage() bool {
-	return b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
-}
-
-// isCastType returns true if field has gogoprotobuf.casttype flag
-func (b *fieldBuilder) isCastType() bool {
-	return gogoproto.IsCastType(b.fieldDescriptor)
-}
-
-// isCastType returns true if field has gogoprotobuf.customtype flag
-func (b *fieldBuilder) isCustomType() bool {
-	return gogoproto.IsCustomType(b.fieldDescriptor)
-}
-
-// getCastType returns field cast type name
-func (b *fieldBuilder) getCastType() string {
-	return gogoproto.GetCastType(b.fieldDescriptor)
-}
-
-// getCustomType returns field custom type name
-func (b *fieldBuilder) getCustomType() string {
-	return gogoproto.GetCustomType(b.fieldDescriptor)
-}
-
-// setTypes sets SchemaRawType and SchemaGoType
-func (b *fieldBuilder) setSchemaTypes(schemaRawType string, goTypeCast string) {
-	b.field.SchemaRawType = schemaRawType
-	b.field.SchemaGoType = goTypeCast
-}
-
-// resolveType analyses field type and sets required fields in Field structure.
-func (b *fieldBuilder) resolveType() error {
-	d := b.fieldDescriptor // syntax shortcut for gogoproto.IsStd* methods
-
-	switch {
-	case b.isTime():
-		b.setSchemaTypes("string", "time.Time")
-		b.field.IsTime = true
-	case b.isDuration():
-		b.setSchemaTypes("string", "time.Duration")
-		b.field.IsDuration = true
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(d):
-		b.setSchemaTypes("float64", "float64")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(d):
-		b.setSchemaTypes("float64", "float32")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_INT64) || gogoproto.IsStdInt64(d):
-		b.setSchemaTypes("int", "int64")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT64) || gogoproto.IsStdUInt64(d):
-		b.setSchemaTypes("int", "uint64")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_INT32) || gogoproto.IsStdInt32(d):
-		b.setSchemaTypes("int", "int32")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT32) || gogoproto.IsStdUInt32(d):
-		b.setSchemaTypes("int", "uint32")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FIXED64):
-		b.setSchemaTypes("int", "uint64")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_FIXED32):
-		b.setSchemaTypes("int", "uint32")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_BOOL) || gogoproto.IsStdBool(d):
-		b.setSchemaTypes("bool", "bool")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_STRING) || gogoproto.IsStdString(d):
-		b.setSchemaTypes("string", "string")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_BYTES) || gogoproto.IsStdBytes(d):
-		b.setSchemaTypes("string", "[]byte")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED32):
-		b.setSchemaTypes("int", "int32")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED64):
-		b.setSchemaTypes("int", "int64")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT32):
-		b.setSchemaTypes("int", "int32")
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
-		b.setSchemaTypes("string", "int64")
-	case b.isMessage():
-		err := b.setMessage()
-		if err != nil {
-			return trace.Wrap(err)
-		}
-		b.field.IsMessage = true
-	case b.isTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
-		b.setSchemaTypes("string", "string")
-	default:
-		return trace.Wrap(newInvalidFieldError(b, "unknown field type"))
-	}
-
-	return nil
-}
-
-// prependPackageName prepends package name to cast type, custom type or message type names
-func (b *fieldBuilder) prependPackageName(t string) (result string) {
-	result = t
-
-	if b.isCastType() {
-		result = b.getCastType()
-	}
-
-	if b.isCustomType() {
-		result = b.getCustomType()
-	}
-
-	// Prepend package name to overridden field type
-	if b.isCastType() || b.isCustomType() {
-		// If cast type is within current package, append default package name to it
-		if !strings.Contains(result, ".") && config.DefaultPackageName != "" {
-			result = config.DefaultPackageName + "." + result
-		}
+	// Byte slice is an exception, should not be treated as normal array
+	if c.IsByteSlice() {
+		f.GoType = c.GetRawGoType() // []byte
+		f.GoTypeFull = c.GetRawGoType()
 	} else {
-		// Get go type from a message
-		if b.isMessage() && b.field.Message != nil {
-			result = b.field.Message.GoTypeName
-		}
-	}
+		f.GoTypeIsPtr = c.GetGoTypeIsPtr()
+		f.GoTypeIsSlice = c.GetGoTypeIsSlice()
 
-	return result
-}
+		if f.IsMessage {
+			d, err := c.GetMessageDescriptor()
+			if err != nil {
+				return nil, err
+			}
 
-// setMessage sets reference to a nested message
-func (b *fieldBuilder) setMessage() error {
-	// Resolve underlying message via protobuf
-	x := b.generator.ObjectNamed(b.fieldDescriptor.GetTypeName())
-	desc, ok := x.(*generator.Descriptor)
-	if desc == nil || !ok {
-		return nil
-	}
+			m, err := BuildMessage(c.g, d, false, c.path)
+			if err != nil {
+				return nil, err
+			}
+			if m == nil {
+				return nil, nil
+			}
 
-	// Try to analyse it
-	m, err := BuildMessage(b.generator, desc, false, b.field.path)
-	if err != nil {
-		// If underlying message is invalid, we must consider current field as invalid and not stop
-		_, ok := trace.Unwrap(err).(*invalidMessageError)
-		if ok {
-			return trace.Wrap(
-				newInvalidFieldError(b, fmt.Sprintf("failed to reflect message type information: %v", err.Error())),
-			)
+			f.Message = m
+			f.GoType = m.GoTypeName
+		} else {
+			f.GoType = c.GetGoType()
 		}
 
-		return trace.Wrap(err)
-	} else if m == nil {
-		return trace.Wrap(newInvalidFieldError(b, "field marked as skipped"))
+		f.setGoTypeFull()
 	}
 
-	// Nested message schema, or nil if message is not whitelisted
-	b.field.Message = m
+	f.setKind()
 
-	return nil
+	return f, nil
 }
 
-// setAggregate detects and sets IsList and IsMap flags.
-func (b *fieldBuilder) setAggregate() error {
-	f := b.field
+// setGoTypeFull constructs and sets full go type name for the field
+func (f *Field) setGoTypeFull() {
+	r := f.GoType
 
-	if b.generator.IsMap(b.fieldDescriptor) {
-		f.IsMap = true
-		err := b.setMap()
-		if err != nil {
-			return trace.Wrap(err)
-		}
-	} else if b.fieldDescriptor.IsRepeated() {
-		f.IsRepeated = true
+	if f.GoTypeIsPtr {
+		r = "*" + r
+	}
+	if f.GoTypeIsSlice {
+		r = "[]" + r
 	}
 
-	return nil
+	f.GoTypeFull = r
 }
 
-// setCustomType sets detects and set IsCustomType flag and custom type method infix
-func (b *fieldBuilder) setCustomType() {
-	if !gogoproto.IsCustomType(b.fieldDescriptor) {
-		return
-	}
-
-	b.field.IsCustomType = true
-	b.field.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(b.field.GoType, "/", ""), ".", "")
-}
-
-// setMap sets map value properties
-func (b *fieldBuilder) setMap() error {
-	m := b.generator.GoMapType(nil, b.fieldDescriptor)
-
-	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
-	if keyGoType != "string" {
-		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
-	}
-
-	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField, b.field.path, 0)
-	if err != nil {
-		return err
-	}
-	b.field.MapValueField = valueField
-
-	return nil
-}
-
-// setKind sets field kind
-func (b *fieldBuilder) setKind(kind string) {
-	b.field.Kind = kind
-}
-
-// setKind sets field kind which represents field meta type for generation
-func (b *fieldBuilder) resolveKind() {
-	f := b.field // shortcut to field flags used in conditions
-
+// setKind resolves and sets kind for current field
+func (f *Field) setKind() {
 	switch {
 	case f.IsCustomType:
-		b.setKind("CUSTOM_TYPE")
+		f.Kind = "CUSTOM_TYPE"
 	case f.IsMap && f.MapValueField.IsMessage:
 		// Terraform does not support map of objects. We replace such field with list of objects having key and value fields.
-		b.setKind("OBJECT_MAP") // ex: map[string]struct, requires additional steps to unmarshal
+		f.Kind = "OBJECT_MAP" // ex: map[string]struct, requires additional steps to unmarshal
 	case f.IsMap:
-		b.setKind("MAP") // ex: map[string]string
+		f.Kind = "MAP" // ex: map[string]string
 	case f.IsRepeated && f.IsMessage:
-		b.setKind("REPEATED_MESSAGE") // ex: []struct
+		f.Kind = "REPEATED_MESSAGE" // ex: []struct
 	case f.IsRepeated:
-		b.setKind("REPEATED_ELEMENTARY") // ex: []string
+		f.Kind = "REPEATED_ELEMENTARY" // ex: []string
 	case f.IsMessage:
-		b.setKind("SINGULAR_MESSAGE") // ex: struct
+		f.Kind = "SINGULAR_MESSAGE" // ex: struct
 	default:
-		b.setKind("SINGULAR_ELEMENTARY") // ex: string
+		f.Kind = "SINGULAR_ELEMENTARY" // ex: string
 	}
 }
 
-// setComment resolves leading comment for this field
-func (b *fieldBuilder) setComment() {
-	p := b.descriptor.Path() + ",2," + strconv.Itoa(b.field.index)
+// err := f.setMessage(ctx)
+// if err != nil {
+// 	return trace.Wrap(err)
+// }
 
-	for _, l := range b.descriptor.File().GetSourceCodeInfo().GetLocation() {
-		if getLocationPath(l) == p {
-			c := strings.Trim(l.GetLeadingComments(), "\n")
-			b.field.RawComment = commentToSingleLine(strings.TrimSpace(c))
-			b.field.Comment = appendSlashSlash(c, false)
-		}
-	}
-}
+// f.setGoType(ctx)
+// f.setAggregate(ctx)
+// // // if err != nil {
+// // // 	return nil, trace.Wrap(err)
+// // // }
 
-// setRequired sets IsRequired flag
-func (b *fieldBuilder) setRequired() {
-	if hasFieldInSet(config.RequiredFields, b.field) {
-		b.field.IsRequired = true
-	}
-}
+// f.setCustomType(ctx.f)
 
-// setComputed sets IsComputed flag
-func (b *fieldBuilder) setComputed() {
-	if hasFieldInSet(config.ComputedFields, b.field) {
-		b.field.IsComputed = true
-	}
-}
+// f.setComment(ctx.d)
+// f.setRequired()
+// f.setComputed()
+// f.setDefault()
+// f.setKind()
 
-// setDefault sets default value
-func (b *fieldBuilder) setDefault() {
-	v, ok := config.Defaults[b.field.typeName]
-	if ok {
-		b.field.Default = fmt.Sprintf("%s", v)
-	}
-}
+// f, err := BuildField(g, d, f, path, i)
+// if err != nil {
+// 	invErr, ok := trace.Unwrap(err).(*invalidFieldError)
 
-// hasFieldInSet checks field existence in set
-func hasFieldInSet(m map[string]struct{}, f *Field) bool {
-	_, ok := m[f.typeName]
-	if ok {
-		return true
-	}
+// 	// invalidFieldError is not considered fatal, we just need to report it to the user and skip it
+// 	if !ok {
+// 		return err
+// 	}
 
-	_, ok = m[f.path]
-	return ok
-}
+// 	logrus.Warning(invErr.Error())
+// 	continue
+// }
+//}
+
+// setMessage sets reference to a nested message
+// func (f *Field) setMessage(ctx *context) error {
+// 	// Resolve underlying message via protobuf
+// 	x := ctx.g.ObjectNamed(ctx.f.GetTypeName())
+// 	desc, ok := x.(*generator.Descriptor)
+// 	if desc == nil || !ok {
+// 		return nil
+// 	}
+
+// 	// Try to analyse it
+// 	m, err := BuildMessage(g, d, false, f.Path)
+// 	if err != nil {
+// 		// If underlying message is invalid, we must consider current field as invalid and not stop
+// 		_, ok := trace.Unwrap(err).(*invalidMessageError)
+// 		if ok {
+// 			return trace.Wrap(
+// 				newInvalidFieldError(b, fmt.Sprintf("failed to reflect message type information: %v", err.Error())),
+// 			)
+// 		}
+
+// 		return trace.Wrap(err)
+// 	} else if m == nil {
+// 		return trace.Wrap(newInvalidFieldError(b, "field marked as skipped"))
+// 	}
+
+// 	// Nested message schema, or nil if message is not whitelisted
+// 	f.Message = m
+
+// 	return nil
+// }
+
+// // setAggregate detects and sets IsList and IsMap flags.
+// func (f *Field) setAggregate(ctx *context) error {
+// 	if ctx.g.IsMap(ctx.f.FieldDescriptorProto) {
+// 		f.IsMap = true
+// 		err := f.setMap(ctx)
+// 		if err != nil {
+// 			return trace.Wrap(err)
+// 		}
+// 	} else if ctx.f.IsRepeated() {
+// 		f.IsRepeated = true
+// 	}
+
+// 	return nil
+// }
+
+// // setCustomType sets detects and set IsCustomType flag and custom type method infix
+// func (f *Field) setCustomType(fd *FieldDescriptorProtoExt) {
+// 	if !fd.IsCustomType() {
+// 		return
+// 	}
+
+// 	f.IsCustomType = true
+// 	f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
+// }
+
+// // setMap sets map value properties
+// func (f *Field) setMap(ctx *context) error {
+// 	m := ctx.g.GoMapType(nil, ctx.f.FieldDescriptorProto)
+
+// 	keyGoType, _ := ctx.g.GoType(ctx.d, m.KeyField)
+// 	if keyGoType != "string" {
+// 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
+// 	}
+
+// 	c := &context{m: ctx.m, g: ctx.g, d: ctx.d, f: &FieldDescriptorProtoExt{m.ValueField}}
+
+// 	valueField, err := BuildField(c, 0)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	f.MapValueField = valueField
+
+// 	return nil
+// }
+
+// // setSchemaTypes sets SchemaRawType and SchemaGoType
+// func (f *Field) setSchemaTypes(schemaRawType string, goTypeCast string) {
+// 	f.SchemaRawType = schemaRawType
+// 	f.SchemaGoType = goTypeCast
+// }
+
+// // isInSet returns true if that field name or path is in set
+// func isInSet(f *Field, m map[string]struct{}) bool {
+// 	_, ok := m[f.TypeName]
+// 	if ok {
+// 		return true
+// 	}
+
+// 	_, ok = m[f.Path]
+// 	return ok
+// }
+
+// // setComment resolves leading comment for this field
+// func (f *Field) setComment(d *generator.Descriptor) {
+// 	p := d.Path() + ",2," + strconv.Itoa(f.Index)
+
+// 	for _, l := range d.File().GetSourceCodeInfo().GetLocation() {
+// 		if getLocationPath(l) == p {
+// 			c := strings.Trim(l.GetLeadingComments(), "\n")
+
+// 			f.RawComment = commentToSingleLine(strings.TrimSpace(c))
+// 			f.Comment = appendSlashSlash(c, false)
+// 		}
+// 	}
+// }
+
+// // setRequired sets IsRequired flag
+// func (f *Field) setRequired() {
+// 	if f.isInSet(config.RequiredFields) {
+// 		f.IsRequired = true
+// 	}
+// }
+
+// // setComputed sets IsComputed flag
+// func (f *Field) setComputed() {
+// 	if f.isInSet(config.ComputedFields) {
+// 		f.IsComputed = true
+// 	}
+// }
+
+// // setDefault sets default value
+// func (f *Field) setDefault() {
+// 	v, ok := config.Defaults[f.TypeName]
+// 	if ok {
+// 		f.Default = fmt.Sprintf("%s", v)
+// 	}
+// }
+
+// // setKind sets field kind which represents field meta type for generation
+
+// // getFieldTypeName returns field type name with package
+// func getFieldTypeName(d *generator.Descriptor, f *FieldDescriptorProtoExt) string {
+// 	return getMessageTypeName(d) + "." + f.GetName()
+// }
+
+// // // build fills in a Field structure
+// // func (b *fieldBuilder) build() (*Field, error) {
+// // 	// b.resolveName()
+
+// // 	// if hasFieldInSet(config.ExcludeFields, b.field) {
+// // 	// 	return nil, nil
+// // 	// }
+
+// // 	// err := b.resolveType()
+// // 	// if err != nil {
+// // 	// 	return nil, trace.Wrap(err)
+// // 	// }
+
+// // 	// err = b.setGoType()
+// // 	// if err != nil {
+// // 	// 	return nil, trace.Wrap(err)
+// // 	// }
+
+// // 	// // err = b.setAggregate()
+// // 	// // if err != nil {
+// // 	// // 	return nil, trace.Wrap(err)
+// // 	// // }
+
+// // 	// b.setCustomType()
+// // 	//b.resolveKind()
+// // 	//b.setComment()
+// // 	// b.setRequired()
+// // 	// b.setComputed()
+// // 	// b.setDefault()
+
+// // 	return b.field, nil
+// // }
+
+// // // setMessage sets reference to a nested message
+// // func (b *fieldBuilder) setMessage() error {
+// // 	// Resolve underlying message via protobuf
+// // 	x := b.generator.ObjectNamed(b.fieldDescriptor.GetTypeName())
+// // 	desc, ok := x.(*generator.Descriptor)
+// // 	if desc == nil || !ok {
+// // 		return nil
+// // 	}
+
+// // 	// Try to analyse it
+// // 	m, err := BuildMessage(b.generator, desc, false, b.field.path)
+// // 	if err != nil {
+// // 		// If underlying message is invalid, we must consider current field as invalid and not stop
+// // 		_, ok := trace.Unwrap(err).(*invalidMessageError)
+// // 		if ok {
+// // 			return trace.Wrap(
+// // 				newInvalidFieldError(b, fmt.Sprintf("failed to reflect message type information: %v", err.Error())),
+// // 			)
+// // 		}
+
+// // 		return trace.Wrap(err)
+// // 	} else if m == nil {
+// // 		return trace.Wrap(newInvalidFieldError(b, "field marked as skipped"))
+// // 	}
+
+// // 	// Nested message schema, or nil if message is not whitelisted
+// // 	b.field.Message = m
+
+// // 	return nil
+// // }
+
+// // // setAggregate detects and sets IsList and IsMap flags.
+// // func (b *fieldBuilder) setAggregate() error {
+// // 	f := b.field
+
+// // 	if b.generator.IsMap(b.fieldDescriptor) {
+// // 		f.IsMap = true
+// // 		err := b.setMap()
+// // 		if err != nil {
+// // 			return trace.Wrap(err)
+// // 		}
+// // 	} else if b.fieldDescriptor.IsRepeated() {
+// // 		f.IsRepeated = true
+// // 	}
+
+// // 	return nil
+// // }
+
+// // // setCustomType sets detects and set IsCustomType flag and custom type method infix
+// // func (b *fieldBuilder) setCustomType() {
+// // 	if !gogoproto.IsCustomType(b.fieldDescriptor) {
+// // 		return
+// // 	}
+
+// // 	b.field.IsCustomType = true
+// // 	b.field.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(b.field.GoType, "/", ""), ".", "")
+// // }
+
+// // // setMap sets map value properties
+// // func (b *fieldBuilder) setMap() error {
+// // 	m := b.generator.GoMapType(nil, b.fieldDescriptor)
+
+// // 	keyGoType, _ := b.generator.GoType(b.descriptor, m.KeyField)
+// // 	if keyGoType != "string" {
+// // 		return trace.Wrap(newInvalidFieldError(b, "non-string map keys are not supported"))
+// // 	}
+
+// // 	valueField, err := BuildField(b.generator, b.descriptor, m.ValueField, b.field.path, 0)
+// // 	if err != nil {
+// // 		return err
+// // 	}
+// // 	b.field.MapValueField = valueField
+
+// // 	return nil
+// // }

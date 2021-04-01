@@ -79,7 +79,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	// Adds Terraform package imports to target file
 	p.setImports()
 
-	p.reflect(file)
+	p.build(file)
 
 	p.writeSchemaStructureComment()
 
@@ -95,7 +95,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 }
 
 // reflect builds message dictionary from a messages in protoc file
-func (p *Plugin) reflect(file *generator.FileDescriptor) {
+func (p *Plugin) build(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
 		m, err := BuildMessage(p.Generator, message, true, "")
 

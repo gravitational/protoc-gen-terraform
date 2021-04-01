@@ -46,7 +46,7 @@ type Message struct {
 	Comment string
 
 	// Path in schema to current message (types.UserV2.Metadata.ID)
-	path string
+	Path string
 }
 
 // BuildMessage builds Message from its protobuf descriptor.
@@ -67,7 +67,7 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
-			return nil, newInvalidMessageError(typeName, "oneOf messages are not supported yet")
+			return nil, trace.Errorf("oneOf messages are not supported yet" + typeName)
 		}
 	}
 
@@ -84,10 +84,10 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 		GoTypeName: typeName,
 		RawComment: rawComment,
 		Comment:    comment,
-		path:       path,
+		Path:       path,
 	}
 
-	err := BuildFields(message, g, d, path)
+	err := BuildFields(message, g, d)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
