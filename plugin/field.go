@@ -80,6 +80,9 @@ type Field struct {
 	// IsCustomType field has gogo.customtype flag?
 	IsCustomType bool
 
+	// IsForceNew field has ForceNew flag
+	IsForceNew bool
+
 	// CustomTypeMethodInfix custom type schema and unmarshal method name infix
 	CustomTypeMethodInfix string
 
@@ -204,6 +207,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.setRequired(c)
 	f.setComputed(c)
 	f.setDefault(c)
+	f.setForceNew(c)
 
 	f.setKind()
 
@@ -270,6 +274,16 @@ func (f *Field) setComputed(c *FieldBuildContext) {
 
 	if ok1 || ok2 {
 		f.IsComputed = true
+	}
+}
+
+// setForceNew sets IsForceNew flag
+func (f *Field) setForceNew(c *FieldBuildContext) {
+	_, ok1 := config.ForceNewFields[c.GetTypeName()]
+	_, ok2 := config.ForceNewFields[c.GetPath()]
+
+	if ok1 || ok2 {
+		f.IsForceNew = true
 	}
 }
 

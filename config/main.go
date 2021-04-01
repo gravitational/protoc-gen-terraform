@@ -66,6 +66,11 @@ var (
 	// Can be set in config file only
 	Defaults map[string]interface{} = make(map[string]interface{})
 
+	// ForceNewFields is the list of fields to mark as 'Required: true'
+	//
+	// Passed from command line (--terraform_out=force=types.Metadata.Name:./_out)
+	ForceNewFields map[string]struct{} = make(map[string]struct{})
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -83,6 +88,7 @@ type config struct {
 	ExcludeFields      []string               `yaml:"exclude_fields"`
 	ComputedFields     []string               `yaml:"computed_fields"`
 	RequiredFields     []string               `yaml:"required_fields"`
+	ForceNew           []string               `yaml:"force_new_fields"`
 	CustomImports      []string               `yaml:"custom_imports"`
 	Defaults           map[string]interface{} `yaml:"defaults"`
 }
@@ -107,6 +113,7 @@ func Read(p map[string]string) error {
 	setComputedFields(splitArg(p["computed"]))
 	setRequiredFields(splitArg(p["required"]))
 	setCustomImports(splitArg(p["custom_imports"]))
+	setForceNewFields(splitArg(p["force"]))
 
 	setDefaultPackageName(p["pkg"])
 	setDurationType(p["custom_duration"])
@@ -149,6 +156,7 @@ func setVarsFromConfig() error {
 	setRequiredFields(cfg.RequiredFields)
 	setCustomImports(cfg.CustomImports)
 	setDefaults(cfg.Defaults)
+	setForceNewFields(cfg.ForceNew)
 
 	return nil
 }
@@ -239,6 +247,7 @@ func setRequiredFields(f []string) {
 	}
 }
 
+// setDefaults sets default values for a fields
 func setDefaults(m map[string]interface{}) {
 	if len(m) == 0 {
 		return
@@ -253,6 +262,15 @@ func setDefaults(m map[string]interface{}) {
 	}
 
 	logrus.Printf("Defaults set for: %v", s)
+}
+
+// setForceNew parses and sets ExcludeFields
+func setForceNewFields(f []string) {
+	setSet(ForceNewFields, f)
+
+	if len(f) > 0 {
+		logrus.Printf("Force new fields: %s", f)
+	}
 }
 
 // trimArg returns argument value without spaces and line breaks

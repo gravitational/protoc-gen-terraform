@@ -49,6 +49,10 @@ required_fields:
     # Github connector
     - "types.GithubConnectorV3.Spec.TeamsToLogins"
 
+# These fields will be marked as ForceNew: true
+force_new_fields:
+    - "types.Metadata.Name"
+
 # Field default values
 defaults:
     # Metadata

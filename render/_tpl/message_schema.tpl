@@ -77,6 +77,9 @@ ValidateFunc: validation.IsRFC3339Time,
 {{- if .Default }}
 Default: {{.Default | quote}},
 {{- end }}
+{{- if .IsForceNew }}
+ForceNew: true,
+{{- end }}
 {{- if .IsDuration }}
 DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
     o, err := time.ParseDuration(old)
