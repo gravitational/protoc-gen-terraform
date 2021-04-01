@@ -222,7 +222,7 @@ func (c *FieldBuildContext) IsRepeated() bool {
 
 // IsMap returns true if field is map
 func (c *FieldBuildContext) IsMap() bool {
-	return c.g.IsMap(c.f.FieldDescriptorProto) && !c.f.IsRepeated()
+	return c.g.IsMap(c.f.FieldDescriptorProto)
 }
 
 // GetMapValueFieldDescriptor returns field descriptor for a map field
