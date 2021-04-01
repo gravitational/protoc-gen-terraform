@@ -5,6 +5,7 @@ duration_custom_type: "Duration"
 custom_imports:
     - "github.com/gravitational/teleport/api/types"
 
+# Top-level type names to export
 types:
     - "types.UserV2"
     - "types.RoleV3"
@@ -14,6 +15,7 @@ types:
     - "types.OIDCConnectorV2"
     - "types.TrustedClusterV2"
 
+# These fields will be marked as Computed: true
 computed_fields:
     - "types.UserV2.Version"
     - "types.RoleV3.Version"
@@ -23,6 +25,7 @@ computed_fields:
     - "types.OIDCConnectorV2.Version"
     - "types.TrustedClusterV2.Version"
 
+# These fields will be excluded
 exclude_fields:
     # Metadata
     - "types.Metadata.ID"
@@ -33,6 +36,7 @@ exclude_fields:
     - "types.UserSpecV2.CreatedBy"
     - "types.UserSpecV2.Status"
 
+# These fields will be marked as Required: true 
 required_fields:
     # Metadata
     - "types.Metadata.Name"
@@ -45,6 +49,7 @@ required_fields:
     # Github connector
     - "types.GithubConnectorV3.Spec.TeamsToLogins"
 
+# Field default values
 defaults:
     # Metadata
     "types.Metadata.Namespace": "default"    
