@@ -70,6 +70,11 @@ func NewFieldBuildContext(
 	return c, nil
 }
 
+// NewFieldBuildContextWithField creates FieldBuildContext from another context, overriding field
+func NewFieldBuildContextWithField(c *FieldBuildContext, f *FieldDescriptorProtoExt, i int) (*FieldBuildContext, error) {
+	return NewFieldBuildContext(c.m, c.g, c.d, f, i)
+}
+
 // IsExcluded returns true if field is added to config.ExcludeFields
 func (c *FieldBuildContext) IsExcluded() bool {
 	_, ok1 := config.ExcludeFields[c.GetTypeName()]

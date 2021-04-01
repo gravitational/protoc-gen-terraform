@@ -146,7 +146,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.IsTime = c.IsTime()
 	f.IsDuration = c.IsDuration()
 
-	// Byte slice is an exception, should not be treated as normal array
+	// Byte slice is an exception, is should be treated as string
 	if c.IsByteSlice() {
 		f.GoType = c.GetBytesExceptionGoType()
 		f.GoTypeFull = c.GetRawGoType()
@@ -187,7 +187,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 			return nil, trace.Wrap(err)
 		}
 
-		ctx, err := NewFieldBuildContext(c.m, c.g, c.d, d, -1)
+		ctx, err := NewFieldBuildContextWithField(c, d, -1)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
@@ -200,11 +200,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		f.MapValueField = vf
 	}
 
-	if c.IsCustomType() {
-		f.IsCustomType = true
-		f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
-	}
-
+	f.setCustomType(c)
 	f.setRequired(c)
 	f.setComputed(c)
 	f.setDefault(c)
@@ -246,6 +242,14 @@ func (f *Field) setKind() {
 		f.Kind = "SINGULAR_MESSAGE" // ex: struct
 	default:
 		f.Kind = "SINGULAR_ELEMENTARY" // ex: string
+	}
+}
+
+// setCustomType sets custom type information
+func (f *Field) setCustomType(c *FieldBuildContext) {
+	if c.IsCustomType() {
+		f.IsCustomType = true
+		f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
 	}
 }
 
