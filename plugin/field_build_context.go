@@ -201,8 +201,9 @@ func (c *FieldBuildContext) GetGoTypeIsPtr() bool {
 	return strings.Contains(c.rawGoType, "*")
 }
 
-// GetGoType returns go type without [] and *
-func (c *FieldBuildContext) GetGoType() string {
+// GetGoType returns go type without [] and *.
+// t overrides default rawGoType if set
+func (c *FieldBuildContext) GetGoType(t string) string {
 	if c.f.IsCustomType() {
 		return c.prependPackageName(c.f.GetCustomType())
 	}
@@ -211,8 +212,11 @@ func (c *FieldBuildContext) GetGoType() string {
 		return c.prependPackageName(c.f.GetCastType())
 	}
 
-	t := strings.ReplaceAll(strings.ReplaceAll(c.rawGoType, "[]", ""), "*", "")
-	return t
+	if t != "" {
+		return t
+	}
+
+	return strings.ReplaceAll(strings.ReplaceAll(c.rawGoType, "[]", ""), "*", "")
 }
 
 // prependPackageName prepends default package name to a type name

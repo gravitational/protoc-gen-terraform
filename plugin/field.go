@@ -169,9 +169,9 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 			}
 
 			f.Message = m
-			f.GoType = m.GoTypeName
+			f.GoType = c.GetGoType(m.GoTypeName)
 		} else {
-			f.GoType = c.GetGoType()
+			f.GoType = c.GetGoType("")
 		}
 
 		f.setGoTypeFull()
