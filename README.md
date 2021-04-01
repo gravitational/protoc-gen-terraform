@@ -50,6 +50,7 @@ Options:
 * `custom_imports` - comma-separated package list to add into target file
 * `required` - list of a fields to mark as required
 * `computed` - list of a fields to mark as computed
+* `force_new` - list of a fields to mark as force new
 
 All config variables could be set in [example/teleport.yaml](YAML config). Path to config file can be specified using `config` variable.
 
