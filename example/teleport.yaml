@@ -14,13 +14,8 @@ types:
     - "types.OIDCConnectorV2"
     - "types.TrustedClusterV2"
 
-exclude_fields:
-    - "types.Metadata.ID"
+computed_fields:
     - "types.UserV2.Version"
-    - "types.UserSpecV2.LocalAuth"
-    - "types.UserSpecV2.Expires"
-    - "types.UserSpecV2.CreatedBy"
-    - "types.UserSpecV2.Status"
     - "types.RoleV3.Version"
     - "types.ProvisionTokenV2.Version" 
     - "types.GithubConnectorV3.Version"
@@ -28,16 +23,49 @@ exclude_fields:
     - "types.OIDCConnectorV2.Version"
     - "types.TrustedClusterV2.Version"
 
+exclude_fields:
+    # Metadata
+    - "types.Metadata.ID"
+    
+    # User
+    - "types.UserSpecV2.LocalAuth"
+    - "types.UserSpecV2.Expires"
+    - "types.UserSpecV2.CreatedBy"
+    - "types.UserSpecV2.Status"
+
 required_fields:
+    # Metadata
     - "types.Metadata.Name"
+    
+    # Provision token
+    - "types.ProvisionTokenV2.Spec"
+    - "types.ProvisionTokenV2.Spec.Roles"
     - "types.ProvisionTokenV2.Metadata.Expires"
 
+    # Github connector
+    - "types.GithubConnectorV3.Spec.TeamsToLogins"
+
 defaults:
+    # Metadata
     "types.Metadata.Namespace": "default"    
+
+    # User
     "types.UserV2.Kind": "user"
-    "types.ProvisionTokenV2.Kind": "token"    
+
+    # Role
     "types.RoleV3.Kind": "role"
+
+    # Provision token
+    "types.ProvisionTokenV2.Kind": "token"
+
+    # Github connector
     "types.GithubConnectorV3.Kind": "github_connector"
+
+    # SAML connector
     "types.SAMLConnectorV2.Kind": "saml_connector"
+
+    # OIDC connector
     "types.OIDCConnectorV2.Kind": "oidc_connector"
+
+    # Trusted cluster
     "types.TrustedClusterV2.Kind": "trusted_cluster"

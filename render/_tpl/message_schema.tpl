@@ -77,6 +77,21 @@ ValidateFunc: validation.IsRFC3339Time,
 {{- if .Default }}
 Default: {{.Default | quote}},
 {{- end }}
+{{- if .IsDuration }}
+DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
+    o, err := time.ParseDuration(old)
+    if err != nil {
+        return false
+    }
+
+    n, err := time.ParseDuration(new)
+    if err != nil {
+        return false
+    }
+
+    return o == n
+},
+{{- end }}
 {{- end -}}
 
 {{- define "repeatedMessage" -}}
