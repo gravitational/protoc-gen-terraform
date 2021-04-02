@@ -227,8 +227,9 @@ func SchemaTest() map[string]*schema.Schema {
 		"nested": {
 			Optional:    true,
 			Type:        schema.TypeList,
-			Description: "Nested message definition",
 			MaxItems:    1,
+			ConfigMode:  schema.SchemaConfigModeAttr,
+			Description: "Nested message definition",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -242,6 +243,7 @@ func SchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeList,
 						Description: "Message nested into nested message",
+						ConfigMode:  schema.SchemaConfigModeAttr,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -266,7 +268,8 @@ func SchemaTest() map[string]*schema.Schema {
 					"nested_m_obj": {
 						Optional:    true,
 						Type:        schema.TypeList,
-						Description: "",
+						Description: "NestedMObj nested object map",
+						ConfigMode:  schema.SchemaConfigModeAttr,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -276,8 +279,9 @@ func SchemaTest() map[string]*schema.Schema {
 								"value": {
 									Optional:    true,
 									Type:        schema.TypeList,
-									Description: "Message nested into nested message",
 									MaxItems:    1,
+									ConfigMode:  schema.SchemaConfigModeAttr,
+									Description: "Message nested into nested message",
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -300,6 +304,7 @@ func SchemaTest() map[string]*schema.Schema {
 			Optional:    true,
 			Type:        schema.TypeList,
 			Description: "Nested message definition",
+			ConfigMode:  schema.SchemaConfigModeAttr,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -313,6 +318,7 @@ func SchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeList,
 						Description: "Message nested into nested message",
+						ConfigMode:  schema.SchemaConfigModeAttr,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -337,7 +343,8 @@ func SchemaTest() map[string]*schema.Schema {
 					"nested_m_obj": {
 						Optional:    true,
 						Type:        schema.TypeList,
-						Description: "",
+						Description: "NestedMObj nested object map",
+						ConfigMode:  schema.SchemaConfigModeAttr,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -347,8 +354,9 @@ func SchemaTest() map[string]*schema.Schema {
 								"value": {
 									Optional:    true,
 									Type:        schema.TypeList,
-									Description: "Message nested into nested message",
 									MaxItems:    1,
+									ConfigMode:  schema.SchemaConfigModeAttr,
+									Description: "Message nested into nested message",
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -379,7 +387,8 @@ func SchemaTest() map[string]*schema.Schema {
 		"nested_m_obj": {
 			Optional:    true,
 			Type:        schema.TypeList,
-			Description: "",
+			Description: "NestedMObj object map",
+			ConfigMode:  schema.SchemaConfigModeAttr,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
@@ -389,8 +398,9 @@ func SchemaTest() map[string]*schema.Schema {
 					"value": {
 						Optional:    true,
 						Type:        schema.TypeList,
-						Description: "Nested message definition",
 						MaxItems:    1,
+						ConfigMode:  schema.SchemaConfigModeAttr,
+						Description: "Nested message definition",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -404,6 +414,7 @@ func SchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 									Type:        schema.TypeList,
 									Description: "Message nested into nested message",
+									ConfigMode:  schema.SchemaConfigModeAttr,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -428,7 +439,8 @@ func SchemaTest() map[string]*schema.Schema {
 								"nested_m_obj": {
 									Optional:    true,
 									Type:        schema.TypeList,
-									Description: "",
+									Description: "NestedMObj nested object map",
+									ConfigMode:  schema.SchemaConfigModeAttr,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											"key": {
@@ -438,8 +450,9 @@ func SchemaTest() map[string]*schema.Schema {
 											"value": {
 												Optional:    true,
 												Type:        schema.TypeList,
-												Description: "Message nested into nested message",
 												MaxItems:    1,
+												ConfigMode:  schema.SchemaConfigModeAttr,
+												Description: "Message nested into nested message",
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
 														// Str string field
@@ -1161,7 +1174,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	return nil
 }
 
-func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
+func SetTestToResourceData(d *schema.ResourceData, t *Test, skip bool) error {
 	obj := make(map[string]interface{})
 
 	{
@@ -1234,14 +1247,16 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	}
 	{
 		_arr := t.StringA
-		_raw := make([]string, len(_arr))
+		if len(_arr) > 0 {
+			_raw := make([]string, len(_arr))
 
-		for i, _v := range _arr {
-			_value := string(_v)
-			_raw[i] = _value
+			for i, _v := range _arr {
+				_value := string(_v)
+				_raw[i] = _value
+			}
+
+			obj["string_a"] = _raw
 		}
-
-		obj["string_a"] = _raw
 	}
 	{
 		_v, err := SetBoolCustomToResourceData(&t.BoolA)
@@ -1252,36 +1267,42 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	}
 	{
 		_arr := t.BytesA
-		_raw := make([]string, len(_arr))
+		if len(_arr) > 0 {
+			_raw := make([]string, len(_arr))
 
-		for i, _v := range _arr {
-			_value := string(_v)
-			_raw[i] = _value
+			for i, _v := range _arr {
+				_value := string(_v)
+				_raw[i] = _value
+			}
+
+			obj["bytes_a"] = _raw
 		}
-
-		obj["bytes_a"] = _raw
 	}
 	{
 		_arr := t.TimestampA
-		_raw := make([]string, len(_arr))
+		if len(_arr) > 0 {
+			_raw := make([]string, len(_arr))
 
-		for i, _v := range _arr {
-			_value := _v.Format(time.RFC3339Nano)
-			_raw[i] = _value
+			for i, _v := range _arr {
+				_value := _v.Format(time.RFC3339Nano)
+				_raw[i] = _value
+			}
+
+			obj["timestamp_a"] = _raw
 		}
-
-		obj["timestamp_a"] = _raw
 	}
 	{
 		_arr := t.DurationCustomA
-		_raw := make([]string, len(_arr))
+		if len(_arr) > 0 {
+			_raw := make([]string, len(_arr))
 
-		for i, _v := range _arr {
-			_value := time.Duration(_v).String()
-			_raw[i] = _value
+			for i, _v := range _arr {
+				_value := time.Duration(_v).String()
+				_raw[i] = _value
+			}
+
+			obj["duration_custom_a"] = _raw
 		}
-
-		obj["duration_custom_a"] = _raw
 	}
 	{
 
@@ -1302,32 +1323,33 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 				{
 					arr := make([]interface{}, len(t.Nested))
 
-					for i, t := range t.Nested {
-						obj := make(map[string]interface{})
-						{
-							_v := t.Str
+					if len(arr) > 0 {
+						for i, t := range t.Nested {
+							obj := make(map[string]interface{})
+							{
+								_v := t.Str
 
-							_value := string(_v)
-							obj["str"] = _value
+								_value := string(_v)
+								obj["str"] = _value
+							}
+
+							arr[i] = obj
 						}
 
-						arr[i] = obj
-					}
-
-					if len(arr) > 0 {
 						obj["nested"] = arr
 					}
 				}
 				{
 
 					m := make(map[string]interface{})
+					v := t.NestedM
 
-					for key, _v := range t.NestedM {
-						_value := string(_v)
-						m[key] = _value
-					}
+					if len(v) > 0 {
+						for key, _v := range v {
+							_value := string(_v)
+							m[key] = _value
+						}
 
-					if len(m) > 0 {
 						obj["nested_m"] = m
 					}
 				}
@@ -1368,92 +1390,94 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	{
 		arr := make([]interface{}, len(t.NestedA))
 
-		for i, t := range t.NestedA {
-			obj := make(map[string]interface{})
-			{
-				_v := t.Str
-
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
-
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
-					_value := string(_v)
-					m[key] = _value
-				}
-
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
-			}
-			{
-
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
-
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
-
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					i["value"] = []interface{}{obj}
-
-					a[n] = i
-					n++
-				}
-
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
-			}
-
-			arr[i] = obj
-		}
-
 		if len(arr) > 0 {
+			for i, t := range t.NestedA {
+				obj := make(map[string]interface{})
+				{
+					_v := t.Str
+
+					_value := string(_v)
+					obj["str"] = _value
+				}
+				{
+					arr := make([]interface{}, len(t.Nested))
+
+					if len(arr) > 0 {
+						for i, t := range t.Nested {
+							obj := make(map[string]interface{})
+							{
+								_v := t.Str
+
+								_value := string(_v)
+								obj["str"] = _value
+							}
+
+							arr[i] = obj
+						}
+
+						obj["nested"] = arr
+					}
+				}
+				{
+
+					m := make(map[string]interface{})
+					v := t.NestedM
+
+					if len(v) > 0 {
+						for key, _v := range v {
+							_value := string(_v)
+							m[key] = _value
+						}
+
+						obj["nested_m"] = m
+					}
+				}
+				{
+
+					a := make([]interface{}, len(t.NestedMObj))
+					n := 0
+
+					for k, v := range t.NestedMObj {
+						i := make(map[string]interface{})
+						i["key"] = k
+
+						obj := make(map[string]interface{})
+						t := v
+						{
+							_v := t.Str
+
+							_value := string(_v)
+							obj["str"] = _value
+						}
+
+						i["value"] = []interface{}{obj}
+
+						a[n] = i
+						n++
+					}
+
+					if len(a) > 0 {
+						obj["nested_m_obj"] = a
+					}
+				}
+
+				arr[i] = obj
+			}
+
 			obj["nested_a"] = arr
 		}
 	}
 	{
 
 		m := make(map[string]interface{})
+		v := t.NestedM
 
-		for key, _v := range t.NestedM {
-			_value := string(_v)
-			m[key] = _value
-		}
+		if len(v) > 0 {
+			for key, _v := range v {
+				_value := string(_v)
+				m[key] = _value
+			}
 
-		if len(m) > 0 {
 			obj["nested_m"] = m
 		}
 	}
@@ -1477,32 +1501,33 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			{
 				arr := make([]interface{}, len(t.Nested))
 
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
+				if len(arr) > 0 {
+					for i, t := range t.Nested {
+						obj := make(map[string]interface{})
+						{
+							_v := t.Str
 
-						_value := string(_v)
-						obj["str"] = _value
+							_value := string(_v)
+							obj["str"] = _value
+						}
+
+						arr[i] = obj
 					}
 
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
 					obj["nested"] = arr
 				}
 			}
 			{
 
 				m := make(map[string]interface{})
+				v := t.NestedM
 
-				for key, _v := range t.NestedM {
-					_value := string(_v)
-					m[key] = _value
-				}
+				if len(v) > 0 {
+					for key, _v := range v {
+						_value := string(_v)
+						m[key] = _value
+					}
 
-				if len(m) > 0 {
 					obj["nested_m"] = m
 				}
 			}

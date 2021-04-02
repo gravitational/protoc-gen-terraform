@@ -90,7 +90,7 @@ func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = SetTestToResourceData(subject, &test)
+	err = SetTestToResourceData(subject, &test, false)
 	return subject, err
 }
 

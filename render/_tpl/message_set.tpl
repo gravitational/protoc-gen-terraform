@@ -1,4 +1,4 @@
-func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) error {
+func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}, skip bool) error {
     obj := make(map[string]interface{})
 
     {{ template "fields" .Fields }}
@@ -81,14 +81,16 @@ obj[{{.NameSnake | quote}}] = _value
 {{/* Renders setter for elementary array of any type */}}
 {{- define "repeatedElementary" -}}
 _arr := t.{{.Name}}
-_raw := make([]{{.SchemaRawType}}, len(_arr))
+if len(_arr) > 0 {
+    _raw := make([]{{.SchemaRawType}}, len(_arr))
 
-for i, _v := range _arr {
-    {{- template "rawToValue" . }}
-    _raw[i] = _value
+    for i, _v := range _arr {
+        {{- template "rawToValue" . }}
+        _raw[i] = _value
+    }
+
+    obj[{{.NameSnake | quote}}] = _raw
 }
-
-obj[{{.NameSnake | quote}}] = _raw
 {{- end -}}
 
 {{/* Renders custom getter custom type */}}
@@ -136,13 +138,13 @@ obj[{{.NameSnake | quote }}] = []interface{}{msg}
 {{- define "repeatedMessage" -}}
 arr := make([]interface{}, len(t.{{.Name}}))
 
-for i, t := range t.{{.Name}} {
-    obj := make(map[string]interface{})
-    {{ template "fields" .Message.Fields }}
-    arr[i] = obj
-}
-
 if len(arr) > 0 {
+    for i, t := range t.{{.Name}} {
+        obj := make(map[string]interface{})
+        {{ template "fields" .Message.Fields }}
+        arr[i] = obj
+    }
+
     obj[{{.NameSnake | quote }}] = arr
 }
 {{- end -}}
@@ -151,13 +153,14 @@ if len(arr) > 0 {
 {{- define "map" -}}
 {{ $m := .MapValueField }}
 m := make(map[string]interface{})
+v := t.{{.Name}} 
 
-for key, _v := range t.{{.Name}} {
-    {{- template "rawToValue" $m }}
-    m[key] = _value
-}
+if len(v) > 0 {
+    for key, _v := range v {
+        {{- template "rawToValue" $m }}
+        m[key] = _value
+    }
 
-if len(m) > 0 {
     obj[{{.NameSnake | quote}}] = m
 }
 {{- end -}}

@@ -48,8 +48,9 @@ map[string]*schema.Schema {
 {
     {{ template "required" . }}
     Type: schema.TypeList,
-    Description: {{ .Message.RawComment | quote }},
     MaxItems: 1,
+    ConfigMode: schema.SchemaConfigModeAttr,
+    Description: {{ .Message.RawComment | quote }},
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
@@ -74,12 +75,6 @@ Description: {{ .RawComment | quote }},
 {{- if .IsTime }}
 ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
-{{- if .Default }}
-Default: {{.Default | quote}},
-{{- end }}
-{{- if .IsForceNew }}
-ForceNew: true,
-{{- end }}
 {{- if .IsDuration }}
 DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
     o, err := time.ParseDuration(old)
@@ -100,6 +95,7 @@ DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData)
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
 Description: {{ .Message.RawComment | quote }},
+ConfigMode: schema.SchemaConfigModeAttr,
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
@@ -123,7 +119,8 @@ Elem: &schema.Schema {
 
 {{- define "objectMap" -}}
 Type: schema.TypeList,
-Description: {{ .MapValueField.RawComment | quote }},
+Description: {{ .RawComment | quote }},
+ConfigMode: schema.SchemaConfigModeAttr,
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{
         "key": {
@@ -157,4 +154,11 @@ Required: true,
 Optional: true,
 {{- end }}
 {{- end -}}
+
+{{- if .Default }}
+Default: {{.Default | quote}},
+{{- end }}
+{{- if .IsForceNew }}
+ForceNew: true,
+{{- end }}
 {{- end -}}
