@@ -57,6 +57,9 @@ var (
 			"n2": {
 				Str: "NestedObjString2",
 			},
+			"n3": {
+				Str: "NestedObjString3",
+			},
 		},
 	}
 )
@@ -90,7 +93,7 @@ func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = SetTestToResourceData(subject, &test, false)
+	err = SetTestToResourceData(subject, &test)
 	return subject, err
 }
 
@@ -175,4 +178,5 @@ func TestObjectMapSet(t *testing.T) {
 
 	assert.Equal(t, test.NestedMObj["n1"].Str, subject.Get("nested_m_obj.0.value.0.str"))
 	assert.Equal(t, test.NestedMObj["n2"].Str, subject.Get("nested_m_obj.1.value.0.str"))
+	assert.Equal(t, test.NestedMObj["n3"].Str, subject.Get("nested_m_obj.2.value.0.str"))
 }

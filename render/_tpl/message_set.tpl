@@ -1,4 +1,4 @@
-func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}, skip bool) error {
+func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) error {
     obj := make(map[string]interface{})
 
     {{ template "fields" .Fields }}
@@ -171,7 +171,14 @@ if len(v) > 0 {
 a := make([]interface{}, len(t.{{.Name}}))
 n := 0
 
-for k, v := range t.{{.Name}} {
+ks := make([]string, 0, len(t.{{.Name}}))
+for k := range t.{{.Name}} {
+    ks = append(ks, k)
+}
+sort.Strings(ks)
+
+for _, k := range ks {
+    v := t.{{.Name}}[k]
     i := make(map[string]interface{})
     i["key"] = k
     

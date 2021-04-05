@@ -98,6 +98,7 @@ config_mode_attr_fields:
     - "types.RoleV3.Spec"
     - "types.RoleV3.Spec.Options"
     - "types.RoleV3.Spec.Allow"
+    - "types.RoleV3.Spec.Allow.Rules"
     - "types.RoleV3.Spec.Allow.Request"
     - "types.RoleV3.Spec.Allow.Request.ClaimsToRoles"
     - "types.RoleV3.Spec.Allow.Request.Thresholds"
@@ -134,7 +135,7 @@ defaults:
     "types.RoleV3.Spec.Options.MaxSessions": 0
     "types.RoleV3.Spec.Options.RequireSessionsMFA": false
     "types.RoleV3.Spec.Allow.ReviewRequests.Where": ""
-    "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles": ""
+    "types.RoleV3.Spec.Deny.ReviewRequests.Where": ""
 
     # Provision token
     "types.ProvisionTokenV2.Kind": "token"

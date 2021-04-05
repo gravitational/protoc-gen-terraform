@@ -83,6 +83,14 @@ var (
 					},
 				},
 			},
+			map[string]interface{}{
+				"key": "obj2",
+				"value": []interface{}{
+					map[string]interface{}{
+						"str": "TestString2",
+					},
+				},
+			},
 		},
 	}
 )
@@ -181,4 +189,5 @@ func TestObjectMapGet(t *testing.T) {
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, subject.NestedMObj["obj1"].Str, "TestString1")
+	assert.Equal(t, subject.NestedMObj["obj2"].Str, "TestString2")
 }
