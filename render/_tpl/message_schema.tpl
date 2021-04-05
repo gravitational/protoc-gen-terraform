@@ -46,11 +46,11 @@ map[string]*schema.Schema {
 
 {{- if eq .Kind "SINGULAR_MESSAGE" }}
 {
-    {{ template "required" . }}
-    {{ template "configMode" . }}
     Type: schema.TypeList,
     MaxItems: 1,
-    Description: {{ .Message.RawComment | quote }},
+    Description: {{ .RawComment | quote }},
+    {{- template "configMode" . }}    
+    {{- template "required" . }}
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
@@ -60,7 +60,7 @@ map[string]*schema.Schema {
 {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
 {
     {{ template "singularElementary" . }}
-    {{ template "required" . }}    
+    {{- template "required" . }}    
 },
 {{- end }}
 
@@ -95,8 +95,8 @@ DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData)
 
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
-Description: {{ .Message.RawComment | quote }},
-{{ template "configMode" . }}
+Description: {{ .RawComment | quote }},
+{{- template "configMode" . }}
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
@@ -155,11 +155,15 @@ Required: true,
 Optional: true,
 {{- end }}
 {{- if .Default }}
-Default: {{.Default}},
+Default: {{.Default }},
 {{- end }}
 {{- if .IsForceNew }}
 ForceNew: true,
 {{- end }}
 {{- end -}}
 
-{{- define "configMode" -}}{{- if .ConfigMode -}}ConfigMode: schema.{{.ConfigMode}},{{- end -}}{{- end -}}
+{{- define "configMode" -}}
+{{- if .ConfigMode }}
+ConfigMode: schema.{{.ConfigMode}},
+{{- end }}
+{{- end -}}
