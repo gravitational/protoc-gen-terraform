@@ -77,14 +77,14 @@ func NewFieldBuildContextWithField(c *FieldBuildContext, f *FieldDescriptorProto
 
 // IsExcluded returns true if field is added to config.ExcludeFields
 func (c *FieldBuildContext) IsExcluded() bool {
-	_, ok1 := config.ExcludeFields[c.GetTypeName()]
+	_, ok1 := config.ExcludeFields[c.GetNameWithTypeName()]
 	_, ok2 := config.ExcludeFields[c.GetPath()]
 
 	return ok1 || ok2
 }
 
-// GetTypeName returns field type name with package
-func (c *FieldBuildContext) GetTypeName() string {
+// GetNameWithTypeName returns field type name with package
+func (c *FieldBuildContext) GetNameWithTypeName() string {
 	return c.typeName
 }
 

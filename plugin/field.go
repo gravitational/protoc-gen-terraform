@@ -271,7 +271,7 @@ func (f *Field) setCustomType(c *FieldBuildContext) {
 
 // setRequired sets IsRequired flag
 func (f *Field) setRequired(c *FieldBuildContext) {
-	_, ok1 := config.RequiredFields[c.GetTypeName()]
+	_, ok1 := config.RequiredFields[c.GetNameWithTypeName()]
 	_, ok2 := config.RequiredFields[c.GetPath()]
 
 	if ok1 || ok2 {
@@ -281,7 +281,7 @@ func (f *Field) setRequired(c *FieldBuildContext) {
 
 // setComputed sets IsComputed flag
 func (f *Field) setComputed(c *FieldBuildContext) {
-	_, ok1 := config.ComputedFields[c.GetTypeName()]
+	_, ok1 := config.ComputedFields[c.GetNameWithTypeName()]
 	_, ok2 := config.ComputedFields[c.GetPath()]
 
 	if ok1 || ok2 {
@@ -291,7 +291,7 @@ func (f *Field) setComputed(c *FieldBuildContext) {
 
 // setForceNew sets IsForceNew flag
 func (f *Field) setForceNew(c *FieldBuildContext) {
-	_, ok1 := config.ForceNewFields[c.GetTypeName()]
+	_, ok1 := config.ForceNewFields[c.GetNameWithTypeName()]
 	_, ok2 := config.ForceNewFields[c.GetPath()]
 
 	if ok1 || ok2 {
@@ -302,10 +302,10 @@ func (f *Field) setForceNew(c *FieldBuildContext) {
 // setDefault returns field default value
 func (f *Field) setDefault(c *FieldBuildContext) error {
 	v1, ok1 := config.Defaults[c.GetPath()]
-	v2, ok2 := config.Defaults[c.GetTypeName()]
+	v2, ok2 := config.Defaults[c.GetNameWithTypeName()]
 
-	if ok1 && ok2 && c.GetPath() != c.GetTypeName() {
-		return trace.Errorf("field has default value set by path " + c.GetPath() + " and by name " + c.GetTypeName())
+	if ok1 && ok2 && c.GetPath() != c.GetNameWithTypeName() {
+		return trace.Errorf("field has default value set by path " + c.GetPath() + " and by name " + c.GetNameWithTypeName())
 	}
 
 	if ok1 {
@@ -321,10 +321,10 @@ func (f *Field) setDefault(c *FieldBuildContext) error {
 
 // setConfigMode sets field config mode
 func (f *Field) setConfigMode(c *FieldBuildContext) error {
-	_, a1 := config.ConfigModeAttrFields[c.GetTypeName()]
+	_, a1 := config.ConfigModeAttrFields[c.GetNameWithTypeName()]
 	_, a2 := config.ConfigModeAttrFields[c.GetPath()]
 
-	_, b1 := config.ConfigModeBlockFields[c.GetTypeName()]
+	_, b1 := config.ConfigModeBlockFields[c.GetNameWithTypeName()]
 	_, b2 := config.ConfigModeBlockFields[c.GetPath()]
 
 	if (a1 || a2) && (b1 || b2) {
