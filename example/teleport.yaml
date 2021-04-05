@@ -22,7 +22,7 @@ computed_fields:
 
     # Role
     - "types.RoleV3.Version"
-    - "types.RoleV3.Spec.Options.Bpf"
+    - "types.RoleV3.Spec.Options.BPF"
     - "types.RoleV3.Spec.Allow"
     - "types.RoleV3.Spec.Allow.Request"
     - "types.RoleV3.Spec.Allow.Request.Thresholds"    
@@ -93,10 +93,8 @@ force_new_fields:
 
 # SchemaConfigModeAttr: true values for a fields
 config_mode_attr_fields:
-    # Metadata
-    - "types.Metadata"
-
     # Role 
+    - "types.RoleV3.Metadata"
     - "types.RoleV3.Spec"
     - "types.RoleV3.Spec.Options"
     - "types.RoleV3.Spec.Allow"
@@ -116,6 +114,7 @@ config_mode_attr_fields:
     - "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles"
 
     # TrustedCluster config modes
+    - "types.TrustedClusterV2.Metadata"
     - "types.TrustedClusterV2.Spec"
     - "types.TrustedClusterV2.Spec.Options"
     - "types.TrustedClusterV2.Spec.RoleMap"
@@ -131,12 +130,12 @@ defaults:
 
     # Role
     "types.RoleV3.Kind": "role"
-    "types.RoleV3.SubKind": "role"
+    "types.RoleV3.SubKind": ""
     "types.RoleV3.Spec.Options.MaxSessions": 0
     "types.RoleV3.Spec.Options.RequireSessionsMFA": false
     "types.RoleV3.Spec.Allow.ReviewRequests.Where": ""
     "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles": ""
-    
+
     # Provision token
     "types.ProvisionTokenV2.Kind": "token"
     "types.ProvisionTokenV2.SubKind": ""

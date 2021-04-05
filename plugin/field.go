@@ -100,6 +100,9 @@ type Field struct {
 
 	// Default is field default value
 	Default string
+
+	// ConfigMode is field config mode
+	ConfigMode string
 }
 
 // BuildFields builds []*Field from descriptors of specified message
@@ -206,8 +209,17 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.setCustomType(c)
 	f.setRequired(c)
 	f.setComputed(c)
-	f.setDefault(c)
 	f.setForceNew(c)
+
+	err = f.setDefault(c)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	err = f.setConfigMode(c)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
 
 	f.setKind()
 
@@ -287,10 +299,46 @@ func (f *Field) setForceNew(c *FieldBuildContext) {
 	}
 }
 
-// setDefault returns a field default value
-func (f *Field) setDefault(c *FieldBuildContext) {
-	v, ok := config.Defaults[c.GetTypeName()]
-	if ok {
-		f.Default = fmt.Sprintf("%v", v)
+// setDefault returns field default value
+func (f *Field) setDefault(c *FieldBuildContext) error {
+	v1, ok1 := config.Defaults[c.GetPath()]
+	v2, ok2 := config.Defaults[c.GetTypeName()]
+
+	if ok1 && ok2 && c.GetPath() != c.GetTypeName() {
+		return trace.Errorf("field has default value set by path " + c.GetPath() + " and by name " + c.GetTypeName())
 	}
+
+	if ok1 {
+		f.Default = fmt.Sprintf("%#v", v1)
+	}
+
+	if ok2 {
+		f.Default = fmt.Sprintf("%#v", v2)
+	}
+
+	return nil
+}
+
+// setConfigMode sets field config mode
+func (f *Field) setConfigMode(c *FieldBuildContext) error {
+	_, a1 := config.ConfigModeAttrFields[c.GetTypeName()]
+	_, a2 := config.ConfigModeAttrFields[c.GetPath()]
+
+	_, b1 := config.ConfigModeBlockFields[c.GetTypeName()]
+	_, b2 := config.ConfigModeBlockFields[c.GetPath()]
+
+	if (a1 || a2) && (b1 || b2) {
+		return trace.Errorf("field " + c.GetPath() + " can not have SchemaConfigModeAttrs and SchemaConfigModeBlock " +
+			"in the same time, check config_mode_attrs/config_mode_block configuration variables")
+	}
+
+	if a1 || a2 {
+		f.ConfigMode = "SchemaConfigModeAttr"
+	}
+
+	if b1 || b2 {
+		f.ConfigMode = "SchemaConfigModeBlock"
+	}
+
+	return nil
 }

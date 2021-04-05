@@ -61,6 +61,16 @@ var (
 	// Passed from command line (--terraform_out=required=types.Metadata.Name:./_out)
 	RequiredFields map[string]struct{} = make(map[string]struct{})
 
+	// ConfigModeAttrFields is the list of fields to mark as 'Required: true'
+	//
+	// Passed from command line (--terraform_out=config_mode_attr=types.Metadata.Name:./_out)
+	ConfigModeAttrFields map[string]struct{} = make(map[string]struct{})
+
+	// ConfigModeBlockFields is the list of fields to mark as 'Required: true'
+	//
+	// Passed from command line (--terraform_out=config_mode_block=types.Metadata.Name:./_out)
+	ConfigModeBlockFields map[string]struct{} = make(map[string]struct{})
+
 	// Defaults is the map of default values for a fields
 	//
 	// Can be set in config file only
@@ -81,16 +91,18 @@ const (
 
 // config is yaml config unmarshalling helper struct
 type config struct {
-	Types              []string               `yaml:"types"`
-	DurationCustomType string                 `yaml:"duration_custom_type"`
-	TargetPackageName  string                 `yaml:"target_package_name"`
-	DefaultPackageName string                 `yaml:"default_package_name"`
-	ExcludeFields      []string               `yaml:"exclude_fields"`
-	ComputedFields     []string               `yaml:"computed_fields"`
-	RequiredFields     []string               `yaml:"required_fields"`
-	ForceNew           []string               `yaml:"force_new_fields"`
-	CustomImports      []string               `yaml:"custom_imports"`
-	Defaults           map[string]interface{} `yaml:"defaults"`
+	Types                 []string               `yaml:"types"`
+	DurationCustomType    string                 `yaml:"duration_custom_type"`
+	TargetPackageName     string                 `yaml:"target_package_name"`
+	DefaultPackageName    string                 `yaml:"default_package_name"`
+	ExcludeFields         []string               `yaml:"exclude_fields"`
+	ComputedFields        []string               `yaml:"computed_fields"`
+	RequiredFields        []string               `yaml:"required_fields"`
+	ForceNew              []string               `yaml:"force_new_fields"`
+	ConfigModeAttrFields  []string               `yaml:"config_mode_attr_fields"`
+	ConfigModeBlockFields []string               `yaml:"config_mode_block_fields"`
+	CustomImports         []string               `yaml:"custom_imports"`
+	Defaults              map[string]interface{} `yaml:"defaults"`
 }
 
 // Read reads config variables from command line or config file
@@ -114,6 +126,8 @@ func Read(p map[string]string) error {
 	setRequiredFields(splitArg(p["required"]))
 	setCustomImports(splitArg(p["custom_imports"]))
 	setForceNewFields(splitArg(p["force"]))
+	setConfigModeAttrFields(splitArg(p["config_mode_attr"]))
+	setConfigModeBlockFields(splitArg(p["config_mode_block"]))
 
 	setDefaultPackageName(p["pkg"])
 	setDurationType(p["custom_duration"])
@@ -154,6 +168,8 @@ func setVarsFromConfig() error {
 	setExcludeFields(cfg.ExcludeFields)
 	setComputedFields(cfg.ComputedFields)
 	setRequiredFields(cfg.RequiredFields)
+	setConfigModeAttrFields(cfg.ConfigModeAttrFields)
+	setConfigModeBlockFields(cfg.ConfigModeBlockFields)
 	setCustomImports(cfg.CustomImports)
 	setDefaults(cfg.Defaults)
 	setForceNewFields(cfg.ForceNew)
@@ -270,6 +286,24 @@ func setForceNewFields(f []string) {
 
 	if len(f) > 0 {
 		logrus.Printf("Force new fields: %s", f)
+	}
+}
+
+// setConfigModeAttrFields parses and sets ExcludeFields
+func setConfigModeAttrFields(f []string) {
+	setSet(ConfigModeAttrFields, f)
+
+	if len(f) > 0 {
+		logrus.Printf("SchemaConfigModeAttr fields: %s", f)
+	}
+}
+
+// setConfigModeBlockFields parses and sets ExcludeFields
+func setConfigModeBlockFields(f []string) {
+	setSet(ConfigModeBlockFields, f)
+
+	if len(f) > 0 {
+		logrus.Printf("SchemaConfigModeBlock fields: %s", f)
 	}
 }
 

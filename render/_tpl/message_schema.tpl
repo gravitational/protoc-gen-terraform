@@ -47,9 +47,9 @@ map[string]*schema.Schema {
 {{- if eq .Kind "SINGULAR_MESSAGE" }}
 {
     {{ template "required" . }}
+    {{ template "configMode" . }}
     Type: schema.TypeList,
     MaxItems: 1,
-    ConfigMode: schema.SchemaConfigModeAttr,
     Description: {{ .Message.RawComment | quote }},
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
@@ -70,6 +70,7 @@ Schema{{.CustomTypeMethodInfix}}(),
 {{- end -}}
 
 {{- define "singularElementary" -}}
+{{- template "configMode" . -}}
 Type: {{ template "type" .SchemaRawType }},
 Description: {{ .RawComment | quote }},
 {{- if .IsTime }}
@@ -95,7 +96,7 @@ DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData)
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
 Description: {{ .Message.RawComment | quote }},
-ConfigMode: schema.SchemaConfigModeAttr,
+{{ template "configMode" . }}
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
@@ -120,7 +121,7 @@ Elem: &schema.Schema {
 {{- define "objectMap" -}}
 Type: schema.TypeList,
 Description: {{ .RawComment | quote }},
-ConfigMode: schema.SchemaConfigModeAttr,
+{{ template "configMode" . }}
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{
         "key": {
@@ -145,20 +146,20 @@ schema.TypeString
 {{- end -}}
 
 {{- define "required" -}}
-{{- if .IsComputed -}}
+{{- if .IsComputed }}
 Computed: true,
-{{- else -}}
-{{- if .IsRequired -}}
+{{- end }}
+{{- if .IsRequired }}
 Required: true,
-{{- else -}}
+{{- else }}
 Optional: true,
 {{- end }}
-{{- end -}}
-
 {{- if .Default }}
-Default: {{.Default | quote}},
+Default: {{.Default}},
 {{- end }}
 {{- if .IsForceNew }}
 ForceNew: true,
 {{- end }}
 {{- end -}}
+
+{{- define "configMode" -}}{{- if .ConfigMode -}}ConfigMode: schema.{{.ConfigMode}},{{- end -}}{{- end -}}
