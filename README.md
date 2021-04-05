@@ -48,11 +48,13 @@ Options:
 * `target_pkg` - the name of the target package
 * `custom_duration` - the name of custom Duration type, if used.
 * `custom_imports` - comma-separated package list to add into target file
-* `required` - list of a fields to mark as required
-* `computed` - list of a fields to mark as computed
-* `force_new` - list of a fields to mark as force new
+* `required` - list of a fields to mark as `Required: true`
+* `computed` - list of a fields to mark as `Computed: true`
+* `force_new` - list of a fields to mark as `ForceNew: true`
+* `config_mode_attr` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeAttr`
+* `config_mode_block` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
 
-All config variables could be set in [example/teleport.yaml](YAML config). Path to config file can be specified using `config` variable.
+All config variables could be set in [example/teleport.yaml](YAML config). Path to config file can be specified using `config` variable. `defaults` variable is available in config only because it requirers type information. CLI args take higher priority over config file.
 
 # Testing
 

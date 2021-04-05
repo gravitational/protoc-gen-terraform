@@ -17,12 +17,50 @@ types:
 
 # These fields will be marked as Computed: true
 computed_fields:
+    # User
     - "types.UserV2.Version"
+
+    # Role
     - "types.RoleV3.Version"
+    - "types.RoleV3.Spec.Options.Bpf"
+    - "types.RoleV3.Spec.Allow"
+    - "types.RoleV3.Spec.Allow.Request"
+    - "types.RoleV3.Spec.Allow.Request.Thresholds"    
+    - "types.RoleV3.Spec.Allow.Impersonate"
+    - "types.RoleV3.Spec.Allow.Impersonate.Users"
+    - "types.RoleV3.Spec.Allow.Impersonate.Roles"
+    - "types.RoleV3.Spec.Allow.Impersonate.Where"
+    - "types.RoleV3.Spec.Allow.ReviewRequests"
+    - "types.RoleV3.Spec.Deny"
+    - "types.RoleV3.Spec.Deny.Namespaces"
+    - "types.RoleV3.Spec.Deny.Rules"
+    - "types.RoleV3.Spec.Deny.Request"
+    - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles"
+    - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles.Roles"    
+    - "types.RoleV3.Spec.Deny.Request.Thresholds"
+    - "types.RoleV3.Spec.Deny.Request.SuggestedReviewers"
+    - "types.RoleV3.Spec.Deny.KubeUsers"
+    - "types.RoleV3.Spec.Deny.DatabaseNames"
+    - "types.RoleV3.Spec.Deny.DatabaseUsers"
+    - "types.RoleV3.Spec.Deny.Impersonate"
+    - "types.RoleV3.Spec.Deny.Impersonate.Users"
+    - "types.RoleV3.Spec.Deny.Impersonate.Roles"
+    - "types.RoleV3.Spec.Deny.Impersonate.Where"
+    - "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles"
+
+    # Provision Token
     - "types.ProvisionTokenV2.Version" 
+
+    # Github connector
     - "types.GithubConnectorV3.Version"
+
+    # SAML connector
     - "types.SAMLConnectorV2.Version"
+
+    # OIDC connector
     - "types.OIDCConnectorV2.Version"
+
+    # Trusted cluster
     - "types.TrustedClusterV2.Version"
 
 # These fields will be excluded
@@ -53,6 +91,35 @@ required_fields:
 force_new_fields:
     - "types.Metadata.Name"
 
+# SchemaConfigModeAttr: true values for a fields
+config_mode_attr_fields:
+    # Metadata
+    - "types.Metadata"
+
+    # Role 
+    - "types.RoleV3.Spec"
+    - "types.RoleV3.Spec.Options"
+    - "types.RoleV3.Spec.Allow"
+    - "types.RoleV3.Spec.Allow.Request"
+    - "types.RoleV3.Spec.Allow.Request.ClaimsToRoles"
+    - "types.RoleV3.Spec.Allow.Request.Thresholds"
+    - "types.RoleV3.Spec.Allow.Impersonate"
+    - "types.RoleV3.Spec.Allow.ReviewRequests"
+    - "types.RoleV3.Spec.Allow.ReviewRequests.ClaimsToRoles"
+    - "types.RoleV3.Spec.Deny"    
+    - "types.RoleV3.Spec.Deny.Rules"
+    - "types.RoleV3.Spec.Deny.Request"
+    - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles"
+    - "types.RoleV3.Spec.Deny.Request.Thresholds"    
+    - "types.RoleV3.Spec.Deny.Impersonate"
+    - "types.RoleV3.Spec.Deny.ReviewRequests"    
+    - "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles"
+
+    # TrustedCluster config modes
+    - "types.TrustedClusterV2.Spec"
+    - "types.TrustedClusterV2.Spec.Options"
+    - "types.TrustedClusterV2.Spec.RoleMap"
+
 # Field default values
 defaults:
     # Metadata
@@ -60,21 +127,32 @@ defaults:
 
     # User
     "types.UserV2.Kind": "user"
+    "types.UserV2.SubKind": ""
 
     # Role
     "types.RoleV3.Kind": "role"
-
+    "types.RoleV3.SubKind": "role"
+    "types.RoleV3.Spec.Options.MaxSessions": 0
+    "types.RoleV3.Spec.Options.RequireSessionsMFA": false
+    "types.RoleV3.Spec.Allow.ReviewRequests.Where": ""
+    "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles": ""
+    
     # Provision token
     "types.ProvisionTokenV2.Kind": "token"
+    "types.ProvisionTokenV2.SubKind": ""
 
     # Github connector
     "types.GithubConnectorV3.Kind": "github_connector"
+    "types.GithubConnectorV3.SubKind": ""
 
     # SAML connector
     "types.SAMLConnectorV2.Kind": "saml_connector"
+    "types.SAMLConnectorV2.SubKind": ""
 
     # OIDC connector
     "types.OIDCConnectorV2.Kind": "oidc_connector"
+    "types.OIDCConnectorV2.SubKind": ""
 
     # Trusted cluster
     "types.TrustedClusterV2.Kind": "trusted_cluster"
+    "types.TrustedClusterV2.SubKind": ""
