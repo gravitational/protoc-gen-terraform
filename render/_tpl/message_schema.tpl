@@ -48,7 +48,7 @@ map[string]*schema.Schema {
 {
     Type: schema.TypeList,
     MaxItems: 1,
-    Description: {{ .RawComment | quote }},
+    Description: {{ .Message.RawComment | quote }},
     {{- template "configMode" . }}    
     {{- template "required" . }}
     Elem: &schema.Resource {

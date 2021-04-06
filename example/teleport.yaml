@@ -15,6 +15,25 @@ types:
     - "types.OIDCConnectorV2"
     - "types.TrustedClusterV2"
 
+# These fields will be excluded
+exclude_fields:
+    # Metadata
+    - "types.Metadata.ID"
+    
+    # User
+    - "types.UserSpecV2.LocalAuth"
+    - "types.UserSpecV2.Expires"
+    - "types.UserSpecV2.CreatedBy"
+    - "types.UserSpecV2.Status"
+
+    # Role: TEMPORARY
+    # - "types.RoleV3.Spec.Allow.Request.ClaimsToRoles"
+    # - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles"
+    # - "types.RoleV3.Spec.Allow.Request.Annotations"
+    # - "types.RoleV3.Spec.Deny.Request.Annotations"    
+    # - "types.RoleV3.Spec.Allow.Request.Thresholds"
+    # - "types.RoleV3.Spec.Deny.Request.Thresholds"
+
 # These fields will be marked as Computed: true
 computed_fields:
     # User
@@ -42,17 +61,6 @@ computed_fields:
 
     # Trusted cluster
     - "types.TrustedClusterV2.Version"
-
-# These fields will be excluded
-exclude_fields:
-    # Metadata
-    - "types.Metadata.ID"
-    
-    # User
-    - "types.UserSpecV2.LocalAuth"
-    - "types.UserSpecV2.Expires"
-    - "types.UserSpecV2.CreatedBy"
-    - "types.UserSpecV2.Status"
 
 # These fields will be marked as Required: true 
 required_fields:
@@ -107,3 +115,9 @@ defaults:
     # Trusted cluster
     "types.TrustedClusterV2.Kind": "trusted_cluster"
     "types.TrustedClusterV2.SubKind": ""
+
+# These fields will be marked as ConfigMode: schema.SchemaConfigModeAttrs
+config_mode_attr_fields:
+
+# These fields will be marked as ConfigMode: schema.SchemaConfigModeBlock
+config_mode_block_fields:

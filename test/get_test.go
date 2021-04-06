@@ -18,9 +18,11 @@ limitations under the License.
 package test
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/gravitational/trace"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -95,6 +97,93 @@ var (
 	}
 )
 
+type SchemaMeta struct {
+	name        string
+	schema_name string
+	nested      map[string]*SchemaMeta
+}
+
+func SchemaTestMeta() map[string]*SchemaMeta {
+	return map[string]*SchemaMeta{
+		"str": {
+			name:        "Str",
+			schema_name: "str",
+		},
+		"int32": {
+			name:        "Int32",
+			schema_name: "int32",
+		},
+		"int64": {
+			name:        "Int64",
+			schema_name: "int64",
+		},
+		"float": {
+			name:        "Float",
+			schema_name: "float",
+		},
+		"double": {
+			name:        "Double",
+			schema_name: "double",
+		},
+		"bool": {
+			name:        "Bool",
+			schema_name: "bool",
+		},
+		"bytes": {
+			name:        "Bytes",
+			schema_name: "bytes",
+		},
+		"timestamp": {
+			name:        "Timestamp",
+			schema_name: "timestamp",
+		},
+	}
+}
+
+func GetTestFromResourceDataN(s map[string]*schema.Schema, d *schema.ResourceData, m map[string]*SchemaMeta, obj interface{}) error {
+	o := reflect.Indirect(reflect.ValueOf(obj))
+
+	for k, sch := range s {
+		me, ok := m[k]
+		if !ok {
+			continue
+			return trace.Errorf("field not found in corresponding meta " + k)
+		}
+
+		v := o.FieldByName(me.name)
+
+		switch {
+		case sch.Type == schema.TypeInt ||
+			sch.Type == schema.TypeFloat ||
+			sch.Type == schema.TypeBool ||
+			sch.Type == schema.TypeString:
+
+			setAtomic(me, &v, sch, d)
+		default:
+			return trace.Errorf("unknown type %v", sch.Type)
+		}
+	}
+
+	return nil
+}
+
+func setAtomic(m *SchemaMeta, v *reflect.Value, s *schema.Schema, d *schema.ResourceData) {
+	r, ok := d.GetOk(m.schema_name)
+	if !ok {
+		v.Set(reflect.ValueOf(s.ZeroValue()))
+	}
+
+	// Time
+	// if v.Type().() == "time.Time"
+
+	// }
+
+	// TODO: Convertible? Assignable?
+
+	// Convert and set
+	v.Set(reflect.ValueOf(r).Convert(v.Type()))
+}
+
 // buildSubjectGet builds Test struct from test fixture data
 func buildSubjectGet(t *testing.T) (*Test, error) {
 	subject := &Test{}
@@ -105,16 +194,31 @@ func buildSubjectGet(t *testing.T) (*Test, error) {
 
 // TestElementariesGet ensures decoding of elementary types
 func TestElementariesGet(t *testing.T) {
-	subject, err := buildSubjectGet(t)
-	require.NoError(t, err, "failed to unmarshal test data")
+	// subject, err := buildSubjectGet(t)
+	// require.NoError(t, err, "failed to unmarshal test data")
 
-	assert.Equal(t, subject.Str, "TestString", "Test.Str")
-	assert.Equal(t, subject.Int32, int32(999), "Test.Int32")
-	assert.Equal(t, subject.Int64, int64(998), "Test.Int64")
-	assert.Equal(t, subject.Float, float32(18.1), "Test.Float")
-	assert.Equal(t, subject.Double, float64(18.4), "Test.Dobule")
-	assert.Equal(t, subject.Bool, true, "Test.Bool")
-	assert.Equal(t, subject.Bytes, []byte("TestBytes"), "Test.Bytes")
+	// assert.Equal(t, subject.Str, "TestString", "Test.Str")
+	// assert.Equal(t, subject.Int32, int32(999), "Test.Int32")
+	// assert.Equal(t, subject.Int64, int64(998), "Test.Int64")
+	// assert.Equal(t, subject.Float, float32(18.1), "Test.Float")
+	// assert.Equal(t, subject.Double, float64(18.4), "Test.Dobule")
+	// assert.Equal(t, subject.Bool, true, "Test.Bool")
+	// assert.Equal(t, subject.Bytes, []byte("TestBytes"), "Test.Bytes")
+
+	subject := &Test{}
+	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
+
+	err := GetTestFromResourceDataN(SchemaTest(), data, SchemaTestMeta(), subject)
+	require.NoError(t, err)
+
+	assert.Equal(t, int32(999), subject.Int32, "Test.Int32")
+	assert.Equal(t, int64(998), subject.Int64, "Test.Int64")
+	assert.Equal(t, "TestString", subject.Str, "Test.Str")
+	assert.Equal(t, float32(18.1), subject.Float, "Test.Float")
+	assert.Equal(t, float64(18.4), subject.Double, "Test.Dobule")
+	assert.Equal(t, true, subject.Bool, "Test.Bool")
+	assert.Equal(t, []byte("TestBytes"), subject.Bytes, "Test.Bytes")
+
 }
 
 // TestTimesGet ensures decoding of time and duration fields

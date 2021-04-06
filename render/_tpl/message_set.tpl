@@ -81,16 +81,16 @@ obj[{{.NameSnake | quote}}] = _value
 {{/* Renders setter for elementary array of any type */}}
 {{- define "repeatedElementary" -}}
 _arr := t.{{.Name}}
-if len(_arr) > 0 {
-    _raw := make([]{{.SchemaRawType}}, len(_arr))
+_raw := make([]{{.SchemaRawType}}, len(_arr))
 
+if len(_arr) > 0 {
     for i, _v := range _arr {
         {{- template "rawToValue" . }}
         _raw[i] = _value
     }
-
-    obj[{{.NameSnake | quote}}] = _raw
 }
+
+obj[{{.NameSnake | quote}}] = _raw
 {{- end -}}
 
 {{/* Renders custom getter custom type */}}
@@ -122,12 +122,16 @@ if t.{{.Name}} != nil {
 {{end}}
 
 msg := make(map[string]interface{})
-obj[{{.NameSnake | quote }}] = []interface{}{msg}
+
 {
     obj := msg
     t := t.{{.Name}}
 
     {{ template "fields" .Message.Fields }}
+}
+
+if len(msg) > 0 {
+    obj[{{.NameSnake | quote }}] = []interface{}{msg}
 }
 {{if .GoTypeIsPtr}}
 }
@@ -144,9 +148,9 @@ if len(arr) > 0 {
         {{ template "fields" .Message.Fields }}
         arr[i] = obj
     }
-
-    obj[{{.NameSnake | quote }}] = arr
 }
+
+obj[{{.NameSnake | quote }}] = arr
 {{- end -}}
 
 {{/* String -> elementary value map */}}
@@ -160,9 +164,9 @@ if len(v) > 0 {
         {{- template "rawToValue" $m }}
         m[key] = _value
     }
-
-    obj[{{.NameSnake | quote}}] = m
 }
+
+obj[{{.NameSnake | quote}}] = m
 {{- end -}}
 
 {{/* String -> object map */}}
@@ -191,7 +195,6 @@ for _, k := range ks {
     n++
 }
 
-if len(a) > 0 {
-    obj[{{.NameSnake | quote}}] = a
-}
+
+obj[{{.NameSnake | quote}}] = a
 {{- end -}}

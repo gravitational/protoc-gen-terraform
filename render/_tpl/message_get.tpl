@@ -86,6 +86,8 @@ if ok {
             t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_value
         }
     }
+} else {
+    t.{{.Name}} = make({{.GoTypeFull}}, 0)
 }
 {{- end -}}
 
@@ -124,9 +126,11 @@ _value := {{.GoType}}({{.SchemaGoType}}(_raws))
 
 {{/* Singular message */}}
 {{- define "singularMessage" -}}
+n := d.Get(p + {{.NameSnake | quote }} + ".#")
+
 p := p + {{.NameSnake | quote }} + ".0"
 _, ok := d.GetOk(p)
-if ok {
+if ok && n != nil && n.(int) != 0 {
     p := p + "."
 
     {{ if .GoTypeIsPtr }}
@@ -138,6 +142,10 @@ if ok {
     {{ end }}
 
     {{ template "fields" .Message.Fields }}
+} else {
+    {{ if .GoTypeIsPtr }}
+    t.{{ .Name }} = nil
+    {{ end }}
 }
 {{- end -}}
 
@@ -168,6 +176,8 @@ if ok {
             }
         }
     }
+} else {
+    t.{{.Name}} = make({{.GoTypeFull}}, 0)
 }
 {{- end -}}
 
@@ -189,6 +199,8 @@ if ok {
             t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
         }   
     }
+} else {
+    t.{{.Name}} = make(map[string]{{$m.GoTypeFull}})
 }
 {{- end -}}
 
@@ -233,5 +245,7 @@ if ok {
 
         t.{{.Name}} = _value
     }
+} else {
+    t.{{.Name}} = make(map[string]{{$m.GoTypeFull}})
 }
 {{- end -}}

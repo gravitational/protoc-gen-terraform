@@ -232,7 +232,7 @@ func SchemaTest() map[string]*schema.Schema {
 		"nested": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
-			Description: "Nested nested message field",
+			Description: "Nested message definition",
 			Optional:    true,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -285,7 +285,7 @@ func SchemaTest() map[string]*schema.Schema {
 								"value": {
 									Type:        schema.TypeList,
 									MaxItems:    1,
-									Description: "",
+									Description: "Message nested into nested message",
 									Optional:    true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
@@ -361,7 +361,7 @@ func SchemaTest() map[string]*schema.Schema {
 								"value": {
 									Type:        schema.TypeList,
 									MaxItems:    1,
-									Description: "",
+									Description: "Message nested into nested message",
 									Optional:    true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
@@ -406,7 +406,7 @@ func SchemaTest() map[string]*schema.Schema {
 					"value": {
 						Type:        schema.TypeList,
 						MaxItems:    1,
-						Description: "",
+						Description: "Nested message definition",
 						Optional:    true,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -459,7 +459,7 @@ func SchemaTest() map[string]*schema.Schema {
 											"value": {
 												Type:        schema.TypeList,
 												MaxItems:    1,
-												Description: "",
+												Description: "Message nested into nested message",
 												Optional:    true,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
@@ -662,6 +662,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					t.StringA[i] = _value
 				}
 			}
+		} else {
+			t.StringA = make([]string, 0)
 		}
 	}
 	{
@@ -689,6 +691,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					t.BytesA[i] = _value
 				}
 			}
+		} else {
+			t.BytesA = make([][]byte, 0)
 		}
 	}
 	{
@@ -713,6 +717,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					t.TimestampA[i] = &_value
 				}
 			}
+		} else {
+			t.TimestampA = make([]*time.Time, 0)
 		}
 	}
 	{
@@ -738,12 +744,16 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					t.DurationCustomA[i] = _value
 				}
 			}
+		} else {
+			t.DurationCustomA = make([]Duration, 0)
 		}
 	}
 	{
+		n := d.Get(p + "nested" + ".#")
+
 		p := p + "nested" + ".0"
 		_, ok := d.GetOk(p)
-		if ok {
+		if ok && n != nil && n.(int) != 0 {
 			p := p + "."
 
 			_obj := Nested{}
@@ -801,6 +811,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 							}
 						}
 					}
+				} else {
+					t.Nested = make([]*NestedLevel2, 0)
 				}
 			}
 			{
@@ -824,6 +836,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 							t.NestedM[_k] = _value
 						}
 					}
+				} else {
+					t.NestedM = make(map[string]string)
 				}
 			}
 			{
@@ -874,8 +888,14 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 						t.NestedMObj = _value
 					}
+				} else {
+					t.NestedMObj = make(map[string]*NestedLevel2)
 				}
 			}
+
+		} else {
+
+			t.Nested = nil
 
 		}
 	}
@@ -951,6 +971,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 										}
 									}
 								}
+							} else {
+								t.Nested = make([]*NestedLevel2, 0)
 							}
 						}
 						{
@@ -974,6 +996,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 										t.NestedM[_k] = _value
 									}
 								}
+							} else {
+								t.NestedM = make(map[string]string)
 							}
 						}
 						{
@@ -1024,12 +1048,16 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 									t.NestedMObj = _value
 								}
+							} else {
+								t.NestedMObj = make(map[string]*NestedLevel2)
 							}
 						}
 
 					}
 				}
 			}
+		} else {
+			t.NestedA = make([]*Nested, 0)
 		}
 	}
 	{
@@ -1053,6 +1081,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 					t.NestedM[_k] = _value
 				}
 			}
+		} else {
+			t.NestedM = make(map[string]string)
 		}
 	}
 	{
@@ -1135,6 +1165,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 										}
 									}
 								}
+							} else {
+								t.Nested = make([]*NestedLevel2, 0)
 							}
 						}
 						{
@@ -1158,6 +1190,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 										t.NestedM[_k] = _value
 									}
 								}
+							} else {
+								t.NestedM = make(map[string]string)
 							}
 						}
 						{
@@ -1208,6 +1242,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 									t.NestedMObj = _value
 								}
+							} else {
+								t.NestedMObj = make(map[string]*NestedLevel2)
 							}
 						}
 
@@ -1216,6 +1252,8 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 				t.NestedMObj = _value
 			}
+		} else {
+			t.NestedMObj = make(map[string]*Nested)
 		}
 	}
 
@@ -1295,16 +1333,16 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	}
 	{
 		_arr := t.StringA
-		if len(_arr) > 0 {
-			_raw := make([]string, len(_arr))
+		_raw := make([]string, len(_arr))
 
+		if len(_arr) > 0 {
 			for i, _v := range _arr {
 				_value := string(_v)
 				_raw[i] = _value
 			}
-
-			obj["string_a"] = _raw
 		}
+
+		obj["string_a"] = _raw
 	}
 	{
 		_v, err := SetBoolCustomToResourceData(&t.BoolA)
@@ -1315,49 +1353,49 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 	}
 	{
 		_arr := t.BytesA
-		if len(_arr) > 0 {
-			_raw := make([]string, len(_arr))
+		_raw := make([]string, len(_arr))
 
+		if len(_arr) > 0 {
 			for i, _v := range _arr {
 				_value := string(_v)
 				_raw[i] = _value
 			}
-
-			obj["bytes_a"] = _raw
 		}
+
+		obj["bytes_a"] = _raw
 	}
 	{
 		_arr := t.TimestampA
-		if len(_arr) > 0 {
-			_raw := make([]string, len(_arr))
+		_raw := make([]string, len(_arr))
 
+		if len(_arr) > 0 {
 			for i, _v := range _arr {
 				_value := _v.Format(time.RFC3339Nano)
 				_raw[i] = _value
 			}
-
-			obj["timestamp_a"] = _raw
 		}
+
+		obj["timestamp_a"] = _raw
 	}
 	{
 		_arr := t.DurationCustomA
-		if len(_arr) > 0 {
-			_raw := make([]string, len(_arr))
+		_raw := make([]string, len(_arr))
 
+		if len(_arr) > 0 {
 			for i, _v := range _arr {
 				_value := time.Duration(_v).String()
 				_raw[i] = _value
 			}
-
-			obj["duration_custom_a"] = _raw
 		}
+
+		obj["duration_custom_a"] = _raw
 	}
 	{
 
 		if t.Nested != nil {
 
 			msg := make(map[string]interface{})
-			obj["nested"] = []interface{}{msg}
+
 			{
 				obj := msg
 				t := t.Nested
@@ -1383,9 +1421,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 							arr[i] = obj
 						}
-
-						obj["nested"] = arr
 					}
+
+					obj["nested"] = arr
 				}
 				{
 
@@ -1397,9 +1435,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 							_value := string(_v)
 							m[key] = _value
 						}
-
-						obj["nested_m"] = m
 					}
+
+					obj["nested_m"] = m
 				}
 				{
 
@@ -1432,11 +1470,13 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 						n++
 					}
 
-					if len(a) > 0 {
-						obj["nested_m_obj"] = a
-					}
+					obj["nested_m_obj"] = a
 				}
 
+			}
+
+			if len(msg) > 0 {
+				obj["nested"] = []interface{}{msg}
 			}
 
 		}
@@ -1469,9 +1509,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 							arr[i] = obj
 						}
-
-						obj["nested"] = arr
 					}
+
+					obj["nested"] = arr
 				}
 				{
 
@@ -1483,9 +1523,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 							_value := string(_v)
 							m[key] = _value
 						}
-
-						obj["nested_m"] = m
 					}
+
+					obj["nested_m"] = m
 				}
 				{
 
@@ -1518,16 +1558,14 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 						n++
 					}
 
-					if len(a) > 0 {
-						obj["nested_m_obj"] = a
-					}
+					obj["nested_m_obj"] = a
 				}
 
 				arr[i] = obj
 			}
-
-			obj["nested_a"] = arr
 		}
+
+		obj["nested_a"] = arr
 	}
 	{
 
@@ -1539,9 +1577,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 				_value := string(_v)
 				m[key] = _value
 			}
-
-			obj["nested_m"] = m
 		}
+
+		obj["nested_m"] = m
 	}
 	{
 
@@ -1582,9 +1620,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 						arr[i] = obj
 					}
-
-					obj["nested"] = arr
 				}
+
+				obj["nested"] = arr
 			}
 			{
 
@@ -1596,9 +1634,9 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 						_value := string(_v)
 						m[key] = _value
 					}
-
-					obj["nested_m"] = m
 				}
+
+				obj["nested_m"] = m
 			}
 			{
 
@@ -1631,9 +1669,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 					n++
 				}
 
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
+				obj["nested_m_obj"] = a
 			}
 
 			i["value"] = []interface{}{obj}
@@ -1642,9 +1678,7 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 			n++
 		}
 
-		if len(a) > 0 {
-			obj["nested_m_obj"] = a
-		}
+		obj["nested_m_obj"] = a
 	}
 
 	for key, value := range obj {
