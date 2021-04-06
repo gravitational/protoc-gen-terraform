@@ -24,29 +24,9 @@ computed_fields:
     - "types.RoleV3.Version"
     - "types.RoleV3.Spec.Options.BPF"
     - "types.RoleV3.Spec.Allow"
-    - "types.RoleV3.Spec.Allow.Request"
-    - "types.RoleV3.Spec.Allow.Request.Thresholds"    
-    - "types.RoleV3.Spec.Allow.Impersonate"
-    - "types.RoleV3.Spec.Allow.Impersonate.Users"
-    - "types.RoleV3.Spec.Allow.Impersonate.Roles"
-    - "types.RoleV3.Spec.Allow.Impersonate.Where"
-    - "types.RoleV3.Spec.Allow.ReviewRequests"
+    - "types.RoleV3.Spec.Allow.Namespaces"
     - "types.RoleV3.Spec.Deny"
     - "types.RoleV3.Spec.Deny.Namespaces"
-    - "types.RoleV3.Spec.Deny.Rules"
-    - "types.RoleV3.Spec.Deny.Request"
-    - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles"
-    - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles.Roles"    
-    - "types.RoleV3.Spec.Deny.Request.Thresholds"
-    - "types.RoleV3.Spec.Deny.Request.SuggestedReviewers"
-    - "types.RoleV3.Spec.Deny.KubeUsers"
-    - "types.RoleV3.Spec.Deny.DatabaseNames"
-    - "types.RoleV3.Spec.Deny.DatabaseUsers"
-    - "types.RoleV3.Spec.Deny.Impersonate"
-    - "types.RoleV3.Spec.Deny.Impersonate.Users"
-    - "types.RoleV3.Spec.Deny.Impersonate.Roles"
-    - "types.RoleV3.Spec.Deny.Impersonate.Where"
-    - "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles"
 
     # Provision Token
     - "types.ProvisionTokenV2.Version" 
@@ -90,35 +70,6 @@ required_fields:
 # These fields will be marked as ForceNew: true
 force_new_fields:
     - "types.Metadata.Name"
-
-# SchemaConfigModeAttr: true values for a fields
-config_mode_attr_fields:
-    # Role 
-    - "types.RoleV3.Metadata"
-    - "types.RoleV3.Spec"
-    - "types.RoleV3.Spec.Options"
-    - "types.RoleV3.Spec.Allow"
-    - "types.RoleV3.Spec.Allow.Rules"
-    - "types.RoleV3.Spec.Allow.Request"
-    - "types.RoleV3.Spec.Allow.Request.ClaimsToRoles"
-    - "types.RoleV3.Spec.Allow.Request.Thresholds"
-    - "types.RoleV3.Spec.Allow.Impersonate"
-    - "types.RoleV3.Spec.Allow.ReviewRequests"
-    - "types.RoleV3.Spec.Allow.ReviewRequests.ClaimsToRoles"
-    - "types.RoleV3.Spec.Deny"    
-    - "types.RoleV3.Spec.Deny.Rules"
-    - "types.RoleV3.Spec.Deny.Request"
-    - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles"
-    - "types.RoleV3.Spec.Deny.Request.Thresholds"    
-    - "types.RoleV3.Spec.Deny.Impersonate"
-    - "types.RoleV3.Spec.Deny.ReviewRequests"    
-    - "types.RoleV3.Spec.Deny.ReviewRequests.ClaimsToRoles"
-
-    # TrustedCluster config modes
-    - "types.TrustedClusterV2.Metadata"
-    - "types.TrustedClusterV2.Spec"
-    - "types.TrustedClusterV2.Spec.Options"
-    - "types.TrustedClusterV2.Spec.RoleMap"
 
 # Field default values
 defaults:

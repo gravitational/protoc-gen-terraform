@@ -644,21 +644,23 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "string_a")
+		_a, ok := d.GetOk(p + "string_a")
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			a, ok := _a.([]interface{})
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
 			}
-			t.StringA = make([]string, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
+			if len(a) > 0 {
+				t.StringA = make([]string, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.StringA[i] = _value
 				}
-				_value := string(string(_raws))
-				t.StringA[i] = _value
 			}
 		}
 	}
@@ -669,107 +671,234 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "bytes_a")
+		_a, ok := d.GetOk(p + "bytes_a")
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			a, ok := _a.([]interface{})
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
 			}
-			t.BytesA = make([][]byte, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
+			if len(a) > 0 {
+				t.BytesA = make([][]byte, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := []byte([]byte(_raws))
+					t.BytesA[i] = _value
 				}
-				_value := []byte([]byte(_raws))
-				t.BytesA[i] = _value
 			}
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "timestamp_a")
+		_a, ok := d.GetOk(p + "timestamp_a")
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			a, ok := _a.([]interface{})
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
 			}
-			t.TimestampA = make([]*time.Time, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
+			if len(a) > 0 {
+				t.TimestampA = make([]*time.Time, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value, err := time.Parse(time.RFC3339Nano, _raws)
+					if err != nil {
+						return fmt.Errorf("malformed time value for field TimestampA : %w", err)
+					}
+					t.TimestampA[i] = &_value
 				}
-				_value, err := time.Parse(time.RFC3339Nano, _raws)
-				if err != nil {
-					return fmt.Errorf("malformed time value for field TimestampA : %w", err)
-				}
-				t.TimestampA[i] = &_value
 			}
 		}
 	}
 	{
-		_rawi, ok := d.GetOk(p + "duration_custom_a")
+		_a, ok := d.GetOk(p + "duration_custom_a")
 		if ok {
-			_rawi, ok := _rawi.([]interface{})
+			a, ok := _a.([]interface{})
 			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
 			}
-			t.DurationCustomA = make([]Duration, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
+			if len(a) > 0 {
+				t.DurationCustomA = make([]Duration, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_valued, err := time.ParseDuration(_raws)
+					if err != nil {
+						return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
+					}
+					_value := Duration(_valued)
+					t.DurationCustomA[i] = _value
 				}
-				_valued, err := time.ParseDuration(_raws)
-				if err != nil {
-					return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
-				}
-				_value := Duration(_valued)
-				t.DurationCustomA[i] = _value
 			}
 		}
 	}
 	{
-		p := p + "nested" + ".0."
+		p := p + "nested" + ".0"
+		_, ok := d.GetOk(p)
+		if ok {
+			p := p + "."
 
-		_obj := Nested{}
-		t.Nested = &_obj
-		t := &_obj
+			_obj := Nested{}
+			t.Nested = &_obj
+			t := &_obj
 
-		{
+			{
 
-			_raw, ok := d.GetOk(p + "str")
+				_raw, ok := d.GetOk(p + "str")
 
-			if ok {
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.Str = _value
 				}
-				_value := string(string(_raws))
-				t.Str = _value
 			}
-		}
-		{
-			p := p + "nested"
+			{
+				p := p + "nested"
 
-			_raw, ok := d.GetOk(p)
-			if ok {
-				_rawi, ok := _raw.([]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to []interface{}", _raw)
+				_a, ok := d.GetOk(p)
+				if ok {
+					a, ok := _a.([]interface{})
+					if !ok {
+						return fmt.Errorf("can not convert %T to []interface{}", _a)
+					}
+
+					if len(a) > 0 {
+						t.Nested = make([]*NestedLevel2, len(a))
+
+						for i := 0; i < len(a); i++ {
+
+							_obj := NestedLevel2{}
+							t.Nested[i] = &_obj
+
+							{
+								t := t.Nested[i]
+								p := p + fmt.Sprintf(".%v.", i)
+								{
+
+									_raw, ok := d.GetOk(p + "str")
+
+									if ok {
+										_raws, ok := _raw.(string)
+										if !ok {
+											return fmt.Errorf("can not convert %T to string", _raws)
+										}
+										_value := string(string(_raws))
+										t.Str = _value
+									}
+								}
+
+							}
+						}
+					}
 				}
+			}
+			{
 
-				t.Nested = make([]*NestedLevel2, len(_rawi))
-				for i := 0; i < len(_rawi); i++ {
+				p := p + "nested_m"
+				_m, ok := d.GetOk(p)
+				if ok {
+					m, ok := _m.(map[string]interface{})
+					if !ok {
+						return fmt.Errorf("can not convert %T to map[string]interface{}", _m)
+					}
+					if len(m) > 0 {
+						t.NestedM = make(map[string]string, len(m))
+						for _k, _v := range m {
+							_raw := _v
+							_raws, ok := _raw.(string)
+							if !ok {
+								return fmt.Errorf("can not convert %T to string", _raws)
+							}
+							_value := string(string(_raws))
+							t.NestedM[_k] = _value
+						}
+					}
+				}
+			}
+			{
+				p := p + "nested_m_obj"
 
-					_obj := NestedLevel2{}
-					t.Nested[i] = &_obj
+				_m, ok := d.GetOk(p)
+				if ok {
+					m, ok := _m.([]interface{})
+					if !ok {
+						return fmt.Errorf("can not convert %T to []interface{}", _m)
+					}
+
+					if len(m) > 0 {
+						_value := make(map[string]*NestedLevel2)
+
+						for i := range m {
+							_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+							_key, ok := _rawkey.(string)
+							if !ok {
+								return fmt.Errorf("can not convert %T to string", _rawkey)
+							}
+							if _key == "" {
+								return fmt.Errorf("missing key field in object map NestedMObj")
+							}
+
+							_obj := NestedLevel2{}
+							_value[_key] = &_obj
+							t := &_obj
+
+							{
+								p := fmt.Sprintf("%v.%v.value.0.", p, i)
+								{
+
+									_raw, ok := d.GetOk(p + "str")
+
+									if ok {
+										_raws, ok := _raw.(string)
+										if !ok {
+											return fmt.Errorf("can not convert %T to string", _raws)
+										}
+										_value := string(string(_raws))
+										t.Str = _value
+									}
+								}
+
+							}
+						}
+
+						t.NestedMObj = _value
+					}
+				}
+			}
+
+		}
+	}
+	{
+		p := p + "nested_a"
+
+		_a, ok := d.GetOk(p)
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _a)
+			}
+
+			if len(a) > 0 {
+				t.NestedA = make([]*Nested, len(a))
+
+				for i := 0; i < len(a); i++ {
+
+					_obj := Nested{}
+					t.NestedA[i] = &_obj
 
 					{
-						t := t.Nested[i]
+						t := t.NestedA[i]
 						p := p + fmt.Sprintf(".%v.", i)
 						{
 
@@ -784,22 +913,137 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 								t.Str = _value
 							}
 						}
+						{
+							p := p + "nested"
+
+							_a, ok := d.GetOk(p)
+							if ok {
+								a, ok := _a.([]interface{})
+								if !ok {
+									return fmt.Errorf("can not convert %T to []interface{}", _a)
+								}
+
+								if len(a) > 0 {
+									t.Nested = make([]*NestedLevel2, len(a))
+
+									for i := 0; i < len(a); i++ {
+
+										_obj := NestedLevel2{}
+										t.Nested[i] = &_obj
+
+										{
+											t := t.Nested[i]
+											p := p + fmt.Sprintf(".%v.", i)
+											{
+
+												_raw, ok := d.GetOk(p + "str")
+
+												if ok {
+													_raws, ok := _raw.(string)
+													if !ok {
+														return fmt.Errorf("can not convert %T to string", _raws)
+													}
+													_value := string(string(_raws))
+													t.Str = _value
+												}
+											}
+
+										}
+									}
+								}
+							}
+						}
+						{
+
+							p := p + "nested_m"
+							_m, ok := d.GetOk(p)
+							if ok {
+								m, ok := _m.(map[string]interface{})
+								if !ok {
+									return fmt.Errorf("can not convert %T to map[string]interface{}", _m)
+								}
+								if len(m) > 0 {
+									t.NestedM = make(map[string]string, len(m))
+									for _k, _v := range m {
+										_raw := _v
+										_raws, ok := _raw.(string)
+										if !ok {
+											return fmt.Errorf("can not convert %T to string", _raws)
+										}
+										_value := string(string(_raws))
+										t.NestedM[_k] = _value
+									}
+								}
+							}
+						}
+						{
+							p := p + "nested_m_obj"
+
+							_m, ok := d.GetOk(p)
+							if ok {
+								m, ok := _m.([]interface{})
+								if !ok {
+									return fmt.Errorf("can not convert %T to []interface{}", _m)
+								}
+
+								if len(m) > 0 {
+									_value := make(map[string]*NestedLevel2)
+
+									for i := range m {
+										_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+										_key, ok := _rawkey.(string)
+										if !ok {
+											return fmt.Errorf("can not convert %T to string", _rawkey)
+										}
+										if _key == "" {
+											return fmt.Errorf("missing key field in object map NestedMObj")
+										}
+
+										_obj := NestedLevel2{}
+										_value[_key] = &_obj
+										t := &_obj
+
+										{
+											p := fmt.Sprintf("%v.%v.value.0.", p, i)
+											{
+
+												_raw, ok := d.GetOk(p + "str")
+
+												if ok {
+													_raws, ok := _raw.(string)
+													if !ok {
+														return fmt.Errorf("can not convert %T to string", _raws)
+													}
+													_value := string(string(_raws))
+													t.Str = _value
+												}
+											}
+
+										}
+									}
+
+									t.NestedMObj = _value
+								}
+							}
+						}
 
 					}
 				}
 			}
 		}
-		{
+	}
+	{
 
-			p := p + "nested_m"
-			_rawm, ok := d.GetOk(p)
-			if ok {
-				_rawmi, ok := _rawm.(map[string]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-				}
-				t.NestedM = make(map[string]string, len(_rawmi))
-				for _k, _v := range _rawmi {
+		p := p + "nested_m"
+		_m, ok := d.GetOk(p)
+		if ok {
+			m, ok := _m.(map[string]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to map[string]interface{}", _m)
+			}
+			if len(m) > 0 {
+				t.NestedM = make(map[string]string, len(m))
+				for _k, _v := range m {
 					_raw := _v
 					_raws, ok := _raw.(string)
 					if !ok {
@@ -810,19 +1054,21 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 				}
 			}
 		}
-		{
-			p := p + "nested_m_obj"
+	}
+	{
+		p := p + "nested_m_obj"
 
-			_raw, ok := d.GetOk(p)
-			if ok {
-				_rawi, ok := _raw.([]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to []interface{}", _raw)
-				}
+		_m, ok := d.GetOk(p)
+		if ok {
+			m, ok := _m.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _m)
+			}
 
-				_value := make(map[string]*NestedLevel2)
+			if len(m) > 0 {
+				_value := make(map[string]*Nested)
 
-				for i := range _rawi {
+				for i := range m {
 					_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
 					_key, ok := _rawkey.(string)
 					if !ok {
@@ -832,7 +1078,7 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 						return fmt.Errorf("missing key field in object map NestedMObj")
 					}
 
-					_obj := NestedLevel2{}
+					_obj := Nested{}
 					_value[_key] = &_obj
 					t := &_obj
 
@@ -851,331 +1097,125 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 								t.Str = _value
 							}
 						}
+						{
+							p := p + "nested"
+
+							_a, ok := d.GetOk(p)
+							if ok {
+								a, ok := _a.([]interface{})
+								if !ok {
+									return fmt.Errorf("can not convert %T to []interface{}", _a)
+								}
+
+								if len(a) > 0 {
+									t.Nested = make([]*NestedLevel2, len(a))
+
+									for i := 0; i < len(a); i++ {
+
+										_obj := NestedLevel2{}
+										t.Nested[i] = &_obj
+
+										{
+											t := t.Nested[i]
+											p := p + fmt.Sprintf(".%v.", i)
+											{
+
+												_raw, ok := d.GetOk(p + "str")
+
+												if ok {
+													_raws, ok := _raw.(string)
+													if !ok {
+														return fmt.Errorf("can not convert %T to string", _raws)
+													}
+													_value := string(string(_raws))
+													t.Str = _value
+												}
+											}
+
+										}
+									}
+								}
+							}
+						}
+						{
+
+							p := p + "nested_m"
+							_m, ok := d.GetOk(p)
+							if ok {
+								m, ok := _m.(map[string]interface{})
+								if !ok {
+									return fmt.Errorf("can not convert %T to map[string]interface{}", _m)
+								}
+								if len(m) > 0 {
+									t.NestedM = make(map[string]string, len(m))
+									for _k, _v := range m {
+										_raw := _v
+										_raws, ok := _raw.(string)
+										if !ok {
+											return fmt.Errorf("can not convert %T to string", _raws)
+										}
+										_value := string(string(_raws))
+										t.NestedM[_k] = _value
+									}
+								}
+							}
+						}
+						{
+							p := p + "nested_m_obj"
+
+							_m, ok := d.GetOk(p)
+							if ok {
+								m, ok := _m.([]interface{})
+								if !ok {
+									return fmt.Errorf("can not convert %T to []interface{}", _m)
+								}
+
+								if len(m) > 0 {
+									_value := make(map[string]*NestedLevel2)
+
+									for i := range m {
+										_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+										_key, ok := _rawkey.(string)
+										if !ok {
+											return fmt.Errorf("can not convert %T to string", _rawkey)
+										}
+										if _key == "" {
+											return fmt.Errorf("missing key field in object map NestedMObj")
+										}
+
+										_obj := NestedLevel2{}
+										_value[_key] = &_obj
+										t := &_obj
+
+										{
+											p := fmt.Sprintf("%v.%v.value.0.", p, i)
+											{
+
+												_raw, ok := d.GetOk(p + "str")
+
+												if ok {
+													_raws, ok := _raw.(string)
+													if !ok {
+														return fmt.Errorf("can not convert %T to string", _raws)
+													}
+													_value := string(string(_raws))
+													t.Str = _value
+												}
+											}
+
+										}
+									}
+
+									t.NestedMObj = _value
+								}
+							}
+						}
 
 					}
 				}
 
 				t.NestedMObj = _value
 			}
-		}
-
-	}
-	{
-		p := p + "nested_a"
-
-		_raw, ok := d.GetOk(p)
-		if ok {
-			_rawi, ok := _raw.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _raw)
-			}
-
-			t.NestedA = make([]*Nested, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-
-				_obj := Nested{}
-				t.NestedA[i] = &_obj
-
-				{
-					t := t.NestedA[i]
-					p := p + fmt.Sprintf(".%v.", i)
-					{
-
-						_raw, ok := d.GetOk(p + "str")
-
-						if ok {
-							_raws, ok := _raw.(string)
-							if !ok {
-								return fmt.Errorf("can not convert %T to string", _raws)
-							}
-							_value := string(string(_raws))
-							t.Str = _value
-						}
-					}
-					{
-						p := p + "nested"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							t.Nested = make([]*NestedLevel2, len(_rawi))
-							for i := 0; i < len(_rawi); i++ {
-
-								_obj := NestedLevel2{}
-								t.Nested[i] = &_obj
-
-								{
-									t := t.Nested[i]
-									p := p + fmt.Sprintf(".%v.", i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-						}
-					}
-					{
-
-						p := p + "nested_m"
-						_rawm, ok := d.GetOk(p)
-						if ok {
-							_rawmi, ok := _rawm.(map[string]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-							}
-							t.NestedM = make(map[string]string, len(_rawmi))
-							for _k, _v := range _rawmi {
-								_raw := _v
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.NestedM[_k] = _value
-							}
-						}
-					}
-					{
-						p := p + "nested_m_obj"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							_value := make(map[string]*NestedLevel2)
-
-							for i := range _rawi {
-								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-								_key, ok := _rawkey.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _rawkey)
-								}
-								if _key == "" {
-									return fmt.Errorf("missing key field in object map NestedMObj")
-								}
-
-								_obj := NestedLevel2{}
-								_value[_key] = &_obj
-								t := &_obj
-
-								{
-									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-
-							t.NestedMObj = _value
-						}
-					}
-
-				}
-			}
-		}
-	}
-	{
-
-		p := p + "nested_m"
-		_rawm, ok := d.GetOk(p)
-		if ok {
-			_rawmi, ok := _rawm.(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-			}
-			t.NestedM = make(map[string]string, len(_rawmi))
-			for _k, _v := range _rawmi {
-				_raw := _v
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := string(string(_raws))
-				t.NestedM[_k] = _value
-			}
-		}
-	}
-	{
-		p := p + "nested_m_obj"
-
-		_raw, ok := d.GetOk(p)
-		if ok {
-			_rawi, ok := _raw.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _raw)
-			}
-
-			_value := make(map[string]*Nested)
-
-			for i := range _rawi {
-				_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-				_key, ok := _rawkey.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _rawkey)
-				}
-				if _key == "" {
-					return fmt.Errorf("missing key field in object map NestedMObj")
-				}
-
-				_obj := Nested{}
-				_value[_key] = &_obj
-				t := &_obj
-
-				{
-					p := fmt.Sprintf("%v.%v.value.0.", p, i)
-					{
-
-						_raw, ok := d.GetOk(p + "str")
-
-						if ok {
-							_raws, ok := _raw.(string)
-							if !ok {
-								return fmt.Errorf("can not convert %T to string", _raws)
-							}
-							_value := string(string(_raws))
-							t.Str = _value
-						}
-					}
-					{
-						p := p + "nested"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							t.Nested = make([]*NestedLevel2, len(_rawi))
-							for i := 0; i < len(_rawi); i++ {
-
-								_obj := NestedLevel2{}
-								t.Nested[i] = &_obj
-
-								{
-									t := t.Nested[i]
-									p := p + fmt.Sprintf(".%v.", i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-						}
-					}
-					{
-
-						p := p + "nested_m"
-						_rawm, ok := d.GetOk(p)
-						if ok {
-							_rawmi, ok := _rawm.(map[string]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-							}
-							t.NestedM = make(map[string]string, len(_rawmi))
-							for _k, _v := range _rawmi {
-								_raw := _v
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.NestedM[_k] = _value
-							}
-						}
-					}
-					{
-						p := p + "nested_m_obj"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							_value := make(map[string]*NestedLevel2)
-
-							for i := range _rawi {
-								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-								_key, ok := _rawkey.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _rawkey)
-								}
-								if _key == "" {
-									return fmt.Errorf("missing key field in object map NestedMObj")
-								}
-
-								_obj := NestedLevel2{}
-								_value[_key] = &_obj
-								t := &_obj
-
-								{
-									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-
-							t.NestedMObj = _value
-						}
-					}
-
-				}
-			}
-
-			t.NestedMObj = _value
 		}
 	}
 

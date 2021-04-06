@@ -72,17 +72,19 @@ if ok {
 
 {{/* Renders unmarshaller for elementary array of any type */}}
 {{- define "repeatedElementary" -}}
-_rawi, ok := d.GetOk(p + {{ .NameSnake | quote }})
+_a, ok := d.GetOk(p + {{ .NameSnake | quote }})
 if ok {
-    _rawi, ok := _rawi.([]interface{})
+    a, ok := _a.([]interface{})
     if !ok {
-        return fmt.Errorf("count not convert %T to []interface{}", _rawi)
+        return fmt.Errorf("count not convert %T to []interface{}", _a)
     }
-    t.{{.Name}} = make({{.GoTypeFull}}, len(_rawi))
-    for i := 0; i < len(_rawi); i++ {
-        _raw := _rawi[i]
-        {{- template "rawToValue" . }}
-        t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_value
+    if len(a) > 0 {
+        t.{{.Name}} = make({{.GoTypeFull}}, len(a))
+        for i := 0; i < len(a); i++ {
+            _raw := a[i]
+            {{- template "rawToValue" . }}
+            t.{{.Name}}[i] = {{if .GoTypeIsPtr }}&{{end}}_value
+        }
     }
 }
 {{- end -}}
@@ -122,41 +124,48 @@ _value := {{.GoType}}({{.SchemaGoType}}(_raws))
 
 {{/* Singular message */}}
 {{- define "singularMessage" -}}
-p := p + {{.NameSnake | quote }} + ".0."
+p := p + {{.NameSnake | quote }} + ".0"
+_, ok := d.GetOk(p)
+if ok {
+    p := p + "."
 
-{{ if .GoTypeIsPtr }}
-_obj := {{.GoType}}{}
-t.{{ .Name }} = &_obj
-t := &_obj
-{{ else }}
-t := &t.{{.Name}}
-{{ end }}
+    {{ if .GoTypeIsPtr }}
+    _obj := {{.GoType}}{}
+    t.{{ .Name }} = &_obj
+    t := &_obj
+    {{ else }}
+    t := &t.{{.Name}}
+    {{ end }}
 
-{{ template "fields" .Message.Fields }}
+    {{ template "fields" .Message.Fields }}
+}
 {{- end -}}
 
 {{/* Repeated message */}}
 {{- define "repeatedMessage" -}}
 p := p + {{.NameSnake | quote }}
 
-_raw, ok := d.GetOk(p)
+_a, ok := d.GetOk(p)
 if ok {
-    _rawi, ok := _raw.([]interface{})
+    a, ok := _a.([]interface{})
     if !ok {
-        return fmt.Errorf("can not convert %T to []interface{}", _raw)
+        return fmt.Errorf("can not convert %T to []interface{}", _a)
     }
 
-    t.{{.Name}} = make({{.GoTypeFull}}, len(_rawi))
-    for i := 0; i < len(_rawi); i++ {
-        {{ if .GoTypeIsPtr }}
-        _obj := {{.GoType}}{}
-        t.{{.Name }}[i] = &_obj
-        {{ end }}
+    if len(a) > 0 {
+        t.{{.Name}} = make({{.GoTypeFull}}, len(a))
+     
+        for i := 0; i < len(a); i++ {
+            {{ if .GoTypeIsPtr }}
+            _obj := {{.GoType}}{}
+            t.{{.Name }}[i] = &_obj
+            {{ end }}
 
-        {
-            t := {{if not .GoTypeIsPtr}}&{{end}}t.{{.Name }}[i]
-            p := p + fmt.Sprintf(".%v.", i)
-            {{ template "fields" .Message.Fields }}
+            {
+                t := {{if not .GoTypeIsPtr}}&{{end}}t.{{.Name }}[i]
+                p := p + fmt.Sprintf(".%v.", i)
+                {{ template "fields" .Message.Fields }}
+            }
         }
     }
 }
@@ -166,18 +175,20 @@ if ok {
 {{- define "map" -}}
 {{ $m := .MapValueField }}
 p := p + {{.NameSnake | quote }}
-_rawm, ok := d.GetOk(p)
+_m, ok := d.GetOk(p)
 if ok {
-    _rawmi, ok := _rawm.(map[string]interface{})
+    m, ok := _m.(map[string]interface{})
     if !ok {
-        return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
+        return fmt.Errorf("can not convert %T to map[string]interface{}", _m)
     }
-    t.{{.Name}} = make(map[string]{{$m.GoTypeFull}}, len(_rawmi))
-    for _k, _v := range _rawmi {
-        _raw := _v
-        {{- template "rawToValue" $m }}
-        t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
-    }   
+    if len(m) > 0 {
+        t.{{.Name}} = make(map[string]{{$m.GoTypeFull}}, len(m))
+        for _k, _v := range m {
+            _raw := _v
+            {{- template "rawToValue" $m }}
+            t.{{.Name}}[_k] = {{if $m.GoTypeIsPtr }}&{{end}}_value
+        }   
+    }
 }
 {{- end -}}
 
@@ -186,39 +197,41 @@ if ok {
 p := p + {{.NameSnake | quote }}
 
 {{ $m := .MapValueField }}
-_raw, ok := d.GetOk(p)
+_m, ok := d.GetOk(p)
 if ok {
-    _rawi, ok := _raw.([]interface{})
+    m, ok := _m.([]interface{})
     if !ok {
-        return fmt.Errorf("can not convert %T to []interface{}", _raw)
+        return fmt.Errorf("can not convert %T to []interface{}", _m)
     }
 
-    _value := make(map[string]{{$m.GoTypeFull}})
+    if len(m) > 0 {
+        _value := make(map[string]{{$m.GoTypeFull}})
 
-    for i := range _rawi {
-        _rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-        _key, ok := _rawkey.(string)
-        if !ok {
-            return fmt.Errorf("can not convert %T to string", _rawkey)
-        }
-        if _key == "" {
-            return fmt.Errorf("missing key field in object map {{.Name}}")
+        for i := range m {
+            _rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
+            _key, ok := _rawkey.(string)
+            if !ok {
+                return fmt.Errorf("can not convert %T to string", _rawkey)
+            }
+            if _key == "" {
+                return fmt.Errorf("missing key field in object map {{.Name}}")
+            }
+
+            {{ if $m.GoTypeIsPtr }}
+            _obj := {{$m.GoType}}{}
+            _value[_key] = &_obj
+            t := &_obj
+            {{ else }}
+            t := &_value[_key]
+            {{ end }}
+
+            {
+                p := fmt.Sprintf("%v.%v.value.0.", p, i)
+                {{ template "fields" $m.Message.Fields }}
+            }
         }
 
-        {{ if $m.GoTypeIsPtr }}
-        _obj := {{$m.GoType}}{}
-        _value[_key] = &_obj
-        t := &_obj
-        {{ else }}
-        t := &_value[_key]
-        {{ end }}
-
-        {
-            p := fmt.Sprintf("%v.%v.value.0.", p, i)
-            {{ template "fields" $m.Message.Fields }}
-        }
+        t.{{.Name}} = _value
     }
-
-    t.{{.Name}} = _value
 }
 {{- end -}}
