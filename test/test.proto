@@ -62,63 +62,72 @@ message Test {
     // Timestamp time.Time field
     google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 
-    // TimestampN *time.Time field
-    google.protobuf.Timestamp TimestampNullable = 9 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+    // Timestamp time.Time field
+    google.protobuf.Timestamp TimestampMissing = 9 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 
-    // TimestampN *time.Time field
-    google.protobuf.Timestamp TimestampNullableWithNilValue = 10 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+    // TimestampNullable *time.Time field
+    google.protobuf.Timestamp TimestampNullable = 10 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
 
-    // DurationStd time.Duration field (standard)
-    int64 DurationStd = 110 [ (gogoproto.stdduration) = true ];
+    // TimestampNullableWithNilValue *time.Time field
+    google.protobuf.Timestamp TimestampNullableWithNilValue = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
 
-    // DurationCustom time.Duration field (custom)
-    int64 DurationCustom = 120 [ (gogoproto.casttype) = "Duration" ];
-    
-    // StringA []string field
-    repeated string StringA = 12;
+    // DurationStandard time.Duration field (standard)
+    int64 DurationStandard = 12 [ (gogoproto.stdduration) = true ];
 
-    // BoolA []bool field
-    repeated bool BoolA = 13 [ (gogoproto.customtype) = "BoolCustom" ];
+    // DurationStandardMissing time.Duration field (standard) missing in input data
+    int64 DurationStandardMissing = 13 [ (gogoproto.stdduration) = true ];
 
-    // BytesA [][]byte field
-    repeated bytes BytesA = 14;
+    // DurationCustom time.Duration field (with casttype)
+    int64 DurationCustom = 14 [ (gogoproto.casttype) = "Duration" ];
 
-    // TimestampA []time.Time field
-    repeated google.protobuf.Timestamp TimestampA = 15 [ (gogoproto.stdtime) = true ];
-
-    // DurationCustomA []time.Duration field
-    repeated int64 DurationCustomA = 16 [ (gogoproto.casttype) = "Duration" ];
-
-    // Nested nested message field
-    Nested Nested = 17;   
-
-    // NestedA nested message array
-    repeated Nested NestedA = 18;
-
-    // NestedM normal map
-    map<string, string> NestedM = 19;
-
-    // NestedMObj object map
-    map<string, Nested> NestedMObj = 20;
+    // DurationCustomMissing time.Duration field (with casttype) missing in input data
+    int64 DurationCustomMissing = 15 [ (gogoproto.casttype) = "Duration" ];
 }
+//     // StringA []string field
+//     repeated string StringA = 13;
 
-// Nested message definition
-message Nested {
-    // Str string field
-    string Str = 1;
+//     // BoolA []bool field
+//     repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustom" ];
 
-    // Nested repeated nested messages
-    repeated NestedLevel2 Nested = 2;
+//     // BytesA [][]byte field
+//     repeated bytes BytesA = 15;
 
-    // Nested map repeated nested messages
-    map<string, string> NestedM = 3;
+//     // TimestampA []time.Time field
+//     repeated google.protobuf.Timestamp TimestampA = 16 [ (gogoproto.stdtime) = true ];
 
-    // NestedMObj nested object map
-    map<string, NestedLevel2> NestedMObj = 4;
-}
+//     // DurationCustomA []time.Duration field
+//     repeated int64 DurationCustomA = 116 [ (gogoproto.casttype) = "Duration" ];
 
-// Message nested into nested message
-message NestedLevel2 {
-    // Str string field
-    string Str = 1;
-}
+//     // Nested nested message field
+//     Nested Nested = 17;   
+
+//     // NestedA nested message array
+//     repeated Nested NestedA = 18;
+
+//     // NestedM normal map
+//     map<string, string> NestedM = 19;
+
+//     // NestedMObj object map
+//     map<string, Nested> NestedMObj = 20;
+// }
+
+// // Nested message definition
+// message Nested {
+//     // Str string field
+//     string Str = 1;
+
+//     // Nested repeated nested messages
+//     repeated NestedLevel2 Nested = 2;
+
+//     // Nested map repeated nested messages
+//     map<string, string> NestedM = 3;
+
+//     // NestedMObj nested object map
+//     map<string, NestedLevel2> NestedMObj = 4;
+// }
+
+// // Message nested into nested message
+// message NestedLevel2 {
+//     // Str string field
+//     string Str = 1;
+// }

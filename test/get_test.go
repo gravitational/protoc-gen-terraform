@@ -46,7 +46,7 @@ var (
 		"timestamp":                        defaultTimestamp,
 		"timestamp_nullable":               defaultTimestamp,
 		"timestamp_nullable_with_no_value": nil,
-		"duration_std":                     "1h",
+		"duration_standard":                "1h",
 		"duration_custom":                  "1m",
 		"string_a":                         []interface{}{"TestString1", "TestString2"},
 		"bool_a":                           []interface{}{false, true, false},
@@ -152,17 +152,16 @@ func SchemaTestMeta() map[string]*SchemaMeta {
 			schemaName: "timestamp_nullable_with_nil_value",
 			isTime:     true,
 		},
-
-		// "duration_std": {
-		// 	name:       "DurationStd",
-		// 	schemaName: "duration_std",
-		// 	isDuration: true,
-		// },
-		// "duration_custom": {
-		// 	name:       "DurationCustom",
-		// 	schemaName: "duration_custom",
-		// 	isDuration: true,
-		// },
+		"duration_standard": {
+			name:       "DurationStandard",
+			schemaName: "duration_standard",
+			isDuration: true,
+		},
+		"duration_custom": {
+			name:       "DurationCustom",
+			schemaName: "duration_custom",
+			isDuration: true,
+		},
 	}
 }
 
@@ -216,14 +215,11 @@ func GetFromResourceData(
 	return nil
 }
 
+// setAtomic sets atomic value (scalar, string, time, duration)
 func setAtomic(target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	s, ok := data.GetOk(meta.schemaName)
 	if !ok {
-		if target.Kind() == reflect.Ptr {
-			target.Set(reflect.Zero(target.Type()))
-		} else {
-			target.Set(reflect.ValueOf(sch.ZeroValue()))
-		}
+		target.Set(reflect.Zero(target.Type()))
 
 		return nil
 	}
@@ -232,17 +228,17 @@ func setAtomic(target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data
 	case meta.isTime:
 		err := assignTime(s, target)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 	case meta.isDuration:
 		err := assignDuration(s, target)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 	default:
 		err := assignAtomic(s, target)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 	}
 
@@ -340,7 +336,7 @@ func TestElementariesGet(t *testing.T) {
 	assert.Equal(t, []byte("TestBytes"), subject.Bytes, "Test.Bytes")
 }
 
-// // TestTimesGet ensures decoding of time and duration fields
+// TestTimesGet ensures decoding of time and duration fields
 func TestTimesGet(t *testing.T) {
 	now := time.Now()
 
@@ -351,19 +347,18 @@ func TestTimesGet(t *testing.T) {
 	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
 	require.NoError(t, err, "failed to parse example timestamp")
 
-	// durationStd, err := time.ParseDuration("1h")
-	// require.NoError(t, err, "failed to parse example duration")
+	durationStd, err := time.ParseDuration("1h")
+	require.NoError(t, err, "failed to parse example duration")
 
-	// durationCustom, err := time.ParseDuration("1m")
-	// require.NoError(t, err, "failed to parse example duration")
+	durationCustom, err := time.ParseDuration("1m")
+	require.NoError(t, err, "failed to parse example duration")
 
 	assert.Equal(t, timestamp, subject.Timestamp, "Test.Timestamp")
 	assert.Equal(t, timestamp, *subject.TimestampNullable, "Test.TimestampNullable")
 	assert.Nil(t, subject.TimestampNullableWithNilValue, "Test.Timestamp.TimestampNullableWithNilValue")
 
-	// assert.Equal(t, subject.DurationStd, durationStd, "Test.DurationStd")
-	// assert.Equal(t, subject.DurationCustom, Duration(durationCustom), "Test.DurationCustom")
-	// assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
+	assert.Equal(t, durationStd, subject.DurationStandard, "Test.DurationStandard")
+	assert.Equal(t, Duration(durationCustom), subject.DurationCustom, "Test.DurationCustom")
 }
 
 // // TestArraysGet ensures decoding of arrays
