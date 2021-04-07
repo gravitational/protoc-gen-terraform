@@ -216,28 +216,31 @@ func GetFromResourceData(
 	return nil
 }
 
-func setAtomic(value *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func setAtomic(target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	s, ok := data.GetOk(meta.schemaName)
 	if !ok {
-		// TODO: 2. test this branch
-		// TODO: 3. test this with pointer
-		value.Set(reflect.ValueOf(sch.ZeroValue()))
+		if target.Kind() == reflect.Ptr {
+			target.Set(reflect.Zero(target.Type()))
+		} else {
+			target.Set(reflect.ValueOf(sch.ZeroValue()))
+		}
+
 		return nil
 	}
 
 	switch {
 	case meta.isTime:
-		err := assignTime(s, value)
+		err := assignTime(s, target)
 		if err != nil {
 			return err
 		}
 	case meta.isDuration:
-		err := assignDuration(s, value)
+		err := assignDuration(s, target)
 		if err != nil {
 			return err
 		}
 	default:
-		err := assignAtomic(s, value)
+		err := assignAtomic(s, target)
 		if err != nil {
 			return err
 		}
