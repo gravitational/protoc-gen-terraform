@@ -62,15 +62,18 @@ message Test {
     // Timestamp time.Time field
     google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 
+    // TimestampN *time.Time field
+    google.protobuf.Timestamp TimestampNullable = 9 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+
+    // TimestampN *time.Time field
+    google.protobuf.Timestamp TimestampNullableWithNilValue = 10 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+
     // DurationStd time.Duration field (standard)
-    int64 DurationStd = 9 [ (gogoproto.stdduration) = true ];
+    int64 DurationStd = 110 [ (gogoproto.stdduration) = true ];
 
     // DurationCustom time.Duration field (custom)
-    int64 DurationCustom = 10 [ (gogoproto.casttype) = "Duration" ];
+    int64 DurationCustom = 120 [ (gogoproto.casttype) = "Duration" ];
     
-    // TimestampN *time.Time field
-    google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
-
     // StringA []string field
     repeated string StringA = 12;
 

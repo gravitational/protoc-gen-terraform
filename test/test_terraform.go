@@ -48,9 +48,10 @@ var _ = time.Kitchen
 // └── bool:bool (Bool bool field)
 // └── bytes:string (Bytest byte[] field)
 // └── timestamp:string (Timestamp time.Time field)
+// └── timestamp_nullable:string (TimestampN *time.Time field)
+// └── timestamp_nullable_with_nil_value:string (TimestampN *time.Time field)
 // └── duration_std:string (DurationStd time.Duration field (standard))
 // └── duration_custom:string (DurationCustom time.Duration field (custom))
-// └── timestamp_n:string (TimestampN *time.Time field)
 // └── [string_a:string] (StringA []string field)
 // └── bool_a !custom schema, see target code! (BoolA []bool field)
 // └── [bytes_a:string] (BytesA [][]byte field)
@@ -141,6 +142,20 @@ func SchemaTest() map[string]*schema.Schema {
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
+		// TimestampN *time.Time field
+		"timestamp_nullable": {
+			Type:         schema.TypeString,
+			Description:  "TimestampN *time.Time field",
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
+		},
+		// TimestampN *time.Time field
+		"timestamp_nullable_with_nil_value": {
+			Type:         schema.TypeString,
+			Description:  "TimestampN *time.Time field",
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
+		},
 		// DurationStd time.Duration field (standard)
 		"duration_std": {
 			Type:        schema.TypeString,
@@ -178,13 +193,6 @@ func SchemaTest() map[string]*schema.Schema {
 				return o == n
 			},
 			Optional: true,
-		},
-		// TimestampN *time.Time field
-		"timestamp_n": {
-			Type:         schema.TypeString,
-			Description:  "TimestampN *time.Time field",
-			ValidateFunc: validation.IsRFC3339Time,
-			Optional:     true,
 		},
 		// StringA []string field
 		"string_a": {
@@ -595,6 +603,38 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 	}
 	{
 
+		_raw, ok := d.GetOk(p + "timestamp_nullable")
+
+		if ok {
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_value, err := time.Parse(time.RFC3339Nano, _raws)
+			if err != nil {
+				return fmt.Errorf("malformed time value for field TimestampNullable : %w", err)
+			}
+			t.TimestampNullable = &_value
+		}
+	}
+	{
+
+		_raw, ok := d.GetOk(p + "timestamp_nullable_with_nil_value")
+
+		if ok {
+			_raws, ok := _raw.(string)
+			if !ok {
+				return fmt.Errorf("can not convert %T to string", _raws)
+			}
+			_value, err := time.Parse(time.RFC3339Nano, _raws)
+			if err != nil {
+				return fmt.Errorf("malformed time value for field TimestampNullableWithNilValue : %w", err)
+			}
+			t.TimestampNullableWithNilValue = &_value
+		}
+	}
+	{
+
 		_raw, ok := d.GetOk(p + "duration_std")
 
 		if ok {
@@ -625,22 +665,6 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			}
 			_value := Duration(_valued)
 			t.DurationCustom = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp_n")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339Nano, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field TimestampN : %w", err)
-			}
-			t.TimestampN = &_value
 		}
 	}
 	{
@@ -1312,6 +1336,22 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		obj["timestamp"] = _value
 	}
 	{
+		_v := t.TimestampNullable
+		if _v != nil {
+
+			_value := _v.Format(time.RFC3339Nano)
+			obj["timestamp_nullable"] = _value
+		}
+	}
+	{
+		_v := t.TimestampNullableWithNilValue
+		if _v != nil {
+
+			_value := _v.Format(time.RFC3339Nano)
+			obj["timestamp_nullable_with_nil_value"] = _value
+		}
+	}
+	{
 		_v := t.DurationStd
 
 		_value := time.Duration(_v).String()
@@ -1322,14 +1362,6 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 		_value := time.Duration(_v).String()
 		obj["duration_custom"] = _value
-	}
-	{
-		_v := t.TimestampN
-		if _v != nil {
-
-			_value := _v.Format(time.RFC3339Nano)
-			obj["timestamp_n"] = _value
-		}
 	}
 	{
 		_arr := t.StringA
