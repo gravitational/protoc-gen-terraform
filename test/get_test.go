@@ -320,31 +320,16 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 // func setCustom()
 
 // buildSubjectGet builds Test struct from test fixture data
-func buildSubjectGet(t *testing.T) (*Test, error) {
-	subject := &Test{}
+func buildSubjectGet(t *testing.T, subject *Test) (*Test, error) {
 	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
-	err := GetTestFromResourceData(data, subject)
+	err := GetFromResourceData(SchemaTest(), data, SchemaTestMeta(), subject)
 	return subject, err
 }
 
 // TestElementariesGet ensures decoding of elementary types
 func TestElementariesGet(t *testing.T) {
-	// subject, err := buildSubjectGet(t)
-	// require.NoError(t, err, "failed to unmarshal test data")
-
-	// assert.Equal(t, subject.Str, "TestString", "Test.Str")
-	// assert.Equal(t, subject.Int32, int32(999), "Test.Int32")
-	// assert.Equal(t, subject.Int64, int64(998), "Test.Int64")
-	// assert.Equal(t, subject.Float, float32(18.1), "Test.Float")
-	// assert.Equal(t, subject.Double, float64(18.4), "Test.Dobule")
-	// assert.Equal(t, subject.Bool, true, "Test.Bool")
-	// assert.Equal(t, subject.Bytes, []byte("TestBytes"), "Test.Bytes")
-
-	subject := &Test{}
-	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
-
-	err := GetFromResourceData(SchemaTest(), data, SchemaTestMeta(), subject)
-	require.NoError(t, err)
+	subject, err := buildSubjectGet(t, &Test{})
+	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, int32(999), subject.Int32, "Test.Int32")
 	assert.Equal(t, int64(998), subject.Int64, "Test.Int64")
@@ -356,24 +341,30 @@ func TestElementariesGet(t *testing.T) {
 }
 
 // // TestTimesGet ensures decoding of time and duration fields
-// func TestTimesGet(t *testing.T) {
-// 	subject, err := buildSubjectGet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+func TestTimesGet(t *testing.T) {
+	now := time.Now()
 
-// 	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
-// 	require.NoError(t, err, "failed to parse example timestamp")
+	// Ensure nullify
+	subject, err := buildSubjectGet(t, &Test{TimestampNullableWithNilValue: &now})
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	durationStd, err := time.ParseDuration("1h")
-// 	require.NoError(t, err, "failed to parse example duration")
+	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
+	require.NoError(t, err, "failed to parse example timestamp")
 
-// 	durationCustom, err := time.ParseDuration("1m")
-// 	require.NoError(t, err, "failed to parse example duration")
+	// durationStd, err := time.ParseDuration("1h")
+	// require.NoError(t, err, "failed to parse example duration")
 
-// 	assert.Equal(t, subject.Timestamp, timestamp, "Test.Timestamp")
-// 	assert.Equal(t, subject.DurationStd, durationStd, "Test.DurationStd")
-// 	assert.Equal(t, subject.DurationCustom, Duration(durationCustom), "Test.DurationCustom")
-// 	assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
-// }
+	// durationCustom, err := time.ParseDuration("1m")
+	// require.NoError(t, err, "failed to parse example duration")
+
+	assert.Equal(t, timestamp, subject.Timestamp, "Test.Timestamp")
+	assert.Equal(t, timestamp, *subject.TimestampNullable, "Test.TimestampNullable")
+	assert.Nil(t, subject.TimestampNullableWithNilValue, "Test.Timestamp.TimestampNullableWithNilValue")
+
+	// assert.Equal(t, subject.DurationStd, durationStd, "Test.DurationStd")
+	// assert.Equal(t, subject.DurationCustom, Duration(durationCustom), "Test.DurationCustom")
+	// assert.Equal(t, *(subject.TimestampN), timestamp, "Test.TimestampN")
+}
 
 // // TestArraysGet ensures decoding of arrays
 // func TestArraysGet(t *testing.T) {
