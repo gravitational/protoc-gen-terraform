@@ -98,50 +98,74 @@ var (
 )
 
 type SchemaMeta struct {
-	name        string
-	schema_name string
-	nested      map[string]*SchemaMeta
+	name       string
+	schemaName string
+	isTime     bool
+	isDuration bool
+	nested     map[string]*SchemaMeta
 }
 
+// NOTE: make compound struct, values instead of methods
 func SchemaTestMeta() map[string]*SchemaMeta {
 	return map[string]*SchemaMeta{
 		"str": {
-			name:        "Str",
-			schema_name: "str",
+			name:       "Str",
+			schemaName: "str",
 		},
 		"int32": {
-			name:        "Int32",
-			schema_name: "int32",
+			name:       "Int32",
+			schemaName: "int32",
 		},
 		"int64": {
-			name:        "Int64",
-			schema_name: "int64",
+			name:       "Int64",
+			schemaName: "int64",
 		},
 		"float": {
-			name:        "Float",
-			schema_name: "float",
+			name:       "Float",
+			schemaName: "float",
 		},
 		"double": {
-			name:        "Double",
-			schema_name: "double",
+			name:       "Double",
+			schemaName: "double",
 		},
 		"bool": {
-			name:        "Bool",
-			schema_name: "bool",
+			name:       "Bool",
+			schemaName: "bool",
 		},
 		"bytes": {
-			name:        "Bytes",
-			schema_name: "bytes",
+			name:       "Bytes",
+			schemaName: "bytes",
 		},
 		"timestamp": {
-			name:        "Timestamp",
-			schema_name: "timestamp",
+			name:       "Timestamp",
+			schemaName: "timestamp",
+			isTime:     true,
+		},
+		"duration_std": {
+			name:       "DurationStd",
+			schemaName: "duration_std",
+			isDuration: true,
+		},
+		"duration_custom": {
+			name:       "DurationCustom",
+			schemaName: "duration_custom",
+			isDuration: true,
 		},
 	}
 }
 
-func GetTestFromResourceDataN(s map[string]*schema.Schema, d *schema.ResourceData, m map[string]*SchemaMeta, obj interface{}) error {
-	o := reflect.Indirect(reflect.ValueOf(obj))
+func GetFromResourceData(s map[string]*schema.Schema, d *schema.ResourceData, m map[string]*SchemaMeta, obj interface{}) error {
+	o := reflect.ValueOf(obj)
+
+	if o.IsNil() {
+		return trace.Errorf("obj must not be nil")
+	}
+
+	if o.Kind() != reflect.Ptr {
+		return trace.Errorf("pass a reference to an object you need to set")
+	}
+
+	o = reflect.Indirect(o)
 
 	for k, sch := range s {
 		me, ok := m[k]
@@ -153,12 +177,20 @@ func GetTestFromResourceDataN(s map[string]*schema.Schema, d *schema.ResourceDat
 		v := o.FieldByName(me.name)
 
 		switch {
+		//case me.object_map:
+		//case me.custom
 		case sch.Type == schema.TypeInt ||
 			sch.Type == schema.TypeFloat ||
 			sch.Type == schema.TypeBool ||
 			sch.Type == schema.TypeString:
 
-			setAtomic(me, &v, sch, d)
+			err := setAtomic(&v, me, sch, d)
+			if err != nil {
+				return trace.Wrap(err)
+			}
+		// case sch.Type == schema.TypeList:
+		// case sch.Type == schema.TypeMap:
+		// case sch.Type == schema.TypeSet:
 		default:
 			return trace.Errorf("unknown type %v", sch.Type)
 		}
@@ -167,22 +199,87 @@ func GetTestFromResourceDataN(s map[string]*schema.Schema, d *schema.ResourceDat
 	return nil
 }
 
-func setAtomic(m *SchemaMeta, v *reflect.Value, s *schema.Schema, d *schema.ResourceData) {
-	r, ok := d.GetOk(m.schema_name)
+func setAtomic(value *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+	s, ok := data.GetOk(meta.schemaName)
 	if !ok {
-		v.Set(reflect.ValueOf(s.ZeroValue()))
+		// TODO: 2. test this branch
+		// TODO: 3. test this with pointer
+		value.Set(reflect.ValueOf(sch.ZeroValue()))
+		return nil
 	}
 
-	// Time
-	// if v.Type().() == "time.Time"
+	switch {
+	case meta.isTime:
+		err := assignTime(s, value)
+		if err != nil {
+			return err
+		}
+	case meta.isDuration:
+		err := assignDuration(s, value)
+		if err != nil {
+			return err
+		}
+	default:
+		err := assignAtomic(s, value)
+		if err != nil {
+			return err
+		}
+	}
 
-	// }
-
-	// TODO: Convertible? Assignable?
-
-	// Convert and set
-	v.Set(reflect.ValueOf(r).Convert(v.Type()))
+	return nil
 }
+
+// assignAtomic reads atomic value form
+func assignAtomic(source interface{}, target *reflect.Value) error {
+	s := reflect.TypeOf(source)
+	if !s.ConvertibleTo(target.Type()) {
+		return trace.Errorf("can not convert %T to %T", s, target.Type())
+	}
+
+	c := reflect.ValueOf(source).Convert(target.Type())
+	if !c.Type().AssignableTo(target.Type()) {
+		return trace.Errorf("can not assign %T to %T", c.Type(), target.Type())
+	}
+
+	target.Set(c)
+
+	return nil
+}
+
+// assignTime assigns time value from a string
+func assignTime(source interface{}, target *reflect.Value) error {
+	s, ok := source.(string)
+	if !ok {
+		return trace.Errorf("can not convert %T to string", source)
+	}
+
+	t, err := time.Parse(time.RFC3339Nano, s)
+	if err != nil {
+		return trace.Errorf("can not parse time: %w", err)
+	}
+
+	return assignAtomic(t, target)
+}
+
+// assignTime assigns duration value from a string
+func assignDuration(source interface{}, target *reflect.Value) error {
+	s, ok := source.(string)
+	if !ok {
+		return trace.Errorf("can not convert %T to string", source)
+	}
+
+	t, err := time.ParseDuration(s)
+	if err != nil {
+		return trace.Errorf("can not parse duration: %w", err)
+	}
+
+	return assignAtomic(t, target)
+}
+
+// func setList()
+// func setMap()
+// func setSet()
+// func setCustom()
 
 // buildSubjectGet builds Test struct from test fixture data
 func buildSubjectGet(t *testing.T) (*Test, error) {
@@ -208,7 +305,7 @@ func TestElementariesGet(t *testing.T) {
 	subject := &Test{}
 	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
 
-	err := GetTestFromResourceDataN(SchemaTest(), data, SchemaTestMeta(), subject)
+	err := GetFromResourceData(SchemaTest(), data, SchemaTestMeta(), subject)
 	require.NoError(t, err)
 
 	assert.Equal(t, int32(999), subject.Int32, "Test.Int32")
@@ -218,7 +315,6 @@ func TestElementariesGet(t *testing.T) {
 	assert.Equal(t, float64(18.4), subject.Double, "Test.Dobule")
 	assert.Equal(t, true, subject.Bool, "Test.Bool")
 	assert.Equal(t, []byte("TestBytes"), subject.Bytes, "Test.Bytes")
-
 }
 
 // TestTimesGet ensures decoding of time and duration fields
