@@ -147,11 +147,11 @@ func SchemaTestMeta() map[string]*SchemaMeta {
 			schemaName: "timestamp_nullable",
 			isTime:     true,
 		},
-		// "timestamp_nullable_with_nil_value": {
-		// 	name:       "TimestampNullableWithNilValue",
-		// 	schemaName: "timestamp_nullable_with_nil_value",
-		// 	isTime:     true,
-		// },
+		"timestamp_nullable_with_nil_value": {
+			name:       "TimestampNullableWithNilValue",
+			schemaName: "timestamp_nullable_with_nil_value",
+			isTime:     true,
+		},
 
 		// "duration_std": {
 		// 	name:       "DurationStd",
