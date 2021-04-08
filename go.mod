@@ -6,7 +6,6 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/disiqueira/gotree v1.0.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gravitational/trace v1.1.14
@@ -20,6 +19,5 @@ require (
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/tools v0.0.0-20210106214847-113979e3529a
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/yaml.v2 v2.3.0
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )

@@ -92,10 +92,10 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 		p.Generator.Fail(err.Error())
 	}
 
-	// err = p.writeGettersSetters()
-	// if err != nil {
-	// 	p.Generator.Fail(err.Error())
-	// }
+	err = p.writeGettersSetters()
+	if err != nil {
+		p.Generator.Fail(err.Error())
+	}
 }
 
 // reflect builds message dictionary from a messages in protoc file

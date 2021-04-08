@@ -13,9 +13,6 @@ github.com/agext/levenshtein
 github.com/apparentlymart/go-textseg/textseg
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/disiqueira/gotree v1.0.0
-## explicit
-github.com/disiqueira/gotree
 # github.com/gogo/protobuf v1.3.2
 ## explicit
 github.com/gogo/protobuf/gogoproto
@@ -210,9 +207,6 @@ google.golang.org/protobuf/runtime/protoiface
 google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/known/wrapperspb
-# gopkg.in/yaml.v2 v2.3.0
-## explicit
-gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 ## explicit
 gopkg.in/yaml.v3
