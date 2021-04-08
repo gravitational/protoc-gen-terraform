@@ -26,6 +26,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	"github.com/gravitational/protoc-gen-terraform/accessors"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	validation "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
@@ -45,14 +46,6 @@ var (
 	// SchemaMetaTest is schema metadata for Test message definition.
 	SchemaMetaTest = GenSchemaMetaTest()
 )
-
-// SchemaMeta represents schema metadata struct
-type SchemaMeta struct {
-	name       string
-	isTime     bool
-	isDuration bool
-	nested     map[string]*SchemaMeta
-}
 
 // SupressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
 func SupressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
@@ -458,318 +451,318 @@ func GenSchemaTest() map[string]*schema.Schema {
 // GenSchemaMetaTest returns schema for Test
 //
 // Test message definition.
-func GenSchemaMetaTest() map[string]*SchemaMeta {
-	return map[string]*SchemaMeta{
+func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
+	return map[string]*accessors.SchemaMeta{
 		// Str string field
 		"str": {
-			name:       "Str",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Str",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Int32 int32 field
 		"int32": {
-			name:       "Int32",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Int32",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Int64 int64 field
 		"int64": {
-			name:       "Int64",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Int64",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Float float field
 		"float": {
-			name:       "Float",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Float",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Double double field
 		"double": {
-			name:       "Double",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Double",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Bool bool field
 		"bool": {
-			name:       "Bool",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Bool",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Bytest byte[] field
 		"bytes": {
-			name:       "Bytes",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Bytes",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// Timestamp time.Time field
 		"timestamp": {
-			name:       "Timestamp",
-			isTime:     true,
-			isDuration: false,
+			Name:       "Timestamp",
+			IsTime:     true,
+			IsDuration: false,
 		},
 
 		// Timestamp time.Time field
 		"timestamp_missing": {
-			name:       "TimestampMissing",
-			isTime:     true,
-			isDuration: false,
+			Name:       "TimestampMissing",
+			IsTime:     true,
+			IsDuration: false,
 		},
 
 		// TimestampNullable *time.Time field
 		"timestamp_nullable": {
-			name:       "TimestampNullable",
-			isTime:     true,
-			isDuration: false,
+			Name:       "TimestampNullable",
+			IsTime:     true,
+			IsDuration: false,
 		},
 
 		// TimestampNullableWithNilValue *time.Time field
 		"timestamp_nullable_with_nil_value": {
-			name:       "TimestampNullableWithNilValue",
-			isTime:     true,
-			isDuration: false,
+			Name:       "TimestampNullableWithNilValue",
+			IsTime:     true,
+			IsDuration: false,
 		},
 
 		// DurationStandard time.Duration field (standard)
 		"duration_standard": {
-			name:       "DurationStandard",
-			isTime:     false,
-			isDuration: true,
+			Name:       "DurationStandard",
+			IsTime:     false,
+			IsDuration: true,
 		},
 
 		// DurationStandardMissing time.Duration field (standard) missing in input data
 		"duration_standard_missing": {
-			name:       "DurationStandardMissing",
-			isTime:     false,
-			isDuration: true,
+			Name:       "DurationStandardMissing",
+			IsTime:     false,
+			IsDuration: true,
 		},
 
 		// DurationCustom time.Duration field (with casttype)
 		"duration_custom": {
-			name:       "DurationCustom",
-			isTime:     false,
-			isDuration: true,
+			Name:       "DurationCustom",
+			IsTime:     false,
+			IsDuration: true,
 		},
 
 		// DurationCustomMissing time.Duration field (with casttype) missing in input data
 		"duration_custom_missing": {
-			name:       "DurationCustomMissing",
-			isTime:     false,
-			isDuration: true,
+			Name:       "DurationCustomMissing",
+			IsTime:     false,
+			IsDuration: true,
 		},
 
 		// StringList []string field
 		"string_list": {
-			name:       "StringList",
-			isTime:     false,
-			isDuration: false,
+			Name:       "StringList",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// StringListEmpty []string field
 		"string_list_empty": {
-			name:       "StringListEmpty",
-			isTime:     false,
-			isDuration: false,
+			Name:       "StringListEmpty",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// BytesList [][]byte field
 		"bytes_list": {
-			name:       "BytesList",
-			isTime:     false,
-			isDuration: false,
+			Name:       "BytesList",
+			IsTime:     false,
+			IsDuration: false,
 		},
 
 		// TimestampList []time.Time field
 		"timestamp_list": {
-			name:       "TimestampList",
-			isTime:     true,
-			isDuration: false,
+			Name:       "TimestampList",
+			IsTime:     true,
+			IsDuration: false,
 		},
 
 		// DurationCustomList []time.Duration field
 		"duration_custom_list": {
-			name:       "DurationCustomList",
-			isTime:     false,
-			isDuration: true,
+			Name:       "DurationCustomList",
+			IsTime:     false,
+			IsDuration: true,
 		},
 
 		// Nested nested message field, non-nullable
 		"nested": {
-			name: "Nested",
-			nested: map[string]*SchemaMeta{
+			Name: "Nested",
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					name:       "Str",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
 				},
 
 				// Nested repeated nested messages
 				"nested_list": {
-					name: "NestedList",
-					nested: map[string]*SchemaMeta{
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							name:       "Str",
-							isTime:     false,
-							isDuration: false,
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
 						},
 					},
 				},
 
 				// Nested map repeated nested messages
 				"map": {
-					name:       "Map",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
 				},
 			},
 		},
 
 		// NestedNullable nested message field, nullabel
 		"nested_nullable": {
-			name: "NestedNullable",
-			nested: map[string]*SchemaMeta{
+			Name: "NestedNullable",
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					name:       "Str",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
 				},
 
 				// Nested repeated nested messages
 				"nested_list": {
-					name: "NestedList",
-					nested: map[string]*SchemaMeta{
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							name:       "Str",
-							isTime:     false,
-							isDuration: false,
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
 						},
 					},
 				},
 
 				// Nested map repeated nested messages
 				"map": {
-					name:       "Map",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
 				},
 			},
 		},
 
 		// NestedNullableWithNilValue nested message field, with no value set
 		"nested_nullable_with_nil_value": {
-			name: "NestedNullableWithNilValue",
-			nested: map[string]*SchemaMeta{
+			Name: "NestedNullableWithNilValue",
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					name:       "Str",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
 				},
 
 				// Nested repeated nested messages
 				"nested_list": {
-					name: "NestedList",
-					nested: map[string]*SchemaMeta{
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							name:       "Str",
-							isTime:     false,
-							isDuration: false,
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
 						},
 					},
 				},
 
 				// Nested map repeated nested messages
 				"map": {
-					name:       "Map",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
 				},
 			},
 		},
 
 		// NestedList nested message array
 		"nested_list": {
-			name: "NestedList",
-			nested: map[string]*SchemaMeta{
+			Name: "NestedList",
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					name:       "Str",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
 				},
 
 				// Nested repeated nested messages
 				"nested_list": {
-					name: "NestedList",
-					nested: map[string]*SchemaMeta{
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							name:       "Str",
-							isTime:     false,
-							isDuration: false,
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
 						},
 					},
 				},
 
 				// Nested map repeated nested messages
 				"map": {
-					name:       "Map",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
 				},
 			},
 		},
 
 		// NestedListNullable nested message array
 		"nested_list_nullable": {
-			name: "NestedListNullable",
-			nested: map[string]*SchemaMeta{
+			Name: "NestedListNullable",
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					name:       "Str",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
 				},
 
 				// Nested repeated nested messages
 				"nested_list": {
-					name: "NestedList",
-					nested: map[string]*SchemaMeta{
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							name:       "Str",
-							isTime:     false,
-							isDuration: false,
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
 						},
 					},
 				},
 
 				// Nested map repeated nested messages
 				"map": {
-					name:       "Map",
-					isTime:     false,
-					isDuration: false,
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
 				},
 			},
 		},
 
 		// Map normal map
 		"map": {
-			name:       "Map",
-			isTime:     false,
-			isDuration: false,
+			Name:       "Map",
+			IsTime:     false,
+			IsDuration: false,
 		},
 	}
 }

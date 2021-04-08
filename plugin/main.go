@@ -37,6 +37,9 @@ const (
 
 	// validationPkg contains name of Terraform validation package
 	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+	// accessorsPkg contains SchemaMeta definition
+	accessorsPkg = "github.com/gravitational/protoc-gen-terraform/acccessors"
 )
 
 // Plugin is terraform generator plugin
@@ -174,6 +177,7 @@ func (p *Plugin) setImports() {
 	// So those could be referenced via schema. and validation.
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
+	p.AddImport(accessorsPkg)
 
 	for _, i := range config.CustomImports {
 		p.AddImport(generator.GoImportPath(i))

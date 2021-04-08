@@ -20,8 +20,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
+
+	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
 	"github.com/stoewer/go-strcase"
 )
@@ -247,7 +248,7 @@ func (f *Field) setKind() {
 		f.Kind = "CUSTOM_TYPE"
 	case f.IsMap && f.MapValueField.IsMessage:
 		// Terraform does not support map of objects. We replace such field with list of objects having key and value fields.
-		f.Kind = "OBJECT_MAP" // ex: map[string]struct, requires additional steps to unmarshal
+		f.Kind = "MESSSAGE_MAP" // ex: map[string]struct, requires additional steps to unmarshal
 	case f.IsMap:
 		f.Kind = "MAP" // ex: map[string]string
 	case f.IsRepeated && f.IsMessage:

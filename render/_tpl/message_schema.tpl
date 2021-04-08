@@ -37,10 +37,10 @@ map[string]*schema.Schema {
 },
 {{- end }}
 
-{{- if eq .Kind "OBJECT_MAP" }}
+{{- if eq .Kind "MESSSAGE_MAP" }}
 {
     {{ template "required" . }}
-    {{ template "objectMap" . }}
+    {{ template "messageMap" . }}
 },
 {{- end }}
 
@@ -106,8 +106,8 @@ Elem: &schema.Schema {
 },
 {{- end -}}
 
-{{- define "objectMap" -}}
-Type: schema.TypeList,
+{{- define "messageMap" -}}
+Type: schema.TypeSet,
 Description: {{ .RawComment | quote }},
 {{ template "configMode" . }}
 Elem: &schema.Resource {

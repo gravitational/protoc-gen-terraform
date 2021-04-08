@@ -56,9 +56,9 @@ func Set{{.Name}}ToResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) erro
 }
 {{- end -}}
 
-{{- if eq .Kind "OBJECT_MAP" -}}
+{{- if eq .Kind "MESSSAGE_MAP" -}}
 {
-    {{ template "objectMap" . }}
+    {{ template "messageMap" . }}
 }
 {{- end -}}
 {{- end -}}
@@ -170,7 +170,7 @@ obj[{{.NameSnake | quote}}] = m
 {{- end -}}
 
 {{/* String -> object map */}}
-{{- define "objectMap" -}}
+{{- define "messageMap" -}}
 {{ $m := .MapValueField }}
 a := make([]interface{}, len(t.{{.Name}}))
 n := 0

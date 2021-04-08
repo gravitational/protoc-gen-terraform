@@ -49,9 +49,9 @@ func Get{{.Name}}FromResourceData(d *schema.ResourceData, t *{{.GoTypeName}}) er
 }
 {{- end -}}
 
-{{- if eq .Kind "OBJECT_MAP" -}}
+{{- if eq .Kind "MESSSAGE_MAP" -}}
 {
-    {{ template "objectMap" . }}
+    {{ template "messageMap" . }}
 }
 {{- end -}}
 {{- end -}}
@@ -205,7 +205,7 @@ if ok {
 {{- end -}}
 
 {{/* String -> object map */}}
-{{- define "objectMap" -}}
+{{- define "messageMap" -}}
 p := p + {{.NameSnake | quote }}
 
 {{ $m := .MapValueField }}

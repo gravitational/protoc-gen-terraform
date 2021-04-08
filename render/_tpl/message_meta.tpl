@@ -2,12 +2,12 @@
 // GenSchemaMeta{{ .Name }} returns schema for {{.Name}}
 //
 {{.Comment}}
-func GenSchemaMeta{{ .Name }}() map[string]*SchemaMeta {
+func GenSchemaMeta{{ .Name }}() map[string]*accessors.SchemaMeta {
 	return {{ template "fieldsSchema" .Fields -}}
 }
 
 {{- define "fieldsSchema" -}}
-map[string]*SchemaMeta {
+map[string]*accessors.SchemaMeta {
 {{- range $index, $field := . }}
     {{if .Comment}}{{.Comment}}{{else}}{{if .Message}}{{.Message.Comment}}{{end}}{{end}}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
@@ -34,17 +34,16 @@ map[string]*SchemaMeta {
 },
 {{- end }}
 
-{{/* {{- if eq .Kind "OBJECT_MAP" }}
+{{- if eq .Kind "MESSSAGE_MAP" }}
 {
-    {{ template "required" . }}
-    {{ template "objectMap" . }}
+    {{ template "messageMap" . }}
 },
-{{- end }} */}}
+{{- end }}
 
 {{- if eq .Kind "SINGULAR_MESSAGE" }}
 {
-    name: {{.Name|quote}},
-    nested: {{ template "fieldsSchema" .Message.Fields }},
+    Name: {{.Name|quote}},
+    Nested: {{ template "fieldsSchema" .Message.Fields }},
 },
 {{- end }}
 
@@ -60,39 +59,30 @@ Schema{{.CustomTypeMethodInfix}}(),
 {{- end -}}
 
 {{- define "singularElementary" -}}
-name: {{.Name|quote}},
-isTime: {{.IsTime}},
-isDuration: {{.IsDuration}},
+Name: {{.Name|quote}},
+IsTime: {{.IsTime}},
+IsDuration: {{.IsDuration}},
 {{- end -}}
 
 {{- define "repeatedMessage" -}}
-name: {{.Name|quote}},
-nested: {{ template "fieldsSchema" .Message.Fields }},
+Name: {{.Name|quote}},
+Nested: {{ template "fieldsSchema" .Message.Fields }},
 {{- end -}}
 
 {{- define "repeatedElementary" -}}
-name: {{.Name|quote}},
-isTime: {{.IsTime}},
-isDuration: {{.IsDuration}},
+Name: {{.Name|quote}},
+IsTime: {{.IsTime}},
+IsDuration: {{.IsDuration}},
 {{- end -}}
 
 {{- define "map" -}}
-name: {{.Name|quote}},
-isTime: {{.IsTime}},
-isDuration: {{.IsDuration}},
+Name: {{.Name|quote}},
+IsTime: {{.IsTime}},
+IsDuration: {{.IsDuration}},
 {{- end -}}
 
-{{- define "objectMap" -}}
-Type: schema.TypeList,
-Description: {{ .RawComment | quote }},
-{{ template "configMode" . }}
-Elem: &schema.Resource {
-    Schema: map[string]*schema.Schema{
-        "key": {
-            Type: schema.TypeString,
-            Required: true,
-        },
-        "value": {{ template "fieldSchema" .MapValueField }}
-    },
-},
+{{- define "messageMap" -}}
+Name: {{.Name|quote}},
+IsMessageMap: true,
+Nested: {{ template "fieldSchema" .MapValueField }},
 {{- end -}}

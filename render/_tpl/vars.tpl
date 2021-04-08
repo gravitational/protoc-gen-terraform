@@ -8,14 +8,6 @@ var (
 {{- end }}
 )
 
-// SchemaMeta represents schema metadata struct
-type SchemaMeta struct {
-	name        string
-	isTime      bool
-	isDuration  bool
-	nested      map[string]*SchemaMeta
-}
-
 // SupressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
 func SupressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
     o, err := time.ParseDuration(old)
