@@ -24,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+// Get reads object data from schema.ResourceData
 func Get(
 	sch map[string]*schema.Schema,
 	data *schema.ResourceData,
@@ -187,18 +188,13 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 
 // setList sets atomic value (scalar, string, time, duration)
 func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
-	// Get list count variable
-	n, okn := data.GetOk(path + ".#")
-	len, okc := n.(int)
-
-	if !okc {
-		return trace.Errorf("failed to convert list count to number")
+	len, err := getLen(path, data)
+	if err != nil {
+		return trace.Wrap(err)
 	}
 
-	// If list is empty, set target list to empty value
-	if !okn || len == 0 {
+	if len == 0 {
 		target.Set(reflect.Zero(target.Type()))
-
 		return nil
 	}
 
@@ -297,7 +293,7 @@ func setMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 				return trace.Wrap(err)
 			}
 		default:
-			return trace.Errorf("unknown Elem type: map key must be *schema.Schmea")
+			return trace.Errorf("unknown Elem type: map key must be *schema.Schema")
 		}
 
 		r.SetMapIndex(kv, el)
@@ -308,8 +304,18 @@ func setMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	return nil
 }
 
-// setMessageMap sets map of atomic values (scalar, string, time, duration)
+// setSet reads set from resource data
 func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+	len, err := getLen(path, data)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	if len == 0 {
+		target.Set(reflect.Zero(target.Type()))
+		return nil
+	}
+
 	// md, ok := data.GetOk(path)
 	// if !ok {
 	// 	return nil
@@ -319,6 +325,9 @@ func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	// if !ok {
 	// 	return trace.Errorf("failed to convert %T to map[string]interface{}", md)
 	// }
+
+	// target is list: this is list of objects
+	// target is map: this is map of objects
 
 	// // If map is empty, set target empty map
 	// if len(m) == 0 {
@@ -354,4 +363,18 @@ func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	// target.Set(r)
 
 	return nil
+}
+
+func getLen(path string, data *schema.ResourceData) (int, error) {
+	n, ok := data.GetOk(path + ".#")
+	if !ok || n == nil {
+		return 0, nil
+	}
+
+	len, ok := n.(int)
+	if !ok {
+		return 0, trace.Errorf("failed to convert list count to number")
+	}
+
+	return len, nil
 }

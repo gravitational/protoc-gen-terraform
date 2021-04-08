@@ -256,6 +256,38 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
+					// NestedMObj nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "NestedMObj nested object map",
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+									Optional:    true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -298,6 +330,38 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Description: "Nested map repeated nested messages",
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
+						},
+					},
+					// NestedMObj nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "NestedMObj nested object map",
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+									Optional:    true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},
@@ -344,6 +408,38 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
+					// NestedMObj nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "NestedMObj nested object map",
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+									Optional:    true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -386,6 +482,38 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Description: "Nested map repeated nested messages",
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
+						},
+					},
+					// NestedMObj nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "NestedMObj nested object map",
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+									Optional:    true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},
@@ -432,6 +560,38 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
+					// NestedMObj nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "NestedMObj nested object map",
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+									Optional:    true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -443,6 +603,188 @@ func GenSchemaTest() map[string]*schema.Schema {
 			Description: "Map normal map",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
+			},
+		},
+		// MapObject is the object map
+		"map_object": {
+
+			Optional:    true,
+			Type:        schema.TypeSet,
+			Description: "MapObject is the object map",
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+					"value": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Description: "Nested message definition",
+						Optional:    true,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+								// Nested repeated nested messages
+								"nested_list": {
+
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Nested repeated nested messages",
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+								// Nested map repeated nested messages
+								"map": {
+
+									Optional:    true,
+									Type:        schema.TypeMap,
+									Description: "Nested map repeated nested messages",
+									Elem: &schema.Schema{
+										Type: schema.TypeString,
+									},
+								},
+								// NestedMObj nested object map
+								"map_object_nested": {
+
+									Optional:    true,
+									Type:        schema.TypeSet,
+									Description: "NestedMObj nested object map",
+
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											"key": {
+												Type:     schema.TypeString,
+												Required: true,
+											},
+											"value": {
+												Type:        schema.TypeList,
+												MaxItems:    1,
+												Description: "OtherNested message nested into nested message",
+												Optional:    true,
+												Elem: &schema.Resource{
+													Schema: map[string]*schema.Schema{
+														// Str string field
+														"str": {
+															Type:        schema.TypeString,
+															Description: "Str string field",
+															Optional:    true,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		// MapObjectNullable is the object map with nullable values
+		"map_object_nullable": {
+
+			Optional:    true,
+			Type:        schema.TypeSet,
+			Description: "MapObjectNullable is the object map with nullable values",
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+					"value": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Description: "Nested message definition",
+						Optional:    true,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+								// Nested repeated nested messages
+								"nested_list": {
+
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Nested repeated nested messages",
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+								// Nested map repeated nested messages
+								"map": {
+
+									Optional:    true,
+									Type:        schema.TypeMap,
+									Description: "Nested map repeated nested messages",
+									Elem: &schema.Schema{
+										Type: schema.TypeString,
+									},
+								},
+								// NestedMObj nested object map
+								"map_object_nested": {
+
+									Optional:    true,
+									Type:        schema.TypeSet,
+									Description: "NestedMObj nested object map",
+
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											"key": {
+												Type:     schema.TypeString,
+												Required: true,
+											},
+											"value": {
+												Type:        schema.TypeList,
+												MaxItems:    1,
+												Description: "OtherNested message nested into nested message",
+												Optional:    true,
+												Elem: &schema.Resource{
+													Schema: map[string]*schema.Schema{
+														// Str string field
+														"str": {
+															Type:        schema.TypeString,
+															Description: "Str string field",
+															Optional:    true,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -623,6 +965,19 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
 			},
 		},
 
@@ -655,6 +1010,19 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
+				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
 				},
 			},
 		},
@@ -689,6 +1057,19 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
 			},
 		},
 
@@ -721,6 +1102,19 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
+				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
 				},
 			},
 		},
@@ -755,6 +1149,19 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
 			},
 		},
 
@@ -763,6 +1170,98 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Name:       "Map",
 			IsTime:     false,
 			IsDuration: false,
+		},
+
+		// MapObject is the object map
+		"map_object": {
+			Name: "MapObject",
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+
+		// MapObjectNullable is the object map with nullable values
+		"map_object_nullable": {
+			Name: "MapObjectNullable",
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					Name: "NestedList",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+
+				// NestedMObj nested object map
+				"map_object_nested": {
+					Name: "MapObjectNested",
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
 		},
 	}
 }

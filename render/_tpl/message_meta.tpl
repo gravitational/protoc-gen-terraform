@@ -83,6 +83,5 @@ IsDuration: {{.IsDuration}},
 
 {{- define "messageMap" -}}
 Name: {{.Name|quote}},
-IsMessageMap: true,
-Nested: {{ template "fieldSchema" .MapValueField }},
+Nested: {{ template "fieldsSchema" .MapValueField.Message.Fields }},
 {{- end -}}

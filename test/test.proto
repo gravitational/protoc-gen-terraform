@@ -118,11 +118,13 @@ message Test {
 
     // Map normal map
     map<string, string> Map = 27;
-}
 
-//     // NestedMObj object map
-//     map<string, Nested> NestedMObj = 20;
-// }
+    // MapObject is the object map
+    map<string, Nested> MapObject = 29 [ (gogoproto.nullable) = false ];    
+
+    // MapObjectNullable is the object map with nullable values
+    map<string, Nested> MapObjectNullable = 30;
+}
 
 // Nested message definition
 message Nested {
@@ -135,8 +137,8 @@ message Nested {
     // Nested map repeated nested messages
     map<string, string> Map = 3;
 
-    // // NestedMObj nested object map
-    // map<string, NestedLevel2> NestedMObj = 4;
+    // NestedMObj nested object map
+    map<string, OtherNested> MapObjectNested = 4;
 }
 
 // OtherNested message nested into nested message

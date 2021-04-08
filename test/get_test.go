@@ -71,6 +71,24 @@ var (
 					"kn1": "vn1",
 					"kn2": "vn2",
 				},
+				"map_object": []interface{}{
+					map[string]interface{}{
+						"key": "obj1",
+						"value": []interface{}{
+							map[string]interface{}{
+								"str": "TestString1",
+							},
+						},
+					},
+					map[string]interface{}{
+						"key": "obj2",
+						"value": []interface{}{
+							map[string]interface{}{
+								"str": "TestString2",
+							},
+						},
+					},
+				},
 			},
 		},
 		"nested_nullable": []interface{}{
@@ -103,7 +121,26 @@ var (
 			"k2": "v2",
 		},
 
-		"nested_m_obj": []interface{}{
+		"map_object": []interface{}{
+			map[string]interface{}{
+				"key": "obj1",
+				"value": []interface{}{
+					map[string]interface{}{
+						"str": "TestString1",
+					},
+				},
+			},
+			map[string]interface{}{
+				"key": "obj2",
+				"value": []interface{}{
+					map[string]interface{}{
+						"str": "TestString2",
+					},
+				},
+			},
+		},
+
+		"map_object_nullable": []interface{}{
 			map[string]interface{}{
 				"key": "obj1",
 				"value": []interface{}{
