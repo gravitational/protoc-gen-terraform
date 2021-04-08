@@ -56,6 +56,14 @@ var _ = time.Kitchen
 // └── duration_custom_missing:string (DurationCustomMissing time.Duration field (with casttype) missing in input data)
 // └── [string_list:string] (StringList []string field)
 // └── [string_list_empty:string] (StringListEmpty []string field)
+// └── [timestamp_list:string] (TimestampList []time.Time field)
+// └── [duration_custom_list:string] (DurationCustomList []time.Duration field)
+// └── nested (Nested nested message field, non-nullable)
+// │   ├── str:string (Str string field)
+// └── nested_nullable (NestedNullable nested message field, nullabel)
+// │   ├── str:string (Str string field)
+// └── nested_nullable_with_nil_value (NestedNullableWithNilValue nested message field, with no value set)
+//     └── str:string (Str string field)
 
 // SchemaTest returns schema for Test
 //
@@ -226,6 +234,77 @@ func SchemaTest() map[string]*schema.Schema {
 			Description: "StringListEmpty []string field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
+			},
+		},
+		// TimestampList []time.Time field
+		"timestamp_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "TimestampList []time.Time field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		// DurationCustomList []time.Duration field
+		"duration_custom_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "DurationCustomList []time.Duration field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		// Nested nested message field, non-nullable
+		"nested": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Description: "Nested message definition",
+			Optional:    true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+				},
+			},
+		},
+		// NestedNullable nested message field, nullabel
+		"nested_nullable": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Description: "Nested message definition",
+			Optional:    true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+				},
+			},
+		},
+		// NestedNullableWithNilValue nested message field, with no value set
+		"nested_nullable_with_nil_value": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Description: "Nested message definition",
+			Optional:    true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+				},
 			},
 		},
 	}
@@ -502,6 +581,151 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			t.StringListEmpty = make([]string, 0)
 		}
 	}
+	{
+		_a, ok := d.GetOk(p + "timestamp_list")
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
+			}
+			if len(a) > 0 {
+				t.TimestampList = make([]*time.Time, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value, err := time.Parse(time.RFC3339Nano, _raws)
+					if err != nil {
+						return fmt.Errorf("malformed time value for field TimestampList : %w", err)
+					}
+					t.TimestampList[i] = &_value
+				}
+			}
+		} else {
+			t.TimestampList = make([]*time.Time, 0)
+		}
+	}
+	{
+		_a, ok := d.GetOk(p + "duration_custom_list")
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
+			}
+			if len(a) > 0 {
+				t.DurationCustomList = make([]Duration, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_valued, err := time.ParseDuration(_raws)
+					if err != nil {
+						return fmt.Errorf("malformed duration value for field DurationCustomList : %w", err)
+					}
+					_value := Duration(_valued)
+					t.DurationCustomList[i] = _value
+				}
+			}
+		} else {
+			t.DurationCustomList = make([]Duration, 0)
+		}
+	}
+	{
+		n := d.Get(p + "nested" + ".#")
+
+		p := p + "nested" + ".0"
+		_, ok := d.GetOk(p)
+		if ok && n != nil && n.(int) != 0 {
+			p := p + "."
+
+			t := &t.Nested
+
+			{
+
+				_raw, ok := d.GetOk(p + "str")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.Str = _value
+				}
+			}
+
+		} else {
+
+		}
+	}
+	{
+		n := d.Get(p + "nested_nullable" + ".#")
+
+		p := p + "nested_nullable" + ".0"
+		_, ok := d.GetOk(p)
+		if ok && n != nil && n.(int) != 0 {
+			p := p + "."
+
+			_obj := Nested{}
+			t.NestedNullable = &_obj
+			t := &_obj
+
+			{
+
+				_raw, ok := d.GetOk(p + "str")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.Str = _value
+				}
+			}
+
+		} else {
+
+			t.NestedNullable = nil
+
+		}
+	}
+	{
+		n := d.Get(p + "nested_nullable_with_nil_value" + ".#")
+
+		p := p + "nested_nullable_with_nil_value" + ".0"
+		_, ok := d.GetOk(p)
+		if ok && n != nil && n.(int) != 0 {
+			p := p + "."
+
+			_obj := Nested{}
+			t.NestedNullableWithNilValue = &_obj
+			t := &_obj
+
+			{
+
+				_raw, ok := d.GetOk(p + "str")
+
+				if ok {
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.Str = _value
+				}
+			}
+
+		} else {
+
+			t.NestedNullableWithNilValue = nil
+
+		}
+	}
 
 	return nil
 }
@@ -628,6 +852,106 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 		}
 
 		obj["string_list_empty"] = _raw
+	}
+	{
+		_arr := t.TimestampList
+		_raw := make([]string, len(_arr))
+
+		if len(_arr) > 0 {
+			for i, _v := range _arr {
+				_value := _v.Format(time.RFC3339Nano)
+				_raw[i] = _value
+			}
+		}
+
+		obj["timestamp_list"] = _raw
+	}
+	{
+		_arr := t.DurationCustomList
+		_raw := make([]string, len(_arr))
+
+		if len(_arr) > 0 {
+			for i, _v := range _arr {
+				_value := time.Duration(_v).String()
+				_raw[i] = _value
+			}
+		}
+
+		obj["duration_custom_list"] = _raw
+	}
+	{
+
+		msg := make(map[string]interface{})
+
+		{
+			obj := msg
+			t := t.Nested
+
+			{
+				_v := t.Str
+
+				_value := string(_v)
+				obj["str"] = _value
+			}
+
+		}
+
+		if len(msg) > 0 {
+			obj["nested"] = []interface{}{msg}
+		}
+
+	}
+	{
+
+		if t.NestedNullable != nil {
+
+			msg := make(map[string]interface{})
+
+			{
+				obj := msg
+				t := t.NestedNullable
+
+				{
+					_v := t.Str
+
+					_value := string(_v)
+					obj["str"] = _value
+				}
+
+			}
+
+			if len(msg) > 0 {
+				obj["nested_nullable"] = []interface{}{msg}
+			}
+
+		}
+
+	}
+	{
+
+		if t.NestedNullableWithNilValue != nil {
+
+			msg := make(map[string]interface{})
+
+			{
+				obj := msg
+				t := t.NestedNullableWithNilValue
+
+				{
+					_v := t.Str
+
+					_value := string(_v)
+					obj["str"] = _value
+				}
+
+			}
+
+			if len(msg) > 0 {
+				obj["nested_nullable_with_nil_value"] = []interface{}{msg}
+			}
+
+		}
+
 	}
 
 	for key, value := range obj {

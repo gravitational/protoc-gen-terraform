@@ -37,6 +37,7 @@ const (
 var (
 	// fixture raw source data for schema.ResourceData
 	fixture map[string]interface{} = map[string]interface{}{
+		// Elementary values, timestamps, durations
 		"str":                              "TestString",
 		"int32":                            999,
 		"int64":                            998,
@@ -50,26 +51,32 @@ var (
 		"duration_standard":                "1h",
 		"duration_custom":                  "1m",
 		"string_list":                      []interface{}{"TestString1", "TestString2"},
-		"bool_a":                           []interface{}{false, true, false},
-		"bytes_a":                          []interface{}{"TestBytes1", "TestBytes2"},
-		"timestamp_a":                      []interface{}{defaultTimestamp},
-		"duration_custom_a":                []interface{}{"1m"},
+		// "bool_a":                           []interface{}{false, true, false},
+		// "bytes_a":                          []interface{}{"TestBytes1", "TestBytes2"},
+		"timestamp_list":       []interface{}{defaultTimestamp},
+		"duration_custom_list": []interface{}{"1m"},
 
+		// Messages
 		"nested": []interface{}{
 			map[string]interface{}{
 				"str": "TestString",
-				"nested": []interface{}{
-					map[string]interface{}{
-						"str": "TestString1",
-					},
-					map[string]interface{}{
-						"str": "TestString2",
-					},
-				},
-				"nested_m": map[string]interface{}{
-					"kn1": "vn1",
-					"kn2": "vn2",
-				},
+				// "nested": []interface{}{
+				// 	map[string]interface{}{
+				// 		"str": "TestString1",
+				// 	},
+				// 	map[string]interface{}{
+				// 		"str": "TestString2",
+				// 	},
+				// },
+				// "nested_m": map[string]interface{}{
+				// 	"kn1": "vn1",
+				// 	"kn2": "vn2",
+				// },
+			},
+		},
+		"nested_nullable": []interface{}{
+			map[string]interface{}{
+				"str": "TestString",
 			},
 		},
 
@@ -101,79 +108,96 @@ var (
 
 // SchemaMeta represents metadata about schema
 type SchemaMeta struct {
-	name       string
-	schemaName string
-	isTime     bool
-	isDuration bool
-	elem       *SchemaMeta
-	nested     map[string]*SchemaMeta
+	name             string
+	isTime           bool
+	isDuration       bool
+	nestedElementary *SchemaMeta
+	nestedObject     map[string]*SchemaMeta
 }
 
 // NOTE: make compound struct, values instead of methods
 func SchemaTestMeta() map[string]*SchemaMeta {
 	return map[string]*SchemaMeta{
 		"str": {
-			name:       "Str",
-			schemaName: "str",
+			name: "Str",
 		},
 		"int32": {
-			name:       "Int32",
-			schemaName: "int32",
+			name: "Int32",
 		},
 		"int64": {
-			name:       "Int64",
-			schemaName: "int64",
+			name: "Int64",
 		},
 		"float": {
-			name:       "Float",
-			schemaName: "float",
+			name: "Float",
 		},
 		"double": {
-			name:       "Double",
-			schemaName: "double",
+			name: "Double",
 		},
 		"bool": {
-			name:       "Bool",
-			schemaName: "bool",
+			name: "Bool",
 		},
 		"bytes": {
-			name:       "Bytes",
-			schemaName: "bytes",
+			name: "Bytes",
 		},
 		"timestamp": {
-			name:       "Timestamp",
-			schemaName: "timestamp",
-			isTime:     true,
+			name:   "Timestamp",
+			isTime: true,
 		},
 		"timestamp_nullable": {
-			name:       "TimestampNullable",
-			schemaName: "timestamp_nullable",
-			isTime:     true,
+			name:   "TimestampNullable",
+			isTime: true,
 		},
 		"timestamp_nullable_with_nil_value": {
-			name:       "TimestampNullableWithNilValue",
-			schemaName: "timestamp_nullable_with_nil_value",
-			isTime:     true,
+			name:   "TimestampNullableWithNilValue",
+			isTime: true,
 		},
 		"duration_standard": {
 			name:       "DurationStandard",
-			schemaName: "duration_standard",
 			isDuration: true,
 		},
 		"duration_custom": {
 			name:       "DurationCustom",
-			schemaName: "duration_custom",
 			isDuration: true,
 		},
 		"string_list": {
-			name:       "StringList",
-			schemaName: "string_list",
-			elem:       &SchemaMeta{},
+			name:             "StringList",
+			nestedElementary: &SchemaMeta{},
 		},
 		"string_list_empty": {
-			name:       "StringListEmpty",
-			schemaName: "string_list_empty",
-			elem:       &SchemaMeta{},
+			name:             "StringListEmpty",
+			nestedElementary: &SchemaMeta{},
+		},
+		"timestamp_list": {
+			name:             "TimestampList",
+			nestedElementary: &SchemaMeta{isTime: true},
+		},
+		"duration_custom_list": {
+			name:             "DurationCustomList",
+			nestedElementary: &SchemaMeta{isDuration: true},
+		},
+		"nested": {
+			name: "Nested",
+			nestedObject: map[string]*SchemaMeta{
+				"str": {
+					name: "Str",
+				},
+			},
+		},
+		"nested_nullable": {
+			name: "NestedNullable",
+			nestedObject: map[string]*SchemaMeta{
+				"str": {
+					name: "Str",
+				},
+			},
+		},
+		"nested_nullable_with_nil_value": {
+			name: "NestedNullableWithNilValue",
+			nestedObject: map[string]*SchemaMeta{
+				"str": {
+					name: "Str",
+				},
+			},
 		},
 	}
 }
@@ -188,26 +212,24 @@ func GetFromResourceData(
 		return trace.Errorf("obj must not be nil")
 	}
 
-	return getFragment("", sch, data, meta, obj)
+	t := reflect.Indirect(reflect.ValueOf(obj))
+	return getFragment("", &t, meta, sch, data)
 }
 
 func getFragment(
 	path string,
+	target *reflect.Value,
+	meta map[string]*SchemaMeta,
 	sch map[string]*schema.Schema,
 	data *schema.ResourceData,
-	meta map[string]*SchemaMeta,
-	obj interface{},
 ) error {
-	o := reflect.Indirect(reflect.ValueOf(obj))
-
 	for k, m := range meta {
 		s, ok := sch[k]
 		if !ok {
-			continue
-			return trace.Errorf("field not found in corresponding meta " + k)
+			return trace.Errorf("field %v.%v not found in corresponding schema", path, k)
 		}
 
-		v := o.FieldByName(m.name)
+		v := target.FieldByName(m.name)
 
 		switch {
 		case s.Type == schema.TypeInt ||
@@ -349,24 +371,52 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		return nil
 	}
 
-	r := reflect.MakeSlice(target.Type(), len, len)
+	if target.Type().Kind() == reflect.Slice {
+		r := reflect.MakeSlice(target.Type(), len, len)
 
-	for i := 0; i < len; i++ {
-		switch sch.Elem.(type) {
-		case *schema.Schema:
+		for i := 0; i < len; i++ {
 			el := r.Index(i)
-			err := setAtomic(fmt.Sprintf("%v.%v", path, i), &el, meta, sch, data)
+			p := fmt.Sprintf("%v.%v", path, i)
+
+			switch s := sch.Elem.(type) {
+			case *schema.Schema:
+				err := setAtomic(p, &el, meta.nestedElementary, s, data)
+				if err != nil {
+					return trace.Wrap(err)
+				}
+			case *schema.Resource:
+				err := getFragment(p, &el, meta.nestedObject, s.Schema, data)
+				if err != nil {
+					return trace.Wrap(err)
+				}
+			default:
+				return trace.Errorf("unknown Elem type")
+			}
+		}
+
+		target.Set(r)
+	} else {
+		s, ok := sch.Elem.(*schema.Resource)
+		if !ok {
+			return trace.Errorf("failed to convert %T to *schema.Resource", sch.Elem)
+		}
+
+		var r reflect.Value
+
+		if target.Kind() != reflect.Ptr {
+			r = reflect.New(target.Type())
+
+			err := getFragment(path+".0.", &r, meta.nestedObject, s.Schema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
-		case *schema.Resource:
 
-		default:
-			return trace.Errorf("unknown Elem type")
+			err = assignAtomic(r, target)
+			if err != nil {
+				return trace.Wrap(err)
+			}
 		}
 	}
-
-	target.Set(r)
 
 	return nil
 }
@@ -428,25 +478,29 @@ func TestArraysGet(t *testing.T) {
 	assert.Equal(t, []string(nil), subject.StringListEmpty, "Test.StringListEmpty")
 	assert.Equal(t, []string{"TestString1", "TestString2"}, subject.StringList)
 
-	// timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
-	// require.NoError(t, err, "failed to parse example timestamp")
+	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
+	require.NoError(t, err, "failed to parse example timestamp")
 
-	// duration, err := time.ParseDuration("1m")
-	// require.NoError(t, err, "failed to parse example duration")
+	duration, err := time.ParseDuration("1m")
+	require.NoError(t, err, "failed to parse example duration")
 
 	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
 	// assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
-	// assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
-	// assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
+	assert.Equal(t, []*time.Time{&timestamp}, subject.TimestampList)
+	assert.Equal(t, []Duration{Duration(duration)}, subject.DurationCustomList)
 }
 
-// // TestNestedMessageGet ensures decoding of nested messages
-// func TestNestedMessageGet(t *testing.T) {
-// 	subject, err := buildSubjectGet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestNestedMessageGet ensures decoding of nested messages
+func TestNestedMessageGet(t *testing.T) {
+	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, subject.Nested.Str, "TestString", "Test.Nested.Str")
-// }
+	var x *Nested = nil
+
+	assert.Equal(t, x, subject.NestedNullableWithNilValue, "Test.NestedNullableWithNilValue")
+	assert.Equal(t, "TestString", subject.Nested.Str, "Test.Nested.Str")
+	assert.Equal(t, "TestString", subject.NestedNullable.Str, "Test.NestedNullable.Str")
+}
 
 // // TestNestedMessageArrayGet ensures decoding of array of messages
 // func TestNestedMessageArrayGet(t *testing.T) {
