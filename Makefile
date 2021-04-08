@@ -1,4 +1,4 @@
-package_version = "0.0.3"
+include version.mk
 
 .PHONY: clean
 
