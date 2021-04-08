@@ -46,8 +46,9 @@ func Get(
 		return trace.Errorf("obj must be a pointer")
 	}
 
-	t := reflect.Indirect(v)
-	return getFragment("", &t, meta, sch, data)
+	v = reflect.Indirect(v)
+
+	return getFragment("", &v, meta, sch, data)
 }
 
 // GetLen returns TypeSet or TypeList value length

@@ -17,90 +17,101 @@ limitations under the License.
 // Package test contains protoc-gen-terraform tests
 package test
 
-// var (
-// 	test = Test{
-// 		Str:     "TestString",
-// 		Int32:   2,
-// 		Int64:   3,
-// 		Float:   18.5,
-// 		Double:  19.21,
-// 		Bool:    true,
-// 		Bytes:   []byte("TestBytes"),
-// 		StringA: []string{"TestString1", "TestString2"},
-// 		BoolA:   []BoolCustom{false, true, false},
-// 		BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
-// 		Nested: &Nested{
-// 			Str:    "TestStringA",
-// 			Nested: []*NestedLevel2{{Str: "NestedString1"}, {Str: "NestedString2"}},
-// 			NestedM: map[string]string{
-// 				"kn1": "vn1",
-// 				"kn2": "vn2",
-// 			},
-// 		},
-// 		NestedM: map[string]string{
-// 			"k1": "v1",
-// 			"k2": "v2",
-// 		},
-// 		NestedMObj: map[string]*Nested{
-// 			"n1": {
-// 				Str: "NestedObjString1",
-// 			},
-// 			"n2": {
-// 				Str: "NestedObjString2",
-// 			},
-// 			"n3": {
-// 				Str: "NestedObjString3",
-// 			},
-// 		},
-// 	}
-// )
+import (
+	"testing"
+	time "time"
+
+	"github.com/gravitational/protoc-gen-terraform/accessors"
+	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+var (
+	test = Test{
+		Str:    "TestString",
+		Int32:  2,
+		Int64:  3,
+		Float:  18.5,
+		Double: 19.21,
+		Bool:   true,
+		// Bytes:   []byte("TestBytes"),
+		// StringA: []string{"TestString1", "TestString2"},
+		// BoolA:   []BoolCustom{false, true, false},
+		// BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
+		// Nested: &Nested{
+		// 	Str:    "TestStringA",
+		// 	Nested: []*NestedLevel2{{Str: "NestedString1"}, {Str: "NestedString2"}},
+		// 	NestedM: map[string]string{
+		// 		"kn1": "vn1",
+		// 		"kn2": "vn2",
+		// 	},
+		// },
+		// NestedM: map[string]string{
+		// 	"k1": "v1",
+		// 	"k2": "v2",
+		// },
+		// NestedMObj: map[string]*Nested{
+		// 	"n1": {
+		// 		Str: "NestedObjString1",
+		// 	},
+		// 	"n2": {
+		// 		Str: "NestedObjString2",
+		// 	},
+		// 	"n3": {
+		// 		Str: "NestedObjString3",
+		// 	},
+		// },
+	}
+)
 
 // // fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
-// func fillTimestamps(t *Test) error {
-// 	ti, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
-// 	if err != nil {
-// 		return err
-// 	}
+func fillTimestamps(t *Test) error {
+	ti, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
+	if err != nil {
+		return err
+	}
 
-// 	d, err := time.ParseDuration("1h")
-// 	if err != nil {
-// 		return err
-// 	}
+	d, err := time.ParseDuration("1h")
+	if err != nil {
+		return err
+	}
 
-// 	t.Timestamp = ti
-// 	t.DurationStd = d
-// 	t.DurationCustom = Duration(d)
-// 	t.TimestampNullable = &ti
-// 	t.TimestampA = []*time.Time{&ti, &ti}
-// 	t.DurationCustomA = []Duration{Duration(d), Duration(d)}
+	t.Timestamp = ti
+	t.DurationStandard = d
+	t.DurationCustom = Duration(d)
+	// t.TimestampNullable = &ti
+	// t.TimestampA = []*time.Time{&ti, &ti}
+	// t.DurationCustomA = []Duration{Duration(d), Duration(d)}
 
-// 	return nil
-// }
+	return nil
+}
 
-// // buildSubjectSet builds Test struct from test fixture data
-// func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
-// 	subject := schema.TestResourceDataRaw(t, SchemaTest(), map[string]interface{}{})
-// 	err := fillTimestamps(&test)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	err = SetTestToResourceData(subject, &test)
-// 	return subject, err
-// }
+// buildSubjectSet builds Test struct from test fixture data
+func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
+	subject := schema.TestResourceDataRaw(t, SchemaTest, map[string]interface{}{})
+	err := fillTimestamps(&test)
+	if err != nil {
+		return nil, err
+	}
 
-// // TestElementariesSet ensures decoding of elementary types
-// func TestElementariesSet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to marshal test data")
+	err = accessors.Set(&test, subject, SchemaTest, SchemaMetaTest)
+	return subject, err
+}
 
-// 	assert.Equal(t, subject.Get("str"), "TestString", "schema.ResourceData['str']")
-// 	assert.Equal(t, subject.Get("int32"), 2, "schema.ResourceData['int32']")
-// 	assert.Equal(t, subject.Get("int64"), 3, "schema.ResourceData['int64']")
-// 	assert.Equal(t, subject.Get("float"), 18.5, "schema.ResourceData['float']")
-// 	assert.Equal(t, subject.Get("double"), 19.21, "schema.ResourceData['d']")
-// 	assert.Equal(t, subject.Get("bool"), true, "schema.ResourceData['bool']")
-// 	assert.Equal(t, subject.Get("bytes"), "TestBytes", "schema.ResourceData['bytes']")
-// }
+// TestElementariesSet ensures decoding of elementary types
+func TestElementariesSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to marshal test data")
+
+	assert.Equal(t, subject.Get("str"), "TestString", "schema.ResourceData['str']")
+	assert.Equal(t, subject.Get("int32"), 2, "schema.ResourceData['int32']")
+	assert.Equal(t, subject.Get("int64"), 3, "schema.ResourceData['int64']")
+	assert.Equal(t, subject.Get("float"), 18.5, "schema.ResourceData['float']")
+	assert.Equal(t, subject.Get("double"), 19.21, "schema.ResourceData['d']")
+	assert.Equal(t, subject.Get("bool"), true, "schema.ResourceData['bool']")
+	assert.Equal(t, subject.Get("bytes"), "TestBytes", "schema.ResourceData['bytes']")
+}
 
 // // TestTimesSet ensures decoding of time and duration fields
 // func TestTimesSet(t *testing.T) {
