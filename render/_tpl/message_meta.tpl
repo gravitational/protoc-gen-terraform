@@ -25,6 +25,7 @@ SchemaValueType: reflect.TypeOf((*{{.SchemaRawType}})(nil)).Elem(),
 {{- end -}}
 {{- if eq .Kind "CUSTOM_TYPE" -}}
 Getter: Get{{.CustomTypeMethodInfix}},
+Setter: Set{{.CustomTypeMethodInfix}},
 {{- end }}
 {{- if eq .Kind "SINGULAR_MESSAGE" "REPEATED_MESSAGE" -}}
 Nested: {{ template "fieldsSchema" .Message.Fields }},

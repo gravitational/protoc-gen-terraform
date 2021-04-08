@@ -29,16 +29,16 @@ import (
 
 var (
 	test = Test{
-		Str:        "TestString",
-		Int32:      2,
-		Int64:      3,
-		Float:      18.5,
-		Double:     19.21,
-		Bool:       true,
-		Bytes:      []byte("TestBytes"),
-		StringList: []string{"TestString1", "TestString2"},
-		// BoolA:   []BoolCustom{false, true, false},
-		BytesList: [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
+		Str:            "TestString",
+		Int32:          2,
+		Int64:          3,
+		Float:          18.5,
+		Double:         19.21,
+		Bool:           true,
+		Bytes:          []byte("TestBytes"),
+		StringList:     []string{"TestString1", "TestString2"},
+		BoolCustomList: []BoolCustom{false, true, false},
+		BytesList:      [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
 		Nested: Nested{
 			Str:        "TestStringA",
 			NestedList: []*OtherNested{{Str: "NestedString1"}, {Str: "NestedString2"}},
@@ -90,9 +90,8 @@ func fillTimestamps(t *Test) error {
 	t.TimestampNullable = &ti
 	t.DurationStandard = d
 	t.DurationCustom = Duration(d)
-	// t.TimestampNullable = &ti
-	// t.TimestampA = []*time.Time{&ti, &ti}
-	// t.DurationCustomA = []Duration{Duration(d), Duration(d)}
+	t.TimestampList = []*time.Time{&ti, &ti}
+	t.DurationCustomList = []Duration{Duration(d), Duration(d)}
 
 	return nil
 }
@@ -140,37 +139,38 @@ func TestArraysSet(t *testing.T) {
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, []interface{}{"TestString1", "TestString2"}, subject.Get("string_list"), "Test.StringList")
-	// assert.Equal(t, []interface{}{false, true, false}, subject.Get("bool_a"), "Test.BoolA")
+	assert.Equal(t, []interface{}{false, true, false}, subject.Get("bool_custom_list"), "Test.BoolCustomList")
 	assert.Equal(t, []interface{}{"TestBytes1", "TestBytes2"}, subject.Get("bytes_list"), "Test.BytesList")
-	// assert.Equal(t, []interface{}{"1h0m0s", "1h0m0s"}, subject.Get("duration_custom_a"))
+	assert.Equal(t, []interface{}{"1h0m0s", "1h0m0s"}, subject.Get("duration_custom_list"))
 
-	// raw := subject.Get("timestamp_a")
-	// a, ok := raw.([]interface{})
-	// if !ok {
-	// 	assert.Fail(t, "can not convert %T to []interface{}", raw)
-	// }
+	raw := subject.Get("timestamp_list")
+	a, ok := raw.([]interface{})
+	if !ok {
+		assert.Fail(t, "can not convert %T to []interface{}", raw)
+	}
 
-	// for n, v := range a {
-	// 	assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339Nano), "Test.TimestampA[]")
-	// }
+	for n, v := range a {
+		assert.Equal(t, v, test.TimestampList[n].Format(time.RFC3339Nano), "Test.TimestampA[]")
+	}
 }
 
-// // TestNestedMessageSet ensures decoding of nested messages
-// func TestNestedMessageSet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestNestedMessageSet ensures decoding of nested messages
+func TestNestedMessageSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, test.Nested.Str, subject.Get("nested.0.str"), "Test.Nested.Str")
-// }
+	assert.Equal(t, test.Nested.Str, subject.Get("nested.0.str"), "Test.Nested.Str")
+	assert.Equal(t, test.NestedNullable.Str, subject.Get("nested_nullable.0.str"), "Test.NestedNullable.Str")
+}
 
-// // TestNestedMessageArraySet ensures decoding of array of messages
-// func TestNestedMessageArraySet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestNestedMessageArraySet ensures decoding of array of messages
+func TestNestedMessageArraySet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, test.Nested.Nested[0].Str, subject.Get("nested.0.nested.0.str"))
-// 	assert.Equal(t, test.Nested.Nested[1].Str, subject.Get("nested.0.nested.1.str"))
-// }
+	assert.Equal(t, test.Nested.NestedList[0].Str, subject.Get("nested.0.nested_list.0.str"))
+	assert.Equal(t, test.Nested.NestedList[1].Str, subject.Get("nested.0.nested_list.1.str"))
+}
 
 // // TestMapGet ensures decoding of a maps
 // func TestMapSet(t *testing.T) {
@@ -183,7 +183,7 @@ func TestArraysSet(t *testing.T) {
 // 	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
 // }
 
-// // TestObjectMapGet ensures decoding of maps of messages
+// // TestObjectMapSet ensures decoding of maps of messages
 // func TestObjectMapSet(t *testing.T) {
 // 	subject, err := buildSubjectSet(t)
 // 	require.NoError(t, err, "failed to unmarshal test data")

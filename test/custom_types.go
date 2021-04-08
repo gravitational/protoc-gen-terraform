@@ -86,12 +86,25 @@ func GetBoolCustom(
 	return nil
 }
 
-// SetBoolCustom sets custom bool value to resource data
-func SetBoolCustom(value *[]BoolCustom) (interface{}, error) {
-	r := make([]interface{}, len(*value))
+// SetBoolCustom returns bool values
+func SetBoolCustom(
+	source reflect.Value,
+	meta *accessors.SchemaMeta,
+	sch *schema.Schema,
+) (interface{}, error) {
+	if !source.IsValid() {
+		return nil, nil
+	}
 
-	for i, v := range *value {
-		r[i] = v
+	c, ok := source.Interface().([]BoolCustom)
+	if !ok {
+		return nil, fmt.Errorf("can not convert %T to []BoolCustom", c)
+	}
+
+	r := make([]interface{}, len(c))
+
+	for i, v := range c {
+		r[i] = bool(v)
 	}
 
 	return r, nil

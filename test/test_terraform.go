@@ -926,6 +926,7 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			IsTime:     false,
 			IsDuration: false,
 			Getter:     GetBoolCustom,
+			Setter:     SetBoolCustom,
 		},
 		// BytesList [][]byte field
 		"bytes_list": {

@@ -64,6 +64,10 @@ func readFragment(
 ) (map[string]interface{}, error) {
 	target := make(map[string]interface{})
 
+	if !source.IsValid() {
+		return nil, nil
+	}
+
 	for k, m := range meta {
 		s, ok := sch[k]
 		if !ok {
@@ -79,9 +83,8 @@ func readFragment(
 				return nil, trace.Wrap(err)
 			}
 
-			err = setConvertedKey(target, k, r, m)
-			if err != nil {
-				return nil, err
+			if r != nil {
+				target[k] = r
 			}
 		case s.Type == schema.TypeInt ||
 			s.Type == schema.TypeFloat ||
@@ -159,17 +162,13 @@ func readList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (inter
 
 		for i := 0; i < source.Len(); i++ {
 			v := source.Index(i)
+
 			el, err := readEnumerableElement(v, meta, sch)
 			if err != nil {
 				return nil, err
 			}
 
-			n, err := convert(reflect.ValueOf(el), meta)
-			if err != nil {
-				return nil, err
-			}
-
-			t[i] = n
+			t[i] = el
 		}
 
 		return t, nil
@@ -261,20 +260,25 @@ func readEnumerableElement(
 ) (interface{}, error) {
 	switch s := sch.Elem.(type) {
 	case *schema.Schema:
-		return readAtomic(source, meta, s)
+		a, err := readAtomic(source, meta, s)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		n, err := convert(reflect.ValueOf(a), meta)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		return n, nil
+
 	case *schema.Resource:
-		return nil, nil
-		// v := newEmptyValue(target.Type())
+		m, err := readFragment(reflect.Indirect(source), meta.Nested, s.Schema)
+		if err != nil {
+			return nil, err
+		}
 
-		// _, ok := data.GetOk(path)
-		// if ok {
-		// 	err := getFragment(path+".", v, meta.Nested, s.Schema, data)
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		// }
-
-		// return assign(v, target)
+		return m, nil
 	default:
 		return nil, trace.Errorf("unknown Elem type")
 	}
