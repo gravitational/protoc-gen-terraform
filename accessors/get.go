@@ -259,7 +259,7 @@ func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 			return err
 		}
 
-		t.SetMapIndex(reflect.ValueOf(k), *v)
+		assignMapIndex(t, reflect.ValueOf(k), v)
 	}
 
 	return assign(&t, target)
@@ -301,27 +301,22 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 				return trace.Errorf("can not convert %T to map[string]interface{}", m)
 			}
 
-			k := m["key"]
-
-			rs, ok := sch.Elem.(*schema.Resource)
+			re, ok := sch.Elem.(*schema.Resource)
 			if !ok {
 				return fmt.Errorf("can not convert %T to *schema.Resource", sch.Elem)
 			}
 
+			p := fmt.Sprintf("%v.%v.value.0", path, s.F(i))
+			k := m["key"]
+
 			v := newEmptyValue(target.Type().Elem())
 
-			p := fmt.Sprintf("%v.%v.value.0", path, s.F(i))
-
-			err := getEnumerableElement(p, v, rs.Schema["value"], meta, data)
+			err := getEnumerableElement(p, v, re.Schema["value"], meta, data)
 			if err != nil {
 				return err
 			}
 
-			if target.Type().Elem().Kind() == reflect.Ptr {
-				r.SetMapIndex(reflect.ValueOf(k), v.Addr())
-			} else {
-				r.SetMapIndex(reflect.ValueOf(k), *v)
-			}
+			assignMapIndex(r, reflect.ValueOf(k), v)
 		}
 
 		target.Set(r)

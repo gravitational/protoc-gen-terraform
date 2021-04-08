@@ -70,3 +70,12 @@ func assign(source *reflect.Value, target *reflect.Value) error {
 func assignZeroValue(target *reflect.Value) {
 	target.Set(reflect.Zero(target.Type()))
 }
+
+// assignMapIndex assigns map element by value or reference
+func assignMapIndex(m reflect.Value, key reflect.Value, value *reflect.Value) {
+	if m.Type().Elem().Kind() == reflect.Ptr {
+		m.SetMapIndex(key, value.Addr())
+	} else {
+		m.SetMapIndex(key, *value)
+	}
+}
