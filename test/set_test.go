@@ -173,15 +173,15 @@ func TestNestedMessageArraySet(t *testing.T) {
 }
 
 // // TestMapGet ensures decoding of a maps
-// func TestMapSet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+func TestMapSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, test.NestedM["k1"], subject.Get("nested_m.k1"))
-// 	assert.Equal(t, test.NestedM["k2"], subject.Get("nested_m.k2"))
-// 	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
-// 	assert.Equal(t, test.Nested.NestedM["kn1"], "vn1")
-// }
+	assert.Equal(t, test.Map["k1"], subject.Get("map.k1"))
+	assert.Equal(t, test.Map["k2"], subject.Get("map.k2"))
+	assert.Equal(t, test.Nested.Map["kn1"], "vn1")
+	assert.Equal(t, test.Nested.Map["kn1"], "vn1")
+}
 
 // // TestObjectMapSet ensures decoding of maps of messages
 // func TestObjectMapSet(t *testing.T) {

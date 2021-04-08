@@ -57,6 +57,7 @@ func Set(
 	return nil
 }
 
+// readFragment returns map[string]interface{} of a block
 func readFragment(
 	source reflect.Value,
 	meta map[string]*SchemaMeta,
@@ -191,7 +192,24 @@ func readList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (inter
 
 // readMap converts source value to map
 func readMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
-	return nil, nil
+	if source.Len() == 0 {
+		return nil, nil
+	}
+
+	m := make(map[string]interface{})
+
+	for _, k := range source.MapKeys() {
+		i := source.MapIndex(k)
+
+		v, err := readEnumerableElement(i, meta, sch)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		reflect.ValueOf(m).SetMapIndex(k, reflect.ValueOf(v))
+	}
+
+	return m, nil
 }
 
 // readSet converts source value to set

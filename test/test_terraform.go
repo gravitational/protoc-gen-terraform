@@ -979,9 +979,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
@@ -1030,9 +1031,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
@@ -1081,9 +1083,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
@@ -1132,9 +1135,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
@@ -1183,9 +1187,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
@@ -1206,9 +1211,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// Map normal map
 		"map": {
-			Name:       "Map",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Map",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// MapObject is the object map
 		"map_object": {
@@ -1240,9 +1246,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
@@ -1291,9 +1298,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested map repeated nested messages
 				"map": {
-					Name:       "Map",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Map",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
