@@ -86,7 +86,7 @@ func GetBoolCustom(
 	return nil
 }
 
-// SetBoolCustomToResourceData sets
+// SetBoolCustom sets custom bool value to resource data
 func SetBoolCustom(value *[]BoolCustom) (interface{}, error) {
 	r := make([]interface{}, len(*value))
 

@@ -9,7 +9,7 @@ func GenSchema{{ .Name }}() map[string]*schema.Schema {
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
-    {{if .Comment}}{{.Comment}}{{else}}{{if .Message}}{{.Message.Comment}}{{end}}{{end}}
+    {{.Comment}}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
@@ -49,7 +49,7 @@ map[string]*schema.Schema {
     Type: schema.TypeList,
     MaxItems: 1,
     Description: {{ .Message.RawComment | quote }},
-    {{- template "configMode" . }}    
+    {{ template "configMode" . -}}    
     {{- template "required" . }}
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
@@ -84,7 +84,7 @@ DiffSuppressFunc: SupressDurationChange,
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
 Description: {{ .RawComment | quote }},
-{{- template "configMode" . }}
+{{ template "configMode" . -}}
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
@@ -109,7 +109,7 @@ Elem: &schema.Schema {
 {{- define "messageMap" -}}
 Type: schema.TypeSet,
 Description: {{ .RawComment | quote }},
-{{ template "configMode" . }}
+{{ template "configMode" . -}}
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{
         "key": {

@@ -9,82 +9,25 @@ func GenSchemaMeta{{ .Name }}() map[string]*accessors.SchemaMeta {
 {{- define "fieldsSchema" -}}
 map[string]*accessors.SchemaMeta {
 {{- range $index, $field := . }}
-    {{if .Comment}}{{.Comment}}{{else}}{{if .Message}}{{.Message.Comment}}{{end}}{{end}}
+    {{.Comment}}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
 {{- end -}}
 
 {{- define "fieldSchema" -}}
-{{- if eq .Kind "REPEATED_MESSAGE" }}
 {
-    {{ template "repeatedMessage" . }}
-},
-{{- end }}
-
-{{- if eq .Kind "REPEATED_ELEMENTARY" }}
-{
-    {{ template "repeatedElementary" . }}
-},
-{{- end }}
-
-{{- if eq .Kind "MAP" }}
-{
-    {{ template "map" . }}
-},
-{{- end }}
-
-{{- if eq .Kind "MESSSAGE_MAP" }}
-{
-    {{ template "messageMap" . }}
-},
-{{- end }}
-
-{{- if eq .Kind "SINGULAR_MESSAGE" }}
-{
-    Name: {{.Name|quote}},
-    Nested: {{ template "fieldsSchema" .Message.Fields }},
-},
-{{- end }}
-
-{{- if eq .Kind "SINGULAR_ELEMENTARY" }}
-{
-    {{ template "singularElementary" . }}
-},
-{{- end }}
-
-{{- if eq .Kind "CUSTOM_TYPE" }}
-{
-    Name: {{.Name|quote}},
-    Getter: Get{{.CustomTypeMethodInfix}},
-},
-{{- end }}
-{{- end -}}
-
-{{- define "singularElementary" -}}
 Name: {{.Name|quote}},
 IsTime: {{.IsTime}},
 IsDuration: {{.IsDuration}},
-{{- end -}}
-
-{{- define "repeatedMessage" -}}
-Name: {{.Name|quote}},
+{{ if eq .Kind "CUSTOM_TYPE" -}}
+Getter: Get{{.CustomTypeMethodInfix}},
+{{- end }}
+{{- if eq .Kind "SINGULAR_MESSAGE" "REPEATED_MESSAGE" -}}
 Nested: {{ template "fieldsSchema" .Message.Fields }},
-{{- end -}}
-
-{{- define "repeatedElementary" -}}
-Name: {{.Name|quote}},
-IsTime: {{.IsTime}},
-IsDuration: {{.IsDuration}},
-{{- end -}}
-
-{{- define "map" -}}
-Name: {{.Name|quote}},
-IsTime: {{.IsTime}},
-IsDuration: {{.IsDuration}},
-{{- end -}}
-
-{{- define "messageMap" -}}
-Name: {{.Name|quote}},
+{{- end }}
+{{- if eq .Kind "MESSSAGE_MAP" -}}
 Nested: {{ template "fieldsSchema" .MapValueField.Message.Fields }},
+{{- end }}
+},
 {{- end -}}

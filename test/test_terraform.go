@@ -222,7 +222,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			Description: "Nested message definition",
-			Optional:    true,
+
+			Optional: true,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -264,7 +265,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeSet,
 						Description: "MapObjectNested nested object map",
-
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -275,7 +275,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Type:        schema.TypeList,
 									MaxItems:    1,
 									Description: "OtherNested message nested into nested message",
-									Optional:    true,
+
+									Optional: true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -298,7 +299,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			Description: "Nested message definition",
-			Optional:    true,
+
+			Optional: true,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -340,7 +342,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeSet,
 						Description: "MapObjectNested nested object map",
-
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -351,7 +352,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Type:        schema.TypeList,
 									MaxItems:    1,
 									Description: "OtherNested message nested into nested message",
-									Optional:    true,
+
+									Optional: true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -374,7 +376,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			Description: "Nested message definition",
-			Optional:    true,
+
+			Optional: true,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -416,7 +419,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeSet,
 						Description: "MapObjectNested nested object map",
-
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -427,7 +429,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Type:        schema.TypeList,
 									MaxItems:    1,
 									Description: "OtherNested message nested into nested message",
-									Optional:    true,
+
+									Optional: true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -492,7 +495,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeSet,
 						Description: "MapObjectNested nested object map",
-
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -503,7 +505,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Type:        schema.TypeList,
 									MaxItems:    1,
 									Description: "OtherNested message nested into nested message",
-									Optional:    true,
+
+									Optional: true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -568,7 +571,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Optional:    true,
 						Type:        schema.TypeSet,
 						Description: "MapObjectNested nested object map",
-
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -579,7 +581,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Type:        schema.TypeList,
 									MaxItems:    1,
 									Description: "OtherNested message nested into nested message",
-									Optional:    true,
+
+									Optional: true,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											// Str string field
@@ -613,7 +616,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 			Optional:    true,
 			Type:        schema.TypeSet,
 			Description: "MapObject is the object map",
-
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
@@ -624,7 +626,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Type:        schema.TypeList,
 						MaxItems:    1,
 						Description: "Nested message definition",
-						Optional:    true,
+
+						Optional: true,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -666,7 +669,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 									Type:        schema.TypeSet,
 									Description: "MapObjectNested nested object map",
-
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											"key": {
@@ -677,7 +679,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 												Type:        schema.TypeList,
 												MaxItems:    1,
 												Description: "OtherNested message nested into nested message",
-												Optional:    true,
+
+												Optional: true,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
 														// Str string field
@@ -704,7 +707,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 			Optional:    true,
 			Type:        schema.TypeSet,
 			Description: "MapObjectNullable is the object map with nullable values",
-
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
@@ -715,7 +717,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 						Type:        schema.TypeList,
 						MaxItems:    1,
 						Description: "Nested message definition",
-						Optional:    true,
+
+						Optional: true,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								// Str string field
@@ -757,7 +760,6 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 									Type:        schema.TypeSet,
 									Description: "MapObjectNested nested object map",
-
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											"key": {
@@ -768,7 +770,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 												Type:        schema.TypeList,
 												MaxItems:    1,
 												Description: "OtherNested message nested into nested message",
-												Optional:    true,
+
+												Optional: true,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
 														// Str string field
@@ -901,8 +904,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// BoolCustomList []bool field
 		"bool_custom_list": {
-			Name:   "BoolCustomList",
-			Getter: GetBoolCustom,
+			Name:       "BoolCustomList",
+			IsTime:     false,
+			IsDuration: false,
+			Getter:     GetBoolCustom,
 		},
 		// BytesList [][]byte field
 		"bytes_list": {
@@ -924,7 +929,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// Nested nested message field, non-nullable
 		"nested": {
-			Name: "Nested",
+			Name:       "Nested",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -934,7 +941,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -952,7 +961,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -966,7 +977,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// NestedNullable nested message field, nullabel
 		"nested_nullable": {
-			Name: "NestedNullable",
+			Name:       "NestedNullable",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -976,7 +989,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -994,7 +1009,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1008,7 +1025,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// NestedNullableWithNilValue nested message field, with no value set
 		"nested_nullable_with_nil_value": {
-			Name: "NestedNullableWithNilValue",
+			Name:       "NestedNullableWithNilValue",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -1018,7 +1037,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1036,7 +1057,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1050,7 +1073,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// NestedList nested message array
 		"nested_list": {
-			Name: "NestedList",
+			Name:       "NestedList",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -1060,7 +1085,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1078,7 +1105,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1092,7 +1121,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// NestedListNullable nested message array
 		"nested_list_nullable": {
-			Name: "NestedListNullable",
+			Name:       "NestedListNullable",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -1102,7 +1133,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1120,7 +1153,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1140,7 +1175,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// MapObject is the object map
 		"map_object": {
-			Name: "MapObject",
+			Name:       "MapObject",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -1150,7 +1187,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1168,7 +1207,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1182,7 +1223,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// MapObjectNullable is the object map with nullable values
 		"map_object_nullable": {
-			Name: "MapObjectNullable",
+			Name:       "MapObjectNullable",
+			IsTime:     false,
+			IsDuration: false,
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
@@ -1192,7 +1235,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// Nested repeated nested messages
 				"nested_list": {
-					Name: "NestedList",
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
@@ -1210,7 +1255,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 				// MapObjectNested nested object map
 				"map_object_nested": {
-					Name: "MapObjectNested",
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
