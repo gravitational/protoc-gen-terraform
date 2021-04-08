@@ -119,7 +119,7 @@ func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 		}
 	default:
 		v := reflect.ValueOf(s)
-		err := assignAtomic(&v, target)
+		err := assign(&v, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -128,9 +128,8 @@ func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 	return nil
 }
 
-// TODO: change assignAtomic
-// assignAtomic reads atomic value form
-func assignAtomic(source *reflect.Value, target *reflect.Value) error {
+// assign assigns source value to target with possible type and pointer conversions
+func assign(source *reflect.Value, target *reflect.Value) error {
 	t := target.Type()
 	v := *source
 
@@ -145,6 +144,7 @@ func assignAtomic(source *reflect.Value, target *reflect.Value) error {
 			return trace.Errorf("can not convert %v to %v", source.Type().Name(), t.Name())
 		}
 
+		// v := source.(string)
 		v = v.Convert(t)
 	}
 
@@ -154,13 +154,19 @@ func assignAtomic(source *reflect.Value, target *reflect.Value) error {
 
 	// If target type is a reference, create new pointer to this reference and assign
 	if target.Type().Kind() == reflect.Ptr {
-		e := reflect.New(v.Type())
-		e.Elem().Set(v)
-		v = e
+		if v.CanAddr() {
+			// target := &source
+			target.Set(v.Addr())
+			return nil
+		} else {
+			// a := "5"
+			// target := a
+			ptr := reflect.New(v.Type())
+			ptr.Elem().Set(v)
+			target.Set(ptr)
+			return nil
+		}
 	}
-	// if v.CanAddr() {
-	// 	target.Set
-	// }
 
 	target.Set(v)
 
@@ -180,7 +186,7 @@ func assignTime(source interface{}, target *reflect.Value) error {
 	}
 
 	v := reflect.ValueOf(t)
-	return assignAtomic(&v, target)
+	return assign(&v, target)
 }
 
 // assignTime assigns duration value from a string
@@ -196,7 +202,7 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 	}
 
 	v := reflect.ValueOf(t)
-	return assignAtomic(&v, target)
+	return assign(&v, target)
 }
 
 // setList sets atomic value (scalar, string, time, duration)
@@ -262,7 +268,7 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		}
 
 		// Assign blank object
-		err = assignAtomic(&r, target)
+		err = assign(&r, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
