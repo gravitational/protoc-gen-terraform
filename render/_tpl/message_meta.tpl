@@ -53,9 +53,11 @@ map[string]*accessors.SchemaMeta {
 },
 {{- end }}
 
-{{/* {{- if eq .Kind "CUSTOM_TYPE" }}
-Schema{{.CustomTypeMethodInfix}}(),
-{{- end  */}}
+{{- if eq .Kind "CUSTOM_TYPE" }}
+{
+    Name: {{.Name|quote}},
+},
+{{- end }}
 {{- end -}}
 
 {{- define "singularElementary" -}}

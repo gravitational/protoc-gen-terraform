@@ -323,7 +323,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 		return nil
 	default:
-		return fmt.Errorf("unknown set target type")
+		return trace.Errorf("unknown set target type")
 	}
 }
 

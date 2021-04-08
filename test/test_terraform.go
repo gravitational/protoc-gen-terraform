@@ -185,6 +185,8 @@ func GenSchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+		// BoolCustomList []bool field
+		"bool_custom_list": SchemaBoolCustom(),
 		// BytesList [][]byte field
 		"bytes_list": {
 
@@ -256,12 +258,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					// MapObjectNested nested object map
 					"map_object_nested": {
 
 						Optional:    true,
 						Type:        schema.TypeSet,
-						Description: "NestedMObj nested object map",
+						Description: "MapObjectNested nested object map",
 
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -332,12 +334,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					// MapObjectNested nested object map
 					"map_object_nested": {
 
 						Optional:    true,
 						Type:        schema.TypeSet,
-						Description: "NestedMObj nested object map",
+						Description: "MapObjectNested nested object map",
 
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -408,12 +410,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					// MapObjectNested nested object map
 					"map_object_nested": {
 
 						Optional:    true,
 						Type:        schema.TypeSet,
-						Description: "NestedMObj nested object map",
+						Description: "MapObjectNested nested object map",
 
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -484,12 +486,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					// MapObjectNested nested object map
 					"map_object_nested": {
 
 						Optional:    true,
 						Type:        schema.TypeSet,
-						Description: "NestedMObj nested object map",
+						Description: "MapObjectNested nested object map",
 
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -560,12 +562,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj nested object map
+					// MapObjectNested nested object map
 					"map_object_nested": {
 
 						Optional:    true,
 						Type:        schema.TypeSet,
-						Description: "NestedMObj nested object map",
+						Description: "MapObjectNested nested object map",
 
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -658,12 +660,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 										Type: schema.TypeString,
 									},
 								},
-								// NestedMObj nested object map
+								// MapObjectNested nested object map
 								"map_object_nested": {
 
 									Optional:    true,
 									Type:        schema.TypeSet,
-									Description: "NestedMObj nested object map",
+									Description: "MapObjectNested nested object map",
 
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
@@ -749,12 +751,12 @@ func GenSchemaTest() map[string]*schema.Schema {
 										Type: schema.TypeString,
 									},
 								},
-								// NestedMObj nested object map
+								// MapObjectNested nested object map
 								"map_object_nested": {
 
 									Optional:    true,
 									Type:        schema.TypeSet,
-									Description: "NestedMObj nested object map",
+									Description: "MapObjectNested nested object map",
 
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
@@ -801,140 +803,124 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Int32 int32 field
 		"int32": {
 			Name:       "Int32",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Int64 int64 field
 		"int64": {
 			Name:       "Int64",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Float float field
 		"float": {
 			Name:       "Float",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Double double field
 		"double": {
 			Name:       "Double",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Bool bool field
 		"bool": {
 			Name:       "Bool",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Bytest byte[] field
 		"bytes": {
 			Name:       "Bytes",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// Timestamp time.Time field
 		"timestamp": {
 			Name:       "Timestamp",
 			IsTime:     true,
 			IsDuration: false,
 		},
-
 		// Timestamp time.Time field
 		"timestamp_missing": {
 			Name:       "TimestampMissing",
 			IsTime:     true,
 			IsDuration: false,
 		},
-
 		// TimestampNullable *time.Time field
 		"timestamp_nullable": {
 			Name:       "TimestampNullable",
 			IsTime:     true,
 			IsDuration: false,
 		},
-
 		// TimestampNullableWithNilValue *time.Time field
 		"timestamp_nullable_with_nil_value": {
 			Name:       "TimestampNullableWithNilValue",
 			IsTime:     true,
 			IsDuration: false,
 		},
-
 		// DurationStandard time.Duration field (standard)
 		"duration_standard": {
 			Name:       "DurationStandard",
 			IsTime:     false,
 			IsDuration: true,
 		},
-
 		// DurationStandardMissing time.Duration field (standard) missing in input data
 		"duration_standard_missing": {
 			Name:       "DurationStandardMissing",
 			IsTime:     false,
 			IsDuration: true,
 		},
-
 		// DurationCustom time.Duration field (with casttype)
 		"duration_custom": {
 			Name:       "DurationCustom",
 			IsTime:     false,
 			IsDuration: true,
 		},
-
 		// DurationCustomMissing time.Duration field (with casttype) missing in input data
 		"duration_custom_missing": {
 			Name:       "DurationCustomMissing",
 			IsTime:     false,
 			IsDuration: true,
 		},
-
 		// StringList []string field
 		"string_list": {
 			Name:       "StringList",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// StringListEmpty []string field
 		"string_list_empty": {
 			Name:       "StringListEmpty",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
+		// BoolCustomList []bool field
+		"bool_custom_list": {
+			Name: "BoolCustomList",
+		},
 		// BytesList [][]byte field
 		"bytes_list": {
 			Name:       "BytesList",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// TimestampList []time.Time field
 		"timestamp_list": {
 			Name:       "TimestampList",
 			IsTime:     true,
 			IsDuration: false,
 		},
-
 		// DurationCustomList []time.Duration field
 		"duration_custom_list": {
 			Name:       "DurationCustomList",
 			IsTime:     false,
 			IsDuration: true,
 		},
-
 		// Nested nested message field, non-nullable
 		"nested": {
 			Name: "Nested",
@@ -945,7 +931,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -958,15 +943,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{
@@ -980,7 +963,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-
 		// NestedNullable nested message field, nullabel
 		"nested_nullable": {
 			Name: "NestedNullable",
@@ -991,7 +973,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -1004,15 +985,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{
@@ -1026,7 +1005,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-
 		// NestedNullableWithNilValue nested message field, with no value set
 		"nested_nullable_with_nil_value": {
 			Name: "NestedNullableWithNilValue",
@@ -1037,7 +1015,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -1050,15 +1027,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{
@@ -1072,7 +1047,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-
 		// NestedList nested message array
 		"nested_list": {
 			Name: "NestedList",
@@ -1083,7 +1057,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -1096,15 +1069,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{
@@ -1118,7 +1089,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-
 		// NestedListNullable nested message array
 		"nested_list_nullable": {
 			Name: "NestedListNullable",
@@ -1129,7 +1099,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -1142,15 +1111,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{
@@ -1164,14 +1131,12 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-
 		// Map normal map
 		"map": {
 			Name:       "Map",
 			IsTime:     false,
 			IsDuration: false,
 		},
-
 		// MapObject is the object map
 		"map_object": {
 			Name: "MapObject",
@@ -1182,7 +1147,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -1195,15 +1159,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{
@@ -1217,7 +1179,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-
 		// MapObjectNullable is the object map with nullable values
 		"map_object_nullable": {
 			Name: "MapObjectNullable",
@@ -1228,7 +1189,6 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					IsTime:     false,
 					IsDuration: false,
 				},
-
 				// Nested repeated nested messages
 				"nested_list": {
 					Name: "NestedList",
@@ -1241,15 +1201,13 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 						},
 					},
 				},
-
 				// Nested map repeated nested messages
 				"map": {
 					Name:       "Map",
 					IsTime:     false,
 					IsDuration: false,
 				},
-
-				// NestedMObj nested object map
+				// MapObjectNested nested object map
 				"map_object_nested": {
 					Name: "MapObjectNested",
 					Nested: map[string]*accessors.SchemaMeta{

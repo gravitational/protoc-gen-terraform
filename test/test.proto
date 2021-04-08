@@ -89,8 +89,8 @@ message Test {
     // StringListEmpty []string field
     repeated string StringListEmpty = 17;
 
-//     // BoolA []bool field
-//     repeated bool BoolCustomList = 14 [ (gogoproto.customtype) = "BoolCustom" ];
+    // BoolCustomList []bool field
+    repeated bool BoolCustomList = 18 [ (gogoproto.customtype) = "BoolCustom" ];
 
     // BytesList [][]byte field
     repeated bytes BytesList = 19;
@@ -137,7 +137,7 @@ message Nested {
     // Nested map repeated nested messages
     map<string, string> Map = 3;
 
-    // NestedMObj nested object map
+    // MapObjectNested nested object map
     map<string, OtherNested> MapObjectNested = 4;
 }
 
