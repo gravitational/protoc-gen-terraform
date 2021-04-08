@@ -128,52 +128,7 @@ func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 	return nil
 }
 
-// assign assigns source value to target with possible type and pointer conversions
-func assign(source *reflect.Value, target *reflect.Value) error {
-	t := target.Type()
-	v := *source
-
-	// If target type is at the pointer reference use underlying type
-	if target.Type().Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-
-	// Convert value to target type
-	if source.Type() != t {
-		if !v.Type().ConvertibleTo(target.Type()) {
-			return trace.Errorf("can not convert %v to %v", source.Type().Name(), t.Name())
-		}
-
-		// v := source.(string)
-		v = v.Convert(t)
-	}
-
-	if !v.Type().AssignableTo(t) {
-		return trace.Errorf("can not assign %s to %s", v.Type().Name(), t.Name())
-	}
-
-	// If target type is a reference, create new pointer to this reference and assign
-	if target.Type().Kind() == reflect.Ptr {
-		if v.CanAddr() {
-			// target := &source
-			target.Set(v.Addr())
-			return nil
-		} else {
-			// a := "5"
-			// target := a
-			ptr := reflect.New(v.Type())
-			ptr.Elem().Set(v)
-			target.Set(ptr)
-			return nil
-		}
-	}
-
-	target.Set(v)
-
-	return nil
-}
-
-// assignTime assigns time value from a string
+// assignTime parses time value from a string and assigns it to target
 func assignTime(source interface{}, target *reflect.Value) error {
 	s, ok := source.(string)
 	if !ok {
@@ -189,7 +144,7 @@ func assignTime(source interface{}, target *reflect.Value) error {
 	return assign(&v, target)
 }
 
-// assignTime assigns duration value from a string
+// assignTime parses duration value from a string and assigns it to target
 func assignDuration(source interface{}, target *reflect.Value) error {
 	s, ok := source.(string)
 	if !ok {
@@ -205,15 +160,16 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 	return assign(&v, target)
 }
 
-// setList sets atomic value (scalar, string, time, duration)
+// setList gets list from ResourceData
 func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	len, err := getLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
 	}
 
+	// Empty list: do nothing, but set target field to empty value
 	if len == 0 {
-		target.Set(reflect.Zero(target.Type()))
+		assignZeroValue(target)
 		return nil
 	}
 
@@ -225,24 +181,9 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 			el := r.Index(i)
 			p := fmt.Sprintf("%v.%v", path, i)
 
-			switch s := sch.Elem.(type) {
-			case *schema.Schema:
-				err := getAtomic(p, &el, meta, s, data)
-				if err != nil {
-					return trace.Wrap(err)
-				}
-			case *schema.Resource:
-				if el.Kind() == reflect.Ptr {
-					el.Set(reflect.New(el.Type().Elem()))
-					el = reflect.Indirect(el)
-				}
-
-				err := getFragment(p+".", &el, meta.Nested, s.Schema, data)
-				if err != nil {
-					return trace.Wrap(err)
-				}
-			default:
-				return trace.Errorf("unknown Elem type")
+			err := getSliceElement(p, &el, sch, meta, data)
+			if err != nil {
+				return err
 			}
 		}
 
@@ -272,6 +213,40 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		if err != nil {
 			return trace.Wrap(err)
 		}
+	}
+
+	return nil
+}
+
+// getSliceElement gets singular slice element from resource data
+func getSliceElement(
+	path string,
+	target *reflect.Value,
+	sch *schema.Schema,
+	meta *SchemaMeta,
+	data *schema.ResourceData,
+) error {
+	switch s := sch.Elem.(type) {
+	case *schema.Schema:
+		err := getAtomic(path, target, meta, s, data)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+	case *schema.Resource:
+		t := target
+
+		if target.Kind() == reflect.Ptr {
+			target.Set(reflect.New(target.Type().Elem()))
+			i := reflect.Indirect(*target)
+			t = &i
+		}
+
+		err := getFragment(path+".", t, meta.Nested, s.Schema, data)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+	default:
+		return trace.Errorf("unknown Elem type")
 	}
 
 	return nil
@@ -333,7 +308,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	}
 
 	if len == 0 {
-		target.Set(reflect.Zero(target.Type()))
+		assignZeroValue(target)
 		return nil
 	}
 

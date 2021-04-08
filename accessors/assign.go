@@ -13,8 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package accessors
+
+import (
+	"reflect"
+
+	"github.com/gravitational/trace"
+)
 
 // assign assigns source value to target with possible type and pointer conversions
 func assign(source *reflect.Value, target *reflect.Value) error {
@@ -59,4 +64,9 @@ func assign(source *reflect.Value, target *reflect.Value) error {
 	target.Set(v)
 
 	return nil
+}
+
+// assignZeroValue sets target to zero value
+func assignZeroValue(target *reflect.Value) {
+	target.Set(reflect.Zero(target.Type()))
 }
