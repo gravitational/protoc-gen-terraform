@@ -289,7 +289,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 	switch target.Kind() {
 	case reflect.Slice:
-		// This set must be converted to normal slice
+		// TODO: This set must be converted to normal slice, will implement along with override
 		return trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		// This set must be read into a map, so, it contains artificial key and value arguments
@@ -355,7 +355,6 @@ func newEmptyValue(source reflect.Type) *reflect.Value {
 		t = t.Elem()
 	}
 
-	n := reflect.New(t)
-	i := reflect.Indirect(n)
-	return &i
+	n := reflect.Indirect(reflect.New(t))
+	return &n
 }
