@@ -33,6 +33,19 @@ var (
 	//go:embed _tpl/message_schema.tpl
 	SchemaTpl string
 
+	// MetaTpl is schema metadata template
+	//go:embed _tpl/message_meta.tpl
+	MetaTpl string
+
+	// LicenseTpl is license message template
+	//go:embed _tpl/license.tpl
+	LicenseTpl string
+
+	// VarsTpl is the template for global variables, type definitions and shared methods
+	//go:embed _tpl/vars.tpl
+	VarsTpl string
+
+	// NOTE: soon be obsolete
 	// GetTpl is unmarshaller template
 	//go:embed _tpl/message_get.tpl
 	GetTpl string
@@ -40,10 +53,6 @@ var (
 	// SetTpl is unmarshaller template
 	//go:embed _tpl/message_set.tpl
 	SetTpl string
-
-	// LicenseTpl is license message template
-	//go:embed _tpl/license.tpl
-	LicenseTpl string
 )
 
 // Template renders template from string to the specified writer

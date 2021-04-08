@@ -38,41 +38,26 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-// Test (Test message definition.)
-// └── str:string (Str string field)
-// └── int32:int (Int32 int32 field)
-// └── int64:int (Int64 int64 field)
-// └── float:float64 (Float float field)
-// └── double:float64 (Double double field)
-// └── bool:bool (Bool bool field)
-// └── bytes:string (Bytest byte[] field)
-// └── timestamp:string (Timestamp time.Time field)
-// └── timestamp_missing:string (Timestamp time.Time field)
-// └── timestamp_nullable:string (TimestampNullable *time.Time field)
-// └── timestamp_nullable_with_nil_value:string (TimestampNullableWithNilValue *time.Time field)
-// └── duration_standard:string (DurationStandard time.Duration field (standard))
-// └── duration_standard_missing:string (DurationStandardMissing time.Duration field (standard) missing in input data)
-// └── duration_custom:string (DurationCustom time.Duration field (with casttype))
-// └── duration_custom_missing:string (DurationCustomMissing time.Duration field (with casttype) missing in input data)
-// └── [string_list:string] (StringList []string field)
-// └── [string_list_empty:string] (StringListEmpty []string field)
-// └── [timestamp_list:string] (TimestampList []time.Time field)
-// └── [duration_custom_list:string] (DurationCustomList []time.Duration field)
-// └── nested (Nested nested message field, non-nullable)
-// │   ├── str:string (Str string field)
-// └── nested_nullable (NestedNullable nested message field, nullabel)
-// │   ├── str:string (Str string field)
-// └── nested_nullable_with_nil_value (NestedNullableWithNilValue nested message field, with no value set)
-// │   ├── str:string (Str string field)
-// └── [nested_list] (NestedList nested message array)
-// │   ├── str:string (Str string field)
-// └── [nested_list_nullable] (NestedListNullable nested message array)
-//     └── str:string (Str string field)
+var (
+	// SchemaTest is schema for Test message definition.
+	SchemaTest = GenSchemaTest()
+
+	// SchemaMetaTest is schema metadata for Test message definition.
+	SchemaMetaTest = GenSchemaMetaTest()
+)
+
+// SchemaMeta represents schema metadata struct
+type SchemaMeta struct {
+	name       string
+	isTime     bool
+	isDuration bool
+	nested     map[string]*SchemaMeta
+}
 
 // SchemaTest returns schema for Test
 //
 // Test message definition.
-func SchemaTest() map[string]*schema.Schema {
+func GenSchemaTest() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		// Str string field
 		"str": {
@@ -274,6 +259,23 @@ func SchemaTest() map[string]*schema.Schema {
 						Description: "Str string field",
 						Optional:    true,
 					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -290,6 +292,23 @@ func SchemaTest() map[string]*schema.Schema {
 						Type:        schema.TypeString,
 						Description: "Str string field",
 						Optional:    true,
+					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -308,6 +327,23 @@ func SchemaTest() map[string]*schema.Schema {
 						Description: "Str string field",
 						Optional:    true,
 					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -324,6 +360,23 @@ func SchemaTest() map[string]*schema.Schema {
 						Type:        schema.TypeString,
 						Description: "Str string field",
 						Optional:    true,
+					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -342,781 +395,295 @@ func SchemaTest() map[string]*schema.Schema {
 						Description: "Str string field",
 						Optional:    true,
 					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
+					},
 				},
 			},
 		},
 	}
 }
-func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
-	p := ""
 
-	{
+// GenSchemaMetaTest returns schema for Test
+//
+// Test message definition.
+func GenSchemaMetaTest() map[string]*SchemaMeta {
+	return map[string]*SchemaMeta{
+		// Str string field
+		"str": {
+			name:       "Str",
+			isTime:     false,
+			isDuration: false,
+		},
 
-		_raw, ok := d.GetOk(p + "str")
+		// Int32 int32 field
+		"int32": {
+			name:       "Int32",
+			isTime:     false,
+			isDuration: false,
+		},
 
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value := string(string(_raws))
-			t.Str = _value
-		}
+		// Int64 int64 field
+		"int64": {
+			name:       "Int64",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// Float float field
+		"float": {
+			name:       "Float",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// Double double field
+		"double": {
+			name:       "Double",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// Bool bool field
+		"bool": {
+			name:       "Bool",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// Bytest byte[] field
+		"bytes": {
+			name:       "Bytes",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// Timestamp time.Time field
+		"timestamp": {
+			name:       "Timestamp",
+			isTime:     true,
+			isDuration: false,
+		},
+
+		// Timestamp time.Time field
+		"timestamp_missing": {
+			name:       "TimestampMissing",
+			isTime:     true,
+			isDuration: false,
+		},
+
+		// TimestampNullable *time.Time field
+		"timestamp_nullable": {
+			name:       "TimestampNullable",
+			isTime:     true,
+			isDuration: false,
+		},
+
+		// TimestampNullableWithNilValue *time.Time field
+		"timestamp_nullable_with_nil_value": {
+			name:       "TimestampNullableWithNilValue",
+			isTime:     true,
+			isDuration: false,
+		},
+
+		// DurationStandard time.Duration field (standard)
+		"duration_standard": {
+			name:       "DurationStandard",
+			isTime:     false,
+			isDuration: true,
+		},
+
+		// DurationStandardMissing time.Duration field (standard) missing in input data
+		"duration_standard_missing": {
+			name:       "DurationStandardMissing",
+			isTime:     false,
+			isDuration: true,
+		},
+
+		// DurationCustom time.Duration field (with casttype)
+		"duration_custom": {
+			name:       "DurationCustom",
+			isTime:     false,
+			isDuration: true,
+		},
+
+		// DurationCustomMissing time.Duration field (with casttype) missing in input data
+		"duration_custom_missing": {
+			name:       "DurationCustomMissing",
+			isTime:     false,
+			isDuration: true,
+		},
+
+		// StringList []string field
+		"string_list": {
+			name:       "StringList",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// StringListEmpty []string field
+		"string_list_empty": {
+			name:       "StringListEmpty",
+			isTime:     false,
+			isDuration: false,
+		},
+
+		// TimestampList []time.Time field
+		"timestamp_list": {
+			name:       "TimestampList",
+			isTime:     true,
+			isDuration: false,
+		},
+
+		// DurationCustomList []time.Duration field
+		"duration_custom_list": {
+			name:       "DurationCustomList",
+			isTime:     false,
+			isDuration: true,
+		},
+
+		// Nested nested message field, non-nullable
+		"nested": {
+			name: "Nested",
+			nested: map[string]*SchemaMeta{
+				// Str string field
+				"str": {
+					name:       "Str",
+					isTime:     false,
+					isDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					name: "NestedList",
+					nested: map[string]*SchemaMeta{
+						// Str string field
+						"str": {
+							name:       "Str",
+							isTime:     false,
+							isDuration: false,
+						},
+					},
+				},
+			},
+		},
+
+		// NestedNullable nested message field, nullabel
+		"nested_nullable": {
+			name: "NestedNullable",
+			nested: map[string]*SchemaMeta{
+				// Str string field
+				"str": {
+					name:       "Str",
+					isTime:     false,
+					isDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					name: "NestedList",
+					nested: map[string]*SchemaMeta{
+						// Str string field
+						"str": {
+							name:       "Str",
+							isTime:     false,
+							isDuration: false,
+						},
+					},
+				},
+			},
+		},
+
+		// NestedNullableWithNilValue nested message field, with no value set
+		"nested_nullable_with_nil_value": {
+			name: "NestedNullableWithNilValue",
+			nested: map[string]*SchemaMeta{
+				// Str string field
+				"str": {
+					name:       "Str",
+					isTime:     false,
+					isDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					name: "NestedList",
+					nested: map[string]*SchemaMeta{
+						// Str string field
+						"str": {
+							name:       "Str",
+							isTime:     false,
+							isDuration: false,
+						},
+					},
+				},
+			},
+		},
+
+		// NestedList nested message array
+		"nested_list": {
+			name: "NestedList",
+			nested: map[string]*SchemaMeta{
+				// Str string field
+				"str": {
+					name:       "Str",
+					isTime:     false,
+					isDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					name: "NestedList",
+					nested: map[string]*SchemaMeta{
+						// Str string field
+						"str": {
+							name:       "Str",
+							isTime:     false,
+							isDuration: false,
+						},
+					},
+				},
+			},
+		},
+
+		// NestedListNullable nested message array
+		"nested_list_nullable": {
+			name: "NestedListNullable",
+			nested: map[string]*SchemaMeta{
+				// Str string field
+				"str": {
+					name:       "Str",
+					isTime:     false,
+					isDuration: false,
+				},
+
+				// Nested repeated nested messages
+				"nested_list": {
+					name: "NestedList",
+					nested: map[string]*SchemaMeta{
+						// Str string field
+						"str": {
+							name:       "Str",
+							isTime:     false,
+							isDuration: false,
+						},
+					},
+				},
+			},
+		},
 	}
-	{
-
-		_raw, ok := d.GetOk(p + "int32")
-
-		if ok {
-			_raws, ok := _raw.(int)
-			if !ok {
-				return fmt.Errorf("can not convert %T to int", _raws)
-			}
-			_value := int32(int32(_raws))
-			t.Int32 = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "int64")
-
-		if ok {
-			_raws, ok := _raw.(int)
-			if !ok {
-				return fmt.Errorf("can not convert %T to int", _raws)
-			}
-			_value := int64(int64(_raws))
-			t.Int64 = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "float")
-
-		if ok {
-			_raws, ok := _raw.(float64)
-			if !ok {
-				return fmt.Errorf("can not convert %T to float64", _raws)
-			}
-			_value := float32(float32(_raws))
-			t.Float = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "double")
-
-		if ok {
-			_raws, ok := _raw.(float64)
-			if !ok {
-				return fmt.Errorf("can not convert %T to float64", _raws)
-			}
-			_value := float64(float64(_raws))
-			t.Double = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOkExists(p + "bool")
-
-		if ok {
-			_raws, ok := _raw.(bool)
-			if !ok {
-				return fmt.Errorf("can not convert %T to bool", _raws)
-			}
-			_value := bool(bool(_raws))
-			t.Bool = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "bytes")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value := []byte([]byte(_raws))
-			t.Bytes = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339Nano, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field Timestamp : %w", err)
-			}
-			t.Timestamp = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp_missing")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339Nano, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field TimestampMissing : %w", err)
-			}
-			t.TimestampMissing = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp_nullable")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339Nano, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field TimestampNullable : %w", err)
-			}
-			t.TimestampNullable = &_value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp_nullable_with_nil_value")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339Nano, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field TimestampNullableWithNilValue : %w", err)
-			}
-			t.TimestampNullableWithNilValue = &_value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "duration_standard")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationStandard : %w", err)
-			}
-			_value := time.Duration(_valued)
-			t.DurationStandard = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "duration_standard_missing")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationStandardMissing : %w", err)
-			}
-			_value := time.Duration(_valued)
-			t.DurationStandardMissing = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "duration_custom")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationCustom : %w", err)
-			}
-			_value := Duration(_valued)
-			t.DurationCustom = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "duration_custom_missing")
-
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationCustomMissing : %w", err)
-			}
-			_value := Duration(_valued)
-			t.DurationCustomMissing = _value
-		}
-	}
-	{
-		_a, ok := d.GetOk(p + "string_list")
-		if ok {
-			a, ok := _a.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _a)
-			}
-			if len(a) > 0 {
-				t.StringList = make([]string, len(a))
-				for i := 0; i < len(a); i++ {
-					_raw := a[i]
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.StringList[i] = _value
-				}
-			}
-		} else {
-			t.StringList = make([]string, 0)
-		}
-	}
-	{
-		_a, ok := d.GetOk(p + "string_list_empty")
-		if ok {
-			a, ok := _a.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _a)
-			}
-			if len(a) > 0 {
-				t.StringListEmpty = make([]string, len(a))
-				for i := 0; i < len(a); i++ {
-					_raw := a[i]
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.StringListEmpty[i] = _value
-				}
-			}
-		} else {
-			t.StringListEmpty = make([]string, 0)
-		}
-	}
-	{
-		_a, ok := d.GetOk(p + "timestamp_list")
-		if ok {
-			a, ok := _a.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _a)
-			}
-			if len(a) > 0 {
-				t.TimestampList = make([]*time.Time, len(a))
-				for i := 0; i < len(a); i++ {
-					_raw := a[i]
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value, err := time.Parse(time.RFC3339Nano, _raws)
-					if err != nil {
-						return fmt.Errorf("malformed time value for field TimestampList : %w", err)
-					}
-					t.TimestampList[i] = &_value
-				}
-			}
-		} else {
-			t.TimestampList = make([]*time.Time, 0)
-		}
-	}
-	{
-		_a, ok := d.GetOk(p + "duration_custom_list")
-		if ok {
-			a, ok := _a.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _a)
-			}
-			if len(a) > 0 {
-				t.DurationCustomList = make([]Duration, len(a))
-				for i := 0; i < len(a); i++ {
-					_raw := a[i]
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_valued, err := time.ParseDuration(_raws)
-					if err != nil {
-						return fmt.Errorf("malformed duration value for field DurationCustomList : %w", err)
-					}
-					_value := Duration(_valued)
-					t.DurationCustomList[i] = _value
-				}
-			}
-		} else {
-			t.DurationCustomList = make([]Duration, 0)
-		}
-	}
-	{
-		n := d.Get(p + "nested" + ".#")
-
-		p := p + "nested" + ".0"
-		_, ok := d.GetOk(p)
-		if ok && n != nil && n.(int) != 0 {
-			p := p + "."
-
-			t := &t.Nested
-
-			{
-
-				_raw, ok := d.GetOk(p + "str")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.Str = _value
-				}
-			}
-
-		} else {
-
-		}
-	}
-	{
-		n := d.Get(p + "nested_nullable" + ".#")
-
-		p := p + "nested_nullable" + ".0"
-		_, ok := d.GetOk(p)
-		if ok && n != nil && n.(int) != 0 {
-			p := p + "."
-
-			_obj := Nested{}
-			t.NestedNullable = &_obj
-			t := &_obj
-
-			{
-
-				_raw, ok := d.GetOk(p + "str")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.Str = _value
-				}
-			}
-
-		} else {
-
-			t.NestedNullable = nil
-
-		}
-	}
-	{
-		n := d.Get(p + "nested_nullable_with_nil_value" + ".#")
-
-		p := p + "nested_nullable_with_nil_value" + ".0"
-		_, ok := d.GetOk(p)
-		if ok && n != nil && n.(int) != 0 {
-			p := p + "."
-
-			_obj := Nested{}
-			t.NestedNullableWithNilValue = &_obj
-			t := &_obj
-
-			{
-
-				_raw, ok := d.GetOk(p + "str")
-
-				if ok {
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.Str = _value
-				}
-			}
-
-		} else {
-
-			t.NestedNullableWithNilValue = nil
-
-		}
-	}
-	{
-		p := p + "nested_list"
-
-		_a, ok := d.GetOk(p)
-		if ok {
-			a, ok := _a.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _a)
-			}
-
-			if len(a) > 0 {
-				t.NestedList = make([]Nested, len(a))
-
-				for i := 0; i < len(a); i++ {
-
-					{
-						t := &t.NestedList[i]
-						p := p + fmt.Sprintf(".%v.", i)
-						{
-
-							_raw, ok := d.GetOk(p + "str")
-
-							if ok {
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.Str = _value
-							}
-						}
-
-					}
-				}
-			}
-		} else {
-			t.NestedList = make([]Nested, 0)
-		}
-	}
-	{
-		p := p + "nested_list_nullable"
-
-		_a, ok := d.GetOk(p)
-		if ok {
-			a, ok := _a.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _a)
-			}
-
-			if len(a) > 0 {
-				t.NestedListNullable = make([]*Nested, len(a))
-
-				for i := 0; i < len(a); i++ {
-
-					_obj := Nested{}
-					t.NestedListNullable[i] = &_obj
-
-					{
-						t := t.NestedListNullable[i]
-						p := p + fmt.Sprintf(".%v.", i)
-						{
-
-							_raw, ok := d.GetOk(p + "str")
-
-							if ok {
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.Str = _value
-							}
-						}
-
-					}
-				}
-			}
-		} else {
-			t.NestedListNullable = make([]*Nested, 0)
-		}
-	}
-
-	return nil
-}
-
-func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
-	obj := make(map[string]interface{})
-
-	{
-		_v := t.Str
-
-		_value := string(_v)
-		obj["str"] = _value
-	}
-	{
-		_v := t.Int32
-
-		_value := int(_v)
-		obj["int32"] = _value
-	}
-	{
-		_v := t.Int64
-
-		_value := int(_v)
-		obj["int64"] = _value
-	}
-	{
-		_v := t.Float
-
-		_value := float64(_v)
-		obj["float"] = _value
-	}
-	{
-		_v := t.Double
-
-		_value := float64(_v)
-		obj["double"] = _value
-	}
-	{
-		_v := t.Bool
-
-		_value := bool(_v)
-		obj["bool"] = _value
-	}
-	{
-		_v := t.Bytes
-
-		_value := string(_v)
-		obj["bytes"] = _value
-	}
-	{
-		_v := t.Timestamp
-
-		_value := _v.Format(time.RFC3339Nano)
-		obj["timestamp"] = _value
-	}
-	{
-		_v := t.TimestampMissing
-
-		_value := _v.Format(time.RFC3339Nano)
-		obj["timestamp_missing"] = _value
-	}
-	{
-		_v := t.TimestampNullable
-		if _v != nil {
-
-			_value := _v.Format(time.RFC3339Nano)
-			obj["timestamp_nullable"] = _value
-		}
-	}
-	{
-		_v := t.TimestampNullableWithNilValue
-		if _v != nil {
-
-			_value := _v.Format(time.RFC3339Nano)
-			obj["timestamp_nullable_with_nil_value"] = _value
-		}
-	}
-	{
-		_v := t.DurationStandard
-
-		_value := time.Duration(_v).String()
-		obj["duration_standard"] = _value
-	}
-	{
-		_v := t.DurationStandardMissing
-
-		_value := time.Duration(_v).String()
-		obj["duration_standard_missing"] = _value
-	}
-	{
-		_v := t.DurationCustom
-
-		_value := time.Duration(_v).String()
-		obj["duration_custom"] = _value
-	}
-	{
-		_v := t.DurationCustomMissing
-
-		_value := time.Duration(_v).String()
-		obj["duration_custom_missing"] = _value
-	}
-	{
-		_arr := t.StringList
-		_raw := make([]string, len(_arr))
-
-		if len(_arr) > 0 {
-			for i, _v := range _arr {
-				_value := string(_v)
-				_raw[i] = _value
-			}
-		}
-
-		obj["string_list"] = _raw
-	}
-	{
-		_arr := t.StringListEmpty
-		_raw := make([]string, len(_arr))
-
-		if len(_arr) > 0 {
-			for i, _v := range _arr {
-				_value := string(_v)
-				_raw[i] = _value
-			}
-		}
-
-		obj["string_list_empty"] = _raw
-	}
-	{
-		_arr := t.TimestampList
-		_raw := make([]string, len(_arr))
-
-		if len(_arr) > 0 {
-			for i, _v := range _arr {
-				_value := _v.Format(time.RFC3339Nano)
-				_raw[i] = _value
-			}
-		}
-
-		obj["timestamp_list"] = _raw
-	}
-	{
-		_arr := t.DurationCustomList
-		_raw := make([]string, len(_arr))
-
-		if len(_arr) > 0 {
-			for i, _v := range _arr {
-				_value := time.Duration(_v).String()
-				_raw[i] = _value
-			}
-		}
-
-		obj["duration_custom_list"] = _raw
-	}
-	{
-
-		msg := make(map[string]interface{})
-
-		{
-			obj := msg
-			t := t.Nested
-
-			{
-				_v := t.Str
-
-				_value := string(_v)
-				obj["str"] = _value
-			}
-
-		}
-
-		if len(msg) > 0 {
-			obj["nested"] = []interface{}{msg}
-		}
-
-	}
-	{
-
-		if t.NestedNullable != nil {
-
-			msg := make(map[string]interface{})
-
-			{
-				obj := msg
-				t := t.NestedNullable
-
-				{
-					_v := t.Str
-
-					_value := string(_v)
-					obj["str"] = _value
-				}
-
-			}
-
-			if len(msg) > 0 {
-				obj["nested_nullable"] = []interface{}{msg}
-			}
-
-		}
-
-	}
-	{
-
-		if t.NestedNullableWithNilValue != nil {
-
-			msg := make(map[string]interface{})
-
-			{
-				obj := msg
-				t := t.NestedNullableWithNilValue
-
-				{
-					_v := t.Str
-
-					_value := string(_v)
-					obj["str"] = _value
-				}
-
-			}
-
-			if len(msg) > 0 {
-				obj["nested_nullable_with_nil_value"] = []interface{}{msg}
-			}
-
-		}
-
-	}
-	{
-		arr := make([]interface{}, len(t.NestedList))
-
-		if len(arr) > 0 {
-			for i, t := range t.NestedList {
-				obj := make(map[string]interface{})
-				{
-					_v := t.Str
-
-					_value := string(_v)
-					obj["str"] = _value
-				}
-
-				arr[i] = obj
-			}
-		}
-
-		obj["nested_list"] = arr
-	}
-	{
-		arr := make([]interface{}, len(t.NestedListNullable))
-
-		if len(arr) > 0 {
-			for i, t := range t.NestedListNullable {
-				obj := make(map[string]interface{})
-				{
-					_v := t.Str
-
-					_value := string(_v)
-					obj["str"] = _value
-				}
-
-				arr[i] = obj
-			}
-		}
-
-		obj["nested_list_nullable"] = arr
-	}
-
-	for key, value := range obj {
-		err := d.Set(key, value)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

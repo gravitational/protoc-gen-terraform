@@ -60,14 +60,14 @@ var (
 		"nested": []interface{}{
 			map[string]interface{}{
 				"str": "TestString",
-				// "nested": []interface{}{
-				// 	map[string]interface{}{
-				// 		"str": "TestString1",
-				// 	},
-				// 	map[string]interface{}{
-				// 		"str": "TestString2",
-				// 	},
-				// },
+				"nested_list": []interface{}{
+					map[string]interface{}{
+						"str": "TestString1",
+					},
+					map[string]interface{}{
+						"str": "TestString2",
+					},
+				},
 				// "nested_m": map[string]interface{}{
 				// 	"kn1": "vn1",
 				// 	"kn2": "vn2",
@@ -124,117 +124,106 @@ var (
 	}
 )
 
-// SchemaMeta represents metadata about schema
-type SchemaMeta struct {
-	name             string
-	isTime           bool
-	isDuration       bool
-	nestedElementary *SchemaMeta
-	nestedObject     map[string]*SchemaMeta
-}
-
-// NOTE: make compound struct, values instead of methods
-func SchemaTestMeta() map[string]*SchemaMeta {
-	return map[string]*SchemaMeta{
-		"str": {
-			name: "Str",
-		},
-		"int32": {
-			name: "Int32",
-		},
-		"int64": {
-			name: "Int64",
-		},
-		"float": {
-			name: "Float",
-		},
-		"double": {
-			name: "Double",
-		},
-		"bool": {
-			name: "Bool",
-		},
-		"bytes": {
-			name: "Bytes",
-		},
-		"timestamp": {
-			name:   "Timestamp",
-			isTime: true,
-		},
-		"timestamp_nullable": {
-			name:   "TimestampNullable",
-			isTime: true,
-		},
-		"timestamp_nullable_with_nil_value": {
-			name:   "TimestampNullableWithNilValue",
-			isTime: true,
-		},
-		"duration_standard": {
-			name:       "DurationStandard",
-			isDuration: true,
-		},
-		"duration_custom": {
-			name:       "DurationCustom",
-			isDuration: true,
-		},
-		"string_list": {
-			name:             "StringList",
-			nestedElementary: &SchemaMeta{},
-		},
-		"string_list_empty": {
-			name:             "StringListEmpty",
-			nestedElementary: &SchemaMeta{},
-		},
-		"timestamp_list": {
-			name:             "TimestampList",
-			nestedElementary: &SchemaMeta{isTime: true},
-		},
-		"duration_custom_list": {
-			name:             "DurationCustomList",
-			nestedElementary: &SchemaMeta{isDuration: true},
-		},
-		"nested": {
-			name: "Nested",
-			nestedObject: map[string]*SchemaMeta{
-				"str": {
-					name: "Str",
-				},
-			},
-		},
-		"nested_nullable": {
-			name: "NestedNullable",
-			nestedObject: map[string]*SchemaMeta{
-				"str": {
-					name: "Str",
-				},
-			},
-		},
-		"nested_nullable_with_nil_value": {
-			name: "NestedNullableWithNilValue",
-			nestedObject: map[string]*SchemaMeta{
-				"str": {
-					name: "Str",
-				},
-			},
-		},
-		"nested_list": {
-			name: "NestedList",
-			nestedObject: map[string]*SchemaMeta{
-				"str": {
-					name: "Str",
-				},
-			},
-		},
-		"nested_list_nullable": {
-			name: "NestedListNullable",
-			nestedObject: map[string]*SchemaMeta{
-				"str": {
-					name: "Str",
-				},
-			},
-		},
-	}
-}
+// // NOTE: make compound struct, values instead of methods
+// func GenSchemaTestMeta() map[string]*SchemaMeta {
+// 	return map[string]*SchemaMeta{
+// 		"str": {
+// 			name: "Str",
+// 		},
+// 		"int32": {
+// 			name: "Int32",
+// 		},
+// 		"int64": {
+// 			name: "Int64",
+// 		},
+// 		"float": {
+// 			name: "Float",
+// 		},
+// 		"double": {
+// 			name: "Double",
+// 		},
+// 		"bool": {
+// 			name: "Bool",
+// 		},
+// 		"bytes": {
+// 			name: "Bytes",
+// 		},
+// 		"timestamp": {
+// 			name:   "Timestamp",
+// 			isTime: true,
+// 		},
+// 		"timestamp_nullable": {
+// 			name:   "TimestampNullable",
+// 			isTime: true,
+// 		},
+// 		"timestamp_nullable_with_nil_value": {
+// 			name:   "TimestampNullableWithNilValue",
+// 			isTime: true,
+// 		},
+// 		"duration_standard": {
+// 			name:       "DurationStandard",
+// 			isDuration: true,
+// 		},
+// 		"duration_custom": {
+// 			name:       "DurationCustom",
+// 			isDuration: true,
+// 		},
+// 		"string_list": {
+// 			name: "StringList",
+// 		},
+// 		"string_list_empty": {
+// 			name: "StringListEmpty",
+// 		},
+// 		"timestamp_list": {
+// 			name:   "TimestampList",
+// 			isTime: true,
+// 		},
+// 		"duration_custom_list": {
+// 			name:       "DurationCustomList",
+// 			isDuration: true,
+// 		},
+// 		"nested": {
+// 			name: "Nested",
+// 			nested: map[string]*SchemaMeta{
+// 				"str": {
+// 					name: "Str",
+// 				},
+// 			},
+// 		},
+// 		"nested_nullable": {
+// 			name: "NestedNullable",
+// 			nested: map[string]*SchemaMeta{
+// 				"str": {
+// 					name: "Str",
+// 				},
+// 			},
+// 		},
+// 		"nested_nullable_with_nil_value": {
+// 			name: "NestedNullableWithNilValue",
+// 			nested: map[string]*SchemaMeta{
+// 				"str": {
+// 					name: "Str",
+// 				},
+// 			},
+// 		},
+// 		"nested_list": {
+// 			name: "NestedList",
+// 			nested: map[string]*SchemaMeta{
+// 				"str": {
+// 					name: "Str",
+// 				},
+// 			},
+// 		},
+// 		"nested_list_nullable": {
+// 			name: "NestedListNullable",
+// 			nested: map[string]*SchemaMeta{
+// 				"str": {
+// 					name: "Str",
+// 				},
+// 			},
+// 		},
+// 	}
+// }
 
 func GetFromResourceData(
 	sch map[string]*schema.Schema,
@@ -415,17 +404,17 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 
 			switch s := sch.Elem.(type) {
 			case *schema.Schema:
-				err := setAtomic(p, &el, meta.nestedElementary, s, data)
+				err := setAtomic(p, &el, meta, s, data)
 				if err != nil {
 					return trace.Wrap(err)
 				}
 			case *schema.Resource:
 				if el.Kind() == reflect.Ptr {
-					el.Set(reflect.New(target.Type().Elem().Elem()))
+					el.Set(reflect.New(el.Type().Elem()))
 					el = reflect.Indirect(el)
 				}
 
-				err := getFragment(p+".", &el, meta.nestedObject, s.Schema, data)
+				err := getFragment(p+".", &el, meta.nested, s.Schema, data)
 				if err != nil {
 					return trace.Wrap(err)
 				}
@@ -449,7 +438,7 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		r := reflect.Indirect(reflect.New(t))
 
 		// Fill blank object in
-		err := getFragment(path+".0.", &r, meta.nestedObject, s.Schema, data)
+		err := getFragment(path+".0.", &r, meta.nested, s.Schema, data)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -470,8 +459,8 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 
 // buildSubjectGet builds Test struct from test fixture data
 func buildSubjectGet(t *testing.T, subject *Test) (*Test, error) {
-	data := schema.TestResourceDataRaw(t, SchemaTest(), fixture)
-	err := GetFromResourceData(SchemaTest(), data, SchemaTestMeta(), subject)
+	data := schema.TestResourceDataRaw(t, SchemaTest, fixture)
+	err := GetFromResourceData(SchemaTest, data, SchemaMetaTest, subject)
 	return subject, err
 }
 

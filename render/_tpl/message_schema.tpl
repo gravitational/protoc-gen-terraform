@@ -2,7 +2,7 @@
 // Schema{{ .Name }} returns schema for {{.Name}}
 //
 {{.Comment}}
-func Schema{{ .Name }}() map[string]*schema.Schema {
+func GenSchema{{ .Name }}() map[string]*schema.Schema {
 	return {{ template "fieldsSchema" .Fields -}}
 }
 

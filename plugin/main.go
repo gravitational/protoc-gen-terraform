@@ -19,13 +19,11 @@ package plugin
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
 
-	"github.com/disiqueira/gotree"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/sirupsen/logrus"
 )
@@ -81,17 +79,20 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 
 	p.build(file)
 
-	p.writeSchemaStructureComment()
-
-	err := p.writeSchema()
+	err := p.writeVars()
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
 
-	err = p.writeGettersSetters()
+	err = p.writeSchema()
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
+
+	// err = p.writeGettersSetters()
+	// if err != nil {
+	// 	p.Generator.Fail(err.Error())
+	// }
 }
 
 // reflect builds message dictionary from a messages in protoc file
@@ -110,12 +111,32 @@ func (p *Plugin) build(file *generator.FileDescriptor) {
 	}
 }
 
+func (p *Plugin) writeVars() error {
+	var buf bytes.Buffer
+
+	err := render.Template(render.VarsTpl, p.Messages, &buf)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+	p.P(buf.String())
+
+	return nil
+}
+
 // writeSchema writes schema definition to target file
 func (p *Plugin) writeSchema() error {
 	for _, message := range p.Messages {
 		var buf bytes.Buffer
 
 		err := render.Template(render.SchemaTpl, message, &buf)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+		p.P(buf.String())
+
+		buf.Reset()
+
+		err = render.Template(render.MetaTpl, message, &buf)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -156,55 +177,5 @@ func (p *Plugin) setImports() {
 
 	for _, i := range config.CustomImports {
 		p.AddImport(generator.GoImportPath(i))
-	}
-}
-
-// writeSchemaComment writes comment with message structure
-func (p *Plugin) writeSchemaStructureComment() {
-	for _, m := range p.Messages {
-		t := gotree.New(fmt.Sprintf("%s (%s)", m.Name, commentToSingleLine(m.RawComment)))
-		p.writeMessageComment(m, t)
-		p.P(appendSlashSlash(t.Print(), true))
-		p.P()
-	}
-}
-
-// writeMessageComment generates message structure comment part for a message
-func (p *Plugin) writeMessageComment(m *Message, t gotree.Tree) {
-	for _, f := range m.Fields {
-		s := f.NameSnake
-
-		if f.Kind == "SINGULAR_ELEMENTARY" || f.Kind == "REPEATED_ELEMENTARY" {
-			s = s + ":" + f.SchemaRawType
-		}
-
-		if f.Kind == "REPEATED_ELEMENTARY" || f.Kind == "OBJECT_MAP" || f.Kind == "REPEATED_MESSAGE" {
-			s = "[" + s + "]"
-		}
-
-		if f.Kind == "MAP" {
-			s = s + ":map"
-		}
-
-		if f.Kind == "CUSTOM_TYPE" {
-			s = s + " !custom schema, see target code!"
-		}
-
-		if f.RawComment != "" {
-			s = s + " (" + commentToSingleLine(f.RawComment) + ")"
-		}
-
-		i := t.Add(s)
-
-		if f.Kind == "OBJECT_MAP" {
-			i.Add("key:string")
-			if f.MapValueField.Kind == "CUSTOM_TYPE" {
-				i.Add("value !custom schema, see target code!")
-			} else {
-				p.writeMessageComment(f.MapValueField.Message, i.Add("value"))
-			}
-		} else if f.Kind == "REPEATED_MESSAGE" || f.Kind == "SINGULAR_MESSAGE" {
-			p.writeMessageComment(f.Message, i)
-		}
 	}
 }
