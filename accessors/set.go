@@ -214,7 +214,42 @@ func readMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interf
 
 // readSet converts source value to set
 func readSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
-	return nil, nil
+	if source.Len() == 0 {
+		return nil, nil
+	}
+
+	s, ok := sch.ZeroValue().(*schema.Set)
+	if !ok {
+		return nil, trace.Errorf("zero value for schema set element is not *schema.Set")
+	}
+
+	switch source.Kind() {
+	case reflect.Slice:
+		// TODO: This set must be converted to normal slice, will implement along with override
+		return nil, trace.NotImplemented("set acting as list on target is not implemented yet")
+	case reflect.Map:
+		for _, k := range source.MapKeys() {
+			i := source.MapIndex(k)
+
+			vsch := sch.Elem.(*schema.Resource).Schema["value"]
+
+			v, err := readEnumerableElement(i, meta, vsch)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+
+			t := map[string]interface{}{
+				"key":   k.Interface(),
+				"value": []interface{}{v},
+			}
+
+			s.Add(t)
+		}
+
+		return s, nil
+	default:
+		return nil, trace.Errorf("unknown set source type")
+	}
 }
 
 // readTime returns value as time

@@ -18,6 +18,7 @@ limitations under the License.
 package test
 
 import (
+	"sort"
 	"testing"
 	time "time"
 
@@ -60,21 +61,33 @@ var (
 			"k2": "v2",
 		},
 
-		// NestedMObj: map[string]*Nested{
-		// 	"n1": {
-		// 		Str: "NestedObjString1",
-		// 	},
-		// 	"n2": {
-		// 		Str: "NestedObjString2",
-		// 	},
-		// 	"n3": {
-		// 		Str: "NestedObjString3",
-		// 	},
-		// },
+		MapObject: map[string]Nested{
+			"n1": {
+				Str: "NestedObjString1",
+			},
+			"n2": {
+				Str: "NestedObjString2",
+			},
+			"n3": {
+				Str: "NestedObjString3",
+			},
+		},
+
+		MapObjectNullable: map[string]*Nested{
+			"n1": {
+				Str: "NestedObjString1",
+			},
+			"n2": {
+				Str: "NestedObjString2",
+			},
+			"n3": {
+				Str: "NestedObjString3",
+			},
+		},
 	}
 )
 
-// // fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
+// fillTimestamps parses time and duration from predefined strings and fills in correspoding fields in test structure
 func fillTimestamps(t *Test) error {
 	ti, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
 	if err != nil {
@@ -183,12 +196,34 @@ func TestMapSet(t *testing.T) {
 	assert.Equal(t, test.Nested.Map["kn1"], "vn1")
 }
 
-// // TestObjectMapSet ensures decoding of maps of messages
-// func TestObjectMapSet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestObjectMapSet ensures decoding of maps of messages
+func TestObjectMapSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, test.NestedMObj["n1"].Str, subject.Get("nested_m_obj.0.value.0.str"))
-// 	assert.Equal(t, test.NestedMObj["n2"].Str, subject.Get("nested_m_obj.1.value.0.str"))
-// 	assert.Equal(t, test.NestedMObj["n3"].Str, subject.Get("nested_m_obj.2.value.0.str"))
-// }
+	m := subject.Get("map_object")
+	s, ok := m.(*schema.Set)
+	if !ok {
+		assert.Fail(t, "can not convert %T to *schema.Set", s)
+	}
+
+	keys := make([]string, s.Len())
+
+	for i, n := range s.List() {
+		v, ok := n.(map[string]interface{})
+		if !ok {
+			assert.Fail(t, "can not convert %T to map[string]interface{}", s)
+		}
+
+		s, ok := v["key"].(string)
+		if !ok {
+			assert.Fail(t, "can not convert %T to string", s)
+		}
+
+		keys[i] = s
+	}
+
+	sort.Strings(keys)
+
+	assert.Equal(t, keys, []string{"n1", "n2", "n3"})
+}
