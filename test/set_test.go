@@ -35,7 +35,7 @@ var (
 		Float:  18.5,
 		Double: 19.21,
 		Bool:   true,
-		// Bytes:   []byte("TestBytes"),
+		Bytes:  []byte("TestBytes"),
 		// StringA: []string{"TestString1", "TestString2"},
 		// BoolA:   []BoolCustom{false, true, false},
 		// BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},

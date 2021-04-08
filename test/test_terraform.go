@@ -22,6 +22,7 @@ package test
 import (
 	fmt "fmt"
 	math "math"
+	"reflect"
 	time "time"
 
 	_ "github.com/gogo/protobuf/gogoproto"
@@ -802,105 +803,122 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 	return map[string]*accessors.SchemaMeta{
 		// Str string field
 		"str": {
-			Name:       "Str",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Str",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// Int32 int32 field
 		"int32": {
-			Name:       "Int32",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Int32",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*int)(nil)).Elem(),
 		},
 		// Int64 int64 field
 		"int64": {
-			Name:       "Int64",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Int64",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*int)(nil)).Elem(),
 		},
 		// Float float field
 		"float": {
-			Name:       "Float",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Float",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*float64)(nil)).Elem(),
 		},
 		// Double double field
 		"double": {
-			Name:       "Double",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Double",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*float64)(nil)).Elem(),
 		},
 		// Bool bool field
 		"bool": {
-			Name:       "Bool",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Bool",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*bool)(nil)).Elem(),
 		},
 		// Bytest byte[] field
 		"bytes": {
-			Name:       "Bytes",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "Bytes",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// Timestamp time.Time field
 		"timestamp": {
-			Name:       "Timestamp",
-			IsTime:     true,
-			IsDuration: false,
+			Name:            "Timestamp",
+			IsTime:          true,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// Timestamp time.Time field
 		"timestamp_missing": {
-			Name:       "TimestampMissing",
-			IsTime:     true,
-			IsDuration: false,
+			Name:            "TimestampMissing",
+			IsTime:          true,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// TimestampNullable *time.Time field
 		"timestamp_nullable": {
-			Name:       "TimestampNullable",
-			IsTime:     true,
-			IsDuration: false,
+			Name:            "TimestampNullable",
+			IsTime:          true,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// TimestampNullableWithNilValue *time.Time field
 		"timestamp_nullable_with_nil_value": {
-			Name:       "TimestampNullableWithNilValue",
-			IsTime:     true,
-			IsDuration: false,
+			Name:            "TimestampNullableWithNilValue",
+			IsTime:          true,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// DurationStandard time.Duration field (standard)
 		"duration_standard": {
-			Name:       "DurationStandard",
-			IsTime:     false,
-			IsDuration: true,
+			Name:            "DurationStandard",
+			IsTime:          false,
+			IsDuration:      true,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// DurationStandardMissing time.Duration field (standard) missing in input data
 		"duration_standard_missing": {
-			Name:       "DurationStandardMissing",
-			IsTime:     false,
-			IsDuration: true,
+			Name:            "DurationStandardMissing",
+			IsTime:          false,
+			IsDuration:      true,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// DurationCustom time.Duration field (with casttype)
 		"duration_custom": {
-			Name:       "DurationCustom",
-			IsTime:     false,
-			IsDuration: true,
+			Name:            "DurationCustom",
+			IsTime:          false,
+			IsDuration:      true,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// DurationCustomMissing time.Duration field (with casttype) missing in input data
 		"duration_custom_missing": {
-			Name:       "DurationCustomMissing",
-			IsTime:     false,
-			IsDuration: true,
+			Name:            "DurationCustomMissing",
+			IsTime:          false,
+			IsDuration:      true,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// StringList []string field
 		"string_list": {
-			Name:       "StringList",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "StringList",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// StringListEmpty []string field
 		"string_list_empty": {
-			Name:       "StringListEmpty",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "StringListEmpty",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// BoolCustomList []bool field
 		"bool_custom_list": {
@@ -911,21 +929,24 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// BytesList [][]byte field
 		"bytes_list": {
-			Name:       "BytesList",
-			IsTime:     false,
-			IsDuration: false,
+			Name:            "BytesList",
+			IsTime:          false,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// TimestampList []time.Time field
 		"timestamp_list": {
-			Name:       "TimestampList",
-			IsTime:     true,
-			IsDuration: false,
+			Name:            "TimestampList",
+			IsTime:          true,
+			IsDuration:      false,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// DurationCustomList []time.Duration field
 		"duration_custom_list": {
-			Name:       "DurationCustomList",
-			IsTime:     false,
-			IsDuration: true,
+			Name:            "DurationCustomList",
+			IsTime:          false,
+			IsDuration:      true,
+			SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 		},
 		// Nested nested message field, non-nullable
 		"nested": {
@@ -935,9 +956,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -947,9 +969,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -967,9 +990,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -983,9 +1007,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -995,9 +1020,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1015,9 +1041,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1031,9 +1058,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -1043,9 +1071,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1063,9 +1092,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1079,9 +1109,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -1091,9 +1122,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1111,9 +1143,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1127,9 +1160,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -1139,9 +1173,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1159,9 +1194,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1181,9 +1217,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -1193,9 +1230,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1213,9 +1251,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1229,9 +1268,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
-					Name:       "Str",
-					IsTime:     false,
-					IsDuration: false,
+					Name:            "Str",
+					IsTime:          false,
+					IsDuration:      false,
+					SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 				},
 				// Nested repeated nested messages
 				"nested_list": {
@@ -1241,9 +1281,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},
@@ -1261,9 +1302,10 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
-							Name:       "Str",
-							IsTime:     false,
-							IsDuration: false,
+							Name:            "Str",
+							IsTime:          false,
+							IsDuration:      false,
+							SchemaValueType: reflect.TypeOf((*string)(nil)).Elem(),
 						},
 					},
 				},

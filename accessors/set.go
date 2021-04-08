@@ -40,7 +40,7 @@ func Set(
 		return trace.Errorf("obj must not be nil")
 	}
 
-	base, err := setFragment(reflect.Indirect(reflect.ValueOf(obj)), meta, sch, data)
+	base, err := readFragment(reflect.Indirect(reflect.ValueOf(obj)), meta, sch)
 	if err != nil {
 		return trace.Wrap(err)
 	}
@@ -57,11 +57,10 @@ func Set(
 	return nil
 }
 
-func setFragment(
+func readFragment(
 	source reflect.Value,
 	meta map[string]*SchemaMeta,
 	sch map[string]*schema.Schema,
-	data *schema.ResourceData,
 ) (map[string]interface{}, error) {
 	target := make(map[string]interface{})
 
@@ -74,69 +73,130 @@ func setFragment(
 		v := source.FieldByName(m.Name)
 
 		switch {
-		// case m.Setter != nil:
-		// err := m.Setter(target, v, m, s, data)
-		// if err != nil {
-		// 	return err
-		// }
+		case m.Setter != nil:
+			r, err := m.Setter(v, m, s)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+
+			err = setConvertedKey(target, k, r, m)
+			if err != nil {
+				return nil, err
+			}
 		case s.Type == schema.TypeInt ||
 			s.Type == schema.TypeFloat ||
 			s.Type == schema.TypeBool ||
 			s.Type == schema.TypeString:
 
-			r, err := setAtomic(v, m, s, data)
+			r, err := readAtomic(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
 
+			err = setConvertedKey(target, k, r, m)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+
+		case s.Type == schema.TypeList:
+			r, err := readList(v, m, s)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
 			target[k] = r
-			// case s.Type == schema.TypeList:
-			// 	err := getList(p, &v, m, s, data)
-			// 	if err != nil {
-			// 		return trace.Wrap(err)
-			// 	}
 
-			// case s.Type == schema.TypeMap:
-			// 	err := getMap(p, &v, m, s, data)
-			// 	if err != nil {
-			// 		return trace.Wrap(err)
-			// 	}
+		case s.Type == schema.TypeMap:
+			r, err := readMap(v, m, s)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+			target[k] = r
 
-			// case s.Type == schema.TypeSet:
-			// 	err := getSet(p, &v, m, s, data)
-			// 	if err != nil {
-			// 		return trace.Wrap(err)
-			// 	}
+		case s.Type == schema.TypeSet:
+			r, err := readSet(v, m, s)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+			target[k] = r
 
-			// default:
-			// 	return trace.Errorf("unknown type %v for %s", s.Type.String(), p)
+		default:
+			return nil, trace.Errorf("unknown type %v", s.Type.String())
 		}
 	}
 
 	return target, nil
-	// // Fragment value must be nil in case it's empty
-	// if len(target) > 0 {
-
-	// }
-
-	// return nil
 }
 
-// getAtomic gets atomic value (scalar, string, time, duration)
-func setAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) (interface{}, error) {
+// readAtomic gets atomic value (scalar, string, time, duration)
+func readAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Kind() == reflect.Ptr && source.IsNil() {
 		return nil, nil
 	}
 
 	switch {
 	case meta.IsTime:
-		return readTime(source)
+		t, err := readTime(source)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		return t, nil
 	case meta.IsDuration:
-		return readDuration(source)
+		d, err := readDuration(source)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+
+		return d, nil
 	default:
 		return source.Interface(), nil
 	}
+}
 
+// readList converts source value to list
+func readList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+	if source.Type().Kind() == reflect.Slice {
+		t := make([]interface{}, source.Len())
+
+		for i := 0; i < source.Len(); i++ {
+			v := source.Index(i)
+			el, err := readEnumerableElement(v, meta, sch)
+			if err != nil {
+				return nil, err
+			}
+
+			n, err := convert(reflect.ValueOf(el), meta)
+			if err != nil {
+				return nil, err
+			}
+
+			t[i] = n
+		}
+
+		return t, nil
+	}
+
+	t := make([]interface{}, 1)
+
+	item, err := readEnumerableElement(reflect.Indirect(source), meta, sch)
+	if err != nil {
+		return nil, err
+	}
+
+	if item != nil {
+		t[0] = item
+		return t, nil
+	}
+
+	return nil, nil
+}
+
+// readMap converts source value to map
+func readMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+	return nil, nil
+}
+
+// readSet converts source value to set
+func readSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	return nil, nil
 }
 
@@ -147,19 +207,75 @@ func readTime(source reflect.Value) (interface{}, error) {
 	if !ok {
 		return nil, trace.Errorf("can not convert %T to time.Time", t)
 	}
+
 	return v.Format(time.RFC3339Nano), nil
 }
 
 // readDuration returns value as duration
 func readDuration(source reflect.Value) (interface{}, error) {
-	var _d time.Duration
-
 	t := reflect.Indirect(source)
-	d := reflect.TypeOf(_d)
+	d := reflect.TypeOf((*time.Duration)(nil)).Elem()
 
 	if !t.Type().ConvertibleTo(d) {
 		return nil, trace.Errorf("can not convert %T to time.Duration", t)
 	}
 
-	return t.Convert(d).MethodByName("String").Call([]reflect.Value{}), nil
+	s, ok := t.Convert(d).Interface().(time.Duration)
+	if !ok {
+		return nil, trace.Errorf("can not convert %T to time.Duration", t)
+	}
+
+	return s.String(), nil
+}
+
+// convert converts source value to schema tyoe given in meta
+func convert(source reflect.Value, meta *SchemaMeta) (interface{}, error) {
+	t := reflect.Indirect(source)
+
+	if !t.Type().ConvertibleTo(meta.SchemaValueType) {
+		return nil, trace.Errorf("can not convert %T to %T", t.Type(), meta.SchemaValueType)
+	}
+
+	return t.Convert(meta.SchemaValueType).Interface(), nil
+}
+
+// setConvertedKey converts value to target schema type and sets it to resulting map if not nil
+func setConvertedKey(target map[string]interface{}, key string, source interface{}, meta *SchemaMeta) error {
+	if source != nil {
+		f, err := convert(reflect.ValueOf(source), meta)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+		target[key] = f
+	}
+
+	return nil
+}
+
+// readEnumerableElement gets singular slice element from a resource data. If enumerable element is empty, it assigns
+// an empty value to the target.
+func readEnumerableElement(
+	source reflect.Value,
+	meta *SchemaMeta,
+	sch *schema.Schema,
+) (interface{}, error) {
+	switch s := sch.Elem.(type) {
+	case *schema.Schema:
+		return readAtomic(source, meta, s)
+	case *schema.Resource:
+		return nil, nil
+		// v := newEmptyValue(target.Type())
+
+		// _, ok := data.GetOk(path)
+		// if ok {
+		// 	err := getFragment(path+".", v, meta.Nested, s.Schema, data)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
+
+		// return assign(v, target)
+	default:
+		return nil, trace.Errorf("unknown Elem type")
+	}
 }
