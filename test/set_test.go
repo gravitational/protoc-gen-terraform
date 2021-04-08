@@ -29,28 +29,37 @@ import (
 
 var (
 	test = Test{
-		Str:    "TestString",
-		Int32:  2,
-		Int64:  3,
-		Float:  18.5,
-		Double: 19.21,
-		Bool:   true,
-		Bytes:  []byte("TestBytes"),
-		// StringA: []string{"TestString1", "TestString2"},
+		Str:        "TestString",
+		Int32:      2,
+		Int64:      3,
+		Float:      18.5,
+		Double:     19.21,
+		Bool:       true,
+		Bytes:      []byte("TestBytes"),
+		StringList: []string{"TestString1", "TestString2"},
 		// BoolA:   []BoolCustom{false, true, false},
-		// BytesA:  [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
-		// Nested: &Nested{
-		// 	Str:    "TestStringA",
-		// 	Nested: []*NestedLevel2{{Str: "NestedString1"}, {Str: "NestedString2"}},
-		// 	NestedM: map[string]string{
-		// 		"kn1": "vn1",
-		// 		"kn2": "vn2",
-		// 	},
-		// },
-		// NestedM: map[string]string{
-		// 	"k1": "v1",
-		// 	"k2": "v2",
-		// },
+		BytesList: [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")},
+		Nested: Nested{
+			Str:        "TestStringA",
+			NestedList: []*OtherNested{{Str: "NestedString1"}, {Str: "NestedString2"}},
+			Map: map[string]string{
+				"kn1": "vn1",
+				"kn2": "vn2",
+			},
+		},
+		NestedNullable: &Nested{
+			Str:        "TestStringA",
+			NestedList: []*OtherNested{{Str: "NestedString1"}, {Str: "NestedString2"}},
+			Map: map[string]string{
+				"kn1": "vn1",
+				"kn2": "vn2",
+			},
+		},
+		Map: map[string]string{
+			"k1": "v1",
+			"k2": "v2",
+		},
+
 		// NestedMObj: map[string]*Nested{
 		// 	"n1": {
 		// 		Str: "NestedObjString1",
@@ -78,6 +87,7 @@ func fillTimestamps(t *Test) error {
 	}
 
 	t.Timestamp = ti
+	t.TimestampNullable = &ti
 	t.DurationStandard = d
 	t.DurationCustom = Duration(d)
 	// t.TimestampNullable = &ti
@@ -113,37 +123,37 @@ func TestElementariesSet(t *testing.T) {
 	assert.Equal(t, subject.Get("bytes"), "TestBytes", "schema.ResourceData['bytes']")
 }
 
-// // TestTimesSet ensures decoding of time and duration fields
-// func TestTimesSet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestTimesSet ensures decoding of time and duration fields
+func TestTimesSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, test.Timestamp.Format(time.RFC3339Nano), subject.Get("timestamp"), "Test.Timestamp")
-// 	assert.Equal(t, test.DurationStd.String(), subject.Get("duration_std"), "Test.DurationStd")
-// 	assert.Equal(t, time.Duration(test.DurationCustom).String(), subject.Get("duration_custom"), "Test.DurationCustom")
-// 	assert.Equal(t, test.TimestampN.Format(time.RFC3339Nano), subject.Get("timestamp_n"), "Test.TimestampN")
-// }
+	assert.Equal(t, test.Timestamp.Format(time.RFC3339Nano), subject.Get("timestamp"), "Test.Timestamp")
+	assert.Equal(t, test.DurationStandard.String(), subject.Get("duration_standard"), "Test.DurationStandard")
+	assert.Equal(t, time.Duration(test.DurationCustom).String(), subject.Get("duration_custom"), "Test.DurationCustom")
+	assert.Equal(t, test.TimestampNullable.Format(time.RFC3339Nano), subject.Get("timestamp_nullable"), "Test.TimestampNullable")
+}
 
-// // TestArraysSet ensures decoding of arrays
-// func TestArraysSet(t *testing.T) {
-// 	subject, err := buildSubjectSet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestArraysSet ensures decoding of arrays
+func TestArraysSet(t *testing.T) {
+	subject, err := buildSubjectSet(t)
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, []interface{}{"TestString1", "TestString2"}, subject.Get("string_a"), "Test.StringA")
-// 	assert.Equal(t, []interface{}{false, true, false}, subject.Get("bool_a"), "Test.BoolA")
-// 	assert.Equal(t, []interface{}{"TestBytes1", "TestBytes2"}, subject.Get("bytes_a"), "Test.BytesA")
-// 	assert.Equal(t, []interface{}{"1h0m0s", "1h0m0s"}, subject.Get("duration_custom_a"))
+	assert.Equal(t, []interface{}{"TestString1", "TestString2"}, subject.Get("string_list"), "Test.StringList")
+	// assert.Equal(t, []interface{}{false, true, false}, subject.Get("bool_a"), "Test.BoolA")
+	assert.Equal(t, []interface{}{"TestBytes1", "TestBytes2"}, subject.Get("bytes_list"), "Test.BytesList")
+	// assert.Equal(t, []interface{}{"1h0m0s", "1h0m0s"}, subject.Get("duration_custom_a"))
 
-// 	raw := subject.Get("timestamp_a")
-// 	a, ok := raw.([]interface{})
-// 	if !ok {
-// 		assert.Fail(t, "can not convert %T to []interface{}", raw)
-// 	}
+	// raw := subject.Get("timestamp_a")
+	// a, ok := raw.([]interface{})
+	// if !ok {
+	// 	assert.Fail(t, "can not convert %T to []interface{}", raw)
+	// }
 
-// 	for n, v := range a {
-// 		assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339Nano), "Test.TimestampA[]")
-// 	}
-// }
+	// for n, v := range a {
+	// 	assert.Equal(t, v, test.TimestampA[n].Format(time.RFC3339Nano), "Test.TimestampA[]")
+	// }
+}
 
 // // TestNestedMessageSet ensures decoding of nested messages
 // func TestNestedMessageSet(t *testing.T) {
