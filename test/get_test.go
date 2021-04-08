@@ -50,10 +50,10 @@ var (
 		"duration_standard":                "1h",
 		"duration_custom":                  "1m",
 		"string_list":                      []interface{}{"TestString1", "TestString2"},
-		// "bool_a":                           []interface{}{false, true, false},
-		"bytes_list":           []interface{}{"TestBytes1", "TestBytes2"},
-		"timestamp_list":       []interface{}{defaultTimestamp},
-		"duration_custom_list": []interface{}{"1m"},
+		"bool_custom_list":                 []interface{}{false, true, false},
+		"bytes_list":                       []interface{}{"TestBytes1", "TestBytes2"},
+		"timestamp_list":                   []interface{}{defaultTimestamp},
+		"duration_custom_list":             []interface{}{"1m"},
 
 		// Messages
 		"nested": []interface{}{
@@ -221,7 +221,7 @@ func TestArraysGet(t *testing.T) {
 	duration, err := time.ParseDuration("1m")
 	require.NoError(t, err, "failed to parse example duration")
 
-	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
+	assert.Equal(t, subject.BoolCustomList, []BoolCustom{false, true, false})
 	assert.Equal(t, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")}, subject.BytesList, "Test.BytesList")
 	assert.Equal(t, []*time.Time{&timestamp}, subject.TimestampList, "Test.TimestampList")
 	assert.Equal(t, []Duration{Duration(duration)}, subject.DurationCustomList, "Test.DurationCustomList")

@@ -41,9 +41,28 @@ func Get(
 		return trace.Errorf("obj must not be nil")
 	}
 
-	// Obj must be reference
-	t := reflect.Indirect(reflect.ValueOf(obj))
+	v := reflect.ValueOf(obj)
+	if v.Kind() != reflect.Ptr {
+		return trace.Errorf("obj must be a pointer")
+	}
+
+	t := reflect.Indirect(v)
 	return getFragment("", &t, meta, sch, data)
+}
+
+// GetLen returns TypeSet or TypeList value length
+func GetLen(path string, data *schema.ResourceData) (int, error) {
+	n, ok := data.GetOk(path + ".#")
+	if !ok || n == nil {
+		return 0, nil
+	}
+
+	len, ok := n.(int)
+	if !ok {
+		return 0, trace.Errorf("failed to convert list count to number %s", path)
+	}
+
+	return len, nil
 }
 
 // getFragment iterates over a schema fragment and calls appropriate getters for a fields of passed target.
@@ -65,6 +84,11 @@ func getFragment(
 		p := path + k
 
 		switch {
+		case m.Getter != nil:
+			err := m.Getter(p, v, m, s, data)
+			if err != nil {
+				return err
+			}
 		case s.Type == schema.TypeInt ||
 			s.Type == schema.TypeFloat ||
 			s.Type == schema.TypeBool ||
@@ -193,7 +217,7 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 
 // setList gets list from ResourceData
 func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
-	len, err := getLen(path, data)
+	len, err := GetLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
 	}
@@ -267,7 +291,7 @@ func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 // setSet reads set from resource data
 func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
-	len, err := getLen(path, data)
+	len, err := GetLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
 	}
@@ -279,12 +303,12 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 	raw, ok := data.GetOk(path)
 	if !ok {
-		return fmt.Errorf("can not read key " + path)
+		return trace.Errorf("can not read key " + path)
 	}
 
 	s, ok := raw.(*schema.Set)
 	if !ok {
-		return fmt.Errorf("can not convert %T to *schema.Set", raw)
+		return trace.Errorf("can not convert %T to *schema.Set", raw)
 	}
 
 	switch target.Kind() {
@@ -325,21 +349,6 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	default:
 		return trace.Errorf("unknown set target type")
 	}
-}
-
-// getLen returns length of a list or set
-func getLen(path string, data *schema.ResourceData) (int, error) {
-	n, ok := data.GetOk(path + ".#")
-	if !ok || n == nil {
-		return 0, nil
-	}
-
-	len, ok := n.(int)
-	if !ok {
-		return 0, trace.Errorf("failed to convert list count to number %s", path)
-	}
-
-	return len, nil
 }
 
 // newEmptyValue constructs new empty value for a given type. Type might be a pointer.

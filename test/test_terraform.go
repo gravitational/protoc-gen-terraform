@@ -901,7 +901,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// BoolCustomList []bool field
 		"bool_custom_list": {
-			Name: "BoolCustomList",
+			Name:   "BoolCustomList",
+			Getter: GetBoolCustom,
 		},
 		// BytesList [][]byte field
 		"bytes_list": {

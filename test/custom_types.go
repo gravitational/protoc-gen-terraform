@@ -18,8 +18,11 @@ package test
 
 import (
 	fmt "fmt"
+	"reflect"
 	time "time"
 
+	"github.com/gravitational/protoc-gen-terraform/accessors"
+	"github.com/gravitational/trace"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -45,27 +48,46 @@ func SchemaBoolCustom() *schema.Schema {
 	}
 }
 
-// GetBoolCustomFromResourceData interprets data at path as an array of boolean values.
+// GetBoolCustom interprets data at path as an array of boolean values.
 // The values are returned in target
-func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, target *[]BoolCustom) error {
-	rawi, ok := data.GetOk(path)
-	if ok {
-		arr, ok := rawi.([]interface{})
-		if !ok {
-			return fmt.Errorf("cat not convert %T to []interface{}", rawi)
-		}
-		*target = make([]BoolCustom, len(arr))
-
-		for i := 0; i < len(arr); i++ {
-			(*target)[i] = BoolCustom(arr[i].(bool))
-		}
+func GetBoolCustom(
+	path string,
+	target reflect.Value,
+	meta *accessors.SchemaMeta,
+	sch *schema.Schema,
+	data *schema.ResourceData,
+) error {
+	len, err := accessors.GetLen(path, data)
+	if err != nil {
+		return err
 	}
+	if len == 0 {
+		// TODO: Share with accessors
+		target.Set(reflect.Zero(target.Type()))
+		return nil
+	}
+
+	t := make([]BoolCustom, len)
+
+	for i := 0; i < len; i++ {
+		p := fmt.Sprintf("%v.%v", path, i)
+
+		raw := data.Get(p)
+		v, ok := raw.(bool)
+		if !ok {
+			return trace.Errorf("can not convert %T to bool", raw)
+		}
+
+		t[i] = BoolCustom(v)
+	}
+
+	target.Set(reflect.ValueOf(t))
 
 	return nil
 }
 
 // SetBoolCustomToResourceData sets
-func SetBoolCustomToResourceData(value *[]BoolCustom) (interface{}, error) {
+func SetBoolCustom(value *[]BoolCustom) (interface{}, error) {
 	r := make([]interface{}, len(*value))
 
 	for i, v := range *value {

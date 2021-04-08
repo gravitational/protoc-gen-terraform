@@ -56,6 +56,7 @@ map[string]*accessors.SchemaMeta {
 {{- if eq .Kind "CUSTOM_TYPE" }}
 {
     Name: {{.Name|quote}},
+    Getter: Get{{.CustomTypeMethodInfix}},
 },
 {{- end }}
 {{- end -}}

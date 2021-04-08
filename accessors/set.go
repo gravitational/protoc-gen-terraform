@@ -13,31 +13,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+// Package accessors contains Get and Set methods for ResourceData
 package accessors
 
 import (
 	"reflect"
 
+	"github.com/gravitational/trace"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-// Getter is a function used to get custom value from ResourceData
-type Getter func(string, reflect.Value, *SchemaMeta, *schema.Schema, *schema.ResourceData) error
+// Set assigns object data from object to schema.ResourceData
+//
+// Example:
+//   user := UserV2{Name: "example"}
+//   Set(&user, data, SchemaUserV2, MetaUserV2)
+func Set(
+	obj interface{},
+	data *schema.ResourceData,
+	sch map[string]*schema.Schema,
+	meta map[string]*SchemaMeta,
+) error {
+	if obj == nil {
+		return trace.Errorf("obj must not be nil")
+	}
 
-// SchemaMeta represents schema metadata struct
-type SchemaMeta struct {
-	// Name field name in target struct
-	Name string
-
-	// IsTime is true if field contains time
-	IsTime bool
-
-	// IsDuration is true if field contains duration
-	IsDuration bool
-
-	// Getter contains reference to setter function if value is custom type
-	Getter Getter
-
-	// Nested nested message definition
-	Nested map[string]*SchemaMeta
+	// Obj must be reference
+	t := reflect.Indirect(reflect.ValueOf(obj))
+	return getFragment("", &t, meta, sch, data)
 }
