@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+// Package accessors contains Get and Set methods for ResourceData
 package accessors
 
 import (
@@ -45,7 +47,7 @@ func Get(
 }
 
 // getFragment iterates over a schema fragment and calls appropriate getters for a fields of passed target.
-// Target must be struct.
+// Target must point to a struct.
 func getFragment(
 	path string,
 	target *reflect.Value,
@@ -98,7 +100,8 @@ func getFragment(
 	return nil
 }
 
-// getEnumerableElement gets singular slice element from a resource data
+// getEnumerableElement gets singular slice element from a resource data. If enumerable element is empty, it assigns
+// an empty value to the target.
 func getEnumerableElement(
 	path string,
 	target *reflect.Value,
@@ -108,28 +111,22 @@ func getEnumerableElement(
 ) error {
 	switch s := sch.Elem.(type) {
 	case *schema.Schema:
-		err := getAtomic(path, target, meta, s, data)
-		if err != nil {
-			return trace.Wrap(err)
-		}
+		return getAtomic(path, target, meta, s, data)
 	case *schema.Resource:
-		t := target
+		v := newEmptyValue(target.Type())
 
-		if target.Kind() == reflect.Ptr {
-			target.Set(reflect.New(target.Type().Elem()))
-			i := reflect.Indirect(*target)
-			t = &i
+		_, ok := data.GetOk(path)
+		if ok {
+			err := getFragment(path+".", v, meta.Nested, s.Schema, data)
+			if err != nil {
+				return err
+			}
 		}
 
-		err := getFragment(path+".", t, meta.Nested, s.Schema, data)
-		if err != nil {
-			return trace.Wrap(err)
-		}
+		return assign(v, target)
 	default:
 		return trace.Errorf("unknown Elem type")
 	}
-
-	return nil
 }
 
 // getAtomic gets atomic value (scalar, string, time, duration)
@@ -222,15 +219,10 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		}
 
 		return assign(&r, target)
-	} else {
-		// Target is an object represented by a single element list
-		err := getEnumerableElement(path+".0", target, sch, meta, data)
-		if err != nil {
-			return err
-		}
-
-		return nil
 	}
+
+	// Target is an object represented by a single element list
+	return getEnumerableElement(path+".0", target, sch, meta, data)
 }
 
 // setMap sets map of atomic values (scalar, string, time, duration)
@@ -260,16 +252,14 @@ func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 	// Iterate over map keys
 	for k := range m {
-		// Construct new map value
-		// Map values can be only elementary so no need to handle reflect.Ptr here
-		v := reflect.Indirect(reflect.New(target.Type().Elem()))
+		v := newEmptyValue(target.Type().Elem())
 
-		err := getEnumerableElement(path+"."+k, &v, sch, meta, data)
+		err := getEnumerableElement(path+"."+k, v, sch, meta, data)
 		if err != nil {
 			return err
 		}
 
-		t.SetMapIndex(reflect.ValueOf(k), v)
+		t.SetMapIndex(reflect.ValueOf(k), *v)
 	}
 
 	return assign(&t, target)
@@ -287,6 +277,16 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 		return nil
 	}
 
+	raw, ok := data.GetOk(path)
+	if !ok {
+		return fmt.Errorf("can not read key " + path)
+	}
+
+	s, ok := raw.(*schema.Set)
+	if !ok {
+		return fmt.Errorf("can not convert %T to *schema.Set", raw)
+	}
+
 	switch target.Kind() {
 	case reflect.Slice:
 		// This set must be converted to normal slice
@@ -295,31 +295,24 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 		// This set must be read into a map, so, it contains artificial key and value arguments
 		r := reflect.MakeMap(target.Type())
 
-		ds, ok := data.GetOk(path)
-		if !ok {
-			return fmt.Errorf("can not read key " + path)
-		}
-
-		s, ok := ds.(*schema.Set)
-		if !ok {
-			return fmt.Errorf("can not convert %T to *schema.Set", ds)
-		}
-
 		for _, i := range s.List() {
-			m := i.(map[string]interface{})
+			m, ok := i.(map[string]interface{})
+			if !ok {
+				return trace.Errorf("can not convert %T to map[string]interface{}", m)
+			}
+
 			k := m["key"]
 
-			t := target.Type().Elem()
-			if t.Kind() == reflect.Ptr {
-				t = t.Elem()
+			rs, ok := sch.Elem.(*schema.Resource)
+			if !ok {
+				return fmt.Errorf("can not convert %T to *schema.Resource", sch.Elem)
 			}
-			v := reflect.Indirect(reflect.New(t))
 
-			e := sch.Elem.(*schema.Resource).Schema["value"].Elem.(*schema.Resource)
+			v := newEmptyValue(target.Type().Elem())
 
-			p := fmt.Sprintf("%v.%v.value.0.", path, s.F(i))
+			p := fmt.Sprintf("%v.%v.value.0", path, s.F(i))
 
-			err := getFragment(p, &v, meta.Nested, e.Schema, data)
+			err := getEnumerableElement(p, v, rs.Schema["value"], meta, data)
 			if err != nil {
 				return err
 			}
@@ -327,7 +320,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 			if target.Type().Elem().Kind() == reflect.Ptr {
 				r.SetMapIndex(reflect.ValueOf(k), v.Addr())
 			} else {
-				r.SetMapIndex(reflect.ValueOf(k), v)
+				r.SetMapIndex(reflect.ValueOf(k), *v)
 			}
 		}
 
@@ -352,4 +345,17 @@ func getLen(path string, data *schema.ResourceData) (int, error) {
 	}
 
 	return len, nil
+}
+
+// newEmptyValue constructs new empty value for a given type. Type might be a pointer.
+func newEmptyValue(source reflect.Type) *reflect.Value {
+	t := source
+
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	n := reflect.New(t)
+	i := reflect.Indirect(n)
+	return &i
 }
