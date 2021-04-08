@@ -71,7 +71,7 @@ var (
 					"kn1": "vn1",
 					"kn2": "vn2",
 				},
-				"map_object": []interface{}{
+				"map_object_nested": []interface{}{
 					map[string]interface{}{
 						"key": "obj1",
 						"value": []interface{}{
@@ -260,15 +260,21 @@ func TestMapGet(t *testing.T) {
 
 	assert.Equal(t, "v1", subject.Map["k1"], "Test.Map['k1']")
 	assert.Equal(t, "v2", subject.Map["k2"], "Test.Map['k2']")
-	assert.Equal(t, "vn1", subject.Nested.Map["kn1"])
-	assert.Equal(t, "vn2", subject.Nested.Map["kn2"])
+	assert.Equal(t, "vn1", subject.Nested.Map["kn1"], "Test.Nested.Map['kn1']")
+	assert.Equal(t, "vn2", subject.Nested.Map["kn2"], "Test.Nested.Map['kn2']")
 }
 
-// // TestObjectMapGet ensures decoding of maps of messages
-// func TestObjectMapGet(t *testing.T) {
-// 	subject, err := buildSubjectGet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestObjectMapGet ensures decoding of maps of messages
+func TestObjectMapGet(t *testing.T) {
+	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, subject.NestedMObj["obj1"].Str, "TestString1")
-// 	assert.Equal(t, subject.NestedMObj["obj2"].Str, "TestString2")
-// }
+	assert.Equal(t, "TestString1", subject.MapObject["obj1"].Str, "MapObject['obj1'].Str")
+	assert.Equal(t, "TestString2", subject.MapObject["obj2"].Str, "MapObject['obj2'].Str")
+
+	assert.Equal(t, "TestString1", subject.MapObjectNullable["obj1"].Str)
+	assert.Equal(t, "TestString2", subject.MapObjectNullable["obj2"].Str)
+
+	assert.Equal(t, "TestString1", subject.Nested.MapObjectNested["obj1"].Str)
+	assert.Equal(t, "TestString2", subject.Nested.MapObjectNested["obj2"].Str)
+}

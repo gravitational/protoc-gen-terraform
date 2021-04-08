@@ -35,6 +35,7 @@ func Get(
 		return trace.Errorf("obj must not be nil")
 	}
 
+	// Obj must be reference
 	t := reflect.Indirect(reflect.ValueOf(obj))
 	return getFragment("", &t, meta, sch, data)
 }
@@ -339,21 +340,28 @@ func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 		for _, i := range s.List() {
 			m := i.(map[string]interface{})
-			m = m
-			// k := m["key"]
+			k := m["key"]
 
-			v := reflect.Indirect(reflect.New(target.Type().Elem()))
-			v = v
+			t := target.Type().Elem()
+			if t.Kind() == reflect.Ptr {
+				t = t.Elem()
+			}
+			v := reflect.Indirect(reflect.New(t))
 
-			// s := sch.Elem.(*schema.Resource)
+			e := sch.Elem.(*schema.Resource).Schema["value"].Elem.(*schema.Resource)
 
-			// m["value"]
-			// err := getFragment(p, &v, meta.Nested, s.Schema, data)
-			// if err != nil {
-			// 	return err
-			// }
+			p := fmt.Sprintf("%v.%v.value.0.", path, s.F(i))
 
-			// r.SetMapIndex(reflect.ValueOf(k), v)
+			err := getFragment(p, &v, meta.Nested, e.Schema, data)
+			if err != nil {
+				return err
+			}
+
+			if target.Type().Elem().Kind() == reflect.Ptr {
+				r.SetMapIndex(reflect.ValueOf(k), v.Addr())
+			} else {
+				r.SetMapIndex(reflect.ValueOf(k), v)
+			}
 		}
 
 		target.Set(r)
