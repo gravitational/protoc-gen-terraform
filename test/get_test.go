@@ -52,7 +52,7 @@ var (
 		"duration_custom":                  "1m",
 		"string_list":                      []interface{}{"TestString1", "TestString2"},
 		// "bool_a":                           []interface{}{false, true, false},
-		// "bytes_a":                          []interface{}{"TestBytes1", "TestBytes2"},
+		"bytes_list":           []interface{}{"TestBytes1", "TestBytes2"},
 		"timestamp_list":       []interface{}{defaultTimestamp},
 		"duration_custom_list": []interface{}{"1m"},
 
@@ -68,10 +68,10 @@ var (
 						"str": "TestString2",
 					},
 				},
-				// "nested_m": map[string]interface{}{
-				// 	"kn1": "vn1",
-				// 	"kn2": "vn2",
-				// },
+				"map": map[string]interface{}{
+					"kn1": "vn1",
+					"kn2": "vn2",
+				},
 			},
 		},
 		"nested_nullable": []interface{}{
@@ -98,7 +98,8 @@ var (
 			},
 		},
 
-		"nested_m": map[string]interface{}{
+		// Map
+		"map": map[string]interface{}{
 			"k1": "v1",
 			"k2": "v2",
 		},
@@ -123,107 +124,6 @@ var (
 		},
 	}
 )
-
-// // NOTE: make compound struct, values instead of methods
-// func GenSchemaTestMeta() map[string]*SchemaMeta {
-// 	return map[string]*SchemaMeta{
-// 		"str": {
-// 			name: "Str",
-// 		},
-// 		"int32": {
-// 			name: "Int32",
-// 		},
-// 		"int64": {
-// 			name: "Int64",
-// 		},
-// 		"float": {
-// 			name: "Float",
-// 		},
-// 		"double": {
-// 			name: "Double",
-// 		},
-// 		"bool": {
-// 			name: "Bool",
-// 		},
-// 		"bytes": {
-// 			name: "Bytes",
-// 		},
-// 		"timestamp": {
-// 			name:   "Timestamp",
-// 			isTime: true,
-// 		},
-// 		"timestamp_nullable": {
-// 			name:   "TimestampNullable",
-// 			isTime: true,
-// 		},
-// 		"timestamp_nullable_with_nil_value": {
-// 			name:   "TimestampNullableWithNilValue",
-// 			isTime: true,
-// 		},
-// 		"duration_standard": {
-// 			name:       "DurationStandard",
-// 			isDuration: true,
-// 		},
-// 		"duration_custom": {
-// 			name:       "DurationCustom",
-// 			isDuration: true,
-// 		},
-// 		"string_list": {
-// 			name: "StringList",
-// 		},
-// 		"string_list_empty": {
-// 			name: "StringListEmpty",
-// 		},
-// 		"timestamp_list": {
-// 			name:   "TimestampList",
-// 			isTime: true,
-// 		},
-// 		"duration_custom_list": {
-// 			name:       "DurationCustomList",
-// 			isDuration: true,
-// 		},
-// 		"nested": {
-// 			name: "Nested",
-// 			nested: map[string]*SchemaMeta{
-// 				"str": {
-// 					name: "Str",
-// 				},
-// 			},
-// 		},
-// 		"nested_nullable": {
-// 			name: "NestedNullable",
-// 			nested: map[string]*SchemaMeta{
-// 				"str": {
-// 					name: "Str",
-// 				},
-// 			},
-// 		},
-// 		"nested_nullable_with_nil_value": {
-// 			name: "NestedNullableWithNilValue",
-// 			nested: map[string]*SchemaMeta{
-// 				"str": {
-// 					name: "Str",
-// 				},
-// 			},
-// 		},
-// 		"nested_list": {
-// 			name: "NestedList",
-// 			nested: map[string]*SchemaMeta{
-// 				"str": {
-// 					name: "Str",
-// 				},
-// 			},
-// 		},
-// 		"nested_list_nullable": {
-// 			name: "NestedListNullable",
-// 			nested: map[string]*SchemaMeta{
-// 				"str": {
-// 					name: "Str",
-// 				},
-// 			},
-// 		},
-// 	}
-// }
 
 func GetFromResourceData(
 	sch map[string]*schema.Schema,
@@ -271,12 +171,14 @@ func getFragment(
 				return trace.Wrap(err)
 			}
 
-		// case me.object_map:
-		// case me.custom
-		// case sch.Type == schema.TypeMap:
+		case s.Type == schema.TypeMap:
+			err := setMap(path+k, &v, m, s, data)
+			if err != nil {
+				return trace.Wrap(err)
+			}
 		// case sch.Type == schema.TypeSet:
 		default:
-			return trace.Errorf("unknown type %v", s.Type)
+			return trace.Errorf("unknown type %v", s.Type.String())
 		}
 	}
 
@@ -313,6 +215,7 @@ func setAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 	return nil
 }
 
+// TODO: change assignAtomic
 // assignAtomic reads atomic value form
 func assignAtomic(source interface{}, target *reflect.Value) error {
 	v := reflect.ValueOf(source)
@@ -444,7 +347,6 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		}
 
 		// Assign blank object
-		// TODO: change assignAtomic
 		err = assignAtomic(r.Interface(), target)
 		if err != nil {
 			return trace.Wrap(err)
@@ -454,8 +356,53 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 	return nil
 }
 
-// func setSet()
-// func setCustom()
+// setMap sets map of atomic values (scalar, string, time, duration)
+func setMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+	md, ok := data.GetOk(path)
+	if !ok {
+		return nil
+	}
+
+	m, ok := md.(map[string]interface{})
+	if !ok {
+		return trace.Errorf("failed to convert %T to map[string]interface{}", md)
+	}
+
+	// If map is empty, set target empty map
+	if len(m) == 0 {
+		target.Set(reflect.Zero(target.Type()))
+
+		return nil
+	}
+
+	if target.Type().Kind() != reflect.Map {
+		return trace.Errorf("target time is not a map")
+	}
+
+	r := reflect.MakeMap(target.Type())
+
+	for k := range m {
+		kv := reflect.ValueOf(k)
+
+		el := reflect.Indirect(reflect.New(target.Type().Elem()))
+
+		switch s := sch.Elem.(type) {
+		case *schema.Schema:
+			err := setAtomic(path+"."+k, &el, meta, s, data)
+			if err != nil {
+				return trace.Wrap(err)
+			}
+		default:
+			return trace.Errorf("unknown Elem type: map key must be *schema.Schmea")
+		}
+
+		r.SetMapIndex(kv, el)
+	}
+
+	target.Set(r)
+
+	return nil
+}
 
 // buildSubjectGet builds Test struct from test fixture data
 func buildSubjectGet(t *testing.T, subject *Test) (*Test, error) {
@@ -518,9 +465,9 @@ func TestArraysGet(t *testing.T) {
 	require.NoError(t, err, "failed to parse example duration")
 
 	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
-	// assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
-	assert.Equal(t, []*time.Time{&timestamp}, subject.TimestampList)
-	assert.Equal(t, []Duration{Duration(duration)}, subject.DurationCustomList)
+	assert.Equal(t, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")}, subject.BytesList, "Test.BytesList")
+	assert.Equal(t, []*time.Time{&timestamp}, subject.TimestampList, "Test.TimestampList")
+	assert.Equal(t, []Duration{Duration(duration)}, subject.DurationCustomList, "Test.DurationCustomList")
 }
 
 // TestNestedMessageGet ensures decoding of nested messages
@@ -549,16 +496,16 @@ func TestNestedMessageArrayGet(t *testing.T) {
 	assert.Equal(t, "TestString2", subject.NestedListNullable[1].Str, "NestedListNullable[1].Str")
 }
 
-// // TestMapGet ensures decoding of a maps
-// func TestMapGet(t *testing.T) {
-// 	subject, err := buildSubjectGet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestMapGet ensures decoding of a maps
+func TestMapGet(t *testing.T) {
+	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, subject.NestedM["k1"], "v1")
-// 	assert.Equal(t, subject.NestedM["k2"], "v2")
-// 	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
-// 	assert.Equal(t, subject.Nested.NestedM["kn1"], "vn1")
-// }
+	assert.Equal(t, "v1", subject.Map["k1"], "Test.Map['k1']")
+	assert.Equal(t, "v2", subject.Map["k2"], "Test.Map['k2']")
+	assert.Equal(t, "vn1", subject.Nested.Map["kn1"])
+	assert.Equal(t, "vn2", subject.Nested.Map["kn2"])
+}
 
 // // TestObjectMapGet ensures decoding of maps of messages
 // func TestObjectMapGet(t *testing.T) {

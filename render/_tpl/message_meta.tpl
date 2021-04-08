@@ -28,14 +28,13 @@ map[string]*SchemaMeta {
 },
 {{- end }}
 
-{{/* {{- if eq .Kind "MAP" }}
+{{- if eq .Kind "MAP" }}
 {
-    {{ template "required" . }}
     {{ template "map" . }}
 },
 {{- end }}
 
-{{- if eq .Kind "OBJECT_MAP" }}
+{{/* {{- if eq .Kind "OBJECT_MAP" }}
 {
     {{ template "required" . }}
     {{ template "objectMap" . }}
@@ -78,11 +77,9 @@ isDuration: {{.IsDuration}},
 {{- end -}}
 
 {{- define "map" -}}
-Type: schema.TypeMap,
-Description: {{ .RawComment | quote }},
-Elem: &schema.Schema {
-    Type: {{ template "type" .MapValueField.SchemaRawType }},
-},
+name: {{.Name|quote}},
+isTime: {{.IsTime}},
+isDuration: {{.IsDuration}},
 {{- end -}}
 
 {{- define "objectMap" -}}

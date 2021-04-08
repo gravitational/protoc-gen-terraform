@@ -54,6 +54,7 @@ type SchemaMeta struct {
 	nested     map[string]*SchemaMeta
 }
 
+// SupressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
 func SupressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
 	o, err := time.ParseDuration(old)
 	if err != nil {
@@ -191,6 +192,16 @@ func GenSchemaTest() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+		// BytesList [][]byte field
+		"bytes_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "BytesList [][]byte field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
 		// TimestampList []time.Time field
 		"timestamp_list": {
 
@@ -242,6 +253,16 @@ func GenSchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
 				},
 			},
 		},
@@ -274,6 +295,16 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 								},
 							},
+						},
+					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
 						},
 					},
 				},
@@ -310,6 +341,16 @@ func GenSchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
 				},
 			},
 		},
@@ -342,6 +383,16 @@ func GenSchemaTest() map[string]*schema.Schema {
 									Optional:    true,
 								},
 							},
+						},
+					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
 						},
 					},
 				},
@@ -378,7 +429,27 @@ func GenSchemaTest() map[string]*schema.Schema {
 							},
 						},
 					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
 				},
+			},
+		},
+		// Map normal map
+		"map": {
+
+			Optional:    true,
+			Type:        schema.TypeMap,
+			Description: "Map normal map",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
 			},
 		},
 	}
@@ -508,6 +579,13 @@ func GenSchemaMetaTest() map[string]*SchemaMeta {
 			isDuration: false,
 		},
 
+		// BytesList [][]byte field
+		"bytes_list": {
+			name:       "BytesList",
+			isTime:     false,
+			isDuration: false,
+		},
+
 		// TimestampList []time.Time field
 		"timestamp_list": {
 			name:       "TimestampList",
@@ -545,6 +623,13 @@ func GenSchemaMetaTest() map[string]*SchemaMeta {
 						},
 					},
 				},
+
+				// Nested map repeated nested messages
+				"map": {
+					name:       "Map",
+					isTime:     false,
+					isDuration: false,
+				},
 			},
 		},
 
@@ -570,6 +655,13 @@ func GenSchemaMetaTest() map[string]*SchemaMeta {
 							isDuration: false,
 						},
 					},
+				},
+
+				// Nested map repeated nested messages
+				"map": {
+					name:       "Map",
+					isTime:     false,
+					isDuration: false,
 				},
 			},
 		},
@@ -597,6 +689,13 @@ func GenSchemaMetaTest() map[string]*SchemaMeta {
 						},
 					},
 				},
+
+				// Nested map repeated nested messages
+				"map": {
+					name:       "Map",
+					isTime:     false,
+					isDuration: false,
+				},
 			},
 		},
 
@@ -622,6 +721,13 @@ func GenSchemaMetaTest() map[string]*SchemaMeta {
 							isDuration: false,
 						},
 					},
+				},
+
+				// Nested map repeated nested messages
+				"map": {
+					name:       "Map",
+					isTime:     false,
+					isDuration: false,
 				},
 			},
 		},
@@ -649,7 +755,21 @@ func GenSchemaMetaTest() map[string]*SchemaMeta {
 						},
 					},
 				},
+
+				// Nested map repeated nested messages
+				"map": {
+					name:       "Map",
+					isTime:     false,
+					isDuration: false,
+				},
 			},
+		},
+
+		// Map normal map
+		"map": {
+			name:       "Map",
+			isTime:     false,
+			isDuration: false,
 		},
 	}
 }

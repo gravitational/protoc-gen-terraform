@@ -92,8 +92,8 @@ message Test {
 //     // BoolA []bool field
 //     repeated bool BoolCustomList = 14 [ (gogoproto.customtype) = "BoolCustom" ];
 
-//     // BytesA [][]byte field
-//     repeated bytes BytesList = 15;
+    // BytesList [][]byte field
+    repeated bytes BytesList = 19;
 
     // TimestampList []time.Time field
     repeated google.protobuf.Timestamp TimestampList = 20 [ (gogoproto.stdtime) = true ];
@@ -115,10 +115,10 @@ message Test {
 
     // NestedListNullable nested message array
     repeated Nested NestedListNullable = 26 [ (gogoproto.nullable) = true ];
-}
 
-//     // NestedM normal map
-//     map<string, string> NestedM = 19;
+    // Map normal map
+    map<string, string> Map = 27;
+}
 
 //     // NestedMObj object map
 //     map<string, Nested> NestedMObj = 20;
@@ -132,8 +132,8 @@ message Nested {
     // Nested repeated nested messages
     repeated OtherNested NestedList = 2;
 
-    // // Nested map repeated nested messages
-    // map<string, string> NestedM = 3;
+    // Nested map repeated nested messages
+    map<string, string> Map = 3;
 
     // // NestedMObj nested object map
     // map<string, NestedLevel2> NestedMObj = 4;
