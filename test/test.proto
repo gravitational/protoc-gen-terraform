@@ -82,10 +82,14 @@ message Test {
 
     // DurationCustomMissing time.Duration field (with casttype) missing in input data
     int64 DurationCustomMissing = 15 [ (gogoproto.casttype) = "Duration" ];
-}
-//     // StringA []string field
-//     repeated string StringA = 13;
 
+    // StringList []string field
+    repeated string StringList = 16;
+
+    // StringListEmpty []string field
+    repeated string StringListEmpty = 17;
+
+}
 //     // BoolA []bool field
 //     repeated bool BoolA = 14 [ (gogoproto.customtype) = "BoolCustom" ];
 

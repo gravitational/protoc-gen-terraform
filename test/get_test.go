@@ -18,6 +18,7 @@ limitations under the License.
 package test
 
 import (
+	fmt "fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -48,7 +49,7 @@ var (
 		"timestamp_nullable_with_no_value": nil,
 		"duration_standard":                "1h",
 		"duration_custom":                  "1m",
-		"string_a":                         []interface{}{"TestString1", "TestString2"},
+		"string_list":                      []interface{}{"TestString1", "TestString2"},
 		"bool_a":                           []interface{}{false, true, false},
 		"bytes_a":                          []interface{}{"TestBytes1", "TestBytes2"},
 		"timestamp_a":                      []interface{}{defaultTimestamp},
@@ -98,11 +99,13 @@ var (
 	}
 )
 
+// SchemaMeta represents metadata about schema
 type SchemaMeta struct {
 	name       string
 	schemaName string
 	isTime     bool
 	isDuration bool
+	elem       *SchemaMeta
 	nested     map[string]*SchemaMeta
 }
 
@@ -162,6 +165,16 @@ func SchemaTestMeta() map[string]*SchemaMeta {
 			schemaName: "duration_custom",
 			isDuration: true,
 		},
+		"string_list": {
+			name:       "StringList",
+			schemaName: "string_list",
+			elem:       &SchemaMeta{},
+		},
+		"string_list_empty": {
+			name:       "StringListEmpty",
+			schemaName: "string_list_empty",
+			elem:       &SchemaMeta{},
+		},
 	}
 }
 
@@ -171,20 +184,24 @@ func GetFromResourceData(
 	meta map[string]*SchemaMeta,
 	obj interface{},
 ) error {
-	o := reflect.ValueOf(obj)
-
-	if o.IsNil() {
+	if obj == nil {
 		return trace.Errorf("obj must not be nil")
 	}
 
-	if o.Kind() != reflect.Ptr {
-		return trace.Errorf("pass a reference to an object you need to set")
-	}
+	return getFragment("", sch, data, meta, obj)
+}
 
-	o = reflect.Indirect(o)
+func getFragment(
+	path string,
+	sch map[string]*schema.Schema,
+	data *schema.ResourceData,
+	meta map[string]*SchemaMeta,
+	obj interface{},
+) error {
+	o := reflect.Indirect(reflect.ValueOf(obj))
 
-	for k, sch := range sch {
-		m, ok := meta[k]
+	for k, m := range meta {
+		s, ok := sch[k]
 		if !ok {
 			continue
 			return trace.Errorf("field not found in corresponding meta " + k)
@@ -193,22 +210,27 @@ func GetFromResourceData(
 		v := o.FieldByName(m.name)
 
 		switch {
-		//case me.object_map:
-		//case me.custom
-		case sch.Type == schema.TypeInt ||
-			sch.Type == schema.TypeFloat ||
-			sch.Type == schema.TypeBool ||
-			sch.Type == schema.TypeString:
+		case s.Type == schema.TypeInt ||
+			s.Type == schema.TypeFloat ||
+			s.Type == schema.TypeBool ||
+			s.Type == schema.TypeString:
 
-			err := setAtomic(&v, m, sch, data)
+			err := setAtomic(path+k, &v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
-		// case sch.Type == schema.TypeList:
+		case s.Type == schema.TypeList:
+			err := setList(path+k, &v, m, s, data)
+			if err != nil {
+				return trace.Wrap(err)
+			}
+
+		// case me.object_map:
+		// case me.custom
 		// case sch.Type == schema.TypeMap:
 		// case sch.Type == schema.TypeSet:
 		default:
-			return trace.Errorf("unknown type %v", sch.Type)
+			return trace.Errorf("unknown type %v", s.Type)
 		}
 	}
 
@@ -216,8 +238,8 @@ func GetFromResourceData(
 }
 
 // setAtomic sets atomic value (scalar, string, time, duration)
-func setAtomic(target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
-	s, ok := data.GetOk(meta.schemaName)
+func setAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+	s, ok := data.GetOk(path)
 	if !ok {
 		target.Set(reflect.Zero(target.Type()))
 
@@ -310,8 +332,45 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 	return assignAtomic(t, target)
 }
 
-// func setList()
-// func setMap()
+// setList sets atomic value (scalar, string, time, duration)
+func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+	// Get list count variable
+	n, okn := data.GetOk(path + ".#")
+	len, okc := n.(int)
+
+	if !okc {
+		return trace.Errorf("failed to convert list count to number")
+	}
+
+	// If list is empty, set target list to empty value
+	if !okn || len == 0 {
+		target.Set(reflect.Zero(target.Type()))
+
+		return nil
+	}
+
+	r := reflect.MakeSlice(target.Type(), len, len)
+
+	for i := 0; i < len; i++ {
+		switch sch.Elem.(type) {
+		case *schema.Schema:
+			el := r.Index(i)
+			err := setAtomic(fmt.Sprintf("%v.%v", path, i), &el, meta, sch, data)
+			if err != nil {
+				return trace.Wrap(err)
+			}
+		case *schema.Resource:
+
+		default:
+			return trace.Errorf("unknown Elem type")
+		}
+	}
+
+	target.Set(r)
+
+	return nil
+}
+
 // func setSet()
 // func setCustom()
 
@@ -362,22 +421,24 @@ func TestTimesGet(t *testing.T) {
 }
 
 // // TestArraysGet ensures decoding of arrays
-// func TestArraysGet(t *testing.T) {
-// 	subject, err := buildSubjectGet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+func TestArraysGet(t *testing.T) {
+	subject, err := buildSubjectGet(t, &Test{StringListEmpty: []string{"a"}})
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
-// 	require.NoError(t, err, "failed to parse example timestamp")
+	assert.Equal(t, []string(nil), subject.StringListEmpty, "Test.StringListEmpty")
+	assert.Equal(t, []string{"TestString1", "TestString2"}, subject.StringList)
 
-// 	duration, err := time.ParseDuration("1m")
-// 	require.NoError(t, err, "failed to parse example duration")
+	// timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
+	// require.NoError(t, err, "failed to parse example timestamp")
 
-// 	assert.Equal(t, subject.StringA, []string{"TestString1", "TestString2"})
-// 	assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
-// 	assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
-// 	assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
-// 	assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
-// }
+	// duration, err := time.ParseDuration("1m")
+	// require.NoError(t, err, "failed to parse example duration")
+
+	// assert.Equal(t, subject.BoolA, []BoolCustom{false, true, false})
+	// assert.Equal(t, subject.BytesA, [][]byte{[]byte("TestBytes1"), []byte("TestBytes2")})
+	// assert.Equal(t, subject.TimestampA, []*time.Time{&timestamp})
+	// assert.Equal(t, subject.DurationCustomA, []Duration{Duration(duration)})
+}
 
 // // TestNestedMessageGet ensures decoding of nested messages
 // func TestNestedMessageGet(t *testing.T) {

@@ -54,6 +54,8 @@ var _ = time.Kitchen
 // └── duration_standard_missing:string (DurationStandardMissing time.Duration field (standard) missing in input data)
 // └── duration_custom:string (DurationCustom time.Duration field (with casttype))
 // └── duration_custom_missing:string (DurationCustomMissing time.Duration field (with casttype) missing in input data)
+// └── [string_list:string] (StringList []string field)
+// └── [string_list_empty:string] (StringListEmpty []string field)
 
 // SchemaTest returns schema for Test
 //
@@ -205,6 +207,26 @@ func SchemaTest() map[string]*schema.Schema {
 				return o == n
 			},
 			Optional: true,
+		},
+		// StringList []string field
+		"string_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "StringList []string field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		// StringListEmpty []string field
+		"string_list_empty": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "StringListEmpty []string field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
 	}
 }
@@ -434,6 +456,52 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 			t.DurationCustomMissing = _value
 		}
 	}
+	{
+		_a, ok := d.GetOk(p + "string_list")
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
+			}
+			if len(a) > 0 {
+				t.StringList = make([]string, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.StringList[i] = _value
+				}
+			}
+		} else {
+			t.StringList = make([]string, 0)
+		}
+	}
+	{
+		_a, ok := d.GetOk(p + "string_list_empty")
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("count not convert %T to []interface{}", _a)
+			}
+			if len(a) > 0 {
+				t.StringListEmpty = make([]string, len(a))
+				for i := 0; i < len(a); i++ {
+					_raw := a[i]
+					_raws, ok := _raw.(string)
+					if !ok {
+						return fmt.Errorf("can not convert %T to string", _raws)
+					}
+					_value := string(string(_raws))
+					t.StringListEmpty[i] = _value
+				}
+			}
+		} else {
+			t.StringListEmpty = make([]string, 0)
+		}
+	}
 
 	return nil
 }
@@ -534,6 +602,32 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 		_value := time.Duration(_v).String()
 		obj["duration_custom_missing"] = _value
+	}
+	{
+		_arr := t.StringList
+		_raw := make([]string, len(_arr))
+
+		if len(_arr) > 0 {
+			for i, _v := range _arr {
+				_value := string(_v)
+				_raw[i] = _value
+			}
+		}
+
+		obj["string_list"] = _raw
+	}
+	{
+		_arr := t.StringListEmpty
+		_raw := make([]string, len(_arr))
+
+		if len(_arr) > 0 {
+			for i, _v := range _arr {
+				_value := string(_v)
+				_raw[i] = _value
+			}
+		}
+
+		obj["string_list_empty"] = _raw
 	}
 
 	for key, value := range obj {
