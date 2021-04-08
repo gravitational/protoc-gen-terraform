@@ -164,7 +164,7 @@ var (
 // buildSubjectGet builds Test struct from test fixture data
 func buildSubjectGet(t *testing.T, subject *Test) (*Test, error) {
 	data := schema.TestResourceDataRaw(t, SchemaTest, fixture)
-	err := accessors.Get(SchemaTest, data, SchemaMetaTest, subject)
+	err := accessors.Get(subject, data, SchemaTest, SchemaMetaTest)
 	return subject, err
 }
 

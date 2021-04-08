@@ -24,12 +24,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-// Get reads object data from schema.ResourceData
+// Get reads object data from schema.ResourceData to object
+//
+// Example:
+//   user := UserV2{}
+//   Get(&user, data, SchemaUserV2, MetaUserV2)
 func Get(
-	sch map[string]*schema.Schema,
-	data *schema.ResourceData,
-	meta map[string]*SchemaMeta,
 	obj interface{},
+	data *schema.ResourceData,
+	sch map[string]*schema.Schema,
+	meta map[string]*SchemaMeta,
 ) error {
 	if obj == nil {
 		return trace.Errorf("obj must not be nil")
@@ -40,7 +44,8 @@ func Get(
 	return getFragment("", &t, meta, sch, data)
 }
 
-// getFragment iterates over a schema fragment and calls appropriate getters for each field
+// getFragment iterates over a schema fragment and calls appropriate getters for a fields of passed target.
+// Target must be struct.
 func getFragment(
 	path string,
 	target *reflect.Value,
@@ -55,6 +60,7 @@ func getFragment(
 		}
 
 		v := target.FieldByName(m.Name)
+		p := path + k
 
 		switch {
 		case s.Type == schema.TypeInt ||
@@ -62,42 +68,41 @@ func getFragment(
 			s.Type == schema.TypeBool ||
 			s.Type == schema.TypeString:
 
-			err := setAtomic(path+k, &v, m, s, data)
+			err := getAtomic(p, &v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 		case s.Type == schema.TypeList:
-			err := setList(path+k, &v, m, s, data)
+			err := getList(p, &v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case s.Type == schema.TypeMap:
-			err := setMap(path+k, &v, m, s, data)
+			err := getMap(p, &v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case s.Type == schema.TypeSet:
-			err := setSet(path+k, &v, m, s, data)
+			err := getSet(p, &v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		default:
-			return trace.Errorf("unknown type %v", s.Type.String())
+			return trace.Errorf("unknown type %v for %s", s.Type.String(), p)
 		}
 	}
 
 	return nil
 }
 
-// setAtomic sets atomic value (scalar, string, time, duration)
-func setAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+// getAtomic gets atomic value (scalar, string, time, duration)
+func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	s, ok := data.GetOk(path)
 	if !ok {
 		target.Set(reflect.Zero(target.Type()))
-
 		return nil
 	}
 
@@ -113,7 +118,8 @@ func setAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 			return trace.Wrap(err)
 		}
 	default:
-		err := assignAtomic(s, target)
+		v := reflect.ValueOf(s)
+		err := assignAtomic(&v, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -124,9 +130,9 @@ func setAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 
 // TODO: change assignAtomic
 // assignAtomic reads atomic value form
-func assignAtomic(source interface{}, target *reflect.Value) error {
-	v := reflect.ValueOf(source)
+func assignAtomic(source *reflect.Value, target *reflect.Value) error {
 	t := target.Type()
+	v := *source
 
 	// If target type is at the pointer reference use underlying type
 	if target.Type().Kind() == reflect.Ptr {
@@ -134,9 +140,9 @@ func assignAtomic(source interface{}, target *reflect.Value) error {
 	}
 
 	// Convert value to target type
-	if reflect.TypeOf(source) != t {
+	if source.Type() != t {
 		if !v.Type().ConvertibleTo(target.Type()) {
-			return trace.Errorf("can not convert %v to %v", v.Type().Name(), t.Name())
+			return trace.Errorf("can not convert %v to %v", source.Type().Name(), t.Name())
 		}
 
 		v = v.Convert(t)
@@ -152,6 +158,9 @@ func assignAtomic(source interface{}, target *reflect.Value) error {
 		e.Elem().Set(v)
 		v = e
 	}
+	// if v.CanAddr() {
+	// 	target.Set
+	// }
 
 	target.Set(v)
 
@@ -170,7 +179,8 @@ func assignTime(source interface{}, target *reflect.Value) error {
 		return trace.Errorf("can not parse time: %w", err)
 	}
 
-	return assignAtomic(t, target)
+	v := reflect.ValueOf(t)
+	return assignAtomic(&v, target)
 }
 
 // assignTime assigns duration value from a string
@@ -185,11 +195,12 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 		return trace.Errorf("can not parse duration: %w", err)
 	}
 
-	return assignAtomic(t, target)
+	v := reflect.ValueOf(t)
+	return assignAtomic(&v, target)
 }
 
 // setList sets atomic value (scalar, string, time, duration)
-func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	len, err := getLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
@@ -210,7 +221,7 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 
 			switch s := sch.Elem.(type) {
 			case *schema.Schema:
-				err := setAtomic(p, &el, meta, s, data)
+				err := getAtomic(p, &el, meta, s, data)
 				if err != nil {
 					return trace.Wrap(err)
 				}
@@ -251,7 +262,7 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		}
 
 		// Assign blank object
-		err = assignAtomic(r.Interface(), target)
+		err = assignAtomic(&r, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -261,7 +272,7 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 }
 
 // setMap sets map of atomic values (scalar, string, time, duration)
-func setMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	md, ok := data.GetOk(path)
 	if !ok {
 		return nil
@@ -292,7 +303,7 @@ func setMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 		switch s := sch.Elem.(type) {
 		case *schema.Schema:
-			err := setAtomic(path+"."+k, &el, meta, s, data)
+			err := getAtomic(path+"."+k, &el, meta, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
@@ -309,7 +320,7 @@ func setMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 }
 
 // setSet reads set from resource data
-func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	len, err := getLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
@@ -323,6 +334,7 @@ func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	switch target.Kind() {
 	case reflect.Slice:
 		// This set must be converted to normal slice
+		trace.NotImplemented("set acting as list on target is not implemented yet")
 		return nil
 	case reflect.Map:
 		// This set must be read into a map, so, it contains artificial key and value arguments
@@ -370,56 +382,9 @@ func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	default:
 		return fmt.Errorf("unknown set target type")
 	}
-
-	// md, ok := data.GetOk(path)
-	// if !ok {
-	// 	return nil
-	// }
-
-	// m, ok := md.(map[string]interface{})
-	// if !ok {
-	// 	return trace.Errorf("failed to convert %T to map[string]interface{}", md)
-	// }
-
-	// target is list: this is list of objects
-	// target is map: this is map of objects
-
-	// // If map is empty, set target empty map
-	// if len(m) == 0 {
-	// 	target.Set(reflect.Zero(target.Type()))
-
-	// 	return nil
-	// }
-
-	// if target.Type().Kind() != reflect.Map {
-	// 	return trace.Errorf("target time is not a map")
-	// }
-
-	// r := reflect.MakeMap(target.Type())
-
-	// for k := range m {
-	// 	kv := reflect.ValueOf(k)
-
-	// 	el := reflect.Indirect(reflect.New(target.Type().Elem()))
-
-	// 	switch s := sch.Elem.(type) {
-	// 	case *schema.Schema:
-	// 		err := setAtomic(path+"."+k, &el, meta, s, data)
-	// 		if err != nil {
-	// 			return trace.Wrap(err)
-	// 		}
-	// 	default:
-	// 		return trace.Errorf("unknown Elem type: map key must be *schema.Schmea")
-	// 	}
-
-	// 	r.SetMapIndex(kv, el)
-	// }
-
-	// target.Set(r)
-
-	return nil
 }
 
+// getLen returns length of a list or set
 func getLen(path string, data *schema.ResourceData) (int, error) {
 	n, ok := data.GetOk(path + ".#")
 	if !ok || n == nil {
@@ -428,7 +393,7 @@ func getLen(path string, data *schema.ResourceData) (int, error) {
 
 	len, ok := n.(int)
 	if !ok {
-		return 0, trace.Errorf("failed to convert list count to number")
+		return 0, trace.Errorf("failed to convert list count to number %s", path)
 	}
 
 	return len, nil
