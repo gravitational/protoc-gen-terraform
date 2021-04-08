@@ -216,6 +216,7 @@ func GetFromResourceData(
 	return getFragment("", &t, meta, sch, data)
 }
 
+// getFragment iterates over schema fragment and calls appropriate getters for each field
 func getFragment(
 	path string,
 	target *reflect.Value,
@@ -401,20 +402,20 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 			return trace.Errorf("failed to convert %T to *schema.Resource", sch.Elem)
 		}
 
-		var r reflect.Value
+		t := target.Type()
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+		r := reflect.Indirect(reflect.New(t))
 
-		if target.Kind() != reflect.Ptr {
-			r = reflect.New(target.Type())
+		err := getFragment(path+".0.", &r, meta.nestedObject, s.Schema, data)
+		if err != nil {
+			return trace.Wrap(err)
+		}
 
-			err := getFragment(path+".0.", &r, meta.nestedObject, s.Schema, data)
-			if err != nil {
-				return trace.Wrap(err)
-			}
-
-			err = assignAtomic(r, target)
-			if err != nil {
-				return trace.Wrap(err)
-			}
+		err = assignAtomic(r.Interface(), target)
+		if err != nil {
+			return trace.Wrap(err)
 		}
 	}
 
