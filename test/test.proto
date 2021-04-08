@@ -109,10 +109,13 @@ message Test {
 
     // NestedNullableWithNilValue nested message field, with no value set
     Nested NestedNullableWithNilValue = 24 [ (gogoproto.nullable) = true ];
-}
 
-//     // NestedA nested message array
-//     repeated Nested NestedA = 18;
+    // NestedList nested message array
+    repeated Nested NestedList = 25 [ (gogoproto.nullable) = false ];
+
+    // NestedListNullable nested message array
+    repeated Nested NestedListNullable = 26 [ (gogoproto.nullable) = true ];
+}
 
 //     // NestedM normal map
 //     map<string, string> NestedM = 19;

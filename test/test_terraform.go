@@ -63,6 +63,10 @@ var _ = time.Kitchen
 // └── nested_nullable (NestedNullable nested message field, nullabel)
 // │   ├── str:string (Str string field)
 // └── nested_nullable_with_nil_value (NestedNullableWithNilValue nested message field, with no value set)
+// │   ├── str:string (Str string field)
+// └── [nested_list] (NestedList nested message array)
+// │   ├── str:string (Str string field)
+// └── [nested_list_nullable] (NestedListNullable nested message array)
 //     └── str:string (Str string field)
 
 // SchemaTest returns schema for Test
@@ -296,6 +300,40 @@ func SchemaTest() map[string]*schema.Schema {
 			MaxItems:    1,
 			Description: "Nested message definition",
 			Optional:    true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+				},
+			},
+		},
+		// NestedList nested message array
+		"nested_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "NestedList nested message array",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+				},
+			},
+		},
+		// NestedListNullable nested message array
+		"nested_list_nullable": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "NestedListNullable nested message array",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					// Str string field
@@ -726,6 +764,87 @@ func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
 
 		}
 	}
+	{
+		p := p + "nested_list"
+
+		_a, ok := d.GetOk(p)
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _a)
+			}
+
+			if len(a) > 0 {
+				t.NestedList = make([]Nested, len(a))
+
+				for i := 0; i < len(a); i++ {
+
+					{
+						t := &t.NestedList[i]
+						p := p + fmt.Sprintf(".%v.", i)
+						{
+
+							_raw, ok := d.GetOk(p + "str")
+
+							if ok {
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
+								t.Str = _value
+							}
+						}
+
+					}
+				}
+			}
+		} else {
+			t.NestedList = make([]Nested, 0)
+		}
+	}
+	{
+		p := p + "nested_list_nullable"
+
+		_a, ok := d.GetOk(p)
+		if ok {
+			a, ok := _a.([]interface{})
+			if !ok {
+				return fmt.Errorf("can not convert %T to []interface{}", _a)
+			}
+
+			if len(a) > 0 {
+				t.NestedListNullable = make([]*Nested, len(a))
+
+				for i := 0; i < len(a); i++ {
+
+					_obj := Nested{}
+					t.NestedListNullable[i] = &_obj
+
+					{
+						t := t.NestedListNullable[i]
+						p := p + fmt.Sprintf(".%v.", i)
+						{
+
+							_raw, ok := d.GetOk(p + "str")
+
+							if ok {
+								_raws, ok := _raw.(string)
+								if !ok {
+									return fmt.Errorf("can not convert %T to string", _raws)
+								}
+								_value := string(string(_raws))
+								t.Str = _value
+							}
+						}
+
+					}
+				}
+			}
+		} else {
+			t.NestedListNullable = make([]*Nested, 0)
+		}
+	}
 
 	return nil
 }
@@ -952,6 +1071,44 @@ func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
 
 		}
 
+	}
+	{
+		arr := make([]interface{}, len(t.NestedList))
+
+		if len(arr) > 0 {
+			for i, t := range t.NestedList {
+				obj := make(map[string]interface{})
+				{
+					_v := t.Str
+
+					_value := string(_v)
+					obj["str"] = _value
+				}
+
+				arr[i] = obj
+			}
+		}
+
+		obj["nested_list"] = arr
+	}
+	{
+		arr := make([]interface{}, len(t.NestedListNullable))
+
+		if len(arr) > 0 {
+			for i, t := range t.NestedListNullable {
+				obj := make(map[string]interface{})
+				{
+					_v := t.Str
+
+					_value := string(_v)
+					obj["str"] = _value
+				}
+
+				arr[i] = obj
+			}
+		}
+
+		obj["nested_list_nullable"] = arr
 	}
 
 	for key, value := range obj {

@@ -80,6 +80,24 @@ var (
 			},
 		},
 
+		// List of messages
+		"nested_list": []interface{}{
+			map[string]interface{}{
+				"str": "TestString1",
+			},
+			map[string]interface{}{
+				"str": "TestString2",
+			},
+		},
+		"nested_list_nullable": []interface{}{
+			map[string]interface{}{
+				"str": "TestString1",
+			},
+			map[string]interface{}{
+				"str": "TestString2",
+			},
+		},
+
 		"nested_m": map[string]interface{}{
 			"k1": "v1",
 			"k2": "v2",
@@ -193,6 +211,22 @@ func SchemaTestMeta() map[string]*SchemaMeta {
 		},
 		"nested_nullable_with_nil_value": {
 			name: "NestedNullableWithNilValue",
+			nestedObject: map[string]*SchemaMeta{
+				"str": {
+					name: "Str",
+				},
+			},
+		},
+		"nested_list": {
+			name: "NestedList",
+			nestedObject: map[string]*SchemaMeta{
+				"str": {
+					name: "Str",
+				},
+			},
+		},
+		"nested_list_nullable": {
+			name: "NestedListNullable",
 			nestedObject: map[string]*SchemaMeta{
 				"str": {
 					name: "Str",
@@ -386,7 +420,12 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 					return trace.Wrap(err)
 				}
 			case *schema.Resource:
-				err := getFragment(p, &el, meta.nestedObject, s.Schema, data)
+				if el.Kind() == reflect.Ptr {
+					el.Set(reflect.New(target.Type().Elem().Elem()))
+					el = reflect.Indirect(el)
+				}
+
+				err := getFragment(p+".", &el, meta.nestedObject, s.Schema, data)
 				if err != nil {
 					return trace.Wrap(err)
 				}
@@ -402,17 +441,21 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 			return trace.Errorf("failed to convert %T to *schema.Resource", sch.Elem)
 		}
 
+		// Construct blank object
 		t := target.Type()
 		if t.Kind() == reflect.Ptr {
 			t = t.Elem()
 		}
 		r := reflect.Indirect(reflect.New(t))
 
+		// Fill blank object in
 		err := getFragment(path+".0.", &r, meta.nestedObject, s.Schema, data)
 		if err != nil {
 			return trace.Wrap(err)
 		}
 
+		// Assign blank object
+		// TODO: change assignAtomic
 		err = assignAtomic(r.Interface(), target)
 		if err != nil {
 			return trace.Wrap(err)
@@ -503,14 +546,19 @@ func TestNestedMessageGet(t *testing.T) {
 	assert.Equal(t, "TestString", subject.NestedNullable.Str, "Test.NestedNullable.Str")
 }
 
-// // TestNestedMessageArrayGet ensures decoding of array of messages
-// func TestNestedMessageArrayGet(t *testing.T) {
-// 	subject, err := buildSubjectGet(t)
-// 	require.NoError(t, err, "failed to unmarshal test data")
+// TestNestedMessageArrayGet ensures decoding of array of messages
+func TestNestedMessageArrayGet(t *testing.T) {
+	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+	require.NoError(t, err, "failed to unmarshal test data")
 
-// 	assert.Equal(t, subject.Nested.Nested[0].Str, "TestString1")
-// 	assert.Equal(t, subject.Nested.Nested[1].Str, "TestString2")
-// }
+	assert.Equal(t, 2, len(subject.NestedList), "len(NestedList)")
+	assert.Equal(t, 2, len(subject.NestedListNullable), "len(NestedListNullable)")
+
+	assert.Equal(t, "TestString1", subject.NestedList[0].Str, "NestedList[0].Str")
+	assert.Equal(t, "TestString2", subject.NestedList[1].Str, "NestedList[1].Str")
+	assert.Equal(t, "TestString1", subject.NestedListNullable[0].Str, "NestedListNullable[0].Str")
+	assert.Equal(t, "TestString2", subject.NestedListNullable[1].Str, "NestedListNullable[1].Str")
+}
 
 // // TestMapGet ensures decoding of a maps
 // func TestMapGet(t *testing.T) {
