@@ -39,7 +39,7 @@ func Get(
 	return getFragment("", &t, meta, sch, data)
 }
 
-// getFragment iterates over schema fragment and calls appropriate getters for each field
+// getFragment iterates over a schema fragment and calls appropriate getters for each field
 func getFragment(
 	path string,
 	target *reflect.Value,
@@ -76,6 +76,7 @@ func getFragment(
 			if err != nil {
 				return trace.Wrap(err)
 			}
+
 		case s.Type == schema.TypeSet:
 			err := setSet(path+k, &v, m, s, data)
 			if err != nil {
@@ -198,6 +199,7 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 		return nil
 	}
 
+	// Target is a slice of elementary values or objects
 	if target.Type().Kind() == reflect.Slice {
 		r := reflect.MakeSlice(target.Type(), len, len)
 
@@ -228,6 +230,7 @@ func setList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 
 		target.Set(r)
 	} else {
+		// Target is a singular object
 		s, ok := sch.Elem.(*schema.Resource)
 		if !ok {
 			return trace.Errorf("failed to convert %T to *schema.Resource", sch.Elem)
@@ -314,6 +317,50 @@ func setSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	if len == 0 {
 		target.Set(reflect.Zero(target.Type()))
 		return nil
+	}
+
+	switch target.Kind() {
+	case reflect.Slice:
+		// This set must be converted to normal slice
+		return nil
+	case reflect.Map:
+		// This set must be read into a map, so, it contains artificial key and value arguments
+		r := reflect.MakeMap(target.Type())
+
+		ds, ok := data.GetOk(path)
+		if !ok {
+			return fmt.Errorf("can not read key " + path)
+		}
+
+		s, ok := ds.(*schema.Set)
+		if !ok {
+			return fmt.Errorf("can not convert %T to *schema.Set", ds)
+		}
+
+		for _, i := range s.List() {
+			m := i.(map[string]interface{})
+			m = m
+			// k := m["key"]
+
+			v := reflect.Indirect(reflect.New(target.Type().Elem()))
+			v = v
+
+			// s := sch.Elem.(*schema.Resource)
+
+			// m["value"]
+			// err := getFragment(p, &v, meta.Nested, s.Schema, data)
+			// if err != nil {
+			// 	return err
+			// }
+
+			// r.SetMapIndex(reflect.ValueOf(k), v)
+		}
+
+		target.Set(r)
+
+		return nil
+	default:
+		return fmt.Errorf("unknown set target type")
 	}
 
 	// md, ok := data.GetOk(path)
