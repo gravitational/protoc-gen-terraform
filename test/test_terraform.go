@@ -54,6 +54,20 @@ type SchemaMeta struct {
 	nested     map[string]*SchemaMeta
 }
 
+func SupressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
+	o, err := time.ParseDuration(old)
+	if err != nil {
+		return false
+	}
+
+	n, err := time.ParseDuration(new)
+	if err != nil {
+		return false
+	}
+
+	return o == n
+}
+
 // SchemaTest returns schema for Test
 //
 // Test message definition.
@@ -131,79 +145,31 @@ func GenSchemaTest() map[string]*schema.Schema {
 		},
 		// DurationStandard time.Duration field (standard)
 		"duration_standard": {
-			Type:        schema.TypeString,
-			Description: "DurationStandard time.Duration field (standard)",
-			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
-				o, err := time.ParseDuration(old)
-				if err != nil {
-					return false
-				}
-
-				n, err := time.ParseDuration(new)
-				if err != nil {
-					return false
-				}
-
-				return o == n
-			},
-			Optional: true,
+			Type:             schema.TypeString,
+			Description:      "DurationStandard time.Duration field (standard)",
+			DiffSuppressFunc: SupressDurationChange,
+			Optional:         true,
 		},
 		// DurationStandardMissing time.Duration field (standard) missing in input data
 		"duration_standard_missing": {
-			Type:        schema.TypeString,
-			Description: "DurationStandardMissing time.Duration field (standard) missing in input data",
-			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
-				o, err := time.ParseDuration(old)
-				if err != nil {
-					return false
-				}
-
-				n, err := time.ParseDuration(new)
-				if err != nil {
-					return false
-				}
-
-				return o == n
-			},
-			Optional: true,
+			Type:             schema.TypeString,
+			Description:      "DurationStandardMissing time.Duration field (standard) missing in input data",
+			DiffSuppressFunc: SupressDurationChange,
+			Optional:         true,
 		},
 		// DurationCustom time.Duration field (with casttype)
 		"duration_custom": {
-			Type:        schema.TypeString,
-			Description: "DurationCustom time.Duration field (with casttype)",
-			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
-				o, err := time.ParseDuration(old)
-				if err != nil {
-					return false
-				}
-
-				n, err := time.ParseDuration(new)
-				if err != nil {
-					return false
-				}
-
-				return o == n
-			},
-			Optional: true,
+			Type:             schema.TypeString,
+			Description:      "DurationCustom time.Duration field (with casttype)",
+			DiffSuppressFunc: SupressDurationChange,
+			Optional:         true,
 		},
 		// DurationCustomMissing time.Duration field (with casttype) missing in input data
 		"duration_custom_missing": {
-			Type:        schema.TypeString,
-			Description: "DurationCustomMissing time.Duration field (with casttype) missing in input data",
-			DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
-				o, err := time.ParseDuration(old)
-				if err != nil {
-					return false
-				}
-
-				n, err := time.ParseDuration(new)
-				if err != nil {
-					return false
-				}
-
-				return o == n
-			},
-			Optional: true,
+			Type:             schema.TypeString,
+			Description:      "DurationCustomMissing time.Duration field (with casttype) missing in input data",
+			DiffSuppressFunc: SupressDurationChange,
+			Optional:         true,
 		},
 		// StringList []string field
 		"string_list": {

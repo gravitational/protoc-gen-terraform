@@ -77,19 +77,7 @@ Description: {{ .RawComment | quote }},
 ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
 {{- if .IsDuration }}
-DiffSuppressFunc: func(k string, old string, new string, d *schema.ResourceData) bool {
-    o, err := time.ParseDuration(old)
-    if err != nil {
-        return false
-    }
-
-    n, err := time.ParseDuration(new)
-    if err != nil {
-        return false
-    }
-
-    return o == n
-},
+DiffSuppressFunc: SupressDurationChange,
 {{- end }}
 {{- end -}}
 
