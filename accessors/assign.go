@@ -51,18 +51,17 @@ func assign(source *reflect.Value, target *reflect.Value) error {
 			// target := &source
 			target.Set(v.Addr())
 			return nil
-		} else {
-			// a := "5"
-			// target := a
-			ptr := reflect.New(v.Type())
-			ptr.Elem().Set(v)
-			target.Set(ptr)
-			return nil
 		}
+
+		// a := "5"
+		// target := &a
+		ptr := reflect.New(v.Type())
+		ptr.Elem().Set(v)
+		target.Set(ptr)
+		return nil
 	}
 
 	target.Set(v)
-
 	return nil
 }
 

@@ -3,7 +3,7 @@ TOP ?= $(abspath $(LOCALDIR)/..)
 SRCDIR=/go/src/github.com/gravitational/protoc-gen-terraform
 TELEPORT_SRCDIR=/go/src/github.com/gravitational/teleport
 
-package_version = 0.0.2
+package_version = 0.0.3
 
 HOSTNAME=buildbox
 BUILDBOX ?= proto-gen-buildbox:$(package_version)

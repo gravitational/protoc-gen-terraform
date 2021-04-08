@@ -98,6 +98,40 @@ func getFragment(
 	return nil
 }
 
+// getEnumerableElement gets singular slice element from a resource data
+func getEnumerableElement(
+	path string,
+	target *reflect.Value,
+	sch *schema.Schema,
+	meta *SchemaMeta,
+	data *schema.ResourceData,
+) error {
+	switch s := sch.Elem.(type) {
+	case *schema.Schema:
+		err := getAtomic(path, target, meta, s, data)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+	case *schema.Resource:
+		t := target
+
+		if target.Kind() == reflect.Ptr {
+			target.Set(reflect.New(target.Type().Elem()))
+			i := reflect.Indirect(*target)
+			t = &i
+		}
+
+		err := getFragment(path+".", t, meta.Nested, s.Schema, data)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+	default:
+		return trace.Errorf("unknown Elem type")
+	}
+
+	return nil
+}
+
 // getAtomic gets atomic value (scalar, string, time, duration)
 func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	s, ok := data.GetOk(path)
@@ -181,87 +215,34 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 			el := r.Index(i)
 			p := fmt.Sprintf("%v.%v", path, i)
 
-			err := getSliceElement(p, &el, sch, meta, data)
+			err := getEnumerableElement(p, &el, sch, meta, data)
 			if err != nil {
 				return err
 			}
 		}
 
-		target.Set(r)
+		return assign(&r, target)
 	} else {
-		// Target is a singular object
-		s, ok := sch.Elem.(*schema.Resource)
-		if !ok {
-			return trace.Errorf("failed to convert %T to *schema.Resource", sch.Elem)
-		}
-
-		// Construct blank object
-		t := target.Type()
-		if t.Kind() == reflect.Ptr {
-			t = t.Elem()
-		}
-		r := reflect.Indirect(reflect.New(t))
-
-		// Fill blank object in
-		err := getFragment(path+".0.", &r, meta.Nested, s.Schema, data)
+		// Target is an object represented by a single element list
+		err := getEnumerableElement(path+".0", target, sch, meta, data)
 		if err != nil {
-			return trace.Wrap(err)
+			return err
 		}
 
-		// Assign blank object
-		err = assign(&r, target)
-		if err != nil {
-			return trace.Wrap(err)
-		}
+		return nil
 	}
-
-	return nil
-}
-
-// getSliceElement gets singular slice element from resource data
-func getSliceElement(
-	path string,
-	target *reflect.Value,
-	sch *schema.Schema,
-	meta *SchemaMeta,
-	data *schema.ResourceData,
-) error {
-	switch s := sch.Elem.(type) {
-	case *schema.Schema:
-		err := getAtomic(path, target, meta, s, data)
-		if err != nil {
-			return trace.Wrap(err)
-		}
-	case *schema.Resource:
-		t := target
-
-		if target.Kind() == reflect.Ptr {
-			target.Set(reflect.New(target.Type().Elem()))
-			i := reflect.Indirect(*target)
-			t = &i
-		}
-
-		err := getFragment(path+".", t, meta.Nested, s.Schema, data)
-		if err != nil {
-			return trace.Wrap(err)
-		}
-	default:
-		return trace.Errorf("unknown Elem type")
-	}
-
-	return nil
 }
 
 // setMap sets map of atomic values (scalar, string, time, duration)
 func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
-	md, ok := data.GetOk(path)
+	raw, ok := data.GetOk(path)
 	if !ok {
 		return nil
 	}
 
-	m, ok := md.(map[string]interface{})
+	m, ok := raw.(map[string]interface{})
 	if !ok {
-		return trace.Errorf("failed to convert %T to map[string]interface{}", md)
+		return trace.Errorf("failed to convert %T to map[string]interface{}", raw)
 	}
 
 	// If map is empty, set target empty map
@@ -275,29 +256,23 @@ func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 		return trace.Errorf("target time is not a map")
 	}
 
-	r := reflect.MakeMap(target.Type())
+	t := reflect.MakeMap(target.Type())
 
+	// Iterate over map keys
 	for k := range m {
-		kv := reflect.ValueOf(k)
+		// Construct new map value
+		// Map values can be only elementary so no need to handle reflect.Ptr here
+		v := reflect.Indirect(reflect.New(target.Type().Elem()))
 
-		el := reflect.Indirect(reflect.New(target.Type().Elem()))
-
-		switch s := sch.Elem.(type) {
-		case *schema.Schema:
-			err := getAtomic(path+"."+k, &el, meta, s, data)
-			if err != nil {
-				return trace.Wrap(err)
-			}
-		default:
-			return trace.Errorf("unknown Elem type: map key must be *schema.Schema")
+		err := getEnumerableElement(path+"."+k, &v, sch, meta, data)
+		if err != nil {
+			return err
 		}
 
-		r.SetMapIndex(kv, el)
+		t.SetMapIndex(reflect.ValueOf(k), v)
 	}
 
-	target.Set(r)
-
-	return nil
+	return assign(&t, target)
 }
 
 // setSet reads set from resource data
@@ -315,8 +290,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	switch target.Kind() {
 	case reflect.Slice:
 		// This set must be converted to normal slice
-		trace.NotImplemented("set acting as list on target is not implemented yet")
-		return nil
+		return trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		// This set must be read into a map, so, it contains artificial key and value arguments
 		r := reflect.MakeMap(target.Type())
