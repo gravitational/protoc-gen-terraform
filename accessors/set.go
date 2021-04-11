@@ -97,7 +97,7 @@ func readFragment(
 				return nil, trace.Wrap(err)
 			}
 
-			err = setConvertedKey(target, k, r, m)
+			err = setConvertedKey(target, k, r, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
@@ -280,21 +280,25 @@ func readDuration(source reflect.Value) (interface{}, error) {
 	return s.String(), nil
 }
 
-// convert converts source value to schema tyoe given in meta
-func convert(source reflect.Value, meta *SchemaMeta) (interface{}, error) {
+// convert converts source value to schema type given in meta
+func convert(source reflect.Value, sch *schema.Schema) (interface{}, error) {
 	t := reflect.Indirect(source)
-
-	if !t.Type().ConvertibleTo(meta.SchemaValueType) {
-		return nil, trace.Errorf("can not convert %T to %T", t.Type(), meta.SchemaValueType)
+	s, err := schemaValueType(sch)
+	if err != nil {
+		return nil, trace.Wrap(err)
 	}
 
-	return t.Convert(meta.SchemaValueType).Interface(), nil
+	if !t.Type().ConvertibleTo(s) {
+		return nil, trace.Errorf("can not convert %T to %T", t.Type(), s)
+	}
+
+	return t.Convert(s).Interface(), nil
 }
 
 // setConvertedKey converts value to target schema type and sets it to resulting map if not nil
-func setConvertedKey(target map[string]interface{}, key string, source interface{}, meta *SchemaMeta) error {
+func setConvertedKey(target map[string]interface{}, key string, source interface{}, sch *schema.Schema) error {
 	if source != nil {
-		f, err := convert(reflect.ValueOf(source), meta)
+		f, err := convert(reflect.ValueOf(source), sch)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -318,7 +322,7 @@ func readEnumerableElement(
 			return nil, trace.Wrap(err)
 		}
 
-		n, err := convert(reflect.ValueOf(a), meta)
+		n, err := convert(reflect.ValueOf(a), s)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
@@ -335,4 +339,21 @@ func readEnumerableElement(
 	default:
 		return nil, trace.Errorf("unknown Elem type")
 	}
+}
+
+// schemaValueType returns type to convert value to
+func schemaValueType(sch *schema.Schema) (reflect.Type, error) {
+	switch sch.Type {
+	case schema.TypeFloat:
+		return reflect.TypeOf((*float64)(nil)).Elem(), nil
+	case schema.TypeInt:
+		return reflect.TypeOf((*int)(nil)).Elem(), nil
+	case schema.TypeBool:
+		return reflect.TypeOf((*bool)(nil)).Elem(), nil
+	case schema.TypeString:
+		return reflect.TypeOf((*string)(nil)).Elem(), nil
+	default:
+		return nil, trace.Errorf("unknown schema type: %v", sch.Type.String())
+	}
+
 }

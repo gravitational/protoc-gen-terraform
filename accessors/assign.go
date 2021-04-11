@@ -66,7 +66,7 @@ func assign(source reflect.Value, target reflect.Value) error {
 	return nil
 }
 
-// assignZeroValue sets target to zero value. Target must not be pointer.
+// AssignZeroValue sets target to zero value. Target must not be pointer.
 func AssignZeroValue(target reflect.Value) {
 	target.Set(reflect.Zero(target.Type()))
 }

@@ -20,12 +20,6 @@ map[string]*accessors.SchemaMeta {
 Name: {{.Name|quote}},
 IsTime: {{.IsTime}},
 IsDuration: {{.IsDuration}},
-{{ if eq .Kind "SINGULAR_ELEMENTARY" "REPEATED_ELEMENTARY" -}}
-SchemaValueType: reflect.TypeOf((*{{.SchemaRawType}})(nil)).Elem(),
-{{- end -}}
-{{ if eq .Kind "MAP" -}}
-SchemaValueType: reflect.TypeOf((*{{.MapValueField.SchemaRawType}})(nil)).Elem(),
-{{- end -}}
 {{- if eq .Kind "CUSTOM_TYPE" -}}
 Getter: Get{{.CustomTypeMethodInfix}},
 Setter: Set{{.CustomTypeMethodInfix}},

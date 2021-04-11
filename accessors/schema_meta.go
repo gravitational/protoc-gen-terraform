@@ -46,7 +46,4 @@ type SchemaMeta struct {
 
 	// Nested nested message definition
 	Nested map[string]*SchemaMeta
-
-	// Schema value type to convert to when set
-	SchemaValueType reflect.Type
 }
