@@ -23,20 +23,7 @@ protoc \
     types.proto
 ```
 
-This will generate `types_terraform.go` in _out directory. This file will contain `GetUserV2FromResourceData` and `GetRoleV3FromResourceData` along with `SchemaUserV2`, `SchemaRolesV3`, `SetUserV2ToResourceData`, `SetRoleV3ToResourceData` methods.
-
-Schema method should have the following prototype:
-
-```
-func SchemawrappersLabelValues() *schema.Schema
-```
-
-Getter method should look like this:
-```
-func GetwrappersLabelValuesFromResourceData(string path, data *schema.ResourceData, target *types.Traits) error
-```
-
-Where types.Traits, and wrappers.LabelValues is the type name in proto file.
+This will generate `types_terraform.go` in _out directory. This file will contain `SchemaUserV2`, `SchemaRolesV3` along with `SchemaMetaUserV2`, `SchemaMetaRolesV3`.
 
 See [Makefile](Makefile) for details.
 
@@ -53,8 +40,9 @@ Options:
 * `force_new` - list of a fields to mark as `ForceNew: true`
 * `config_mode_attr` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeAttr`
 * `config_mode_block` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
+* `suffixes` - map of overrides of method names generated for `gogo.customtype` fields.
 
-All config variables could be set in [example/teleport.yaml](YAML config). Path to config file can be specified using `config` variable. `defaults` variable is available in config only because it requirers type information. CLI args take higher priority over config file.
+All config variables could be set in [example/teleport.yaml](YAML config). Path to config file can be specified using `config` variable. `defaults` variable is available in config only because it requirers type information. `suffixes` is available in config file only. CLI args take higher priority over config file.
 
 # Testing
 

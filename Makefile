@@ -31,8 +31,8 @@ custom_imports = "github.com/gravitational/teleport/api/types"
 target_pkg = "tfschema"
 pwd = $(shell pwd)
 
-.PHONY: terraform
-terraform: build
+.PHONY: teleport
+teleport: build
 ifeq ("$(wildcard $(teleport_dir))", "")
 	$(warning Teleport source code is required to build this example!)
 	$(warning git clone ${teleport_repo} ${teleport_dir} to proceed)

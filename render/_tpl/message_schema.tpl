@@ -84,10 +84,10 @@ DiffSuppressFunc: SupressDurationChange,
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
 Description: {{ .RawComment | quote }},
-{{ template "configMode" . -}}
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
+{{ template "configMode" . -}}
 {{- end -}}
 
 {{- define "repeatedElementary" -}}
@@ -109,7 +109,6 @@ Elem: &schema.Schema {
 {{- define "messageMap" -}}
 Type: schema.TypeSet,
 Description: {{ .RawComment | quote }},
-{{ template "configMode" . -}}
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{
         "key": {
@@ -119,6 +118,7 @@ Elem: &schema.Resource {
         "value": {{ template "fieldSchema" .MapValueField }}
     },
 },
+{{ template "configMode" . -}}
 {{- end -}}
 
 {{- define "type" -}}
@@ -134,13 +134,13 @@ schema.TypeString
 {{- end -}}
 
 {{- define "required" -}}
-{{- if .IsComputed }}
-Computed: true,
-{{- end }}
 {{- if .IsRequired }}
 Required: true,
 {{- else }}
 Optional: true,
+{{- end }}
+{{- if .IsComputed }}
+Computed: true,
 {{- end }}
 {{- if .Default }}
 Default: {{.Default }},
