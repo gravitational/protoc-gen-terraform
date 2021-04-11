@@ -2,9 +2,9 @@ var (
 {{- range $index, $message := . }}
     // Schema{{.Name}} is schema for {{.RawComment}}
     Schema{{.Name}} = GenSchema{{.Name}}()
-
     // SchemaMeta{{.Name}} is schema metadata for {{.RawComment}}
     SchemaMeta{{.Name}} = GenSchemaMeta{{.Name}}()
+    
 {{- end }}
 )
 

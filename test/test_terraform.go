@@ -42,7 +42,6 @@ var _ = time.Kitchen
 var (
 	// SchemaTest is schema for Test message definition.
 	SchemaTest = GenSchemaTest()
-
 	// SchemaMetaTest is schema metadata for Test message definition.
 	SchemaMetaTest = GenSchemaMetaTest()
 )
