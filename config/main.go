@@ -159,7 +159,7 @@ func readConfigFromYaml(p string) error {
 func setVarsFromConfig() error {
 	err := setTypes(cfg.Types)
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	setDurationType(cfg.DurationCustomType)

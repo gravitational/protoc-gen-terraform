@@ -74,7 +74,7 @@ func runGoImports(resp *plugin_go.CodeGeneratorResponse) error {
 
 		s, err = prependLicense(s)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 
 		s = replacePackageName(s)

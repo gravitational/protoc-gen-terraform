@@ -22,10 +22,10 @@ import (
 	"github.com/gravitational/trace"
 )
 
-// assign assigns source value to target with possible type and pointer conversions
-func assign(source *reflect.Value, target *reflect.Value) error {
+// assign assigns source value to target with type and pointer conversions
+func assign(source reflect.Value, target reflect.Value) error {
 	t := target.Type()
-	v := *source
+	v := source
 
 	// If target type is at the pointer reference use underlying type
 	if target.Type().Kind() == reflect.Ptr {
@@ -66,16 +66,16 @@ func assign(source *reflect.Value, target *reflect.Value) error {
 	return nil
 }
 
-// assignZeroValue sets target to zero value
-func assignZeroValue(target *reflect.Value) {
+// assignZeroValue sets target to zero value. Target must not be pointer.
+func AssignZeroValue(target reflect.Value) {
 	target.Set(reflect.Zero(target.Type()))
 }
 
 // assignMapIndex assigns map element by value or reference
-func assignMapIndex(m reflect.Value, key reflect.Value, value *reflect.Value) {
+func assignMapIndex(m reflect.Value, key reflect.Value, value reflect.Value) {
 	if m.Type().Elem().Kind() == reflect.Ptr {
 		m.SetMapIndex(key, value.Addr())
 	} else {
-		m.SetMapIndex(key, *value)
+		m.SetMapIndex(key, value)
 	}
 }

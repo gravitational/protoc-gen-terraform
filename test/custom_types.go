@@ -59,11 +59,11 @@ func GetBoolCustom(
 ) error {
 	len, err := accessors.GetLen(path, data)
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 	if len == 0 {
 		// TODO: Share with accessors
-		target.Set(reflect.Zero(target.Type()))
+		accessors.AssignZeroValue(target)
 		return nil
 	}
 

@@ -225,7 +225,7 @@ func readSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interf
 
 	switch source.Kind() {
 	case reflect.Slice:
-		// TODO: This set must be converted to normal slice, will implement along with override
+		// TODO: This case is not important for now
 		return nil, trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		for _, k := range source.MapKeys() {

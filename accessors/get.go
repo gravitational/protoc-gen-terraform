@@ -48,7 +48,7 @@ func Get(
 
 	v = reflect.Indirect(v)
 
-	return getFragment("", &v, meta, sch, data)
+	return getFragment("", v, meta, sch, data)
 }
 
 // GetLen returns TypeSet or TypeList value length
@@ -70,7 +70,7 @@ func GetLen(path string, data *schema.ResourceData) (int, error) {
 // Target must point to a struct.
 func getFragment(
 	path string,
-	target *reflect.Value,
+	target reflect.Value,
 	meta map[string]*SchemaMeta,
 	sch map[string]*schema.Schema,
 	data *schema.ResourceData,
@@ -88,31 +88,31 @@ func getFragment(
 		case m.Getter != nil:
 			err := m.Getter(p, v, m, s, data)
 			if err != nil {
-				return err
+				return trace.Wrap(err)
 			}
 		case s.Type == schema.TypeInt ||
 			s.Type == schema.TypeFloat ||
 			s.Type == schema.TypeBool ||
 			s.Type == schema.TypeString:
 
-			err := getAtomic(p, &v, m, s, data)
+			err := getAtomic(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 		case s.Type == schema.TypeList:
-			err := getList(p, &v, m, s, data)
+			err := getList(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case s.Type == schema.TypeMap:
-			err := getMap(p, &v, m, s, data)
+			err := getMap(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case s.Type == schema.TypeSet:
-			err := getSet(p, &v, m, s, data)
+			err := getSet(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
@@ -129,7 +129,7 @@ func getFragment(
 // an empty value to the target.
 func getEnumerableElement(
 	path string,
-	target *reflect.Value,
+	target reflect.Value,
 	sch *schema.Schema,
 	meta *SchemaMeta,
 	data *schema.ResourceData,
@@ -144,7 +144,7 @@ func getEnumerableElement(
 		if ok {
 			err := getFragment(path+".", v, meta.Nested, s.Schema, data)
 			if err != nil {
-				return err
+				return trace.Wrap(err)
 			}
 		}
 
@@ -155,10 +155,10 @@ func getEnumerableElement(
 }
 
 // getAtomic gets atomic value (scalar, string, time, duration)
-func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getAtomic(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	s, ok := data.GetOk(path)
 	if !ok {
-		target.Set(reflect.Zero(target.Type()))
+		AssignZeroValue(target)
 		return nil
 	}
 
@@ -175,7 +175,7 @@ func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 		}
 	default:
 		v := reflect.ValueOf(s)
-		err := assign(&v, target)
+		err := assign(v, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
@@ -185,7 +185,7 @@ func getAtomic(path string, target *reflect.Value, meta *SchemaMeta, sch *schema
 }
 
 // assignTime parses time value from a string and assigns it to target
-func assignTime(source interface{}, target *reflect.Value) error {
+func assignTime(source interface{}, target reflect.Value) error {
 	s, ok := source.(string)
 	if !ok {
 		return trace.Errorf("can not convert %T to string", source)
@@ -197,11 +197,11 @@ func assignTime(source interface{}, target *reflect.Value) error {
 	}
 
 	v := reflect.ValueOf(t)
-	return assign(&v, target)
+	return assign(v, target)
 }
 
 // assignTime parses duration value from a string and assigns it to target
-func assignDuration(source interface{}, target *reflect.Value) error {
+func assignDuration(source interface{}, target reflect.Value) error {
 	s, ok := source.(string)
 	if !ok {
 		return trace.Errorf("can not convert %T to string", source)
@@ -213,11 +213,11 @@ func assignDuration(source interface{}, target *reflect.Value) error {
 	}
 
 	v := reflect.ValueOf(t)
-	return assign(&v, target)
+	return assign(v, target)
 }
 
 // setList gets list from ResourceData
-func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getList(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	len, err := GetLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
@@ -225,7 +225,7 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 
 	// Empty list: do nothing, but set target field to empty value
 	if len == 0 {
-		assignZeroValue(target)
+		AssignZeroValue(target)
 		return nil
 	}
 
@@ -237,13 +237,13 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 			el := r.Index(i)
 			p := fmt.Sprintf("%v.%v", path, i)
 
-			err := getEnumerableElement(p, &el, sch, meta, data)
+			err := getEnumerableElement(p, el, sch, meta, data)
 			if err != nil {
-				return err
+				return trace.Wrap(err)
 			}
 		}
 
-		return assign(&r, target)
+		return assign(r, target)
 	}
 
 	// Target is an object represented by a single element list
@@ -251,7 +251,7 @@ func getList(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.S
 }
 
 // setMap sets map of atomic values (scalar, string, time, duration)
-func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getMap(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	raw, ok := data.GetOk(path)
 	if !ok {
 		return nil
@@ -264,8 +264,7 @@ func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 	// If map is empty, set target empty map
 	if len(m) == 0 {
-		target.Set(reflect.Zero(target.Type()))
-
+		AssignZeroValue(target)
 		return nil
 	}
 
@@ -281,24 +280,24 @@ func getMap(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 		err := getEnumerableElement(path+"."+k, v, sch, meta, data)
 		if err != nil {
-			return err
+			return trace.Wrap(err)
 		}
 
 		assignMapIndex(t, reflect.ValueOf(k), v)
 	}
 
-	return assign(&t, target)
+	return assign(t, target)
 }
 
 // setSet reads set from resource data
-func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+func getSet(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	len, err := GetLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
 	}
 
 	if len == 0 {
-		assignZeroValue(target)
+		AssignZeroValue(target)
 		return nil
 	}
 
@@ -314,7 +313,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 	switch target.Kind() {
 	case reflect.Slice:
-		// TODO: This set must be converted to normal slice, will implement along with override
+		// TODO: This case is not important for now
 		return trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		// This set must be read into a map, so, it contains artificial key and value arguments
@@ -338,7 +337,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 			err := getEnumerableElement(p, v, re.Schema["value"], meta, data)
 			if err != nil {
-				return err
+				return trace.Wrap(err)
 			}
 
 			assignMapIndex(r, reflect.ValueOf(k), v)
@@ -353,7 +352,7 @@ func getSet(path string, target *reflect.Value, meta *SchemaMeta, sch *schema.Sc
 }
 
 // newEmptyValue constructs new empty value for a given type. Type might be a pointer.
-func newEmptyValue(source reflect.Type) *reflect.Value {
+func newEmptyValue(source reflect.Type) reflect.Value {
 	t := source
 
 	if t.Kind() == reflect.Ptr {
@@ -361,5 +360,5 @@ func newEmptyValue(source reflect.Type) *reflect.Value {
 	}
 
 	n := reflect.Indirect(reflect.New(t))
-	return &n
+	return n
 }

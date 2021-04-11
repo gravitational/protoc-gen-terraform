@@ -23,6 +23,7 @@ import (
 	time "time"
 
 	"github.com/gravitational/protoc-gen-terraform/accessors"
+	"github.com/gravitational/trace"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -91,12 +92,12 @@ var (
 func fillTimestamps(t *Test) error {
 	ti, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	d, err := time.ParseDuration("1h")
 	if err != nil {
-		return err
+		return trace.Wrap(err)
 	}
 
 	t.Timestamp = ti
