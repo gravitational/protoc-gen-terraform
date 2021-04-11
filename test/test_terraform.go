@@ -906,8 +906,9 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"bool_custom_list": {
 			Name:       "BoolCustomList",
 			IsTime:     false,
-			IsDuration: false, Getter: GetBoolCustom,
-			Setter: SetBoolCustom,
+			IsDuration: false,
+			Getter:     GetBoolCustom,
+			Setter:     SetBoolCustom,
 		},
 		// BytesList [][]byte field
 		"bytes_list": {
@@ -931,7 +932,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"nested": {
 			Name:       "Nested",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -942,7 +944,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -961,7 +964,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -976,7 +980,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"nested_nullable": {
 			Name:       "NestedNullable",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -987,7 +992,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1006,7 +1012,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1021,7 +1028,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"nested_nullable_with_nil_value": {
 			Name:       "NestedNullableWithNilValue",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -1032,7 +1040,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1051,7 +1060,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1066,7 +1076,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"nested_list": {
 			Name:       "NestedList",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -1077,7 +1088,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1096,7 +1108,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1111,7 +1124,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"nested_list_nullable": {
 			Name:       "NestedListNullable",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -1122,7 +1136,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1141,7 +1156,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1162,7 +1178,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"map_object": {
 			Name:       "MapObject",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -1173,7 +1190,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1192,7 +1210,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1207,7 +1226,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		"map_object_nullable": {
 			Name:       "MapObjectNullable",
 			IsTime:     false,
-			IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
 				// Str string field
 				"str": {
 					Name:       "Str",
@@ -1218,7 +1238,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"nested_list": {
 					Name:       "NestedList",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",
@@ -1237,7 +1258,8 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				"map_object_nested": {
 					Name:       "MapObjectNested",
 					IsTime:     false,
-					IsDuration: false, Nested: map[string]*accessors.SchemaMeta{
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
 						// Str string field
 						"str": {
 							Name:       "Str",

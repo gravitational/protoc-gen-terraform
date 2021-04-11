@@ -81,6 +81,10 @@ var (
 	// Passed from command line (--terraform_out=force=types.Metadata.Name:./_out)
 	ForceNewFields map[string]struct{} = make(map[string]struct{})
 
+	// Suffixes represents map of suffixes for custom types
+	//
+	Suffixes map[string]string = make(map[string]string)
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -103,6 +107,7 @@ type config struct {
 	ConfigModeBlockFields []string               `yaml:"config_mode_block_fields"`
 	CustomImports         []string               `yaml:"custom_imports"`
 	Defaults              map[string]interface{} `yaml:"defaults"`
+	Suffixes              map[string]string      `yaml:"suffixes"`
 }
 
 // Read reads config variables from command line or config file
@@ -171,8 +176,9 @@ func setVarsFromConfig() error {
 	setConfigModeAttrFields(cfg.ConfigModeAttrFields)
 	setConfigModeBlockFields(cfg.ConfigModeBlockFields)
 	setCustomImports(cfg.CustomImports)
-	setDefaults(cfg.Defaults)
 	setForceNewFields(cfg.ForceNew)
+	setDefaults(cfg.Defaults)
+	setSuffixes(cfg.Suffixes)
 
 	return nil
 }
@@ -278,6 +284,23 @@ func setDefaults(m map[string]interface{}) {
 	}
 
 	logrus.Printf("Defaults set for: %v", s)
+}
+
+// setSuffixes sets suffixes for a fields
+func setSuffixes(m map[string]string) {
+	if len(m) == 0 {
+		return
+	}
+
+	Suffixes = m
+
+	var s []string
+
+	for k := range m {
+		s = append(s, k)
+	}
+
+	logrus.Printf("Suffixes set for: %v", s)
 }
 
 // setForceNew parses and sets ExcludeFields

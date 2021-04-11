@@ -121,3 +121,9 @@ config_mode_attr_fields:
 
 # These fields will be marked as ConfigMode: schema.SchemaConfigModeBlock
 config_mode_block_fields:
+
+# These suffixes for custom methods called when field has custom_type flag. By default they might be weird.
+suffixes:
+    "BoolOption": "BoolOption"
+    "Labels": "Labels"
+    "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"

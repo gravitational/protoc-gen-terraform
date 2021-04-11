@@ -20,9 +20,9 @@ map[string]*accessors.SchemaMeta {
 Name: {{.Name|quote}},
 IsTime: {{.IsTime}},
 IsDuration: {{.IsDuration}},
-{{- if eq .Kind "CUSTOM_TYPE" -}}
-Getter: Get{{.CustomTypeMethodInfix}},
-Setter: Set{{.CustomTypeMethodInfix}},
+{{ if eq .Kind "CUSTOM_TYPE" -}}
+Getter: Get{{.Suffix}},
+Setter: Set{{.Suffix}},
 {{- end }}
 {{- if eq .Kind "SINGULAR_MESSAGE" "REPEATED_MESSAGE" -}}
 Nested: {{ template "fieldsSchema" .Message.Fields }},

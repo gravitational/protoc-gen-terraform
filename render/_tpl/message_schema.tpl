@@ -65,7 +65,7 @@ map[string]*schema.Schema {
 {{- end }}
 
 {{- if eq .Kind "CUSTOM_TYPE" }}
-Schema{{.CustomTypeMethodInfix}}(),
+Schema{{.Suffix}}(),
 {{- end }}
 {{- end -}}
 

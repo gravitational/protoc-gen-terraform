@@ -84,8 +84,8 @@ type Field struct {
 	// IsForceNew field has ForceNew flag
 	IsForceNew bool
 
-	// CustomTypeMethodInfix custom type schema and unmarshal method name infix
-	CustomTypeMethodInfix string
+	// Suffix custom type schema and unmarshal method name suffix
+	Suffix string
 
 	// Message reference to nested message
 	Message *Message
@@ -207,7 +207,11 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		f.MapValueField = vf
 	}
 
-	f.setCustomType(c)
+	err = f.setCustomType(c)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
 	f.setRequired(c)
 	f.setComputed(c)
 	f.setForceNew(c)
@@ -263,11 +267,23 @@ func (f *Field) setKind() {
 }
 
 // setCustomType sets custom type information
-func (f *Field) setCustomType(c *FieldBuildContext) {
-	if c.IsCustomType() {
-		f.IsCustomType = true
-		f.CustomTypeMethodInfix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
+func (f *Field) setCustomType(c *FieldBuildContext) error {
+	if !c.IsCustomType() {
+		return nil
 	}
+
+	f.IsCustomType = true
+
+	v, ok := config.Suffixes[c.f.GetCustomType()]
+
+	if ok {
+		f.Suffix = v
+		return nil
+	}
+
+	f.Suffix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
+
+	return nil
 }
 
 // setRequired sets IsRequired flag
