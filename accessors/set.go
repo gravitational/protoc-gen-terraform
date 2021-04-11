@@ -103,21 +103,23 @@ func readFragment(
 			}
 
 		case s.Type == schema.TypeList:
-			r, err := readList(v, m, s)
+			r, err := setList(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
-			target[k] = r
+			if r != nil {
+				target[k] = r
+			}
 
 		case s.Type == schema.TypeMap:
-			r, err := readMap(v, m, s)
+			r, err := setMap(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
 			target[k] = r
 
 		case s.Type == schema.TypeSet:
-			r, err := readSet(v, m, s)
+			r, err := setSet(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
@@ -156,8 +158,8 @@ func readAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (int
 	}
 }
 
-// readList converts source value to list
-func readList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+// setList converts source value to list
+func setList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Type().Kind() == reflect.Slice {
 		t := make([]interface{}, source.Len())
 
@@ -190,8 +192,8 @@ func readList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (inter
 	return nil, nil
 }
 
-// readMap converts source value to map
-func readMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+// setMap converts source value to map
+func setMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Len() == 0 {
 		return nil, nil
 	}
@@ -212,8 +214,8 @@ func readMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interf
 	return m, nil
 }
 
-// readSet converts source value to set
-func readSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+// setSet converts source value to set
+func setSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Len() == 0 {
 		return nil, nil
 	}
