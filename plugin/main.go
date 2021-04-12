@@ -91,11 +91,6 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
-
-	// err = p.writeGettersSetters()
-	// if err != nil {
-	// 	p.Generator.Fail(err.Error())
-	// }
 }
 
 // reflect builds message dictionary from a messages in protoc file
@@ -144,27 +139,6 @@ func (p *Plugin) writeSchema() error {
 		if err != nil {
 			return trace.Wrap(err)
 		}
-		p.P(buf.String())
-	}
-
-	return nil
-}
-
-// writeGetters writes unmarshallers definition to target file
-func (p *Plugin) writeGettersSetters() error {
-	for _, message := range p.Messages {
-		var buf bytes.Buffer
-
-		err := render.Template(render.GetTpl, message, &buf)
-		if err != nil {
-			return trace.Wrap(err)
-		}
-
-		err = render.Template(render.SetTpl, message, &buf)
-		if err != nil {
-			return trace.Wrap(err)
-		}
-
 		p.P(buf.String())
 	}
 

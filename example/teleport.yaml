@@ -26,22 +26,12 @@ exclude_fields:
     - "types.UserSpecV2.CreatedBy"
     - "types.UserSpecV2.Status"
 
-    # Role: TEMPORARY
+    # Role
     - "types.RoleV3.Spec.Allow.Namespaces"
     - "types.RoleV3.Spec.Deny.Namespaces"
-    # - "types.RoleV3.Spec.Allow.Request.Annotations"
-    # - "types.RoleV3.Spec.Deny.Request.Annotations"    
-    # - "types.RoleV3.Spec.Allow.Request.Thresholds"
-    # - "types.RoleV3.Spec.Deny.Request.Thresholds"
 
 # These fields will be marked as Computed: true
 computed_fields:
-    # Role
-    # - "types.RoleV3.Spec.Options.BPF"
-    # - "types.RoleV3.Spec.Allow"
-    # - "types.RoleV3.Spec.Allow.Namespaces"
-    # - "types.RoleV3.Spec.Deny"
-    # - "types.RoleV3.Spec.Deny.Namespaces"
 
 # These fields will be marked as Required: true 
 required_fields:

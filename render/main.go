@@ -44,15 +44,6 @@ var (
 	// VarsTpl is the template for global variables, type definitions and shared methods
 	//go:embed _tpl/vars.tpl
 	VarsTpl string
-
-	// NOTE: soon be obsolete
-	// GetTpl is unmarshaller template
-	//go:embed _tpl/message_get.tpl
-	GetTpl string
-
-	// SetTpl is unmarshaller template
-	//go:embed _tpl/message_set.tpl
-	SetTpl string
 )
 
 // Template renders template from string to the specified writer
