@@ -40,12 +40,12 @@ func Set(
 		return trace.Errorf("obj must not be nil")
 	}
 
-	base, err := readFragment(reflect.Indirect(reflect.ValueOf(obj)), meta, sch)
+	root, err := setFragment(reflect.Indirect(reflect.ValueOf(obj)), meta, sch)
 	if err != nil {
 		return trace.Wrap(err)
 	}
 
-	for k, v := range base {
+	for k, v := range root {
 		if v != nil {
 			err := data.Set(k, v)
 			if err != nil {
@@ -58,7 +58,7 @@ func Set(
 }
 
 // readFragment returns map[string]interface{} of a block
-func readFragment(
+func setFragment(
 	source reflect.Value,
 	meta map[string]*SchemaMeta,
 	sch map[string]*schema.Schema,
@@ -92,14 +92,16 @@ func readFragment(
 			s.Type == schema.TypeBool ||
 			s.Type == schema.TypeString:
 
-			r, err := readAtomic(v, m, s)
+			r, err := setAtomic(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
 
-			err = setConvertedKey(target, k, r, s)
-			if err != nil {
-				return nil, trace.Wrap(err)
+			if r != nil {
+				err = setConvertedKey(target, k, r, s)
+				if err != nil {
+					return nil, trace.Wrap(err)
+				}
 			}
 
 		case s.Type == schema.TypeList:
@@ -133,27 +135,31 @@ func readFragment(
 	return target, nil
 }
 
-// readAtomic gets atomic value (scalar, string, time, duration)
-func readAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+// setAtomic gets atomic value (scalar, string, time, duration)
+func setAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Kind() == reflect.Ptr && source.IsNil() {
 		return nil, nil
 	}
 
 	switch {
 	case meta.IsTime:
-		t, err := readTime(source)
+		t, err := setTime(source)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
 		return t, nil
 	case meta.IsDuration:
-		d, err := readDuration(source)
+		d, err := setDuration(source)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
 
 		return d, nil
 	default:
+		if source.IsZero() {
+			return nil, nil
+		}
+
 		return source.Interface(), nil
 	}
 }
@@ -166,7 +172,7 @@ func setList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interf
 		for i := 0; i < source.Len(); i++ {
 			v := source.Index(i)
 
-			el, err := readEnumerableElement(v, meta, sch)
+			el, err := setEnumerableElement(v, meta, sch)
 			if err != nil {
 				return nil, err
 			}
@@ -179,7 +185,7 @@ func setList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interf
 
 	t := make([]interface{}, 1)
 
-	item, err := readEnumerableElement(reflect.Indirect(source), meta, sch)
+	item, err := setEnumerableElement(reflect.Indirect(source), meta, sch)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +209,7 @@ func setMap(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interfa
 	for _, k := range source.MapKeys() {
 		i := source.MapIndex(k)
 
-		v, err := readEnumerableElement(i, meta, sch)
+		v, err := setEnumerableElement(i, meta, sch)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
@@ -235,7 +241,7 @@ func setSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interfa
 
 			vsch := sch.Elem.(*schema.Resource).Schema["value"]
 
-			v, err := readEnumerableElement(i, meta, vsch)
+			v, err := setEnumerableElement(i, meta, vsch)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
@@ -254,8 +260,8 @@ func setSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interfa
 	}
 }
 
-// readTime returns value as time
-func readTime(source reflect.Value) (interface{}, error) {
+// setTime returns value as time
+func setTime(source reflect.Value) (interface{}, error) {
 	t := reflect.Indirect(source).Interface()
 	v, ok := t.(time.Time)
 	if !ok {
@@ -265,8 +271,8 @@ func readTime(source reflect.Value) (interface{}, error) {
 	return v.Format(time.RFC3339Nano), nil
 }
 
-// readDuration returns value as duration
-func readDuration(source reflect.Value) (interface{}, error) {
+// setDuration returns value as duration
+func setDuration(source reflect.Value) (interface{}, error) {
 	t := reflect.Indirect(source)
 	d := reflect.TypeOf((*time.Duration)(nil)).Elem()
 
@@ -279,7 +285,11 @@ func readDuration(source reflect.Value) (interface{}, error) {
 		return nil, trace.Errorf("can not convert %T to time.Duration", t)
 	}
 
-	return s.String(), nil
+	if s != 0 {
+		return s.String(), nil
+	}
+
+	return nil, nil
 }
 
 // convert converts source value to schema type given in meta
@@ -310,16 +320,16 @@ func setConvertedKey(target map[string]interface{}, key string, source interface
 	return nil
 }
 
-// readEnumerableElement gets singular slice element from a resource data. If enumerable element is empty, it assigns
-// an empty value to the target.
-func readEnumerableElement(
+// setEnumerableElement gets singular slice element from a resource data and sets it to target. If enumerable element
+// is empty, it assigns an empty value to the target.
+func setEnumerableElement(
 	source reflect.Value,
 	meta *SchemaMeta,
 	sch *schema.Schema,
 ) (interface{}, error) {
 	switch s := sch.Elem.(type) {
 	case *schema.Schema:
-		a, err := readAtomic(source, meta, s)
+		a, err := setAtomic(source, meta, s)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
@@ -332,9 +342,13 @@ func readEnumerableElement(
 		return n, nil
 
 	case *schema.Resource:
-		m, err := readFragment(reflect.Indirect(source), meta.Nested, s.Schema)
+		m, err := setFragment(reflect.Indirect(source), meta.Nested, s.Schema)
 		if err != nil {
 			return nil, err
+		}
+
+		if len(m) == 0 {
+			return nil, nil
 		}
 
 		return m, nil

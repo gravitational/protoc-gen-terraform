@@ -27,8 +27,8 @@ exclude_fields:
     - "types.UserSpecV2.Status"
 
     # Role: TEMPORARY
-    # - "types.RoleV3.Spec.Allow.Request.ClaimsToRoles"
-    # - "types.RoleV3.Spec.Deny.Request.ClaimsToRoles"
+    - "types.RoleV3.Spec.Allow.Namespaces"
+    - "types.RoleV3.Spec.Deny.Namespaces"
     # - "types.RoleV3.Spec.Allow.Request.Annotations"
     # - "types.RoleV3.Spec.Deny.Request.Annotations"    
     # - "types.RoleV3.Spec.Allow.Request.Thresholds"
@@ -38,15 +38,18 @@ exclude_fields:
 computed_fields:
     # Role
     - "types.RoleV3.Spec.Options.BPF"
-    - "types.RoleV3.Spec.Allow"
-    - "types.RoleV3.Spec.Allow.Namespaces"
-    - "types.RoleV3.Spec.Deny"
-    - "types.RoleV3.Spec.Deny.Namespaces"
+    # - "types.RoleV3.Spec.Allow"
+    # - "types.RoleV3.Spec.Allow.Namespaces"
+    # - "types.RoleV3.Spec.Deny"
+    # - "types.RoleV3.Spec.Deny.Namespaces"
 
 # These fields will be marked as Required: true 
 required_fields:
     # Metadata
     - "types.Metadata.Name"
+
+    # Role
+    - "types.RoleV3.Spec.Options"
     
     # Provision token
     - "types.ProvisionTokenV2.Spec"
@@ -74,8 +77,8 @@ defaults:
     "types.RoleV3.Version": "v3"
     "types.RoleV3.Kind": "role"
     "types.RoleV3.SubKind": ""
-    "types.RoleV3.Spec.Options.MaxSessions": 0
-    "types.RoleV3.Spec.Options.RequireSessionsMFA": false
+    "types.RoleV3.Spec.Options.MaxSessionTTL": "30h"
+    "types.RoleV3.Spec.Options.CertificateFormat": "standard"
     "types.RoleV3.Spec.Allow.ReviewRequests.Where": ""
     "types.RoleV3.Spec.Deny.ReviewRequests.Where": ""
 
