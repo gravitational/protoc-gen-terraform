@@ -166,6 +166,11 @@ func (c *FieldBuildContext) IsCustomType() bool {
 	return c.f.IsCustomType()
 }
 
+// GetCustomType returns true if fields has gogo.custom_type flag
+func (c *FieldBuildContext) GetCustomType() string {
+	return c.f.GetCustomType()
+}
+
 // GetComment returns field comment as a single line and as a block comment
 func (c *FieldBuildContext) GetComment() (string, string) {
 	p := c.d.Path() + ",2," + strconv.Itoa(c.index)
@@ -179,53 +184,6 @@ func (c *FieldBuildContext) GetComment() (string, string) {
 	}
 
 	return "", ""
-}
-
-// GetRawGoType returns original type parsed by gogo protobuf
-func (c *FieldBuildContext) GetRawGoType() string {
-	return c.rawGoType
-}
-
-// IsByteSlice returns true if field is []byte or []*byte
-func (c *FieldBuildContext) IsByteSlice() bool {
-	return strings.Contains(c.rawGoType, "[]byte") || strings.Contains(c.rawGoType, "[]*byte")
-}
-
-// GetGoTypeIsSlice returns true of go type has []
-func (c *FieldBuildContext) GetGoTypeIsSlice() bool {
-	return strings.Contains(c.rawGoType, "[]")
-}
-
-// GetGoTypeIsPtr returns true if go type is a pointer
-func (c *FieldBuildContext) GetGoTypeIsPtr() bool {
-	return strings.Contains(c.rawGoType, "*")
-}
-
-// GetGoType returns go type without [] and *.
-// t overrides default rawGoType if set
-func (c *FieldBuildContext) GetGoType(t string) string {
-	if c.f.IsCustomType() {
-		return c.prependPackageName(c.f.GetCustomType())
-	}
-
-	if c.f.IsCastType() {
-		return c.prependPackageName(c.f.GetCastType())
-	}
-
-	if t != "" {
-		return t
-	}
-
-	return strings.ReplaceAll(strings.ReplaceAll(c.rawGoType, "[]", ""), "*", "")
-}
-
-// prependPackageName prepends default package name to a type name
-func (c *FieldBuildContext) prependPackageName(t string) string {
-	if !strings.Contains(t, ".") && config.DefaultPackageName != "" {
-		return config.DefaultPackageName + "." + t
-	}
-
-	return t
 }
 
 // GetMessageDescriptor returns underlying field message descriptor

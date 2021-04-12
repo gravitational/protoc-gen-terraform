@@ -42,18 +42,6 @@ type Field struct {
 	// SchemaGoType Go type to convert schema raw type to (uint32, []byte, time.Time, time.Duration)
 	SchemaGoType string
 
-	// GoType Go type without [] and *, but with package name prepended
-	GoType string
-
-	// GoTypeIsSlice specifies whether Go type is a slice
-	GoTypeIsSlice bool
-
-	// GoTypeIsPtr specifies whether Go type is a pointer
-	GoTypeIsPtr bool
-
-	// GoTypeFull Go type with [] and * and package name prepended
-	GoTypeFull string
-
 	// Kind Field kind (resulting of combination of flags below, see setKind method)
 	Kind string
 
@@ -153,35 +141,21 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.IsTime = c.IsTime()
 	f.IsDuration = c.IsDuration()
 
-	// Byte slice is an exception, is should be treated as string
-	if c.IsByteSlice() {
-		f.GoType = c.GetBytesExceptionGoType()
-		f.GoTypeFull = c.GetRawGoType()
-	} else {
-		f.GoTypeIsPtr = c.GetGoTypeIsPtr()
-		f.GoTypeIsSlice = c.GetGoTypeIsSlice()
-
-		if f.IsMessage {
-			d, err := c.GetMessageDescriptor()
-			if err != nil {
-				return nil, trace.Wrap(err)
-			}
-
-			m, err := BuildMessage(c.g, d, false, c.path)
-			if err != nil {
-				return nil, trace.Wrap(err)
-			}
-			if m == nil {
-				return nil, nil
-			}
-
-			f.Message = m
-			f.GoType = c.GetGoType(m.GoTypeName)
-		} else {
-			f.GoType = c.GetGoType("")
+	if f.IsMessage {
+		d, err := c.GetMessageDescriptor()
+		if err != nil {
+			return nil, trace.Wrap(err)
 		}
 
-		f.setGoTypeFull()
+		m, err := BuildMessage(c.g, d, false, c.path)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		if m == nil {
+			return nil, nil
+		}
+
+		f.Message = m
 	}
 
 	f.IsRepeated = c.IsRepeated()
@@ -231,20 +205,6 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	return f, nil
 }
 
-// setGoTypeFull constructs and sets full go type name for the field
-func (f *Field) setGoTypeFull() {
-	r := f.GoType
-
-	if f.GoTypeIsPtr {
-		r = "*" + r
-	}
-	if f.GoTypeIsSlice {
-		r = "[]" + r
-	}
-
-	f.GoTypeFull = r
-}
-
 // setKind resolves and sets kind for current field
 func (f *Field) setKind() {
 	switch {
@@ -274,14 +234,14 @@ func (f *Field) setCustomType(c *FieldBuildContext) error {
 
 	f.IsCustomType = true
 
-	v, ok := config.Suffixes[c.f.GetCustomType()]
+	v, ok := config.Suffixes[c.GetCustomType()]
 
 	if ok {
 		f.Suffix = v
 		return nil
 	}
 
-	f.Suffix = strings.ReplaceAll(strings.ReplaceAll(f.GoType, "/", ""), ".", "")
+	f.Suffix = strings.ReplaceAll(strings.ReplaceAll(c.GetCustomType(), "/", ""), ".", "")
 
 	return nil
 }
