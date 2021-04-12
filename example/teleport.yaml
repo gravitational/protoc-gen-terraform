@@ -37,7 +37,7 @@ exclude_fields:
 # These fields will be marked as Computed: true
 computed_fields:
     # Role
-    - "types.RoleV3.Spec.Options.BPF"
+    # - "types.RoleV3.Spec.Options.BPF"
     # - "types.RoleV3.Spec.Allow"
     # - "types.RoleV3.Spec.Allow.Namespaces"
     # - "types.RoleV3.Spec.Deny"

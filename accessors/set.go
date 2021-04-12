@@ -167,6 +167,10 @@ func setAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (inte
 // setList converts source value to list
 func setList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Type().Kind() == reflect.Slice {
+		if source.Len() == 0 {
+			return nil, nil
+		}
+
 		t := make([]interface{}, source.Len())
 
 		for i := 0; i < source.Len(); i++ {
