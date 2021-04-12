@@ -95,7 +95,7 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 	return message, nil
 }
 
-// getMessageTypeName returns full message name, with prepended DefaultPkgName if needed
+// getMessageTypeName returns full message name, with prepended DefaultPackageName if needed
 func getMessageTypeName(d *generator.Descriptor) string {
 	if d.GoImportPath() != "." {
 		return d.File().GetPackage() + "." + d.GetName()
