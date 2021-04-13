@@ -61,6 +61,9 @@ required_fields:
     - "types.SAMLConnectorV2.Spec.EntityDescriptor"
     - "types.SAMLConnectorV2.Spec.EntityDescriptorURL"
 
+    # OIDC connector
+    - "types.OIDCConnectorV2.Spec"
+
 # These fields will be marked as ForceNew: true
 force_new_fields:
     - "types.Metadata.Name"
