@@ -39,15 +39,27 @@ required_fields:
     - "types.Metadata.Name"
 
     # Role
-    - "types.RoleV3.Spec.Options"
+    - "types.RoleV3.Spec"
     
     # Provision token
     - "types.ProvisionTokenV2.Spec"
+    - "types.ProvisionTokenV2.Spec.Options"
     - "types.ProvisionTokenV2.Spec.Roles"
     - "types.ProvisionTokenV2.Metadata.Expires"
 
     # Github connector
+    - "types.GithubConnectorV3.Spec"
+    - "types.GithubConnectorV3.Spec.ClientID"
+    - "types.GithubConnectorV3.Spec.ClientSecret"
     - "types.GithubConnectorV3.Spec.TeamsToLogins"
+    - "types.GithubConnectorV3.Spec.TeamsToLogins.Team"
+    - "types.GithubConnectorV3.Spec.TeamsToLogins.Logins"
+
+    # SAML connector
+    - "types.SAMLConnectorV2.Spec"
+    - "types.SAMLConnectorV2.Spec.AssertionConsumerService"
+    - "types.SAMLConnectorV2.Spec.EntityDescriptor"
+    - "types.SAMLConnectorV2.Spec.EntityDescriptorURL"
 
 # These fields will be marked as ForceNew: true
 force_new_fields:
@@ -79,17 +91,17 @@ defaults:
 
     # Github connector
     "types.GithubConnectorV3.Version": "v3"
-    "types.GithubConnectorV3.Kind": "github_connector"
+    "types.GithubConnectorV3.Kind": "github"
     "types.GithubConnectorV3.SubKind": ""
 
     # SAML connector
     "types.SAMLConnectorV2.Version": "v2"
-    "types.SAMLConnectorV2.Kind": "saml_connector"
+    "types.SAMLConnectorV2.Kind": "saml"
     "types.SAMLConnectorV2.SubKind": ""
 
     # OIDC connector
     "types.OIDCConnectorV2.Version": "v2"
-    "types.OIDCConnectorV2.Kind": "oidc_connector"
+    "types.OIDCConnectorV2.Kind": "oidc"
     "types.OIDCConnectorV2.SubKind": ""
 
     # Trusted cluster

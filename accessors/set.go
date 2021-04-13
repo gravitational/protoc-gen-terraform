@@ -199,7 +199,7 @@ func setList(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interf
 		return t, nil
 	}
 
-	return nil, nil
+	return t, nil
 }
 
 // setMap converts source value to map
