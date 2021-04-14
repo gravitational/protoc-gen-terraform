@@ -21,8 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gravitational/protoc-gen-terraform/accessors"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -164,7 +162,7 @@ var (
 // buildSubjectGet builds Test struct from test fixture data
 func buildSubjectGet(t *testing.T, subject *Test) (*Test, error) {
 	data := schema.TestResourceDataRaw(t, SchemaTest, fixture)
-	err := accessors.Get(subject, data, SchemaTest, SchemaMetaTest)
+	err := GetTest(subject, data)
 	return subject, err
 }
 

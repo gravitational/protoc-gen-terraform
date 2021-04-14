@@ -22,7 +22,6 @@ import (
 	"testing"
 	time "time"
 
-	"github.com/gravitational/protoc-gen-terraform/accessors"
 	"github.com/gravitational/trace"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/assert"
@@ -118,7 +117,7 @@ func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
 		return nil, err
 	}
 
-	err = accessors.Set(&test, subject, SchemaTest, SchemaMetaTest)
+	err = SetTest(&test, subject)
 	return subject, err
 }
 
