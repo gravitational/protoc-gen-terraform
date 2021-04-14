@@ -60,11 +60,11 @@ func SupressDurationChange(k string, old string, new string, d *schema.ResourceD
 
 	return o == n
 }
-func GetTest(obj interface{}, data *schema.ResourceData) error {
+func GetTest(obj *Test, data *schema.ResourceData) error {
 	return accessors.Get(obj, data, SchemaTest, SchemaMetaTest)
 }
 
-func SetTest(obj interface{}, data *schema.ResourceData) error {
+func SetTest(obj *Test, data *schema.ResourceData) error {
 	return accessors.Set(obj, data, SchemaTest, SchemaMetaTest)
 }
 

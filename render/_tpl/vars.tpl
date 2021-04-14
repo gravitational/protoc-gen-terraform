@@ -24,11 +24,11 @@ func SupressDurationChange(k string, old string, new string, d *schema.ResourceD
 }
 
 {{- range $index, $message := . }}
-func Get{{.Name}}(obj interface{}, data *schema.ResourceData) error {
+func Get{{.Name}}(obj *{{.GoTypeName}}, data *schema.ResourceData) error {
     return accessors.Get(obj, data, Schema{{.Name}}, SchemaMeta{{.Name}})
 }
 
-func Set{{.Name}}(obj interface{}, data *schema.ResourceData) error {
+func Set{{.Name}}(obj *{{.GoTypeName}}, data *schema.ResourceData) error {
     return accessors.Set(obj, data, Schema{{.Name}}, SchemaMeta{{.Name}})
 }
 {{- end }}
