@@ -42,7 +42,11 @@ Options:
 * `config_mode_block` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
 * `suffixes` - map of overrides of method names generated for `gogo.customtype` fields.
 
-All config variables could be set in [example/teleport.yaml](YAML config). Path to config file can be specified using `config` variable. `defaults` variable is available in config only because it requirers type information. `suffixes` is available in config file only. CLI args take higher priority over config file.
+All config variables could be set in [YAML](example/teleport.yaml). Path to config file can be specified using `config` variable. `defaults` variable is available in config only because it needs variable type information. `suffixes` is available in config file only as well. CLI args take higher priority over config file.
+
+# Usage
+
+See [get](example/get_test.go) and [set](example/get_test.go) tests for details.
 
 # Testing
 
@@ -52,13 +56,13 @@ Run:
 
 # Note on maps of messages
 
-Terraform does not support map of resources. If a field in protoc object is map of messages, it could not be defined in Terraform. This case is emulated via generating list with `key` and `value` fields instead. See `NestedMObj` field of [`Test`](test/custom_types.go) message for example.
+Terraform does not support map of resources. If a field in protoc object is map of messages, it could not be defined in Terraform. This case is emulated via generating list with `key` and `value` fields instead. See `MapObject` field of [`Test`](test/custom_types.go) struct for example.
 
 Map of arrays of elementary types are not supported as well.
 
 # Note on gogoproto.customtype
 
-If a field has `gogoproto.casttype` flag, it can not be automatically unmarshalled from `ResourceData`. You need to define your own custom `Schema<type>` and `Get<type>FromResourceData` methods. See [test/custom_types.go](test/custom_types.go).
+If a field has `gogoproto.customtype` flag, it can not be automatically unmarshalled from `ResourceData`. You need to define your own custom `Get<type>` and `Set<type>` methods. See [test/custom_types.go](test/custom_types.go) for example.
 
 # Build and test using Docker
 
