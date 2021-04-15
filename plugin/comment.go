@@ -17,6 +17,7 @@ limitations under the License.
 package plugin
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -24,19 +25,20 @@ import (
 )
 
 // appendSlashSlash appends "//" to comment
-func appendSlashSlash(s string, space bool) string {
+func appendSlashSlash(s string, addSpace bool) string {
 	var r []string
 
 	l := strings.Split(s, "\n")
 
 	for _, s := range l {
-		if strings.Trim(s, " \n") != "" {
-			v := "//"
-			if space {
-				v = v + " "
-			}
-			v = v + s
-			r = append(r, v)
+		if strings.TrimSpace(s) == "" {
+			continue
+		}
+
+		if addSpace {
+			r = append(r, fmt.Sprintf("// %v", s))
+		} else {
+			r = append(r, fmt.Sprintf("//%v", s))
 		}
 	}
 
