@@ -23,7 +23,7 @@ import (
 )
 
 // assign assigns source value to target with type and pointer conversions
-func assign(source reflect.Value, target reflect.Value) error {
+func assign(source, target reflect.Value) error {
 	t := target.Type()
 	v := source
 
@@ -72,7 +72,7 @@ func AssignZeroValue(target reflect.Value) {
 }
 
 // assignMapIndex assigns map element by value or reference
-func assignMapIndex(m reflect.Value, key reflect.Value, value reflect.Value) {
+func assignMapIndex(m, key, value reflect.Value) {
 	if m.Type().Elem().Kind() == reflect.Ptr {
 		m.SetMapIndex(key, value.Addr())
 	} else {

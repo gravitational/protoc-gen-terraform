@@ -53,7 +53,7 @@ func Get(
 
 // GetLen returns TypeSet or TypeList value length
 func GetLen(path string, data *schema.ResourceData) (int, error) {
-	n, ok := data.GetOk(path + ".#")
+	n, ok := data.GetOk(path + ".#") // Terraform stores collection length in "collection_name.#" key
 	if !ok || n == nil {
 		return 0, nil
 	}
@@ -84,34 +84,34 @@ func getFragment(
 		v := target.FieldByName(m.Name)
 		p := path + k
 
-		switch {
-		case m.Getter != nil:
+		if m.Getter != nil {
 			err := m.Getter(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
-		case s.Type == schema.TypeInt ||
-			s.Type == schema.TypeFloat ||
-			s.Type == schema.TypeBool ||
-			s.Type == schema.TypeString:
 
+			continue
+		}
+
+		switch s.Type {
+		case schema.TypeInt, schema.TypeFloat, schema.TypeBool, schema.TypeString:
 			err := getElementary(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
-		case s.Type == schema.TypeList:
+		case schema.TypeList:
 			err := getList(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
-		case s.Type == schema.TypeMap:
+		case schema.TypeMap:
 			err := getMap(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
-		case s.Type == schema.TypeSet:
+		case schema.TypeSet:
 			err := getSet(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)

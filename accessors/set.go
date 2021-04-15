@@ -77,8 +77,7 @@ func setFragment(
 
 		v := source.FieldByName(m.Name)
 
-		switch {
-		case m.Setter != nil:
+		if m.Setter != nil {
 			r, err := m.Setter(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
@@ -87,11 +86,12 @@ func setFragment(
 			if r != nil {
 				target[k] = r
 			}
-		case s.Type == schema.TypeInt ||
-			s.Type == schema.TypeFloat ||
-			s.Type == schema.TypeBool ||
-			s.Type == schema.TypeString:
 
+			continue
+		}
+
+		switch s.Type {
+		case schema.TypeInt, schema.TypeFloat, schema.TypeBool, schema.TypeString:
 			r, err := setElementary(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
@@ -104,7 +104,7 @@ func setFragment(
 				}
 			}
 
-		case s.Type == schema.TypeList:
+		case schema.TypeList:
 			r, err := setList(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
@@ -113,14 +113,14 @@ func setFragment(
 				target[k] = r
 			}
 
-		case s.Type == schema.TypeMap:
+		case schema.TypeMap:
 			r, err := setMap(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
 			target[k] = r
 
-		case s.Type == schema.TypeSet:
+		case schema.TypeSet:
 			r, err := setSet(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
