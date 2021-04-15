@@ -30,19 +30,20 @@ See [Makefile](Makefile) for details.
 Options:
 
 * `types` - the list of top level types to export (with namespace).
-* `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`).
-* `pkg` - default package name to prepend to type names with no package reference. This option is required if the target package of Terraform generated code is different from package of original protobuf generated code.
+* `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`). Fields could also be addressed via full path in a structure (ex: `types.UserV2.Spec.Allow.Logins`). This distinction is needed if a field needs to have a different behaviour in different parent structs even if it belongs to a same type. For example, `Metadata.Expires` must be excluded for `User` and is required for `Token`.
+* `pkg` - default package name to prepend to type names with no package reference. This option is required if the target package of Terraform generated code is different from the package of original protobuf generated code.
 * `target_pkg` - the name of the target package
-* `custom_duration` - the name of custom Duration type, if used.
-* `custom_imports` - comma-separated package list to add into target file
-* `required` - list of a fields to mark as `Required: true`
-* `computed` - list of a fields to mark as `Computed: true`
-* `force_new` - list of a fields to mark as `ForceNew: true`
-* `config_mode_attr` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeAttr`
-* `config_mode_block` - list of a fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
-* `suffixes` - map of overrides of method names generated for `gogo.customtype` fields.
+* `custom_duration` - the name of custom Duration type, if used
+* `custom_imports` - comma-separated package list to add into generated file
+* `required` - list of a generated Terraform schema fields to mark as `Required: true`
+* `computed` - list of a generated Terraform schema fields to mark as `Computed: true`
+* `force_new` - list of a generated Terraform schema fields to mark as `ForceNew: true`
+* `config_mode_attr` - list of a generated Terraform schema fields to mark as `SchemaConfigMode: schema.SchemaConfigModeAttr`
+* `config_mode_block` - list of a generated Terraform schema fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
+* `suffixes` - map of overrides of method names generated for `gogo.customtype` fields (available in config file only)
+* `defaults` - default values for a fields in generated Terraform schema (available in config file only). Note that default value type in YAML file is taken into account.
 
-All config variables could be set in [YAML](example/teleport.yaml). Path to config file can be specified using `config` variable. `defaults` variable is available in config only because it needs variable type information. `suffixes` is available in config file only as well. CLI args take higher priority over config file.
+All config variables could be set in [YAML](example/teleport.yaml). Path to config file can be specified using `config` variable. 
 
 # Usage
 
