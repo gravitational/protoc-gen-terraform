@@ -17,17 +17,17 @@ types:
 
 # These fields will be excluded
 exclude_fields:
-    # Metadata
+    # Metadata (we id resources by name on our side)
     - "types.Metadata.ID"
     
     # User
-    - "types.UserSpecV2.LocalAuth"
-    - "types.UserSpecV2.Expires"
+    - "types.UserSpecV2.LocalAuth" # We do not need to set user auth data
+    - "types.UserSpecV2.Expires"   # Those fields are Teleport side meta, we do not need to change them via Terraform
     - "types.UserSpecV2.CreatedBy"
     - "types.UserSpecV2.Status"
 
     # Role
-    - "types.RoleV3.Spec.Allow.Namespaces"
+    - "types.RoleV3.Spec.Allow.Namespaces" # These fields are not settable via API
     - "types.RoleV3.Spec.Deny.Namespaces"
 
 # These fields will be marked as Computed: true
@@ -43,6 +43,10 @@ required_fields:
     
     # Provision token
     - "types.ProvisionTokenV2.Spec"
+    # This field is required because it is non-empty by default. It can't be Computed because in this case
+    # user would not be able to reset all nested fields to default values. If user sets an empty Computed field
+    # to empty, it keeps it's last value in the state and never gets reset to default value or deleted. 
+    # So, it's a workaround.
     - "types.ProvisionTokenV2.Spec.Options"
     - "types.ProvisionTokenV2.Spec.Roles"
     - "types.ProvisionTokenV2.Metadata.Expires"
@@ -66,7 +70,7 @@ required_fields:
 
 # These fields will be marked as ForceNew: true
 force_new_fields:
-    - "types.Metadata.Name"
+    - "types.Metadata.Name" # We need to recreate object if it's name is changed
 
 # Field default values
 defaults:
@@ -120,6 +124,6 @@ config_mode_block_fields:
 
 # These suffixes for custom methods called when field has custom_type flag. By default they might be weird.
 suffixes:
-    "BoolOption": "BoolOption"
+    "BoolOption": "BoolOption" # This is listed here for convenience. Just to have all custom method names in a single place.
     "Labels": "Labels"
     "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
