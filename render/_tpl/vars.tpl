@@ -8,8 +8,8 @@ var (
 {{- end }}
 )
 
-// SupressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
-func SupressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
+// SuppressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
+func SuppressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
     o, err := time.ParseDuration(old)
     if err != nil {
         return false

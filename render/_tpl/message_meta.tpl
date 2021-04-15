@@ -9,7 +9,7 @@ func GenSchemaMeta{{ .Name }}() map[string]*accessors.SchemaMeta {
 {{- define "fieldsSchema" -}}
 map[string]*accessors.SchemaMeta {
 {{- range $index, $field := . }}
-    {{.Comment}}
+	{{.Comment}}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
@@ -17,18 +17,18 @@ map[string]*accessors.SchemaMeta {
 
 {{- define "fieldSchema" -}}
 {
-Name: {{.Name|quote}},
-IsTime: {{.IsTime}},
-IsDuration: {{.IsDuration}},
-{{ if eq .Kind "CUSTOM_TYPE" -}}
-Getter: Get{{.Suffix}},
-Setter: Set{{.Suffix}},
-{{- end }}
-{{- if eq .Kind "SINGULAR_MESSAGE" "REPEATED_MESSAGE" -}}
-Nested: {{ template "fieldsSchema" .Message.Fields }},
-{{- end }}
-{{- if eq .Kind "MESSSAGE_MAP" -}}
-Nested: {{ template "fieldsSchema" .MapValueField.Message.Fields }},
-{{- end }}
+	Name: {{.Name|quote}},
+	IsTime: {{.IsTime}},
+	IsDuration: {{.IsDuration}},
+	{{ if eq .Kind "CUSTOM_TYPE" -}}
+	Getter: Get{{.Suffix}},
+	Setter: Set{{.Suffix}},
+	{{- end }}
+	{{- if eq .Kind "SINGULAR_MESSAGE" "REPEATED_MESSAGE" -}}
+	Nested: {{ template "fieldsSchema" .Message.Fields }},
+	{{- end }}
+	{{- if eq .Kind "MESSSAGE_MAP" -}}
+	Nested: {{ template "fieldsSchema" .MapValueField.Message.Fields }},
+	{{- end }}
 },
 {{- end -}}

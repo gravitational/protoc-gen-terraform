@@ -39,7 +39,7 @@ const (
 	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	// accessorsPkg contains SchemaMeta definition
-	accessorsPkg = "github.com/gravitational/protoc-gen-terraform/acccessors"
+	accessorsPkg = "github.com/gravitational/protoc-gen-terraform/accessors"
 )
 
 // Plugin is terraform generator plugin

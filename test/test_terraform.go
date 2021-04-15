@@ -26,7 +26,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	"github.com/gravitational/protoc-gen-terraform/accessors"
+	accessors "github.com/gravitational/protoc-gen-terraform/accessors"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	validation "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
@@ -46,8 +46,8 @@ var (
 	SchemaMetaTest = GenSchemaMetaTest()
 )
 
-// SupressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
-func SupressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
+// SuppressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
+func SuppressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
 	o, err := time.ParseDuration(old)
 	if err != nil {
 		return false
@@ -147,28 +147,28 @@ func GenSchemaTest() map[string]*schema.Schema {
 		"duration_standard": {
 			Type:             schema.TypeString,
 			Description:      "DurationStandard time.Duration field (standard)",
-			DiffSuppressFunc: SupressDurationChange,
+			DiffSuppressFunc: SuppressDurationChange,
 			Optional:         true,
 		},
 		// DurationStandardMissing time.Duration field (standard) missing in input data
 		"duration_standard_missing": {
 			Type:             schema.TypeString,
 			Description:      "DurationStandardMissing time.Duration field (standard) missing in input data",
-			DiffSuppressFunc: SupressDurationChange,
+			DiffSuppressFunc: SuppressDurationChange,
 			Optional:         true,
 		},
 		// DurationCustom time.Duration field (with casttype)
 		"duration_custom": {
 			Type:             schema.TypeString,
 			Description:      "DurationCustom time.Duration field (with casttype)",
-			DiffSuppressFunc: SupressDurationChange,
+			DiffSuppressFunc: SuppressDurationChange,
 			Optional:         true,
 		},
 		// DurationCustomMissing time.Duration field (with casttype) missing in input data
 		"duration_custom_missing": {
 			Type:             schema.TypeString,
 			Description:      "DurationCustomMissing time.Duration field (with casttype) missing in input data",
-			DiffSuppressFunc: SupressDurationChange,
+			DiffSuppressFunc: SuppressDurationChange,
 			Optional:         true,
 		},
 		// StringList []string field

@@ -173,6 +173,7 @@ func (c *FieldBuildContext) GetCustomType() string {
 
 // GetComment returns field comment as a single line and as a block comment
 func (c *FieldBuildContext) GetComment() (string, string) {
+	// ",2," marks that we are extracting comment for a message field. See descriptor.SourceCodeInfo source for details.
 	p := c.d.Path() + ",2," + strconv.Itoa(c.index)
 
 	for _, l := range c.d.File().GetSourceCodeInfo().GetLocation() {

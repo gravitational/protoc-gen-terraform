@@ -77,7 +77,7 @@ Description: {{ .RawComment | quote }},
 ValidateFunc: validation.IsRFC3339Time,
 {{- end }}
 {{- if .IsDuration }}
-DiffSuppressFunc: SupressDurationChange,
+DiffSuppressFunc: SuppressDurationChange,
 {{- end }}
 {{- end -}}
 
