@@ -92,7 +92,7 @@ func setFragment(
 			s.Type == schema.TypeBool ||
 			s.Type == schema.TypeString:
 
-			r, err := setAtomic(v, m, s)
+			r, err := setElementary(v, m, s)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
@@ -135,8 +135,8 @@ func setFragment(
 	return target, nil
 }
 
-// setAtomic gets atomic value (scalar, string, time, duration)
-func setAtomic(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
+// setElementary gets elementary value (scalar, string, time, duration)
+func setElementary(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interface{}, error) {
 	if source.Kind() == reflect.Ptr && source.IsNil() {
 		return nil, nil
 	}
@@ -333,7 +333,7 @@ func setEnumerableElement(
 ) (interface{}, error) {
 	switch s := sch.Elem.(type) {
 	case *schema.Schema:
-		a, err := setAtomic(source, meta, s)
+		a, err := setElementary(source, meta, s)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}

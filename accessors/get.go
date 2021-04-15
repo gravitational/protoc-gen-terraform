@@ -95,7 +95,7 @@ func getFragment(
 			s.Type == schema.TypeBool ||
 			s.Type == schema.TypeString:
 
-			err := getAtomic(p, v, m, s, data)
+			err := getElementary(p, v, m, s, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
@@ -136,7 +136,7 @@ func getEnumerableElement(
 ) error {
 	switch s := sch.Elem.(type) {
 	case *schema.Schema:
-		return getAtomic(path, target, meta, s, data)
+		return getElementary(path, target, meta, s, data)
 	case *schema.Resource:
 		v := newEmptyValue(target.Type())
 
@@ -150,12 +150,12 @@ func getEnumerableElement(
 
 		return assign(v, target)
 	default:
-		return trace.Errorf("unknown Elem type")
+		return trace.Errorf("unknown Elem type: %T", sch.Elem)
 	}
 }
 
-// getAtomic gets atomic value (scalar, string, time, duration)
-func getAtomic(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
+// getElementary gets elementary value (scalar, string, time, duration)
+func getElementary(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	s, ok := data.GetOk(path)
 	if !ok {
 		AssignZeroValue(target)
@@ -250,7 +250,7 @@ func getList(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sc
 	return getEnumerableElement(path+".0", target, sch, meta, data)
 }
 
-// setMap sets map of atomic values (scalar, string, time, duration)
+// setMap sets map of elementary values (scalar, string, time, duration)
 func getMap(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	raw, ok := data.GetOk(path)
 	if !ok {
