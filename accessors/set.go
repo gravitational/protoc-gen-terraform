@@ -57,7 +57,7 @@ func Set(
 	return nil
 }
 
-// readFragment returns map[string]interface{} of a block
+// setFragment returns map[string]interface{} of a block
 func setFragment(
 	source reflect.Value,
 	meta map[string]*SchemaMeta,
@@ -237,7 +237,9 @@ func setSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interfa
 
 	switch source.Kind() {
 	case reflect.Slice:
-		// We do not have sets mapped to slices for now. It might be needed for unordered collections.
+		// We do not have sets mapped to slices for now. It might be needed for unordered collections which
+		// change its order on every API request. Set is unordered collection.
+		//
 		// It will require adding explicit configuration flag "represent_collection_as_set".
 		return nil, trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:

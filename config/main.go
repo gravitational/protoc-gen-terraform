@@ -95,19 +95,19 @@ const (
 
 // config is yaml config unmarshalling helper struct
 type config struct {
-	Types                 []string               `yaml:"types"`
-	DurationCustomType    string                 `yaml:"duration_custom_type"`
-	TargetPackageName     string                 `yaml:"target_package_name"`
-	DefaultPackageName    string                 `yaml:"default_package_name"`
-	ExcludeFields         []string               `yaml:"exclude_fields"`
-	ComputedFields        []string               `yaml:"computed_fields"`
-	RequiredFields        []string               `yaml:"required_fields"`
-	ForceNew              []string               `yaml:"force_new_fields"`
-	ConfigModeAttrFields  []string               `yaml:"config_mode_attr_fields"`
-	ConfigModeBlockFields []string               `yaml:"config_mode_block_fields"`
-	CustomImports         []string               `yaml:"custom_imports"`
-	Defaults              map[string]interface{} `yaml:"defaults"`
-	Suffixes              map[string]string      `yaml:"suffixes"`
+	Types                 []string               `yaml:"types,omitempty"`
+	DurationCustomType    string                 `yaml:"duration_custom_type,omitempty"`
+	TargetPackageName     string                 `yaml:"target_package_name,omitempty"`
+	DefaultPackageName    string                 `yaml:"default_package_name,omitempty"`
+	ExcludeFields         []string               `yaml:"exclude_fields,omitempty"`
+	ComputedFields        []string               `yaml:"computed_fields,omitempty"`
+	RequiredFields        []string               `yaml:"required_fields,omitempty"`
+	ForceNew              []string               `yaml:"force_new_fields,omitempty"`
+	ConfigModeAttrFields  []string               `yaml:"config_mode_attr_fields,omitempty"`
+	ConfigModeBlockFields []string               `yaml:"config_mode_block_fields,omitempty"`
+	CustomImports         []string               `yaml:"custom_imports,omitempty"`
+	Defaults              map[string]interface{} `yaml:"defaults,omitempty"`
+	Suffixes              map[string]string      `yaml:"suffixes,omitempty"`
 }
 
 // Read reads config variables from command line or config file
