@@ -1,4 +1,4 @@
-package_version = "0.0.2"
+include version.mk
 
 .PHONY: clean
 
@@ -15,20 +15,17 @@ build: clean
 install: build
 	go install .
 
+pwd = $(realpath $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+
 gopath = $(shell go env GOPATH)
 srcpath = $(gopath)/src
 teleport_url = github.com/gravitational/teleport
 teleport_repo = https://$(teleport_url)
 teleport_dir = $(srcpath)/$(teleport_url)
-out_dir := "./_out"
-types = "types.UserV2+types.RoleV3"
-exclude_fields = "types.UserSpecV2.LocalAuth"
-custom_duration = "Duration"
-custom_imports = "github.com/gravitational/teleport/api/types"
-target_pkg = "tfschema"
+out_dir := "$(pwd)/_out"
 
-.PHONY: terraform
-terraform: build
+.PHONY: teleport
+teleport: build
 ifeq ("$(wildcard $(teleport_dir))", "")
 	$(warning Teleport source code is required to build this example!)
 	$(warning git clone ${teleport_repo} ${teleport_dir} to proceed)
@@ -40,15 +37,14 @@ endif
 		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=types=${types},exclude_fields=${exclude_fields},\
-pkg=types,custom_duration=Duration,custom_imports=${custom_imports},target_pkg=${target_pkg}:${out_dir} \
+		--terraform_out=config=example/teleport.yaml:${out_dir} \
 		types.proto
 
 .PHONY: test
 test: build
 	@protoc \
-		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform/test \
-		-I$(srcpath)/github.com/gravitational/protoc-gen-terraform \
+		-I$(pwd)/test \
+		-I$(pwd) \
 		-I./vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \

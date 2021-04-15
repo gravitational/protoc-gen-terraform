@@ -26,6 +26,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	accessors "github.com/gravitational/protoc-gen-terraform/accessors"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	validation "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
@@ -38,138 +39,238 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-// Type full name: Test
-func SchemaTest() map[string]*schema.Schema {
+var (
+	// SchemaTest is schema for Test message definition.
+	SchemaTest = GenSchemaTest()
+	// SchemaMetaTest is schema metadata for Test message definition.
+	SchemaMetaTest = GenSchemaMetaTest()
+)
+
+// SuppressDurationChange supresses change for equal durations written differently, ex.: "1h" and "1h0m"
+func SuppressDurationChange(k string, old string, new string, d *schema.ResourceData) bool {
+	o, err := time.ParseDuration(old)
+	if err != nil {
+		return false
+	}
+
+	n, err := time.ParseDuration(new)
+	if err != nil {
+		return false
+	}
+
+	return o == n
+}
+func GetTest(obj *Test, data *schema.ResourceData) error {
+	return accessors.Get(obj, data, SchemaTest, SchemaMetaTest)
+}
+
+func SetTest(obj *Test, data *schema.ResourceData) error {
+	return accessors.Set(obj, data, SchemaTest, SchemaMetaTest)
+}
+
+// SchemaTest returns schema for Test
+//
+// Test message definition.
+func GenSchemaTest() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		// Str SINGULAR_ELEMENTARY
+		// Str string field
 		"str": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Description: "Str string field",
+			Optional:    true,
 		},
-		// Int32 SINGULAR_ELEMENTARY
+		// Int32 int32 field
 		"int32": {
-			Type:     schema.TypeInt,
-			Optional: true,
+			Type:        schema.TypeInt,
+			Description: "Int32 int32 field",
+			Optional:    true,
 		},
-		// Int64 SINGULAR_ELEMENTARY
+		// Int64 int64 field
 		"int64": {
-			Type:     schema.TypeInt,
-			Optional: true,
+			Type:        schema.TypeInt,
+			Description: "Int64 int64 field",
+			Optional:    true,
 		},
-		// Float SINGULAR_ELEMENTARY
+		// Float float field
 		"float": {
-			Type:     schema.TypeFloat,
-			Optional: true,
+			Type:        schema.TypeFloat,
+			Description: "Float float field",
+			Optional:    true,
 		},
-		// Double SINGULAR_ELEMENTARY
+		// Double double field
 		"double": {
-			Type:     schema.TypeFloat,
-			Optional: true,
+			Type:        schema.TypeFloat,
+			Description: "Double double field",
+			Optional:    true,
 		},
-		// Bool SINGULAR_ELEMENTARY
+		// Bool bool field
 		"bool": {
-			Type:     schema.TypeBool,
-			Optional: true,
+			Type:        schema.TypeBool,
+			Description: "Bool bool field",
+			Optional:    true,
 		},
-		// Bytes SINGULAR_ELEMENTARY
+		// Bytest byte[] field
 		"bytes": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:        schema.TypeString,
+			Description: "Bytest byte[] field",
+			Optional:    true,
 		},
-		// Timestamp SINGULAR_ELEMENTARY
+		// Timestamp time.Time field
 		"timestamp": {
 			Type:         schema.TypeString,
+			Description:  "Timestamp time.Time field",
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		// DurationStd SINGULAR_ELEMENTARY
-		"duration_std": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		// DurationCustom SINGULAR_ELEMENTARY
-		"duration_custom": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		// TimestampN SINGULAR_ELEMENTARY
-		"timestamp_n": {
+		// Timestamp time.Time field
+		"timestamp_missing": {
 			Type:         schema.TypeString,
+			Description:  "Timestamp time.Time field",
 			ValidateFunc: validation.IsRFC3339Time,
 			Optional:     true,
 		},
-		// StringA REPEATED_ELEMENTARY
-		"string_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+		// TimestampNullable *time.Time field
+		"timestamp_nullable": {
+			Type:         schema.TypeString,
+			Description:  "TimestampNullable *time.Time field",
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
+		},
+		// TimestampNullableWithNilValue *time.Time field
+		"timestamp_nullable_with_nil_value": {
+			Type:         schema.TypeString,
+			Description:  "TimestampNullableWithNilValue *time.Time field",
+			ValidateFunc: validation.IsRFC3339Time,
+			Optional:     true,
+		},
+		// DurationStandard time.Duration field (standard)
+		"duration_standard": {
+			Type:             schema.TypeString,
+			Description:      "DurationStandard time.Duration field (standard)",
+			DiffSuppressFunc: SuppressDurationChange,
+			Optional:         true,
+		},
+		// DurationStandardMissing time.Duration field (standard) missing in input data
+		"duration_standard_missing": {
+			Type:             schema.TypeString,
+			Description:      "DurationStandardMissing time.Duration field (standard) missing in input data",
+			DiffSuppressFunc: SuppressDurationChange,
+			Optional:         true,
+		},
+		// DurationCustom time.Duration field (with casttype)
+		"duration_custom": {
+			Type:             schema.TypeString,
+			Description:      "DurationCustom time.Duration field (with casttype)",
+			DiffSuppressFunc: SuppressDurationChange,
+			Optional:         true,
+		},
+		// DurationCustomMissing time.Duration field (with casttype) missing in input data
+		"duration_custom_missing": {
+			Type:             schema.TypeString,
+			Description:      "DurationCustomMissing time.Duration field (with casttype) missing in input data",
+			DiffSuppressFunc: SuppressDurationChange,
+			Optional:         true,
+		},
+		// StringList []string field
+		"string_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "StringList []string field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		// BoolA CUSTOM_TYPE
-		"bool_a": SchemaBoolCustom(),
-		// BytesA REPEATED_ELEMENTARY
-		"bytes_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+		// StringListEmpty []string field
+		"string_list_empty": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "StringListEmpty []string field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		// TimestampA REPEATED_ELEMENTARY
-		"timestamp_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+		// BoolCustomList []bool field
+		"bool_custom_list": SchemaBoolCustom(),
+		// BytesList [][]byte field
+		"bytes_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "BytesList [][]byte field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		// DurationCustomA REPEATED_ELEMENTARY
-		"duration_custom_a": {
-			Optional: true,
-			Type:     schema.TypeList,
+		// TimestampList []time.Time field
+		"timestamp_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "TimestampList []time.Time field",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		// Nested SINGULAR_MESSAGE
+		// DurationCustomList []time.Duration field
+		"duration_custom_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "DurationCustomList []time.Duration field",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		// Nested nested message field, non-nullable
 		"nested": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Description: "Nested message definition",
+
 			Optional: true,
-			Type:     schema.TypeList,
-			MaxItems: 1,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					// Str SINGULAR_ELEMENTARY
+					// Str string field
 					"str": {
-						Type:     schema.TypeString,
-						Optional: true,
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
 					},
-					// Nested REPEATED_MESSAGE
-					"nested": {
-						Optional: true,
-						Type:     schema.TypeList,
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str SINGULAR_ELEMENTARY
+								// Str string field
 								"str": {
-									Type:     schema.TypeString,
-									Optional: true,
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
 								},
 							},
 						},
 					},
-					// NestedM MAP
-					"nested_m": {
-						Optional: true,
-						Type:     schema.TypeMap,
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj OBJECT_MAP
-					"nested_m_obj": {
-						Optional: true,
-						Type:     schema.TypeList,
+					// MapObjectNested nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "MapObjectNested nested object map",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -177,15 +278,18 @@ func SchemaTest() map[string]*schema.Schema {
 									Required: true,
 								},
 								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+
 									Optional: true,
-									Type:     schema.TypeList,
-									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str SINGULAR_ELEMENTARY
+											// Str string field
 											"str": {
-												Type:     schema.TypeString,
-												Optional: true,
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
 											},
 										},
 									},
@@ -196,43 +300,54 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedA REPEATED_MESSAGE
-		"nested_a": {
+		// NestedNullable nested message field, nullabel
+		"nested_nullable": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Description: "Nested message definition",
+
 			Optional: true,
-			Type:     schema.TypeList,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
-					// Str SINGULAR_ELEMENTARY
+					// Str string field
 					"str": {
-						Type:     schema.TypeString,
-						Optional: true,
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
 					},
-					// Nested REPEATED_MESSAGE
-					"nested": {
-						Optional: true,
-						Type:     schema.TypeList,
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str SINGULAR_ELEMENTARY
+								// Str string field
 								"str": {
-									Type:     schema.TypeString,
-									Optional: true,
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
 								},
 							},
 						},
 					},
-					// NestedM MAP
-					"nested_m": {
-						Optional: true,
-						Type:     schema.TypeMap,
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
 						Elem: &schema.Schema{
 							Type: schema.TypeString,
 						},
 					},
-					// NestedMObj OBJECT_MAP
-					"nested_m_obj": {
-						Optional: true,
-						Type:     schema.TypeList,
+					// MapObjectNested nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "MapObjectNested nested object map",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"key": {
@@ -240,15 +355,18 @@ func SchemaTest() map[string]*schema.Schema {
 									Required: true,
 								},
 								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+
 									Optional: true,
-									Type:     schema.TypeList,
-									MaxItems: 1,
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str SINGULAR_ELEMENTARY
+											// Str string field
 											"str": {
-												Type:     schema.TypeString,
-												Optional: true,
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
 											},
 										},
 									},
@@ -259,18 +377,251 @@ func SchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedM MAP
-		"nested_m": {
+		// NestedNullableWithNilValue nested message field, with no value set
+		"nested_nullable_with_nil_value": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Description: "Nested message definition",
+
 			Optional: true,
-			Type:     schema.TypeMap,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
+					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+					// MapObjectNested nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "MapObjectNested nested object map",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+
+									Optional: true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		// NestedList nested message array
+		"nested_list": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "NestedList nested message array",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
+					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+					// MapObjectNested nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "MapObjectNested nested object map",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+
+									Optional: true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		// NestedListNullable nested message array
+		"nested_list_nullable": {
+
+			Optional:    true,
+			Type:        schema.TypeList,
+			Description: "NestedListNullable nested message array",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					// Str string field
+					"str": {
+						Type:        schema.TypeString,
+						Description: "Str string field",
+						Optional:    true,
+					},
+					// Nested repeated nested messages
+					"nested_list": {
+
+						Optional:    true,
+						Type:        schema.TypeList,
+						Description: "Nested repeated nested messages",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+							},
+						},
+					},
+					// Nested map repeated nested messages
+					"map": {
+
+						Optional:    true,
+						Type:        schema.TypeMap,
+						Description: "Nested map repeated nested messages",
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+					// MapObjectNested nested object map
+					"map_object_nested": {
+
+						Optional:    true,
+						Type:        schema.TypeSet,
+						Description: "MapObjectNested nested object map",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"key": {
+									Type:     schema.TypeString,
+									Required: true,
+								},
+								"value": {
+									Type:        schema.TypeList,
+									MaxItems:    1,
+									Description: "OtherNested message nested into nested message",
+
+									Optional: true,
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		// Map normal map
+		"map": {
+
+			Optional:    true,
+			Type:        schema.TypeMap,
+			Description: "Map normal map",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
-		// NestedMObj OBJECT_MAP
-		"nested_m_obj": {
-			Optional: true,
-			Type:     schema.TypeList,
+		// MapObject is the object map
+		"map_object": {
+
+			Optional:    true,
+			Type:        schema.TypeSet,
+			Description: "MapObject is the object map",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
@@ -278,42 +629,52 @@ func SchemaTest() map[string]*schema.Schema {
 						Required: true,
 					},
 					"value": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Description: "Nested message definition",
+
 						Optional: true,
-						Type:     schema.TypeList,
-						MaxItems: 1,
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
-								// Str SINGULAR_ELEMENTARY
+								// Str string field
 								"str": {
-									Type:     schema.TypeString,
-									Optional: true,
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
 								},
-								// Nested REPEATED_MESSAGE
-								"nested": {
-									Optional: true,
-									Type:     schema.TypeList,
+								// Nested repeated nested messages
+								"nested_list": {
+
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Nested repeated nested messages",
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
-											// Str SINGULAR_ELEMENTARY
+											// Str string field
 											"str": {
-												Type:     schema.TypeString,
-												Optional: true,
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
 											},
 										},
 									},
 								},
-								// NestedM MAP
-								"nested_m": {
-									Optional: true,
-									Type:     schema.TypeMap,
+								// Nested map repeated nested messages
+								"map": {
+
+									Optional:    true,
+									Type:        schema.TypeMap,
+									Description: "Nested map repeated nested messages",
 									Elem: &schema.Schema{
 										Type: schema.TypeString,
 									},
 								},
-								// NestedMObj OBJECT_MAP
-								"nested_m_obj": {
-									Optional: true,
-									Type:     schema.TypeList,
+								// MapObjectNested nested object map
+								"map_object_nested": {
+
+									Optional:    true,
+									Type:        schema.TypeSet,
+									Description: "MapObjectNested nested object map",
 									Elem: &schema.Resource{
 										Schema: map[string]*schema.Schema{
 											"key": {
@@ -321,15 +682,109 @@ func SchemaTest() map[string]*schema.Schema {
 												Required: true,
 											},
 											"value": {
+												Type:        schema.TypeList,
+												MaxItems:    1,
+												Description: "OtherNested message nested into nested message",
+
 												Optional: true,
-												Type:     schema.TypeList,
-												MaxItems: 1,
 												Elem: &schema.Resource{
 													Schema: map[string]*schema.Schema{
-														// Str SINGULAR_ELEMENTARY
+														// Str string field
 														"str": {
-															Type:     schema.TypeString,
-															Optional: true,
+															Type:        schema.TypeString,
+															Description: "Str string field",
+															Optional:    true,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		// MapObjectNullable is the object map with nullable values
+		"map_object_nullable": {
+
+			Optional:    true,
+			Type:        schema.TypeSet,
+			Description: "MapObjectNullable is the object map with nullable values",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+					"value": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Description: "Nested message definition",
+
+						Optional: true,
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								// Str string field
+								"str": {
+									Type:        schema.TypeString,
+									Description: "Str string field",
+									Optional:    true,
+								},
+								// Nested repeated nested messages
+								"nested_list": {
+
+									Optional:    true,
+									Type:        schema.TypeList,
+									Description: "Nested repeated nested messages",
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											// Str string field
+											"str": {
+												Type:        schema.TypeString,
+												Description: "Str string field",
+												Optional:    true,
+											},
+										},
+									},
+								},
+								// Nested map repeated nested messages
+								"map": {
+
+									Optional:    true,
+									Type:        schema.TypeMap,
+									Description: "Nested map repeated nested messages",
+									Elem: &schema.Schema{
+										Type: schema.TypeString,
+									},
+								},
+								// MapObjectNested nested object map
+								"map_object_nested": {
+
+									Optional:    true,
+									Type:        schema.TypeSet,
+									Description: "MapObjectNested nested object map",
+									Elem: &schema.Resource{
+										Schema: map[string]*schema.Schema{
+											"key": {
+												Type:     schema.TypeString,
+												Required: true,
+											},
+											"value": {
+												Type:        schema.TypeList,
+												MaxItems:    1,
+												Description: "OtherNested message nested into nested message",
+
+												Optional: true,
+												Elem: &schema.Resource{
+													Schema: map[string]*schema.Schema{
+														// Str string field
+														"str": {
+															Type:        schema.TypeString,
+															Description: "Str string field",
+															Optional:    true,
 														},
 													},
 												},
@@ -345,1066 +800,481 @@ func SchemaTest() map[string]*schema.Schema {
 		},
 	}
 }
-func GetTestFromResourceData(d *schema.ResourceData, t *Test) error {
-	p := ""
 
-	{
-
-		_raw, ok := d.GetOk(p + "str")
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value := string(string(_raws))
-			t.Str = _value
-		}
+// GenSchemaMetaTest returns schema for Test
+//
+// Test message definition.
+func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
+	return map[string]*accessors.SchemaMeta{
+		// Str string field
+		"str": {
+			Name:       "Str",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Int32 int32 field
+		"int32": {
+			Name:       "Int32",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Int64 int64 field
+		"int64": {
+			Name:       "Int64",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Float float field
+		"float": {
+			Name:       "Float",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Double double field
+		"double": {
+			Name:       "Double",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Bool bool field
+		"bool": {
+			Name:       "Bool",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Bytest byte[] field
+		"bytes": {
+			Name:       "Bytes",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// Timestamp time.Time field
+		"timestamp": {
+			Name:       "Timestamp",
+			IsTime:     true,
+			IsDuration: false,
+		},
+		// Timestamp time.Time field
+		"timestamp_missing": {
+			Name:       "TimestampMissing",
+			IsTime:     true,
+			IsDuration: false,
+		},
+		// TimestampNullable *time.Time field
+		"timestamp_nullable": {
+			Name:       "TimestampNullable",
+			IsTime:     true,
+			IsDuration: false,
+		},
+		// TimestampNullableWithNilValue *time.Time field
+		"timestamp_nullable_with_nil_value": {
+			Name:       "TimestampNullableWithNilValue",
+			IsTime:     true,
+			IsDuration: false,
+		},
+		// DurationStandard time.Duration field (standard)
+		"duration_standard": {
+			Name:       "DurationStandard",
+			IsTime:     false,
+			IsDuration: true,
+		},
+		// DurationStandardMissing time.Duration field (standard) missing in input data
+		"duration_standard_missing": {
+			Name:       "DurationStandardMissing",
+			IsTime:     false,
+			IsDuration: true,
+		},
+		// DurationCustom time.Duration field (with casttype)
+		"duration_custom": {
+			Name:       "DurationCustom",
+			IsTime:     false,
+			IsDuration: true,
+		},
+		// DurationCustomMissing time.Duration field (with casttype) missing in input data
+		"duration_custom_missing": {
+			Name:       "DurationCustomMissing",
+			IsTime:     false,
+			IsDuration: true,
+		},
+		// StringList []string field
+		"string_list": {
+			Name:       "StringList",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// StringListEmpty []string field
+		"string_list_empty": {
+			Name:       "StringListEmpty",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// BoolCustomList []bool field
+		"bool_custom_list": {
+			Name:       "BoolCustomList",
+			IsTime:     false,
+			IsDuration: false,
+			Getter:     GetBoolCustom,
+			Setter:     SetBoolCustom,
+		},
+		// BytesList [][]byte field
+		"bytes_list": {
+			Name:       "BytesList",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// TimestampList []time.Time field
+		"timestamp_list": {
+			Name:       "TimestampList",
+			IsTime:     true,
+			IsDuration: false,
+		},
+		// DurationCustomList []time.Duration field
+		"duration_custom_list": {
+			Name:       "DurationCustomList",
+			IsTime:     false,
+			IsDuration: true,
+		},
+		// Nested nested message field, non-nullable
+		"nested": {
+			Name:       "Nested",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+		// NestedNullable nested message field, nullabel
+		"nested_nullable": {
+			Name:       "NestedNullable",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+		// NestedNullableWithNilValue nested message field, with no value set
+		"nested_nullable_with_nil_value": {
+			Name:       "NestedNullableWithNilValue",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+		// NestedList nested message array
+		"nested_list": {
+			Name:       "NestedList",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+		// NestedListNullable nested message array
+		"nested_list_nullable": {
+			Name:       "NestedListNullable",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+		// Map normal map
+		"map": {
+			Name:       "Map",
+			IsTime:     false,
+			IsDuration: false,
+		},
+		// MapObject is the object map
+		"map_object": {
+			Name:       "MapObject",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
+		// MapObjectNullable is the object map with nullable values
+		"map_object_nullable": {
+			Name:       "MapObjectNullable",
+			IsTime:     false,
+			IsDuration: false,
+			Nested: map[string]*accessors.SchemaMeta{
+				// Str string field
+				"str": {
+					Name:       "Str",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// Nested repeated nested messages
+				"nested_list": {
+					Name:       "NestedList",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+				// Nested map repeated nested messages
+				"map": {
+					Name:       "Map",
+					IsTime:     false,
+					IsDuration: false,
+				},
+				// MapObjectNested nested object map
+				"map_object_nested": {
+					Name:       "MapObjectNested",
+					IsTime:     false,
+					IsDuration: false,
+					Nested: map[string]*accessors.SchemaMeta{
+						// Str string field
+						"str": {
+							Name:       "Str",
+							IsTime:     false,
+							IsDuration: false,
+						},
+					},
+				},
+			},
+		},
 	}
-	{
-
-		_raw, ok := d.GetOk(p + "int32")
-		if ok {
-			_raws, ok := _raw.(int)
-			if !ok {
-				return fmt.Errorf("can not convert %T to int", _raws)
-			}
-			_value := int32(int32(_raws))
-			t.Int32 = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "int64")
-		if ok {
-			_raws, ok := _raw.(int)
-			if !ok {
-				return fmt.Errorf("can not convert %T to int", _raws)
-			}
-			_value := int64(int64(_raws))
-			t.Int64 = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "float")
-		if ok {
-			_raws, ok := _raw.(float64)
-			if !ok {
-				return fmt.Errorf("can not convert %T to float64", _raws)
-			}
-			_value := float32(float32(_raws))
-			t.Float = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "double")
-		if ok {
-			_raws, ok := _raw.(float64)
-			if !ok {
-				return fmt.Errorf("can not convert %T to float64", _raws)
-			}
-			_value := float64(float64(_raws))
-			t.Double = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOkExists(p + "bool")
-		if ok {
-			_raws, ok := _raw.(bool)
-			if !ok {
-				return fmt.Errorf("can not convert %T to bool", _raws)
-			}
-			_value := bool(bool(_raws))
-			t.Bool = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "bytes")
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value := []byte([]byte(_raws))
-			t.Bytes = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp")
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field Timestamp : %w", err)
-			}
-			t.Timestamp = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "duration_std")
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationStd : %w", err)
-			}
-			_value := time.Duration(_valued)
-			t.DurationStd = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "duration_custom")
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_valued, err := time.ParseDuration(_raws)
-			if err != nil {
-				return fmt.Errorf("malformed duration value for field DurationCustom : %w", err)
-			}
-			_value := Duration(_valued)
-			t.DurationCustom = _value
-		}
-	}
-	{
-
-		_raw, ok := d.GetOk(p + "timestamp_n")
-		if ok {
-			_raws, ok := _raw.(string)
-			if !ok {
-				return fmt.Errorf("can not convert %T to string", _raws)
-			}
-			_value, err := time.Parse(time.RFC3339, _raws)
-			if err != nil {
-				return fmt.Errorf("malformed time value for field TimestampN : %w", err)
-			}
-			t.TimestampN = &_value
-		}
-	}
-	{
-		_rawi, ok := d.GetOk(p + "string_a")
-		if ok {
-			_rawi, ok := _rawi.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
-			}
-			t.StringA = make([]string, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := string(string(_raws))
-				t.StringA[i] = _value
-			}
-		}
-	}
-	{
-		err := GetBoolCustomFromResourceData(p+"bool_a", d, &t.BoolA)
-		if err != nil {
-			return err
-		}
-	}
-	{
-		_rawi, ok := d.GetOk(p + "bytes_a")
-		if ok {
-			_rawi, ok := _rawi.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
-			}
-			t.BytesA = make([][]byte, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := []byte([]byte(_raws))
-				t.BytesA[i] = _value
-			}
-		}
-	}
-	{
-		_rawi, ok := d.GetOk(p + "timestamp_a")
-		if ok {
-			_rawi, ok := _rawi.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
-			}
-			t.TimestampA = make([]*time.Time, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value, err := time.Parse(time.RFC3339, _raws)
-				if err != nil {
-					return fmt.Errorf("malformed time value for field TimestampA : %w", err)
-				}
-				t.TimestampA[i] = &_value
-			}
-		}
-	}
-	{
-		_rawi, ok := d.GetOk(p + "duration_custom_a")
-		if ok {
-			_rawi, ok := _rawi.([]interface{})
-			if !ok {
-				return fmt.Errorf("count not convert %T to []interface{}", _rawi)
-			}
-			t.DurationCustomA = make([]Duration, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-				_raw := _rawi[i]
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_valued, err := time.ParseDuration(_raws)
-				if err != nil {
-					return fmt.Errorf("malformed duration value for field DurationCustomA : %w", err)
-				}
-				_value := Duration(_valued)
-				t.DurationCustomA[i] = _value
-			}
-		}
-	}
-	{
-		p := p + "nested" + ".0."
-
-		_obj := Nested{}
-		t.Nested = &_obj
-		t := &_obj
-
-		{
-
-			_raw, ok := d.GetOk(p + "str")
-			if ok {
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := string(string(_raws))
-				t.Str = _value
-			}
-		}
-		{
-			p := p + "nested"
-
-			_raw, ok := d.GetOk(p)
-			if ok {
-				_rawi, ok := _raw.([]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to []interface{}", _raw)
-				}
-
-				t.Nested = make([]*NestedLevel2, len(_rawi))
-				for i := 0; i < len(_rawi); i++ {
-
-					_obj := NestedLevel2{}
-					t.Nested[i] = &_obj
-
-					{
-						t := t.Nested[i]
-						p := p + fmt.Sprintf(".%v.", i)
-						{
-
-							_raw, ok := d.GetOk(p + "str")
-							if ok {
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.Str = _value
-							}
-						}
-
-					}
-				}
-			}
-		}
-		{
-
-			p := p + "nested_m"
-			_rawm, ok := d.GetOk(p)
-			if ok {
-				_rawmi, ok := _rawm.(map[string]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-				}
-				t.NestedM = make(map[string]string, len(_rawmi))
-				for _k, _v := range _rawmi {
-					_raw := _v
-					_raws, ok := _raw.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _raws)
-					}
-					_value := string(string(_raws))
-					t.NestedM[_k] = _value
-				}
-			}
-		}
-		{
-			p := p + "nested_m_obj"
-
-			_raw, ok := d.GetOk(p)
-			if ok {
-				_rawi, ok := _raw.([]interface{})
-				if !ok {
-					return fmt.Errorf("can not convert %T to []interface{}", _raw)
-				}
-
-				_value := make(map[string]*NestedLevel2)
-
-				for i := range _rawi {
-					_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-					_key, ok := _rawkey.(string)
-					if !ok {
-						return fmt.Errorf("can not convert %T to string", _rawkey)
-					}
-					if _key == "" {
-						return fmt.Errorf("missing key field in object map NestedMObj")
-					}
-
-					_obj := NestedLevel2{}
-					_value[_key] = &_obj
-					t := &_obj
-
-					{
-						p := fmt.Sprintf("%v.%v.value.0.", p, i)
-						{
-
-							_raw, ok := d.GetOk(p + "str")
-							if ok {
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.Str = _value
-							}
-						}
-
-					}
-				}
-
-				t.NestedMObj = _value
-			}
-		}
-
-	}
-	{
-		p := p + "nested_a"
-
-		_raw, ok := d.GetOk(p)
-		if ok {
-			_rawi, ok := _raw.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _raw)
-			}
-
-			t.NestedA = make([]*Nested, len(_rawi))
-			for i := 0; i < len(_rawi); i++ {
-
-				_obj := Nested{}
-				t.NestedA[i] = &_obj
-
-				{
-					t := t.NestedA[i]
-					p := p + fmt.Sprintf(".%v.", i)
-					{
-
-						_raw, ok := d.GetOk(p + "str")
-						if ok {
-							_raws, ok := _raw.(string)
-							if !ok {
-								return fmt.Errorf("can not convert %T to string", _raws)
-							}
-							_value := string(string(_raws))
-							t.Str = _value
-						}
-					}
-					{
-						p := p + "nested"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							t.Nested = make([]*NestedLevel2, len(_rawi))
-							for i := 0; i < len(_rawi); i++ {
-
-								_obj := NestedLevel2{}
-								t.Nested[i] = &_obj
-
-								{
-									t := t.Nested[i]
-									p := p + fmt.Sprintf(".%v.", i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-						}
-					}
-					{
-
-						p := p + "nested_m"
-						_rawm, ok := d.GetOk(p)
-						if ok {
-							_rawmi, ok := _rawm.(map[string]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-							}
-							t.NestedM = make(map[string]string, len(_rawmi))
-							for _k, _v := range _rawmi {
-								_raw := _v
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.NestedM[_k] = _value
-							}
-						}
-					}
-					{
-						p := p + "nested_m_obj"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							_value := make(map[string]*NestedLevel2)
-
-							for i := range _rawi {
-								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-								_key, ok := _rawkey.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _rawkey)
-								}
-								if _key == "" {
-									return fmt.Errorf("missing key field in object map NestedMObj")
-								}
-
-								_obj := NestedLevel2{}
-								_value[_key] = &_obj
-								t := &_obj
-
-								{
-									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-
-							t.NestedMObj = _value
-						}
-					}
-
-				}
-			}
-		}
-	}
-	{
-
-		p := p + "nested_m"
-		_rawm, ok := d.GetOk(p)
-		if ok {
-			_rawmi, ok := _rawm.(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-			}
-			t.NestedM = make(map[string]string, len(_rawmi))
-			for _k, _v := range _rawmi {
-				_raw := _v
-				_raws, ok := _raw.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _raws)
-				}
-				_value := string(string(_raws))
-				t.NestedM[_k] = _value
-			}
-		}
-	}
-	{
-		p := p + "nested_m_obj"
-
-		_raw, ok := d.GetOk(p)
-		if ok {
-			_rawi, ok := _raw.([]interface{})
-			if !ok {
-				return fmt.Errorf("can not convert %T to []interface{}", _raw)
-			}
-
-			_value := make(map[string]*Nested)
-
-			for i := range _rawi {
-				_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-				_key, ok := _rawkey.(string)
-				if !ok {
-					return fmt.Errorf("can not convert %T to string", _rawkey)
-				}
-				if _key == "" {
-					return fmt.Errorf("missing key field in object map NestedMObj")
-				}
-
-				_obj := Nested{}
-				_value[_key] = &_obj
-				t := &_obj
-
-				{
-					p := fmt.Sprintf("%v.%v.value.0.", p, i)
-					{
-
-						_raw, ok := d.GetOk(p + "str")
-						if ok {
-							_raws, ok := _raw.(string)
-							if !ok {
-								return fmt.Errorf("can not convert %T to string", _raws)
-							}
-							_value := string(string(_raws))
-							t.Str = _value
-						}
-					}
-					{
-						p := p + "nested"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							t.Nested = make([]*NestedLevel2, len(_rawi))
-							for i := 0; i < len(_rawi); i++ {
-
-								_obj := NestedLevel2{}
-								t.Nested[i] = &_obj
-
-								{
-									t := t.Nested[i]
-									p := p + fmt.Sprintf(".%v.", i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-						}
-					}
-					{
-
-						p := p + "nested_m"
-						_rawm, ok := d.GetOk(p)
-						if ok {
-							_rawmi, ok := _rawm.(map[string]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to map[string]interface{}", _rawm)
-							}
-							t.NestedM = make(map[string]string, len(_rawmi))
-							for _k, _v := range _rawmi {
-								_raw := _v
-								_raws, ok := _raw.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _raws)
-								}
-								_value := string(string(_raws))
-								t.NestedM[_k] = _value
-							}
-						}
-					}
-					{
-						p := p + "nested_m_obj"
-
-						_raw, ok := d.GetOk(p)
-						if ok {
-							_rawi, ok := _raw.([]interface{})
-							if !ok {
-								return fmt.Errorf("can not convert %T to []interface{}", _raw)
-							}
-
-							_value := make(map[string]*NestedLevel2)
-
-							for i := range _rawi {
-								_rawkey := d.Get(fmt.Sprintf("%v.%v.", p, i) + "key")
-								_key, ok := _rawkey.(string)
-								if !ok {
-									return fmt.Errorf("can not convert %T to string", _rawkey)
-								}
-								if _key == "" {
-									return fmt.Errorf("missing key field in object map NestedMObj")
-								}
-
-								_obj := NestedLevel2{}
-								_value[_key] = &_obj
-								t := &_obj
-
-								{
-									p := fmt.Sprintf("%v.%v.value.0.", p, i)
-									{
-
-										_raw, ok := d.GetOk(p + "str")
-										if ok {
-											_raws, ok := _raw.(string)
-											if !ok {
-												return fmt.Errorf("can not convert %T to string", _raws)
-											}
-											_value := string(string(_raws))
-											t.Str = _value
-										}
-									}
-
-								}
-							}
-
-							t.NestedMObj = _value
-						}
-					}
-
-				}
-			}
-
-			t.NestedMObj = _value
-		}
-	}
-
-	return nil
-}
-
-func SetTestToResourceData(d *schema.ResourceData, t *Test) error {
-	obj := make(map[string]interface{})
-
-	{
-		_v := t.Str
-
-		_value := string(_v)
-		obj["str"] = _value
-	}
-	{
-		_v := t.Int32
-
-		_value := int(_v)
-		obj["int32"] = _value
-	}
-	{
-		_v := t.Int64
-
-		_value := int(_v)
-		obj["int64"] = _value
-	}
-	{
-		_v := t.Float
-
-		_value := float64(_v)
-		obj["float"] = _value
-	}
-	{
-		_v := t.Double
-
-		_value := float64(_v)
-		obj["double"] = _value
-	}
-	{
-		_v := t.Bool
-
-		_value := bool(_v)
-		obj["bool"] = _value
-	}
-	{
-		_v := t.Bytes
-
-		_value := string(_v)
-		obj["bytes"] = _value
-	}
-	{
-		_v := t.Timestamp
-
-		_value := _v.Format(time.RFC3339)
-		obj["timestamp"] = _value
-	}
-	{
-		_v := t.DurationStd
-
-		_value := _v.String()
-		obj["duration_std"] = _value
-	}
-	{
-		_v := t.DurationCustom
-
-		_value := _v.String()
-		obj["duration_custom"] = _value
-	}
-	{
-		_v := t.TimestampN
-		if _v != nil {
-
-			_value := _v.Format(time.RFC3339)
-			obj["timestamp_n"] = _value
-		}
-	}
-	{
-		_arr := t.StringA
-		_raw := make([]string, len(_arr))
-
-		for i, _v := range _arr {
-			_value := string(_v)
-			_raw[i] = _value
-		}
-
-		obj["string_a"] = _raw
-	}
-	{
-		obj["bool_a"] = SetBoolCustomToResourceData(&t.BoolA)
-	}
-	{
-		_arr := t.BytesA
-		_raw := make([]string, len(_arr))
-
-		for i, _v := range _arr {
-			_value := string(_v)
-			_raw[i] = _value
-		}
-
-		obj["bytes_a"] = _raw
-	}
-	{
-		_arr := t.TimestampA
-		_raw := make([]string, len(_arr))
-
-		for i, _v := range _arr {
-			_value := _v.Format(time.RFC3339)
-			_raw[i] = _value
-		}
-
-		obj["timestamp_a"] = _raw
-	}
-	{
-		_arr := t.DurationCustomA
-		_raw := make([]string, len(_arr))
-
-		for i, _v := range _arr {
-			_value := _v.String()
-			_raw[i] = _value
-		}
-
-		obj["duration_custom_a"] = _raw
-	}
-	{
-		msg := make(map[string]interface{})
-		obj["nested"] = []interface{}{msg}
-		{
-			obj := msg
-			t := t.Nested
-
-			{
-				_v := t.Str
-
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
-
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
-					_value := string(_v)
-					m[key] = _value
-				}
-
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
-			}
-			{
-
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
-
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
-
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					i["value"] = []interface{}{obj}
-
-					a[n] = i
-					n++
-				}
-
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
-			}
-
-		}
-	}
-	{
-		arr := make([]interface{}, len(t.NestedA))
-
-		for i, t := range t.NestedA {
-			obj := make(map[string]interface{})
-			{
-				_v := t.Str
-
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
-
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
-					_value := string(_v)
-					m[key] = _value
-				}
-
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
-			}
-			{
-
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
-
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
-
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					i["value"] = []interface{}{obj}
-
-					a[n] = i
-					n++
-				}
-
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
-			}
-
-			arr[i] = obj
-		}
-
-		if len(arr) > 0 {
-			obj["nested_a"] = arr
-		}
-	}
-	{
-
-		m := make(map[string]interface{})
-
-		for key, _v := range t.NestedM {
-			_value := string(_v)
-			m[key] = _value
-		}
-
-		if len(m) > 0 {
-			obj["nested_m"] = m
-		}
-	}
-	{
-
-		a := make([]interface{}, len(t.NestedMObj))
-		n := 0
-
-		for k, v := range t.NestedMObj {
-			i := make(map[string]interface{})
-			i["key"] = k
-
-			obj := make(map[string]interface{})
-			t := v
-			{
-				_v := t.Str
-
-				_value := string(_v)
-				obj["str"] = _value
-			}
-			{
-				arr := make([]interface{}, len(t.Nested))
-
-				for i, t := range t.Nested {
-					obj := make(map[string]interface{})
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					arr[i] = obj
-				}
-
-				if len(arr) > 0 {
-					obj["nested"] = arr
-				}
-			}
-			{
-
-				m := make(map[string]interface{})
-
-				for key, _v := range t.NestedM {
-					_value := string(_v)
-					m[key] = _value
-				}
-
-				if len(m) > 0 {
-					obj["nested_m"] = m
-				}
-			}
-			{
-
-				a := make([]interface{}, len(t.NestedMObj))
-				n := 0
-
-				for k, v := range t.NestedMObj {
-					i := make(map[string]interface{})
-					i["key"] = k
-
-					obj := make(map[string]interface{})
-					t := v
-					{
-						_v := t.Str
-
-						_value := string(_v)
-						obj["str"] = _value
-					}
-
-					i["value"] = []interface{}{obj}
-
-					a[n] = i
-					n++
-				}
-
-				if len(a) > 0 {
-					obj["nested_m_obj"] = a
-				}
-			}
-
-			i["value"] = []interface{}{obj}
-
-			a[n] = i
-			n++
-		}
-
-		if len(a) > 0 {
-			obj["nested_m_obj"] = a
-		}
-	}
-
-	for key, value := range obj {
-		err := d.Set(key, value)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

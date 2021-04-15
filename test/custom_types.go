@@ -17,8 +17,12 @@ limitations under the License.
 package test
 
 import (
+	fmt "fmt"
+	"reflect"
 	time "time"
 
+	"github.com/gravitational/protoc-gen-terraform/accessors"
+	"github.com/gravitational/trace"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -44,29 +48,64 @@ func SchemaBoolCustom() *schema.Schema {
 	}
 }
 
-// GetBoolCustomFromResourceData interprets data at path as an array of boolean values.
+// GetBoolCustom interprets data at path as an array of boolean values.
 // The values are returned in target
-func GetBoolCustomFromResourceData(path string, data *schema.ResourceData, target *[]BoolCustom) error {
-	rawi, ok := data.GetOk(path)
-	if ok {
-		arr := rawi.([]interface{})
-		*target = make([]BoolCustom, len(arr))
-
-		for i := 0; i < len(arr); i++ {
-			(*target)[i] = BoolCustom(arr[i].(bool))
-		}
+func GetBoolCustom(
+	path string,
+	target reflect.Value,
+	meta *accessors.SchemaMeta,
+	sch *schema.Schema,
+	data *schema.ResourceData,
+) error {
+	len, err := accessors.GetLen(path, data)
+	if err != nil {
+		return trace.Wrap(err)
 	}
+	if len == 0 {
+		// TODO: Share with accessors
+		accessors.AssignZeroValue(target)
+		return nil
+	}
+
+	t := make([]BoolCustom, len)
+
+	for i := 0; i < len; i++ {
+		p := fmt.Sprintf("%v.%v", path, i)
+
+		raw := data.Get(p)
+		v, ok := raw.(bool)
+		if !ok {
+			return trace.Errorf("can not convert %T to bool", raw)
+		}
+
+		t[i] = BoolCustom(v)
+	}
+
+	target.Set(reflect.ValueOf(t))
 
 	return nil
 }
 
-// SetBoolCustomToResourceData sets
-func SetBoolCustomToResourceData(value *[]BoolCustom) interface{} {
-	r := make([]interface{}, len(*value))
-
-	for i, v := range *value {
-		r[i] = v
+// SetBoolCustom returns bool values
+func SetBoolCustom(
+	source reflect.Value,
+	meta *accessors.SchemaMeta,
+	sch *schema.Schema,
+) (interface{}, error) {
+	if !source.IsValid() {
+		return nil, nil
 	}
 
-	return r
+	c, ok := source.Interface().([]BoolCustom)
+	if !ok {
+		return nil, fmt.Errorf("can not convert %T to []BoolCustom", c)
+	}
+
+	r := make([]interface{}, len(c))
+
+	for i, v := range c {
+		r[i] = bool(v)
+	}
+
+	return r, nil
 }

@@ -17,14 +17,12 @@ limitations under the License.
 package plugin
 
 import (
+	"strings"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/trace"
 	"github.com/stoewer/go-strcase"
-)
-
-var (
-	cache map[string]*Message = make(map[string]*Message)
 )
 
 // Message represents metadata about protobuf message
@@ -40,6 +38,15 @@ type Message struct {
 
 	// Fields contains the collection of fields
 	Fields []*Field
+
+	// RawComment is field comment in proto file without // prepended
+	RawComment string
+
+	// Comment is field comment in proto file with // prepended
+	Comment string
+
+	// Path in schema to current message (types.UserV2.Metadata.ID)
+	Path string
 }
 
 // BuildMessage builds Message from its protobuf descriptor.
@@ -48,7 +55,7 @@ type Message struct {
 // otherwise it will be overexplicit. Use excludeFields to skip fields.
 //
 // It might return nil, nil which means that operation was successful, but message should be skipped.
-func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool) (*Message, error) {
+func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity bool, path string) (*Message, error) {
 	typeName := getMessageTypeName(d)
 
 	// Check if message is specified in export type list
@@ -58,23 +65,26 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 		return nil, nil
 	}
 
-	c, ok := cache[typeName]
-	if ok {
-		return c, nil
-	}
-
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
-			return nil, newInvalidMessageError(typeName, "oneOf messages are not supported yet")
+			return nil, trace.Errorf("oneOf messages are not supported yet" + typeName)
 		}
 	}
 
 	name := d.GetName()
+	rawComment, comment := findMessageComment(d)
+
+	if path == "" {
+		path = typeName
+	}
 
 	message := &Message{
 		Name:       name,
 		NameSnake:  strcase.SnakeCase(name),
 		GoTypeName: typeName,
+		RawComment: rawComment,
+		Comment:    comment,
+		Path:       path,
 	}
 
 	err := BuildFields(message, g, d)
@@ -85,7 +95,7 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 	return message, nil
 }
 
-// getMessageTypeName returns full message name, with prepended DefaultPkgName if needed
+// getMessageTypeName returns full message name, with prepended DefaultPackageName if needed
 func getMessageTypeName(d *generator.Descriptor) string {
 	if d.GoImportPath() != "." {
 		return d.File().GetPackage() + "." + d.GetName()
@@ -94,4 +104,18 @@ func getMessageTypeName(d *generator.Descriptor) string {
 		return config.DefaultPackageName + "." + d.GetName()
 	}
 	return d.GetName()
+}
+
+// findComment locates leading comment for this message using file source code information
+func findMessageComment(m *generator.Descriptor) (string, string) {
+	p := m.Path()
+
+	for _, l := range m.File().GetSourceCodeInfo().GetLocation() {
+		if getLocationPath(l) == p {
+			c := strings.Trim(l.GetLeadingComments(), "\n")
+			return commentToSingleLine(c), appendSlashSlash(c, false)
+		}
+	}
+
+	return "", ""
 }

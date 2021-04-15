@@ -20,10 +20,11 @@ package plugin
 import (
 	"bytes"
 
-	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
+
+	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,6 +37,9 @@ const (
 
 	// validationPkg contains name of Terraform validation package
 	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+	// accessorsPkg contains SchemaMeta definition
+	accessorsPkg = "github.com/gravitational/protoc-gen-terraform/accessors"
 )
 
 // Plugin is terraform generator plugin
@@ -58,12 +62,10 @@ func NewPlugin() *Plugin {
 func (p *Plugin) Init(g *generator.Generator) {
 	p.Generator = g
 
-	config.MustSetTypes(g.Param["types"])
-	config.SetExcludeFields(g.Param["exclude_fields"])
-	config.SetDefaultPackageName(g.Param["pkg"])
-	config.SetDurationType(g.Param["custom_duration"])
-	config.SetCustomImports(g.Param["custom_imports"])
-	config.SetTargetPackageName(g.Param["target_pkg"])
+	err := config.Read(g.Param)
+	if err != nil {
+		p.Generator.Fail(err.Error())
+	}
 }
 
 // Name returns the name of the plugin
@@ -78,23 +80,23 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	// Adds Terraform package imports to target file
 	p.setImports()
 
-	p.reflect(file)
+	p.build(file)
 
-	err := p.writeSchema()
+	err := p.writeVars()
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
 
-	err = p.writeGettersSetters()
+	err = p.writeSchema()
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
 }
 
 // reflect builds message dictionary from a messages in protoc file
-func (p *Plugin) reflect(file *generator.FileDescriptor) {
+func (p *Plugin) build(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
-		m, err := BuildMessage(p.Generator, message, true)
+		m, err := BuildMessage(p.Generator, message, true, "")
 
 		if err != nil {
 			logrus.Warning(err)
@@ -107,6 +109,19 @@ func (p *Plugin) reflect(file *generator.FileDescriptor) {
 	}
 }
 
+// writeVars writes top level variables and methods
+func (p *Plugin) writeVars() error {
+	var buf bytes.Buffer
+
+	err := render.Template(render.VarsTpl, p.Messages, &buf)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+	p.P(buf.String())
+
+	return nil
+}
+
 // writeSchema writes schema definition to target file
 func (p *Plugin) writeSchema() error {
 	for _, message := range p.Messages {
@@ -117,26 +132,13 @@ func (p *Plugin) writeSchema() error {
 			return trace.Wrap(err)
 		}
 		p.P(buf.String())
-	}
 
-	return nil
-}
+		buf.Reset()
 
-// writeGetters writes unmarshallers definition to target file
-func (p *Plugin) writeGettersSetters() error {
-	for _, message := range p.Messages {
-		var buf bytes.Buffer
-
-		err := render.Template(render.GetTpl, message, &buf)
+		err = render.Template(render.MetaTpl, message, &buf)
 		if err != nil {
 			return trace.Wrap(err)
 		}
-
-		err = render.Template(render.SetTpl, message, &buf)
-		if err != nil {
-			return trace.Wrap(err)
-		}
-
 		p.P(buf.String())
 	}
 
@@ -150,6 +152,7 @@ func (p *Plugin) setImports() {
 	// So those could be referenced via schema. and validation.
 	p.AddImport(schemaPkg)
 	p.AddImport(validationPkg)
+	p.AddImport(accessorsPkg)
 
 	for _, i := range config.CustomImports {
 		p.AddImport(generator.GoImportPath(i))

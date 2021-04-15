@@ -23,9 +23,7 @@ option (gogoproto.marshaler_all) = false;
 option (gogoproto.unmarshaler_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 
-// Test message definition.
-//
-// It contains:
+// Test message contains:
 //   - elementary fields
 //   - repeated elementary fields
 //   - maps of elementary fields
@@ -37,6 +35,8 @@ option (gogoproto.goproto_getters_all) = false;
 //   - standard google protobuf timestamps
 //   - byte arrays, which are treated as strings by default
 //
+
+// Test message definition.
 message Test {
     // Str string field
     string Str = 1;
@@ -62,41 +62,68 @@ message Test {
     // Timestamp time.Time field
     google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 
-    // DurationStd time.Duration field (standard)
-    int64 DurationStd = 9 [ (gogoproto.stdduration) = true ];
+    // Timestamp time.Time field
+    google.protobuf.Timestamp TimestampMissing = 9 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 
-    // DurationCustom time.Duration field (custom)
-    int64 DurationCustom = 10 [ (gogoproto.casttype) = "Duration" ];
-    
-    // TimestampN *time.Time field
-    google.protobuf.Timestamp TimestampN = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
+    // TimestampNullable *time.Time field
+    google.protobuf.Timestamp TimestampNullable = 10 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
 
-    // StringA []string field
-    repeated string StringA = 12;
+    // TimestampNullableWithNilValue *time.Time field
+    google.protobuf.Timestamp TimestampNullableWithNilValue = 11 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = true ];
 
-    // BoolA []bool field
-    repeated bool BoolA = 13 [ (gogoproto.customtype) = "BoolCustom" ];
+    // DurationStandard time.Duration field (standard)
+    int64 DurationStandard = 12 [ (gogoproto.stdduration) = true ];
 
-    // BytesA [][]byte field
-    repeated bytes BytesA = 14;
+    // DurationStandardMissing time.Duration field (standard) missing in input data
+    int64 DurationStandardMissing = 13 [ (gogoproto.stdduration) = true ];
 
-    // TimestampA []time.Time field
-    repeated google.protobuf.Timestamp TimestampA = 15 [ (gogoproto.stdtime) = true ];
+    // DurationCustom time.Duration field (with casttype)
+    int64 DurationCustom = 14 [ (gogoproto.casttype) = "Duration" ];
 
-    // DurationCustomA []time.Duration field
-    repeated int64 DurationCustomA = 16 [ (gogoproto.casttype) = "Duration" ];
+    // DurationCustomMissing time.Duration field (with casttype) missing in input data
+    int64 DurationCustomMissing = 15 [ (gogoproto.casttype) = "Duration" ];
 
-    // Nested nested message field
-    Nested Nested = 17;   
+    // StringList []string field
+    repeated string StringList = 16;
 
-    // NestedA nested message array
-    repeated Nested NestedA = 18;
+    // StringListEmpty []string field
+    repeated string StringListEmpty = 17;
 
-    // NestedM normal map
-    map<string, string> NestedM = 19;
+    // BoolCustomList []bool field
+    repeated bool BoolCustomList = 18 [ (gogoproto.customtype) = "BoolCustom" ];
 
-    // NestedMObj object map
-    map<string, Nested> NestedMObj = 20;
+    // BytesList [][]byte field
+    repeated bytes BytesList = 19;
+
+    // TimestampList []time.Time field
+    repeated google.protobuf.Timestamp TimestampList = 20 [ (gogoproto.stdtime) = true ];
+
+    // DurationCustomList []time.Duration field
+    repeated int64 DurationCustomList = 21 [ (gogoproto.casttype) = "Duration" ];
+
+    // Nested nested message field, non-nullable
+    Nested Nested = 22 [ (gogoproto.nullable) = false ];
+
+    // NestedNullable nested message field, nullabel
+    Nested NestedNullable = 23 [ (gogoproto.nullable) = true ];
+
+    // NestedNullableWithNilValue nested message field, with no value set
+    Nested NestedNullableWithNilValue = 24 [ (gogoproto.nullable) = true ];
+
+    // NestedList nested message array
+    repeated Nested NestedList = 25 [ (gogoproto.nullable) = false ];
+
+    // NestedListNullable nested message array
+    repeated Nested NestedListNullable = 26 [ (gogoproto.nullable) = true ];
+
+    // Map normal map
+    map<string, string> Map = 27;
+
+    // MapObject is the object map
+    map<string, Nested> MapObject = 29 [ (gogoproto.nullable) = false ];    
+
+    // MapObjectNullable is the object map with nullable values
+    map<string, Nested> MapObjectNullable = 30;
 }
 
 // Nested message definition
@@ -105,17 +132,17 @@ message Nested {
     string Str = 1;
 
     // Nested repeated nested messages
-    repeated NestedLevel2 Nested = 2;
+    repeated OtherNested NestedList = 2;
 
     // Nested map repeated nested messages
-    map<string, string> NestedM = 3;
+    map<string, string> Map = 3;
 
-    // NestedMObj nested object map
-    map<string, NestedLevel2> NestedMObj = 4;
+    // MapObjectNested nested object map
+    map<string, OtherNested> MapObjectNested = 4;
 }
 
-// Message nested into nested message
-message NestedLevel2 {
+// OtherNested message nested into nested message
+message OtherNested {
     // Str string field
     string Str = 1;
 }

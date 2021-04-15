@@ -1,13 +1,15 @@
 {{/* ---- Schema rendering ---------------------------------------------------------------*/}}
-// Type full name: {{ .Name }}
-func Schema{{ .Name }}() map[string]*schema.Schema {
+// Schema{{ .Name }} returns schema for {{.Name}}
+//
+{{.Comment}}
+func GenSchema{{ .Name }}() map[string]*schema.Schema {
 	return {{ template "fieldsSchema" .Fields -}}
 }
 
 {{- define "fieldsSchema" -}}
 map[string]*schema.Schema {
 {{- range $index, $field := . }}
-	// {{ .Name }} {{ .Kind }}
+    {{.Comment}}
 	"{{ .NameSnake }}": {{ template "fieldSchema" . }}    
 {{- end }}
 }
@@ -35,18 +37,20 @@ map[string]*schema.Schema {
 },
 {{- end }}
 
-{{- if eq .Kind "OBJECT_MAP" }}
+{{- if eq .Kind "MESSSAGE_MAP" }}
 {
     {{ template "required" . }}
-    {{ template "objectMap" . }}
+    {{ template "messageMap" . }}
 },
 {{- end }}
 
 {{- if eq .Kind "SINGULAR_MESSAGE" }}
 {
-    {{ template "required" . }}
     Type: schema.TypeList,
     MaxItems: 1,
+    Description: {{ .Message.RawComment | quote }},
+    {{ template "configMode" . -}}    
+    {{- template "required" . }}
     Elem: &schema.Resource {
         Schema: {{ template "fieldsSchema" .Message.Fields }},
     },
@@ -56,31 +60,39 @@ map[string]*schema.Schema {
 {{- if eq .Kind "SINGULAR_ELEMENTARY" }}
 {
     {{ template "singularElementary" . }}
-    {{ template "required" . }}    
+    {{- template "required" . }}    
 },
 {{- end }}
 
 {{- if eq .Kind "CUSTOM_TYPE" }}
-Schema{{.CustomTypeMethodInfix}}(),
+Schema{{.Suffix}}(),
 {{- end }}
 {{- end -}}
 
 {{- define "singularElementary" -}}
+{{- template "configMode" . -}}
 Type: {{ template "type" .SchemaRawType }},
+Description: {{ .RawComment | quote }},
 {{- if .IsTime }}
 ValidateFunc: validation.IsRFC3339Time,
+{{- end }}
+{{- if .IsDuration }}
+DiffSuppressFunc: SuppressDurationChange,
 {{- end }}
 {{- end -}}
 
 {{- define "repeatedMessage" -}}
 Type: schema.TypeList,
+Description: {{ .RawComment | quote }},
 Elem: &schema.Resource {
     Schema: {{ template "fieldsSchema" .Message.Fields }},
 },
+{{ template "configMode" . -}}
 {{- end -}}
 
 {{- define "repeatedElementary" -}}
 Type: schema.TypeList,
+Description: {{ .RawComment | quote }},
 Elem: &schema.Schema {
     Type: {{ template "type" .SchemaRawType }},
 },
@@ -88,13 +100,15 @@ Elem: &schema.Schema {
 
 {{- define "map" -}}
 Type: schema.TypeMap,
+Description: {{ .RawComment | quote }},
 Elem: &schema.Schema {
     Type: {{ template "type" .MapValueField.SchemaRawType }},
 },
 {{- end -}}
 
-{{- define "objectMap" -}}
-Type: schema.TypeList,
+{{- define "messageMap" -}}
+Type: schema.TypeSet,
+Description: {{ .RawComment | quote }},
 Elem: &schema.Resource {
     Schema: map[string]*schema.Schema{
         "key": {
@@ -104,6 +118,7 @@ Elem: &schema.Resource {
         "value": {{ template "fieldSchema" .MapValueField }}
     },
 },
+{{ template "configMode" . -}}
 {{- end -}}
 
 {{- define "type" -}}
@@ -119,9 +134,24 @@ schema.TypeString
 {{- end -}}
 
 {{- define "required" -}}
-{{- if .IsRequired -}}
+{{- if .IsRequired }}
 Required: true,
-{{- else -}}
+{{- else }}
 Optional: true,
+{{- end }}
+{{- if .IsComputed }}
+Computed: true,
+{{- end }}
+{{- if .Default }}
+Default: {{.Default }},
+{{- end }}
+{{- if .IsForceNew }}
+ForceNew: true,
+{{- end }}
 {{- end -}}
+
+{{- define "configMode" -}}
+{{- if .ConfigMode }}
+ConfigMode: schema.{{.ConfigMode}},
+{{- end }}
 {{- end -}}

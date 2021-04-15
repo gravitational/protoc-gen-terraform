@@ -119,9 +119,6 @@ github.com/sirupsen/logrus
 # github.com/stoewer/go-strcase v1.2.0
 ## explicit
 github.com/stoewer/go-strcase
-# github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
-## explicit
-github.com/stretchr/stew/slice
 # github.com/stretchr/testify v1.6.1
 ## explicit
 github.com/stretchr/testify/assert
@@ -211,4 +208,5 @@ google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/known/wrapperspb
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+## explicit
 gopkg.in/yaml.v3
