@@ -313,7 +313,10 @@ func getSet(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 
 	switch target.Kind() {
 	case reflect.Slice:
-		// TODO: This case is not important for now
+		// We do not have sets mapped to slices for now. It might be needed for unordered collections which
+		// change its order on every API request. Set is unordered collection.
+		//
+		// It will require adding explicit configuration flag "represent_collection_as_set".
 		return trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		// This set must be read into a map, so, it contains artificial key and value arguments
@@ -331,7 +334,10 @@ func getSet(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 			}
 
 			p := fmt.Sprintf("%v.%v.value.0", path, s.F(i))
-			k := m["key"]
+			k, ok := m["key"]
+			if !ok {
+				return fmt.Errorf("one of the element keys is empty in %s", path)
+			}
 
 			v := newEmptyValue(target.Type().Elem())
 
@@ -347,7 +353,7 @@ func getSet(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 
 		return nil
 	default:
-		return trace.Errorf("unknown set target type")
+		return trace.Errorf("unknown set target type %v", target.Kind())
 	}
 }
 

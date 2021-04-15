@@ -237,7 +237,8 @@ func setSet(source reflect.Value, meta *SchemaMeta, sch *schema.Schema) (interfa
 
 	switch source.Kind() {
 	case reflect.Slice:
-		// TODO: This case is not important for now
+		// We do not have sets mapped to slices for now. It might be needed for unordered collections.
+		// It will require adding explicit configuration flag "represent_collection_as_set".
 		return nil, trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		for _, k := range source.MapKeys() {
