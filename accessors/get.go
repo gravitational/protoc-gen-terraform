@@ -257,13 +257,13 @@ func getMap(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 		return nil
 	}
 
-	m, ok := raw.(map[string]interface{})
+	sourceMap, ok := raw.(map[string]interface{})
 	if !ok {
 		return trace.Errorf("failed to convert %T to map[string]interface{}", raw)
 	}
 
 	// If map is empty, set target empty map
-	if len(m) == 0 {
+	if len(sourceMap) == 0 {
 		AssignZeroValue(target)
 		return nil
 	}
@@ -272,21 +272,21 @@ func getMap(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 		return trace.Errorf("target time is not a map")
 	}
 
-	t := reflect.MakeMap(target.Type())
+	targetMap := reflect.MakeMap(target.Type())
 
 	// Iterate over map keys
-	for k := range m {
-		v := newEmptyValue(target.Type().Elem())
+	for key := range sourceMap {
+		value := newEmptyValue(target.Type().Elem())
 
-		err := getEnumerableElement(path+"."+k, v, sch, meta, data)
+		err := getEnumerableElement(path+"."+key, value, sch, meta, data)
 		if err != nil {
 			return trace.Wrap(err)
 		}
 
-		assignMapIndex(t, reflect.ValueOf(k), v)
+		assignMapIndex(targetMap, reflect.ValueOf(key), value)
 	}
 
-	return assign(t, target)
+	return assign(targetMap, target)
 }
 
 // setSet reads set from resource data
@@ -306,7 +306,7 @@ func getSet(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 		return trace.Errorf("can not read key " + path)
 	}
 
-	s, ok := raw.(*schema.Set)
+	set, ok := raw.(*schema.Set)
 	if !ok {
 		return trace.Errorf("can not convert %T to *schema.Set", raw)
 	}
@@ -320,36 +320,36 @@ func getSet(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sch
 		return trace.NotImplemented("set acting as list on target is not implemented yet")
 	case reflect.Map:
 		// This set must be read into a map, so, it contains artificial key and value arguments
-		r := reflect.MakeMap(target.Type())
+		targetMap := reflect.MakeMap(target.Type())
 
-		for _, i := range s.List() {
-			m, ok := i.(map[string]interface{})
+		for _, i := range set.List() {
+			itemMap, ok := i.(map[string]interface{})
 			if !ok {
-				return trace.Errorf("can not convert %T to map[string]interface{}", m)
+				return trace.Errorf("can not convert %T to map[string]interface{}", itemMap)
 			}
 
-			re, ok := sch.Elem.(*schema.Resource)
+			resource, ok := sch.Elem.(*schema.Resource)
 			if !ok {
 				return fmt.Errorf("can not convert %T to *schema.Resource", sch.Elem)
 			}
 
-			p := fmt.Sprintf("%v.%v.value.0", path, s.F(i))
-			k, ok := m["key"]
+			itemPath := fmt.Sprintf("%v.%v.value.0", path, set.F(i))
+			itemKey, ok := itemMap["key"]
 			if !ok {
 				return fmt.Errorf("one of the element keys is empty in %s", path)
 			}
 
-			v := newEmptyValue(target.Type().Elem())
+			value := newEmptyValue(target.Type().Elem())
 
-			err := getEnumerableElement(p, v, re.Schema["value"], meta, data)
+			err := getEnumerableElement(itemPath, value, resource.Schema["value"], meta, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
-			assignMapIndex(r, reflect.ValueOf(k), v)
+			assignMapIndex(targetMap, reflect.ValueOf(itemKey), value)
 		}
 
-		target.Set(r)
+		target.Set(targetMap)
 
 		return nil
 	default:
@@ -365,6 +365,5 @@ func newEmptyValue(source reflect.Type) reflect.Value {
 		t = t.Elem()
 	}
 
-	n := reflect.Indirect(reflect.New(t))
-	return n
+	return reflect.Indirect(reflect.New(t))
 }
