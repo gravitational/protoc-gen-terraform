@@ -69,66 +69,66 @@ func setFragment(
 		return nil, nil
 	}
 
-	for k, m := range meta {
-		s, ok := sch[k]
+	for key, fieldMeta := range meta {
+		fieldSchema, ok := sch[key]
 		if !ok {
-			return nil, trace.Errorf("field %v not found in corresponding schema", k)
+			return nil, trace.Errorf("field %v not found in corresponding schema", key)
 		}
 
-		v := source.FieldByName(m.Name)
+		fieldValue := source.FieldByName(fieldMeta.Name)
 
-		if m.Setter != nil {
-			r, err := m.Setter(v, m, s)
+		if fieldMeta.Setter != nil {
+			r, err := fieldMeta.Setter(fieldValue, fieldMeta, fieldSchema)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
 
 			if r != nil {
-				target[k] = r
+				target[key] = r
 			}
 
 			continue
 		}
 
-		switch s.Type {
+		switch fieldSchema.Type {
 		case schema.TypeInt, schema.TypeFloat, schema.TypeBool, schema.TypeString:
-			r, err := setElementary(v, m, s)
+			result, err := setElementary(fieldValue, fieldMeta, fieldSchema)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
 
-			if r != nil {
-				err = setConvertedKey(target, k, r, s)
+			if result != nil {
+				err = setConvertedKey(target, key, result, fieldSchema)
 				if err != nil {
 					return nil, trace.Wrap(err)
 				}
 			}
 
 		case schema.TypeList:
-			r, err := setList(v, m, s)
+			result, err := setList(fieldValue, fieldMeta, fieldSchema)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
-			if r != nil {
-				target[k] = r
+			if result != nil {
+				target[key] = result
 			}
 
 		case schema.TypeMap:
-			r, err := setMap(v, m, s)
+			result, err := setMap(fieldValue, fieldMeta, fieldSchema)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
-			target[k] = r
+			target[key] = result
 
 		case schema.TypeSet:
-			r, err := setSet(v, m, s)
+			result, err := setSet(fieldValue, fieldMeta, fieldSchema)
 			if err != nil {
 				return nil, trace.Wrap(err)
 			}
-			target[k] = r
+			target[key] = result
 
 		default:
-			return nil, trace.Errorf("unknown type %v", s.Type.String())
+			return nil, trace.Errorf("unknown type %v", fieldSchema.Type.String())
 		}
 	}
 

@@ -41,24 +41,24 @@ func Get(
 		return trace.Errorf("obj must not be nil")
 	}
 
-	v := reflect.ValueOf(obj)
-	if v.Kind() != reflect.Ptr {
+	value := reflect.ValueOf(obj)
+	if value.Kind() != reflect.Ptr {
 		return trace.Errorf("obj must be a pointer")
 	}
 
-	v = reflect.Indirect(v)
+	value = reflect.Indirect(value)
 
-	return getFragment("", v, meta, sch, data)
+	return getFragment("", value, meta, sch, data)
 }
 
 // GetLen returns TypeSet or TypeList value length
 func GetLen(path string, data *schema.ResourceData) (int, error) {
-	n, ok := data.GetOk(path + ".#") // Terraform stores collection length in "collection_name.#" key
-	if !ok || n == nil {
+	num, ok := data.GetOk(path + ".#") // Terraform stores collection length in "collection_name.#" key
+	if !ok || num == nil {
 		return 0, nil
 	}
 
-	len, ok := n.(int)
+	len, ok := num.(int)
 	if !ok {
 		return 0, trace.Errorf("failed to convert list count to number %s", path)
 	}
@@ -75,17 +75,17 @@ func getFragment(
 	sch map[string]*schema.Schema,
 	data *schema.ResourceData,
 ) error {
-	for k, m := range meta {
-		s, ok := sch[k]
+	for key, fieldMeta := range meta {
+		fieldSchema, ok := sch[key]
 		if !ok {
-			return trace.Errorf("field %v.%v not found in corresponding schema", path, k)
+			return trace.Errorf("field %v.%v not found in corresponding schema", path, key)
 		}
 
-		v := target.FieldByName(m.Name)
-		p := path + k
+		fieldValue := target.FieldByName(fieldMeta.Name)
+		itemPath := path + key
 
-		if m.Getter != nil {
-			err := m.Getter(p, v, m, s, data)
+		if fieldMeta.Getter != nil {
+			err := fieldMeta.Getter(itemPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
@@ -93,32 +93,32 @@ func getFragment(
 			continue
 		}
 
-		switch s.Type {
+		switch fieldSchema.Type {
 		case schema.TypeInt, schema.TypeFloat, schema.TypeBool, schema.TypeString:
-			err := getElementary(p, v, m, s, data)
+			err := getElementary(itemPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 		case schema.TypeList:
-			err := getList(p, v, m, s, data)
+			err := getList(itemPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case schema.TypeMap:
-			err := getMap(p, v, m, s, data)
+			err := getMap(itemPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case schema.TypeSet:
-			err := getSet(p, v, m, s, data)
+			err := getSet(itemPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		default:
-			return trace.Errorf("unknown type %v for %s", s.Type.String(), p)
+			return trace.Errorf("unknown type %v for %s", fieldSchema.Type.String(), itemPath)
 		}
 	}
 
