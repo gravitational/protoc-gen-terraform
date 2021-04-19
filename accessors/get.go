@@ -82,10 +82,10 @@ func getFragment(
 		}
 
 		fieldValue := target.FieldByName(fieldMeta.Name)
-		itemPath := path + key
+		fieldPath := path + key
 
 		if fieldMeta.Getter != nil {
-			err := fieldMeta.Getter(itemPath, fieldValue, fieldMeta, fieldSchema, data)
+			err := fieldMeta.Getter(fieldPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
@@ -95,30 +95,30 @@ func getFragment(
 
 		switch fieldSchema.Type {
 		case schema.TypeInt, schema.TypeFloat, schema.TypeBool, schema.TypeString:
-			err := getElementary(itemPath, fieldValue, fieldMeta, fieldSchema, data)
+			err := getElementary(fieldPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 		case schema.TypeList:
-			err := getList(itemPath, fieldValue, fieldMeta, fieldSchema, data)
+			err := getList(fieldPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case schema.TypeMap:
-			err := getMap(itemPath, fieldValue, fieldMeta, fieldSchema, data)
+			err := getMap(fieldPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		case schema.TypeSet:
-			err := getSet(itemPath, fieldValue, fieldMeta, fieldSchema, data)
+			err := getSet(fieldPath, fieldValue, fieldMeta, fieldSchema, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 
 		default:
-			return trace.Errorf("unknown type %v for %s", fieldSchema.Type.String(), itemPath)
+			return trace.Errorf("unknown type %v for %s", fieldSchema.Type.String(), fieldPath)
 		}
 	}
 
@@ -156,7 +156,7 @@ func getEnumerableElement(
 
 // getElementary gets elementary value (scalar, string, time, duration)
 func getElementary(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
-	s, ok := data.GetOk(path)
+	value, ok := data.GetOk(path)
 	if !ok {
 		AssignZeroValue(target)
 		return nil
@@ -164,17 +164,17 @@ func getElementary(path string, target reflect.Value, meta *SchemaMeta, sch *sch
 
 	switch {
 	case meta.IsTime:
-		err := assignTime(s, target)
+		err := assignTime(value, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
 	case meta.IsDuration:
-		err := assignDuration(s, target)
+		err := assignDuration(value, target)
 		if err != nil {
 			return trace.Wrap(err)
 		}
 	default:
-		v := reflect.ValueOf(s)
+		v := reflect.ValueOf(value)
 		err := assign(v, target)
 		if err != nil {
 			return trace.Wrap(err)
@@ -186,33 +186,33 @@ func getElementary(path string, target reflect.Value, meta *SchemaMeta, sch *sch
 
 // assignTime parses time value from a string and assigns it to target
 func assignTime(source interface{}, target reflect.Value) error {
-	s, ok := source.(string)
+	value, ok := source.(string)
 	if !ok {
 		return trace.Errorf("can not convert %T to string", source)
 	}
 
-	t, err := time.Parse(time.RFC3339Nano, s)
+	parsedTime, err := time.Parse(time.RFC3339Nano, value)
 	if err != nil {
 		return trace.Errorf("can not parse time: %w", err)
 	}
 
-	v := reflect.ValueOf(t)
+	v := reflect.ValueOf(parsedTime)
 	return assign(v, target)
 }
 
 // assignTime parses duration value from a string and assigns it to target
 func assignDuration(source interface{}, target reflect.Value) error {
-	s, ok := source.(string)
+	value, ok := source.(string)
 	if !ok {
 		return trace.Errorf("can not convert %T to string", source)
 	}
 
-	t, err := time.ParseDuration(s)
+	parsedDuration, err := time.ParseDuration(value)
 	if err != nil {
 		return trace.Errorf("can not parse duration: %w", err)
 	}
 
-	v := reflect.ValueOf(t)
+	v := reflect.ValueOf(parsedDuration)
 	return assign(v, target)
 }
 
@@ -231,19 +231,19 @@ func getList(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Sc
 
 	// Target is a slice of elementary values or objects
 	if target.Type().Kind() == reflect.Slice {
-		r := reflect.MakeSlice(target.Type(), len, len)
+		slice := reflect.MakeSlice(target.Type(), len, len)
 
 		for i := 0; i < len; i++ {
-			el := r.Index(i)
-			p := fmt.Sprintf("%v.%v", path, i)
+			value := slice.Index(i)
+			elementPath := fmt.Sprintf("%v.%v", path, i)
 
-			err := getEnumerableElement(p, el, sch, meta, data)
+			err := getEnumerableElement(elementPath, value, sch, meta, data)
 			if err != nil {
 				return trace.Wrap(err)
 			}
 		}
 
-		return assign(r, target)
+		return assign(slice, target)
 	}
 
 	// Target is an object represented by a single element list
