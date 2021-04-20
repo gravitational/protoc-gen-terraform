@@ -224,8 +224,3 @@ func (c *FieldBuildContext) GetMapValueFieldDescriptor() (*FieldDescriptorProtoE
 
 	return &FieldDescriptorProtoExt{m.ValueField}, nil
 }
-
-// GetBytesExceptionGoType returns go type for byte field exception
-func (c *FieldBuildContext) GetBytesExceptionGoType() string {
-	return "[]byte"
-}
