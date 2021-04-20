@@ -79,6 +79,9 @@ ValidateFunc: validation.IsRFC3339Time,
 {{- if .IsDuration }}
 DiffSuppressFunc: SuppressDurationChange,
 {{- end }}
+{{- if .StateFunc }}
+StateFunc: {{ .StateFunc }},
+{{- end }}
 {{- end -}}
 
 {{- define "repeatedMessage" -}}

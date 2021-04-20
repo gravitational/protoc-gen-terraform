@@ -127,3 +127,7 @@ suffixes:
     "BoolOption": "BoolOption" # This is listed here for convenience. Just to have all custom method names in a single place.
     "Labels": "Labels"
     "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
+
+# These funcs will be used as a state funcs for a fields
+state_func:
+    "types.Metadata.Expires": TruncateMs

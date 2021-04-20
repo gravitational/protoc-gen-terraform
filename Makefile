@@ -13,7 +13,7 @@ build: clean
 
 .PHONY: install
 install: build
-	go install .
+	go install -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(package_version)"
 
 pwd = $(realpath $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
 
