@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/gravitational/trace"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -191,7 +191,7 @@ func setTypes(t []string) error {
 
 	setSet(Types, t)
 
-	logrus.Printf("Types: %s", t)
+	log.Printf("Types: %s", t)
 
 	return nil
 }
@@ -201,7 +201,7 @@ func setExcludeFields(f []string) {
 	setSet(ExcludeFields, f)
 
 	if len(f) > 0 {
-		logrus.Printf("Excluded fields: %s", f)
+		log.Printf("Excluded fields: %s", f)
 	}
 }
 
@@ -214,7 +214,7 @@ func setDefaultPackageName(arg string) {
 	_, name := filepath.Split(arg)
 	DefaultPackageName = name
 
-	logrus.Printf("Default package name: %v", DefaultPackageName)
+	log.Printf("Default package name: %v", DefaultPackageName)
 }
 
 // setDurationType sets the custom duration type
@@ -225,7 +225,7 @@ func setDurationType(arg string) {
 
 	DurationCustomType = arg
 
-	logrus.Printf("Duration custom type: %s", DurationCustomType)
+	log.Printf("Duration custom type: %s", DurationCustomType)
 }
 
 // setCustomImports parses custom import packages
@@ -236,7 +236,7 @@ func setCustomImports(i []string) {
 
 	CustomImports = i
 
-	logrus.Printf("Custom imports: %s", CustomImports)
+	log.Printf("Custom imports: %s", CustomImports)
 }
 
 // setTargetPackageName sets the target package name
@@ -248,7 +248,7 @@ func setTargetPackageName(arg string) {
 	_, name := filepath.Split(arg)
 	TargetPackageName = name
 
-	logrus.Printf("Target package name: %v", TargetPackageName)
+	log.Printf("Target package name: %v", TargetPackageName)
 }
 
 // setComputedFields parses and sets ExcludeFields
@@ -256,7 +256,7 @@ func setComputedFields(f []string) {
 	setSet(ComputedFields, f)
 
 	if len(f) > 0 {
-		logrus.Printf("Computed fields: %s", f)
+		log.Printf("Computed fields: %s", f)
 	}
 }
 
@@ -265,7 +265,7 @@ func setRequiredFields(f []string) {
 	setSet(RequiredFields, f)
 
 	if len(f) > 0 {
-		logrus.Printf("Required fields: %s", f)
+		log.Printf("Required fields: %s", f)
 	}
 }
 
@@ -283,7 +283,7 @@ func setDefaults(m map[string]interface{}) {
 		s = append(s, k)
 	}
 
-	logrus.Printf("Defaults set for: %v", s)
+	log.Printf("Defaults set for: %v", s)
 }
 
 // setSuffixes sets suffixes for a fields
@@ -300,7 +300,7 @@ func setSuffixes(m map[string]string) {
 		s = append(s, k)
 	}
 
-	logrus.Printf("Suffixes set for: %v", s)
+	log.Printf("Suffixes set for: %v", s)
 }
 
 // setForceNew parses and sets ExcludeFields
@@ -308,7 +308,7 @@ func setForceNewFields(f []string) {
 	setSet(ForceNewFields, f)
 
 	if len(f) > 0 {
-		logrus.Printf("Force new fields: %s", f)
+		log.Printf("Force new fields: %s", f)
 	}
 }
 
@@ -317,7 +317,7 @@ func setConfigModeAttrFields(f []string) {
 	setSet(ConfigModeAttrFields, f)
 
 	if len(f) > 0 {
-		logrus.Printf("SchemaConfigModeAttr fields: %s", f)
+		log.Printf("SchemaConfigModeAttr fields: %s", f)
 	}
 }
 
@@ -326,7 +326,7 @@ func setConfigModeBlockFields(f []string) {
 	setSet(ConfigModeBlockFields, f)
 
 	if len(f) > 0 {
-		logrus.Printf("SchemaConfigModeBlock fields: %s", f)
+		log.Printf("SchemaConfigModeBlock fields: %s", f)
 	}
 }
 
