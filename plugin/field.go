@@ -92,6 +92,9 @@ type Field struct {
 
 	// ConfigMode is field config mode
 	ConfigMode string
+
+	// StateFunc is field state func name
+	StateFunc string
 }
 
 // BuildFields builds []*Field from descriptors of specified message
@@ -200,6 +203,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		return nil, trace.Wrap(err)
 	}
 
+	f.setStateFunc(c)
 	f.setKind()
 
 	return f, nil
@@ -276,7 +280,7 @@ func (f *Field) setForceNew(c *FieldBuildContext) {
 	}
 }
 
-// setDefault returns field default value
+// setDefault sets field default value
 func (f *Field) setDefault(c *FieldBuildContext) error {
 	v1, ok1 := config.Defaults[c.GetPath()]
 	v2, ok2 := config.Defaults[c.GetNameWithTypeName()]
@@ -315,6 +319,26 @@ func (f *Field) setConfigMode(c *FieldBuildContext) error {
 
 	if b1 || b2 {
 		f.ConfigMode = "SchemaConfigModeBlock"
+	}
+
+	return nil
+}
+
+// setStateFunc sets field state func
+func (f *Field) setStateFunc(c *FieldBuildContext) error {
+	v1, ok1 := config.StateFunc[c.GetPath()]
+	v2, ok2 := config.StateFunc[c.GetNameWithTypeName()]
+
+	if ok1 && ok2 && c.GetPath() != c.GetNameWithTypeName() {
+		return trace.Errorf("field has state func value set by path " + c.GetPath() + " and by name " + c.GetNameWithTypeName())
+	}
+
+	if ok1 {
+		f.StateFunc = v1
+	}
+
+	if ok2 {
+		f.StateFunc = v2
 	}
 
 	return nil

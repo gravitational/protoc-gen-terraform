@@ -82,8 +82,10 @@ var (
 	ForceNewFields map[string]struct{} = make(map[string]struct{})
 
 	// Suffixes represents map of suffixes for custom types
-	//
 	Suffixes map[string]string = make(map[string]string)
+
+	// StateFunc represents map of StateFunc values for a fields
+	StateFunc map[string]string = make(map[string]string)
 
 	// config is yaml config unmarshal struct
 	cfg config
@@ -108,6 +110,7 @@ type config struct {
 	CustomImports         []string               `yaml:"custom_imports,omitempty"`
 	Defaults              map[string]interface{} `yaml:"defaults,omitempty"`
 	Suffixes              map[string]string      `yaml:"suffixes,omitempty"`
+	StateFunc             map[string]string      `yaml:"state_func,omitempty"`
 }
 
 // Read reads config variables from command line or config file
@@ -179,6 +182,7 @@ func setVarsFromConfig() error {
 	setForceNewFields(cfg.ForceNew)
 	setDefaults(cfg.Defaults)
 	setSuffixes(cfg.Suffixes)
+	setStateFunc(cfg.StateFunc)
 
 	return nil
 }
@@ -301,6 +305,23 @@ func setSuffixes(m map[string]string) {
 	}
 
 	log.Printf("Suffixes set for: %v", s)
+}
+
+// setSuffixes sets suffixes for a fields
+func setStateFunc(m map[string]string) {
+	if len(m) == 0 {
+		return
+	}
+
+	StateFunc = m
+
+	var s []string
+
+	for k := range m {
+		s = append(s, k)
+	}
+
+	log.Printf("State funcs set for: %v", s)
 }
 
 // setForceNew parses and sets ExcludeFields
