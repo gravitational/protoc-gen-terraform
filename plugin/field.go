@@ -92,6 +92,9 @@ type Field struct {
 
 	// ConfigMode is field config mode
 	ConfigMode string
+
+	// StateFunc is field state func name
+	StateFunc string
 }
 
 // BuildFields builds []*Field from descriptors of specified message
@@ -190,16 +193,14 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.setComputed(c)
 	f.setForceNew(c)
 
-	err = f.setDefault(c)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
+	f.setDefault(c)
 
 	err = f.setConfigMode(c)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
 
+	f.setStateFunc(c)
 	f.setKind()
 
 	return f, nil
@@ -276,24 +277,16 @@ func (f *Field) setForceNew(c *FieldBuildContext) {
 	}
 }
 
-// setDefault returns field default value
-func (f *Field) setDefault(c *FieldBuildContext) error {
+// setDefault sets field default value
+func (f *Field) setDefault(c *FieldBuildContext) {
 	v1, ok1 := config.Defaults[c.GetPath()]
 	v2, ok2 := config.Defaults[c.GetNameWithTypeName()]
 
-	if ok1 && ok2 && c.GetPath() != c.GetNameWithTypeName() {
-		return trace.Errorf("field has default value set by path " + c.GetPath() + " and by name " + c.GetNameWithTypeName())
-	}
-
 	if ok1 {
 		f.Default = fmt.Sprintf("%#v", v1)
-	}
-
-	if ok2 {
+	} else if ok2 {
 		f.Default = fmt.Sprintf("%#v", v2)
 	}
-
-	return nil
 }
 
 // setConfigMode sets field config mode
@@ -305,8 +298,8 @@ func (f *Field) setConfigMode(c *FieldBuildContext) error {
 	_, b2 := config.ConfigModeBlockFields[c.GetPath()]
 
 	if (a1 || a2) && (b1 || b2) {
-		return trace.Errorf("field " + c.GetPath() + " can not have SchemaConfigModeAttrs and SchemaConfigModeBlock " +
-			"in the same time, check config_mode_attrs/config_mode_block configuration variables")
+		return trace.Errorf("field %v can not have SchemaConfigModeAttrs and SchemaConfigModeBlock "+
+			"in the same time, check config_mode_attrs/config_mode_block configuration variables", c.GetPath())
 	}
 
 	if a1 || a2 {
@@ -318,4 +311,18 @@ func (f *Field) setConfigMode(c *FieldBuildContext) error {
 	}
 
 	return nil
+}
+
+// setStateFunc sets field state func
+func (f *Field) setStateFunc(c *FieldBuildContext) {
+	v1, ok1 := config.StateFunc[c.GetPath()]
+	v2, ok2 := config.StateFunc[c.GetNameWithTypeName()]
+
+	if ok1 {
+		f.StateFunc = v1
+	} else if ok2 {
+		f.StateFunc = v2
+	}
+
+	return
 }

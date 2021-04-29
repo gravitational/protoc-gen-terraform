@@ -67,7 +67,7 @@ func BuildMessage(g *generator.Generator, d *generator.Descriptor, checkValidity
 
 	for _, field := range d.GetField() {
 		if field.OneofIndex != nil {
-			return nil, trace.Errorf("oneOf messages are not supported yet" + typeName)
+			return nil, trace.Errorf("oneOf messages are not supported yet %v", typeName)
 		}
 	}
 

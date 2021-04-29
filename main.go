@@ -27,7 +27,7 @@ import (
 	"github.com/gravitational/protoc-gen-terraform/plugin"
 	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
 )
 
@@ -37,8 +37,8 @@ var (
 )
 
 func main() {
-	logrus.Infof("protoc-gen-terraform %s", Version)
-	logrus.Infof("protoc-gen-terraform build hash: %s", Sha)
+	log.Infof("protoc-gen-terraform %s", Version)
+	log.Infof("protoc-gen-terraform build hash: %s", Sha)
 
 	p := plugin.NewPlugin()
 
@@ -105,7 +105,7 @@ func replacePackageName(s string) string {
 	// Replace one string
 	pkg := packageReplacementRegexp.FindString(s)
 	if pkg == "" {
-		logrus.Warning("Package directive not found in target file, can't replace package name, skipping")
+		log.Warning("Package directive not found in target file, can't replace package name, skipping")
 		return s
 	}
 

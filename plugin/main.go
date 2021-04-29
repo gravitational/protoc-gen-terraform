@@ -25,7 +25,7 @@ import (
 	"github.com/gravitational/trace"
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -75,7 +75,7 @@ func (p *Plugin) Name() string {
 
 // Generate goes over messages in the file passed from gogo, builds reflection structs and writes a target file
 func (p *Plugin) Generate(file *generator.FileDescriptor) {
-	logrus.Printf("Processing: %s", *file.Name)
+	log.Printf("Processing: %s", *file.Name)
 
 	// Adds Terraform package imports to target file
 	p.setImports()
@@ -99,7 +99,7 @@ func (p *Plugin) build(file *generator.FileDescriptor) {
 		m, err := BuildMessage(p.Generator, message, true, "")
 
 		if err != nil {
-			logrus.Warning(err)
+			log.WithError(err).Warningf("failed to build the message %v", message.GetName())
 			continue
 		}
 

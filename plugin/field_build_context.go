@@ -53,7 +53,7 @@ func NewFieldBuildContext(
 
 	t, _ := g.GoType(d, f.FieldDescriptorProto)
 	if t == "" {
-		return nil, trace.Errorf("invalid field go type" + path)
+		return nil, trace.Errorf("invalid field go type %v", path)
 	}
 
 	c := &FieldBuildContext{
@@ -142,7 +142,7 @@ func (c *FieldBuildContext) GetTypeAndIsMessage() (string, string, bool, error) 
 	case c.f.IsMessage():
 		return "", "", true, nil
 	default:
-		return "", "", false, trace.Errorf("unknown field type " + c.GetPath())
+		return "", "", false, trace.Errorf("unknown field type %v", c.GetPath())
 	}
 }
 
@@ -215,11 +215,11 @@ func (c *FieldBuildContext) GetMapValueFieldDescriptor() (*FieldDescriptorProtoE
 
 	k, _ := c.g.GoType(c.d, m.KeyField)
 	if k != "string" {
-		return nil, trace.Errorf("non-string map keys are not supported" + c.GetPath())
+		return nil, trace.Errorf("non-string map keys are not supported %v", c.GetPath())
 	}
 
 	if m.ValueField == nil {
-		return nil, trace.Errorf("map value descriptor is nil" + c.GetPath())
+		return nil, trace.Errorf("map value descriptor is nil %v", c.GetPath())
 	}
 
 	return &FieldDescriptorProtoExt{m.ValueField}, nil
