@@ -20,6 +20,7 @@ package config
 import (
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	"github.com/gravitational/trace"
@@ -281,13 +282,7 @@ func setDefaults(m map[string]interface{}) {
 
 	Defaults = m
 
-	var s []string
-
-	for k := range m {
-		s = append(s, k)
-	}
-
-	log.Printf("Defaults set for: %v", s)
+	log.Printf("Defaults set for: %v", reflect.ValueOf(m).MapKeys())
 }
 
 // setSuffixes sets suffixes for a fields
@@ -298,16 +293,10 @@ func setSuffixes(m map[string]string) {
 
 	Suffixes = m
 
-	var s []string
-
-	for k := range m {
-		s = append(s, k)
-	}
-
-	log.Printf("Suffixes set for: %v", s)
+	log.Printf("Suffixes set for: %v", reflect.ValueOf(m).MapKeys())
 }
 
-// setSuffixes sets suffixes for a fields
+// setStateFunc sets suffixes for a fields
 func setStateFunc(m map[string]string) {
 	if len(m) == 0 {
 		return
@@ -315,13 +304,7 @@ func setStateFunc(m map[string]string) {
 
 	StateFunc = m
 
-	var s []string
-
-	for k := range m {
-		s = append(s, k)
-	}
-
-	log.Printf("State funcs set for: %v", s)
+	log.Printf("State funcs set for: %v", reflect.ValueOf(m).MapKeys())
 }
 
 // setForceNew parses and sets ExcludeFields

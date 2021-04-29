@@ -99,7 +99,7 @@ func (p *Plugin) build(file *generator.FileDescriptor) {
 		m, err := BuildMessage(p.Generator, message, true, "")
 
 		if err != nil {
-			log.Warning(err)
+			log.WithError(err).Warningf("failed to build the message %v", message.GetName())
 			continue
 		}
 
