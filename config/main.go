@@ -40,7 +40,7 @@ var (
 	ExcludeFields map[string]struct{} = make(map[string]struct{})
 
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
-	DurationCustomType = ""
+	DurationCustomType string
 
 	// DefaultPackageName default package name, gets appended to type name if its import
 	// path is ".", but the type itself is located in another package
@@ -88,6 +88,9 @@ var (
 	// StateFunc represents map of StateFunc values for a fields
 	StateFunc map[string]string = make(map[string]string)
 
+	// FieldNameReplacements represents map of CamelCased field names to under_score field names if needs replacement
+	FieldNameReplacements map[string]string = make(map[string]string)
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -112,6 +115,7 @@ type config struct {
 	Defaults              map[string]interface{} `yaml:"defaults,omitempty"`
 	Suffixes              map[string]string      `yaml:"suffixes,omitempty"`
 	StateFunc             map[string]string      `yaml:"state_func,omitempty"`
+	FieldNameReplacements map[string]string      `yaml:"field_name_replacements",omitempty`
 }
 
 // Read reads config variables from command line or config file
@@ -184,6 +188,7 @@ func setVarsFromConfig() error {
 	setDefaults(cfg.Defaults)
 	setSuffixes(cfg.Suffixes)
 	setStateFunc(cfg.StateFunc)
+	setFieldNameReplacements(cfg.FieldNameReplacements)
 
 	return nil
 }
@@ -296,7 +301,18 @@ func setSuffixes(m map[string]string) {
 	log.Printf("Suffixes set for: %v", reflect.ValueOf(m).MapKeys())
 }
 
-// setStateFunc sets suffixes for a fields
+// setFieldNameReplacements sets suffixes for a fields
+func setFieldNameReplacements(m map[string]string) {
+	if len(m) == 0 {
+		return
+	}
+
+	FieldNameReplacements = m
+
+	log.Printf("Field name replacements set: %v", reflect.ValueOf(m).MapKeys())
+}
+
+// setUnderscoreReplacements underscore replacements
 func setStateFunc(m map[string]string) {
 	if len(m) == 0 {
 		return

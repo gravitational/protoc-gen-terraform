@@ -91,6 +91,10 @@ func setFragment(
 
 		fieldValue := source.FieldByName(fieldMeta.Name)
 
+		if !fieldValue.IsValid() {
+			return nil, trace.Errorf("field %v not found in source struct", key)
+		}
+
 		if fieldMeta.Setter != nil {
 			r, err := fieldMeta.Setter(fieldValue, fieldMeta, fieldSchema)
 			if err != nil {
