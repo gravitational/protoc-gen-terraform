@@ -78,10 +78,14 @@ func getFragment(
 	for key, fieldMeta := range meta {
 		fieldSchema, ok := sch[key]
 		if !ok {
-			return trace.Errorf("field %v.%v not found in corresponding schema", path, key)
+			return trace.Errorf("field %v%v not found in corresponding schema", path, key)
 		}
 
 		fieldValue := target.FieldByName(fieldMeta.Name)
+		if !fieldValue.IsValid() {
+			return trace.Errorf("field %v%v not found in target struct", path, key)
+		}
+
 		fieldPath := path + key
 
 		if fieldMeta.Getter != nil {
@@ -157,6 +161,7 @@ func getEnumerableElement(
 // getElementary gets elementary value (scalar, string, time, duration)
 func getElementary(path string, target reflect.Value, meta *SchemaMeta, sch *schema.Schema, data *schema.ResourceData) error {
 	value, ok := data.GetOk(path)
+
 	if !ok {
 		AssignZeroValue(target)
 		return nil

@@ -90,3 +90,16 @@ func (f *FieldDescriptorProtoExt) GetCastType() string {
 func (f *FieldDescriptorProtoExt) GetCustomType() string {
 	return gogoproto.GetCustomType(f.FieldDescriptorProto)
 }
+
+// GetJSONName returns JSON name set in JSON tag
+func (f *FieldDescriptorProtoExt) GetJSONName() string {
+	t := gogoproto.GetJsonTag(f.FieldDescriptorProto)
+	if t != nil {
+		j := strings.Split(*t, ",")
+		if j[0] != "-" {
+			return j[0]
+		}
+	}
+
+	return ""
+}
