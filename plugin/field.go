@@ -128,12 +128,9 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		return nil, nil
 	}
 
-	n := c.GetName()
+	f := &Field{Name: c.GetName()}
 
-	f := &Field{
-		Name:      n,
-		NameSnake: strcase.SnakeCase(n),
-	}
+	f.setNameSnake(c)
 
 	f.RawComment, f.Comment = c.GetComment()
 	f.SchemaRawType, f.SchemaGoType, f.IsMessage, err = c.GetTypeAndIsMessage()
@@ -206,7 +203,21 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	return f, nil
 }
 
-// setKind resolves and sets kind for current field
+// setNameSnake sets snake name for the field
+func (f *Field) setNameSnake(c *FieldBuildContext) {
+	v1, ok1 := config.FieldNameReplacements[c.GetPath()]
+	v2, ok2 := config.FieldNameReplacements[c.GetNameWithTypeName()]
+
+	if ok1 {
+		f.NameSnake = v1
+	} else if ok2 {
+		f.NameSnake = v2
+	} else {
+		f.NameSnake = strcase.SnakeCase(f.Name)
+	}
+}
+
+// setKind resolves and sets kind the field
 func (f *Field) setKind() {
 	switch {
 	case f.IsCustomType:

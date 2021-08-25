@@ -41,6 +41,7 @@ Options:
 * `config_mode_attr` - list of a generated Terraform schema fields to mark as `SchemaConfigMode: schema.SchemaConfigModeAttr`
 * `config_mode_block` - list of a generated Terraform schema fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
 * `suffixes` - map of overrides of method names generated for `gogo.customtype` fields (available in config file only)
+* `snake_name_replacements` - map of schema field name overrides (`"AWSARNs" -> "aws_arns"`)
 * `defaults` - default values for a fields in generated Terraform schema (available in config file only). Note that default value type in YAML file is taken into account.
 
 All config variables could be set in [YAML](example/teleport.yaml). Path to config file can be specified using `config` variable. 
