@@ -25,7 +25,6 @@ import (
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
-	"github.com/stoewer/go-strcase"
 )
 
 // Field represents metadata about protobuf message field descriptor.
@@ -211,7 +210,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	return f, nil
 }
 
-// setNameSnake sets snake name for the field
+// setNameSnake sets snake name for the field taking exceptions into place
 func (f *Field) setNameSnake(c *FieldBuildContext) {
 	v1, ok1 := config.FieldNameReplacements[c.GetPath()]
 	v2, ok2 := config.FieldNameReplacements[c.GetNameWithTypeName()]
@@ -221,8 +220,21 @@ func (f *Field) setNameSnake(c *FieldBuildContext) {
 	} else if ok2 {
 		f.NameSnake = v2
 	} else {
-		f.NameSnake = strcase.SnakeCase(f.Name)
+		f.setNameSnakeWithJSONTag(c)
 	}
+}
+
+// setNameSnakeWithJSONTag sets snake name for the field
+func (f *Field) setNameSnakeWithJSONTag(c *FieldBuildContext) {
+	if config.UseJSONTag {
+		n := c.f.GetJSONName()
+		if n != "" {
+			f.NameSnake = n
+			return
+		}
+	}
+
+	f.NameSnake = c.GetSnakeName()
 }
 
 // setKind resolves and sets kind the field

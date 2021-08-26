@@ -95,6 +95,9 @@ var (
 	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
 	Sort bool
 
+	// UseJSONtag uses json tag as the source for schema field names
+	UseJSONTag bool = false
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -121,6 +124,7 @@ type config struct {
 	StateFunc             map[string]string      `yaml:"state_func,omitempty"`
 	FieldNameReplacements map[string]string      `yaml:"field_name_replacements,omitempty"`
 	Sort                  string                 `yaml:"sort,omitempty"`
+	UseJSONTag            string                 `yaml:"use_json_tag,omitempty"`
 }
 
 // Read reads config variables from command line or config file
@@ -151,6 +155,7 @@ func Read(p map[string]string) error {
 	setDurationType(p["custom_duration"])
 	setTargetPackageName(p["target_pkg"])
 	setSort(p["sort"])
+	setUseJSONTag(p["use_json_tag"])
 
 	return nil
 }
@@ -196,6 +201,7 @@ func setVarsFromConfig() error {
 	setStateFunc(cfg.StateFunc)
 	setFieldNameReplacements(cfg.FieldNameReplacements)
 	setSort(cfg.Sort)
+	setUseJSONTag(cfg.UseJSONTag)
 
 	return nil
 }
@@ -376,6 +382,28 @@ func setSort(arg string) {
 		log.Printf("Sorting is enabled")
 	} else {
 		log.Printf("Sorting is disabled")
+	}
+}
+
+// setUseJSONTag sets the custom duration type
+func setUseJSONTag(arg string) {
+	a := strings.ToLower(trimArg(arg))
+	if a == "" {
+		return
+	}
+
+	b, err := strconv.ParseBool(a)
+	if err != nil {
+		log.Printf("Invalid value for use_json_tag: %v. Use 1 or true to enable, 0 or false to disable.", a)
+		return
+	}
+
+	UseJSONTag = b
+
+	if b {
+		log.Printf("Use json tag is enabled")
+	} else {
+		log.Printf("Use json tag is disabled")
 	}
 }
 

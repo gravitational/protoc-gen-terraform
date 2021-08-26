@@ -25,6 +25,7 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/trace"
+	"github.com/stoewer/go-strcase"
 )
 
 // FieldBuildContext is a facade helper struct which facilitates getting field information
@@ -91,6 +92,11 @@ func (c *FieldBuildContext) GetNameWithTypeName() string {
 // GetName returns field name
 func (c *FieldBuildContext) GetName() string {
 	return c.f.GetName()
+}
+
+// GetSnakeName returns field snake name
+func (c *FieldBuildContext) GetSnakeName() string {
+	return strcase.SnakeCase(c.f.GetName())
 }
 
 // GetPath returns field path

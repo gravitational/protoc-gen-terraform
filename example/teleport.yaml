@@ -3,6 +3,7 @@ target_package_name: "tfschema"
 default_package_name: "types"
 duration_custom_type: "Duration"
 sort: true
+use_json_tag: true
 
 custom_imports:
     - "github.com/gravitational/teleport/api/types"
