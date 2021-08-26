@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/gravitational/trace"
@@ -91,6 +92,9 @@ var (
 	// FieldNameReplacements represents map of CamelCased field names to under_score field names if needs replacement
 	FieldNameReplacements map[string]string = make(map[string]string)
 
+	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
+	Sort bool
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -115,7 +119,8 @@ type config struct {
 	Defaults              map[string]interface{} `yaml:"defaults,omitempty"`
 	Suffixes              map[string]string      `yaml:"suffixes,omitempty"`
 	StateFunc             map[string]string      `yaml:"state_func,omitempty"`
-	FieldNameReplacements map[string]string      `yaml:"field_name_replacements",omitempty`
+	FieldNameReplacements map[string]string      `yaml:"field_name_replacements,omitempty"`
+	Sort                  string                 `yaml:"sort,omitempty"`
 }
 
 // Read reads config variables from command line or config file
@@ -145,6 +150,7 @@ func Read(p map[string]string) error {
 	setDefaultPackageName(p["pkg"])
 	setDurationType(p["custom_duration"])
 	setTargetPackageName(p["target_pkg"])
+	setSort(p["sort"])
 
 	return nil
 }
@@ -189,6 +195,7 @@ func setVarsFromConfig() error {
 	setSuffixes(cfg.Suffixes)
 	setStateFunc(cfg.StateFunc)
 	setFieldNameReplacements(cfg.FieldNameReplacements)
+	setSort(cfg.Sort)
 
 	return nil
 }
@@ -347,6 +354,28 @@ func setConfigModeBlockFields(f []string) {
 
 	if len(f) > 0 {
 		log.Printf("SchemaConfigModeBlock fields: %s", f)
+	}
+}
+
+// setSort sets the custom duration type
+func setSort(arg string) {
+	a := strings.ToLower(trimArg(arg))
+	if a == "" {
+		return
+	}
+
+	b, err := strconv.ParseBool(a)
+	if err != nil {
+		log.Printf("Invalid value for sort: %v. Use 1 or true to enable, 0 or false to disable.", a)
+		return
+	}
+
+	Sort = b
+
+	if b {
+		log.Printf("Sorting is enabled")
+	} else {
+		log.Printf("Sorting is disabled")
 	}
 }
 

@@ -18,6 +18,7 @@ package plugin
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
@@ -115,6 +116,13 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) er
 		if f != nil {
 			m.Fields = append(m.Fields, f)
 		}
+	}
+
+	// Sort fields if required
+	if config.Sort {
+		sort.Slice(m.Fields, func(i, j int) bool {
+			return m.Fields[i].NameSnake < m.Fields[j].NameSnake
+		})
 	}
 
 	return nil
@@ -334,6 +342,4 @@ func (f *Field) setStateFunc(c *FieldBuildContext) {
 	} else if ok2 {
 		f.StateFunc = v2
 	}
-
-	return
 }
