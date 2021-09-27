@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/gravitational/trace"
@@ -40,7 +41,7 @@ var (
 	ExcludeFields map[string]struct{} = make(map[string]struct{})
 
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
-	DurationCustomType = ""
+	DurationCustomType string
 
 	// DefaultPackageName default package name, gets appended to type name if its import
 	// path is ".", but the type itself is located in another package
@@ -88,6 +89,15 @@ var (
 	// StateFunc represents map of StateFunc values for a fields
 	StateFunc map[string]string = make(map[string]string)
 
+	// FieldNameReplacements represents map of CamelCased field names to under_score field names if needs replacement
+	FieldNameReplacements map[string]string = make(map[string]string)
+
+	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
+	Sort bool = false
+
+	// UseJSONtag uses json tag as the source for schema field names
+	UseJSONTag bool = false
+
 	// config is yaml config unmarshal struct
 	cfg config
 )
@@ -112,6 +122,9 @@ type config struct {
 	Defaults              map[string]interface{} `yaml:"defaults,omitempty"`
 	Suffixes              map[string]string      `yaml:"suffixes,omitempty"`
 	StateFunc             map[string]string      `yaml:"state_func,omitempty"`
+	FieldNameReplacements map[string]string      `yaml:"field_name_replacements,omitempty"`
+	Sort                  string                 `yaml:"sort,omitempty"`
+	UseJSONTag            string                 `yaml:"use_json_tag,omitempty"`
 }
 
 // Read reads config variables from command line or config file
@@ -141,6 +154,8 @@ func Read(p map[string]string) error {
 	setDefaultPackageName(p["pkg"])
 	setDurationType(p["custom_duration"])
 	setTargetPackageName(p["target_pkg"])
+	setSort(p["sort"])
+	setUseJSONTag(p["use_json_tag"])
 
 	return nil
 }
@@ -184,6 +199,9 @@ func setVarsFromConfig() error {
 	setDefaults(cfg.Defaults)
 	setSuffixes(cfg.Suffixes)
 	setStateFunc(cfg.StateFunc)
+	setFieldNameReplacements(cfg.FieldNameReplacements)
+	setSort(cfg.Sort)
+	setUseJSONTag(cfg.UseJSONTag)
 
 	return nil
 }
@@ -296,7 +314,18 @@ func setSuffixes(m map[string]string) {
 	log.Printf("Suffixes set for: %v", reflect.ValueOf(m).MapKeys())
 }
 
-// setStateFunc sets suffixes for a fields
+// setFieldNameReplacements sets suffixes for a fields
+func setFieldNameReplacements(m map[string]string) {
+	if len(m) == 0 {
+		return
+	}
+
+	FieldNameReplacements = m
+
+	log.Printf("Field name replacements set: %v", reflect.ValueOf(m).MapKeys())
+}
+
+// setUnderscoreReplacements underscore replacements
 func setStateFunc(m map[string]string) {
 	if len(m) == 0 {
 		return
@@ -331,6 +360,49 @@ func setConfigModeBlockFields(f []string) {
 
 	if len(f) > 0 {
 		log.Printf("SchemaConfigModeBlock fields: %s", f)
+	}
+}
+
+// setSort sets the custom duration type
+func setSort(arg string) {
+	a := strings.ToLower(trimArg(arg))
+	if a == "" {
+		return
+	}
+
+	b, err := strconv.ParseBool(a)
+	if err != nil {
+		log.Printf("Sorting is disabled, invalid value: %v. Use 1 or true to enable, 0 or false to disable.", a)
+		return
+	}
+
+	if b {
+		Sort = true
+		log.Printf("Sorting is enabled")
+	} else {
+		log.Printf("Sorting is disabled")
+	}
+}
+
+// setUseJSONTag sets the custom duration type
+func setUseJSONTag(arg string) {
+	a := strings.ToLower(trimArg(arg))
+	if a == "" {
+		return
+	}
+
+	b, err := strconv.ParseBool(a)
+	if err != nil {
+		log.Printf("Invalid value for use_json_tag: %v. Use 1 or true to enable, 0 or false to disable.", a)
+		return
+	}
+
+	UseJSONTag = b
+
+	if b {
+		log.Printf("Use json tag is enabled")
+	} else {
+		log.Printf("Use json tag is disabled")
 	}
 }
 

@@ -56,7 +56,7 @@ message Test {
     // Bool bool field
     bool Bool = 6;
 
-    // Bytest byte[] field
+    // Bytes byte[] field
     bytes Bytes = 7;
 
     // Timestamp time.Time field

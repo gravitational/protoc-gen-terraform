@@ -18,13 +18,13 @@ package plugin
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
-	"github.com/stoewer/go-strcase"
 )
 
 // Field represents metadata about protobuf message field descriptor.
@@ -117,6 +117,13 @@ func BuildFields(m *Message, g *generator.Generator, d *generator.Descriptor) er
 		}
 	}
 
+	// Sort fields if required
+	if config.Sort {
+		sort.Slice(m.Fields, func(i, j int) bool {
+			return m.Fields[i].NameSnake < m.Fields[j].NameSnake
+		})
+	}
+
 	return nil
 }
 
@@ -128,12 +135,9 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		return nil, nil
 	}
 
-	n := c.GetName()
+	f := &Field{Name: c.GetName()}
 
-	f := &Field{
-		Name:      n,
-		NameSnake: strcase.SnakeCase(n),
-	}
+	f.setNameSnake(c)
 
 	f.RawComment, f.Comment = c.GetComment()
 	f.SchemaRawType, f.SchemaGoType, f.IsMessage, err = c.GetTypeAndIsMessage()
@@ -206,7 +210,34 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	return f, nil
 }
 
-// setKind resolves and sets kind for current field
+// setNameSnake sets snake name for the field taking exceptions into place
+func (f *Field) setNameSnake(c *FieldBuildContext) {
+	v1, ok1 := config.FieldNameReplacements[c.GetPath()]
+	v2, ok2 := config.FieldNameReplacements[c.GetNameWithTypeName()]
+
+	if ok1 {
+		f.NameSnake = v1
+	} else if ok2 {
+		f.NameSnake = v2
+	} else {
+		f.setNameSnakeWithJSONTag(c)
+	}
+}
+
+// setNameSnakeWithJSONTag sets snake name for the field
+func (f *Field) setNameSnakeWithJSONTag(c *FieldBuildContext) {
+	if config.UseJSONTag {
+		n := c.f.GetJSONName()
+		if n != "" {
+			f.NameSnake = n
+			return
+		}
+	}
+
+	f.NameSnake = c.GetSnakeName()
+}
+
+// setKind resolves and sets kind the field
 func (f *Field) setKind() {
 	switch {
 	case f.IsCustomType:
@@ -323,6 +354,4 @@ func (f *Field) setStateFunc(c *FieldBuildContext) {
 	} else if ok2 {
 		f.StateFunc = v2
 	}
-
-	return
 }

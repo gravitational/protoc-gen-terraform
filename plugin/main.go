@@ -19,6 +19,7 @@ package plugin
 
 import (
 	"bytes"
+	"sort"
 
 	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/render"
@@ -48,13 +49,13 @@ type Plugin struct {
 	generator.PluginImports
 
 	// Map of reflected messages, public just in case some post analysis is required
-	Messages map[string]*Message
+	Messages []*Message
 }
 
 // NewPlugin creates the new plugin
 func NewPlugin() *Plugin {
 	return &Plugin{
-		Messages: make(map[string]*Message),
+		Messages: make([]*Message, 0),
 	}
 }
 
@@ -104,8 +105,15 @@ func (p *Plugin) build(file *generator.FileDescriptor) {
 		}
 
 		if m != nil {
-			p.Messages[m.GoTypeName] = m
+			p.Messages = append(p.Messages, m)
 		}
+	}
+
+	// Sort messages if required
+	if config.Sort {
+		sort.Slice(p.Messages, func(i, j int) bool {
+			return p.Messages[i].NameSnake < p.Messages[j].NameSnake
+		})
 	}
 }
 
