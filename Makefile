@@ -1,7 +1,6 @@
 include version.mk
 
 .PHONY: clean
-
 clean:
 	@mkdir -p ./_build
 	rm -rf ./_build/*
@@ -43,12 +42,20 @@ endif
 .PHONY: test
 test: build
 	@protoc \
-		-I$(pwd)/test \
 		-I$(pwd) \
+		-I$(pwd)/test \
+		-I./vendor/github.com/gogo/protobuf \
+		-I$(srcpath) \
+		--gogo_out=test \
+		test.proto
+
+	@protoc \
+		-I$(pwd) \
+		-I$(pwd)/test \
 		-I./vendor/github.com/gogo/protobuf \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=target_pkg=test,types=Test,sort=true,custom_duration=Duration:test \
-		--gogo_out=test \
+		--terraform_out=config=test/config.yaml:test \
 		test.proto
-	@go test -v ./test
+
+	@go test ./...

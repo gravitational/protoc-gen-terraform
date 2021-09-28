@@ -1,0 +1,15 @@
+---
+types:
+  - Test
+duration_custom_type: Duration
+
+time_type:
+  type: "TimeType"            # Implementation of attrs.Type
+  value_type: "TimeValue"     # Implementation of attrs.Value
+  cast_type: "time.Time"      # Go type of .Value
+
+duration_type:
+  type: "DurationType"        # Implementation of attrs.Type
+  value_type: "DurationValue" # Implementation of attrs.Value
+  cast_type: "time.Duration"  # Go type of .Value
+

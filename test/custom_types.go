@@ -1,29 +1,13 @@
-/*
-Copyright 2015-2021 Gravitational, Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package test
 
 import (
-	fmt "fmt"
-	"reflect"
+	"context"
 	time "time"
 
-	"github.com/gravitational/protoc-gen-terraform/accessors"
 	"github.com/gravitational/trace"
-	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Duration custom duration type
@@ -37,75 +21,44 @@ func (d Duration) String() string {
 // BoolCustom custom bool array
 type BoolCustom bool
 
-// SchemaBoolCustom returns schema for custom bool array
-func SchemaBoolCustom() *schema.Schema {
-	return &schema.Schema{
-		Type:     schema.TypeList,
-		Required: true,
-		Elem: &schema.Schema{
-			Type: schema.TypeBool,
+// GenSchemaBoolCustom generates custom field schema (bool list)
+func GenSchemaBoolCustom(_ context.Context) tfsdk.Attribute {
+	return tfsdk.Attribute{
+		Type: types.ListType{
+			ElemType: types.BoolType,
 		},
 	}
 }
 
-// GetBoolCustom interprets data at path as an array of boolean values.
-// The values are returned in target
-func GetBoolCustom(
-	path string,
-	target reflect.Value,
-	meta *accessors.SchemaMeta,
-	sch *schema.Schema,
-	data *schema.ResourceData,
-) error {
-	len, err := accessors.GetLen(path, data)
-	if err != nil {
-		return trace.Wrap(err)
-	}
-	if len == 0 {
-		// TODO: Share with accessors
-		accessors.AssignZeroValue(target)
-		return nil
+// CopyFromBoolCustom copies target value to the source
+func CopyFromBoolCustom(tf attr.Value, obj *[]BoolCustom) error {
+	v, ok := tf.(types.List)
+	if !ok {
+		return trace.Errorf("Failed to cast %T to types.List", tf)
 	}
 
-	t := make([]BoolCustom, len)
-
-	for i := 0; i < len; i++ {
-		p := fmt.Sprintf("%v.%v", path, i)
-
-		raw := data.Get(p)
-		v, ok := raw.(bool)
+	arr := make([]BoolCustom, len(v.Elems))
+	for i, raw := range v.Elems {
+		el, ok := raw.(types.Bool)
 		if !ok {
-			return trace.Errorf("can not convert %T to bool", raw)
+			return trace.Errorf("Failed to cast %T to types.List", raw)
 		}
 
-		t[i] = BoolCustom(v)
+		if !el.Null && !el.Unknown {
+			arr[i] = BoolCustom(el.Value)
+		}
 	}
 
-	target.Set(reflect.ValueOf(t))
+	*obj = arr
 
 	return nil
 }
 
-// SetBoolCustom returns bool values
-func SetBoolCustom(
-	source reflect.Value,
-	meta *accessors.SchemaMeta,
-	sch *schema.Schema,
-) (interface{}, error) {
-	if !source.IsValid() {
-		return nil, nil
-	}
-
-	c, ok := source.Interface().([]BoolCustom)
-	if !ok {
-		return nil, fmt.Errorf("can not convert %T to []BoolCustom", c)
-	}
-
-	r := make([]interface{}, len(c))
-
-	for i, v := range c {
-		r[i] = bool(v)
-	}
-
-	return r, nil
+// CopyToBoolCustom copies source value to the target
+func CopyToBoolCustom(tf attr.Value, obj []BoolCustom) error {
+	// *source = make([]BoolCustom, len(target))
+	// if len(target) > 0 {
+	// 	copy(*source, target)
+	// }
+	return nil
 }
