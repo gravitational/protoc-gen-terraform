@@ -21,8 +21,8 @@ map[string]*accessors.SchemaMeta {
 	IsTime: {{.IsTime}},
 	IsDuration: {{.IsDuration}},
 	{{ if eq .Kind "CUSTOM_TYPE" -}}
-	Getter: Get{{.Suffix}},
-	Setter: Set{{.Suffix}},
+	FromTerraform: FromTerraform{{.Suffix}},
+	ToTerraform: ToTerraform{{.Suffix}},
 	{{- end }}
 	{{- if eq .Kind "SINGULAR_MESSAGE" "REPEATED_MESSAGE" -}}
 	Nested: {{ template "fieldsSchema" .Message.Fields }},

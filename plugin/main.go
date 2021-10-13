@@ -80,7 +80,6 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 
 	// Adds Terraform package imports to target file
 	p.setImports()
-
 	p.build(file)
 
 	err := p.writeVars()
@@ -91,6 +90,13 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 	err = p.writeSchema()
 	if err != nil {
 		p.Generator.Fail(err.Error())
+	}
+
+	if config.Ref {
+		err = p.writeRef()
+		if err != nil {
+			p.Generator.Fail(err.Error())
+		}
 	}
 }
 
@@ -147,6 +153,22 @@ func (p *Plugin) writeSchema() error {
 		if err != nil {
 			return trace.Wrap(err)
 		}
+		p.P(buf.String())
+	}
+
+	return nil
+}
+
+// writeRef writes markdown reference to target file
+func (p *Plugin) writeRef() error {
+	for _, message := range p.Messages {
+		var buf bytes.Buffer
+
+		err := render.Template(render.RefTpl, message, &buf)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+
 		p.P(buf.String())
 	}
 

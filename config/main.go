@@ -83,6 +83,11 @@ var (
 	// Passed from command line (--terraform_out=force=types.Metadata.Name:./_out)
 	ForceNewFields map[string]struct{} = make(map[string]struct{})
 
+	// SensitiveFields is the list of fields to mark as 'Sensitive: true'
+	//
+	// Passed from command line (--terraform_out=sensitive=types.Metadata.Name:./_out)
+	SensitiveFields map[string]struct{} = make(map[string]struct{})
+
 	// Suffixes represents map of suffixes for custom types
 	Suffixes map[string]string = make(map[string]string)
 
@@ -93,10 +98,13 @@ var (
 	FieldNameReplacements map[string]string = make(map[string]string)
 
 	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
-	Sort bool = false
+	Sort bool
 
 	// UseJSONtag uses json tag as the source for schema field names
-	UseJSONTag bool = false
+	UseJSONTag bool
+
+	// Ref represents the list of a messages which needs to have markdown reference generated
+	Ref bool
 
 	// config is yaml config unmarshal struct
 	cfg config
@@ -116,6 +124,7 @@ type config struct {
 	ComputedFields        []string               `yaml:"computed_fields,omitempty"`
 	RequiredFields        []string               `yaml:"required_fields,omitempty"`
 	ForceNew              []string               `yaml:"force_new_fields,omitempty"`
+	SensitiveFields       []string               `yaml:"sensitive,omitempty"`
 	ConfigModeAttrFields  []string               `yaml:"config_mode_attr_fields,omitempty"`
 	ConfigModeBlockFields []string               `yaml:"config_mode_block_fields,omitempty"`
 	CustomImports         []string               `yaml:"custom_imports,omitempty"`
@@ -125,6 +134,7 @@ type config struct {
 	FieldNameReplacements map[string]string      `yaml:"field_name_replacements,omitempty"`
 	Sort                  string                 `yaml:"sort,omitempty"`
 	UseJSONTag            string                 `yaml:"use_json_tag,omitempty"`
+	Ref                   string                 `yaml:"ref,omitempty"`
 }
 
 // Read reads config variables from command line or config file
@@ -148,6 +158,7 @@ func Read(p map[string]string) error {
 	setRequiredFields(splitArg(p["required"]))
 	setCustomImports(splitArg(p["custom_imports"]))
 	setForceNewFields(splitArg(p["force"]))
+	setSensitive(splitArg(p["sensitive"]))
 	setConfigModeAttrFields(splitArg(p["config_mode_attr"]))
 	setConfigModeBlockFields(splitArg(p["config_mode_block"]))
 
@@ -156,6 +167,7 @@ func Read(p map[string]string) error {
 	setTargetPackageName(p["target_pkg"])
 	setSort(p["sort"])
 	setUseJSONTag(p["use_json_tag"])
+	setRef(p["ref"])
 
 	return nil
 }
@@ -196,12 +208,14 @@ func setVarsFromConfig() error {
 	setConfigModeBlockFields(cfg.ConfigModeBlockFields)
 	setCustomImports(cfg.CustomImports)
 	setForceNewFields(cfg.ForceNew)
+	setSensitive(cfg.SensitiveFields)
 	setDefaults(cfg.Defaults)
 	setSuffixes(cfg.Suffixes)
 	setStateFunc(cfg.StateFunc)
 	setFieldNameReplacements(cfg.FieldNameReplacements)
 	setSort(cfg.Sort)
 	setUseJSONTag(cfg.UseJSONTag)
+	setRef(cfg.Ref)
 
 	return nil
 }
@@ -345,6 +359,15 @@ func setForceNewFields(f []string) {
 	}
 }
 
+// setSensitive parses and sets SensitiveFields
+func setSensitive(f []string) {
+	setSet(SensitiveFields, f)
+
+	if len(f) > 0 {
+		log.Printf("Sensitive fields: %s", f)
+	}
+}
+
 // setConfigModeAttrFields parses and sets ExcludeFields
 func setConfigModeAttrFields(f []string) {
 	setSet(ConfigModeAttrFields, f)
@@ -403,6 +426,27 @@ func setUseJSONTag(arg string) {
 		log.Printf("Use json tag is enabled")
 	} else {
 		log.Printf("Use json tag is disabled")
+	}
+}
+
+// setRef sets the custom duration type
+func setRef(arg string) {
+	a := strings.ToLower(trimArg(arg))
+	if a == "" {
+		return
+	}
+
+	b, err := strconv.ParseBool(a)
+	if err != nil {
+		log.Printf("Ref generation is disabled, invalid value: %v. Use 1 or true to enable, 0 or false to disable.", a)
+		return
+	}
+
+	if b {
+		Ref = true
+		log.Printf("Reference generation is enabled")
+	} else {
+		log.Printf("Reference generation is disabled")
 	}
 }
 

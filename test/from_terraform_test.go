@@ -159,16 +159,16 @@ var (
 	}
 )
 
-// buildSubjectGet builds Test struct from test fixture data
-func buildSubjectGet(t *testing.T, subject *Test) (*Test, error) {
+// buildSubjectFromTerraform builds Test struct from test fixture data
+func buildSubjectFromTerraform(t *testing.T, subject *Test) (*Test, error) {
 	data := schema.TestResourceDataRaw(t, SchemaTest, fixture)
-	err := GetTest(subject, data)
+	err := FromTerraformTest(data, subject)
 	return subject, err
 }
 
-// TestElementariesGet ensures decoding of elementary types
-func TestElementariesGet(t *testing.T) {
-	subject, err := buildSubjectGet(t, &Test{})
+// TestElementariesFromTerraform ensures decoding of elementary types
+func TestElementariesFromTerraform(t *testing.T) {
+	subject, err := buildSubjectFromTerraform(t, &Test{})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, int32(999), subject.Int32, "Test.Int32")
@@ -180,12 +180,12 @@ func TestElementariesGet(t *testing.T) {
 	assert.Equal(t, []byte("TestBytes"), subject.Bytes, "Test.Bytes")
 }
 
-// TestTimesGet ensures decoding of time and duration fields
-func TestTimesGet(t *testing.T) {
+// TestTimesFromTerraform ensures decoding of time and duration fields
+func TestTimesFromTerraform(t *testing.T) {
 	now := time.Now()
 
 	// Ensure nullify
-	subject, err := buildSubjectGet(t, &Test{TimestampNullableWithNilValue: &now})
+	subject, err := buildSubjectFromTerraform(t, &Test{TimestampNullableWithNilValue: &now})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	timestamp, err := time.Parse(time.RFC3339Nano, defaultTimestamp)
@@ -205,9 +205,9 @@ func TestTimesGet(t *testing.T) {
 	assert.Equal(t, Duration(durationCustom), subject.DurationCustom, "Test.DurationCustom")
 }
 
-// // TestArraysGet ensures decoding of arrays
-func TestArraysGet(t *testing.T) {
-	subject, err := buildSubjectGet(t, &Test{StringListEmpty: []string{"a"}})
+// // TestArraysFromTerraform ensures decoding of arrays
+func TestArraysFromTerraform(t *testing.T) {
+	subject, err := buildSubjectFromTerraform(t, &Test{StringListEmpty: []string{"a"}})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, []string(nil), subject.StringListEmpty, "Test.StringListEmpty")
@@ -225,9 +225,9 @@ func TestArraysGet(t *testing.T) {
 	assert.Equal(t, []Duration{Duration(duration)}, subject.DurationCustomList, "Test.DurationCustomList")
 }
 
-// TestNestedMessageGet ensures decoding of nested messages
-func TestNestedMessageGet(t *testing.T) {
-	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+// TestNestedMessageFromTerraform ensures decoding of nested messages
+func TestNestedMessageFromTerraform(t *testing.T) {
+	subject, err := buildSubjectFromTerraform(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	var x *Nested = nil
@@ -238,8 +238,8 @@ func TestNestedMessageGet(t *testing.T) {
 }
 
 // TestNestedMessageArrayGet ensures decoding of array of messages
-func TestNestedMessageArrayGet(t *testing.T) {
-	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+func TestNestedMessageArrayFromTerraform(t *testing.T) {
+	subject, err := buildSubjectFromTerraform(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, 2, len(subject.NestedList), "len(NestedList)")
@@ -251,9 +251,9 @@ func TestNestedMessageArrayGet(t *testing.T) {
 	assert.Equal(t, "TestString2", subject.NestedListNullable[1].Str, "NestedListNullable[1].Str")
 }
 
-// TestMapGet ensures decoding of a maps
-func TestMapGet(t *testing.T) {
-	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+// TestMapFromTerraform ensures decoding of a maps
+func TestMapFromTerraform(t *testing.T) {
+	subject, err := buildSubjectFromTerraform(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, "v1", subject.Map["k1"], "Test.Map['k1']")
@@ -262,9 +262,9 @@ func TestMapGet(t *testing.T) {
 	assert.Equal(t, "vn2", subject.Nested.Map["kn2"], "Test.Nested.Map['kn2']")
 }
 
-// TestObjectMapGet ensures decoding of maps of messages
-func TestObjectMapGet(t *testing.T) {
-	subject, err := buildSubjectGet(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
+// TestObjectMapFromTerraform ensures decoding of maps of messages
+func TestObjectMapFromTerraform(t *testing.T) {
+	subject, err := buildSubjectFromTerraform(t, &Test{NestedNullableWithNilValue: &Nested{Str: "5"}})
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, "TestString1", subject.MapObject["obj1"].Str, "MapObject['obj1'].Str")

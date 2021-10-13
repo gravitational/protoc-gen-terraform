@@ -24,11 +24,11 @@ func SuppressDurationChange(k string, old string, new string, d *schema.Resource
 }
 
 {{- range $index, $message := . }}
-func Get{{.Name}}(obj *{{.GoTypeName}}, data *schema.ResourceData) error {
-    return accessors.Get(obj, data, Schema{{.Name}}, SchemaMeta{{.Name}})
+func FromTerraform{{.Name}}(data *schema.ResourceData, obj *{{.GoTypeName}}) error {
+    return accessors.FromTerraform(obj, data, Schema{{.Name}}, SchemaMeta{{.Name}})
 }
 
-func Set{{.Name}}(obj *{{.GoTypeName}}, data *schema.ResourceData) error {
-    return accessors.Set(obj, data, Schema{{.Name}}, SchemaMeta{{.Name}})
+func ToTerraform{{.Name}}(obj *{{.GoTypeName}}, data *schema.ResourceData) error {
+    return accessors.ToTerraform(obj, data, Schema{{.Name}}, SchemaMeta{{.Name}})
 }
 {{- end }}

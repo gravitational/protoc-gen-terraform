@@ -104,7 +104,7 @@ message Test {
     // Nested nested message field, non-nullable
     Nested Nested = 22 [ (gogoproto.nullable) = false ];
 
-    // NestedNullable nested message field, nullabel
+    // NestedNullable nested message field, nullable
     Nested NestedNullable = 23 [ (gogoproto.nullable) = true ];
 
     // NestedNullableWithNilValue nested message field, with no value set
