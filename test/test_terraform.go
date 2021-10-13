@@ -81,10 +81,10 @@ func GenSchemaTest() map[string]*schema.Schema {
 		},
 		// BoolCustomList []bool field
 		"bool_custom_list": SchemaBoolCustom(),
-		// Bytest byte[] field
+		// Bytes byte[] field
 		"bytes": {
 			Type:        schema.TypeString,
-			Description: "Bytest byte[] field",
+			Description: "Bytes byte[] field",
 			Optional:    true,
 		},
 		// BytesList [][]byte field
@@ -820,7 +820,7 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 			Getter:     GetBoolCustom,
 			Setter:     SetBoolCustom,
 		},
-		// Bytest byte[] field
+		// Bytes byte[] field
 		"bytes": {
 			Name:       "Bytes",
 			IsTime:     false,

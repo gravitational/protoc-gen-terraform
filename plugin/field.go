@@ -72,6 +72,9 @@ type Field struct {
 	// IsForceNew field has ForceNew flag
 	IsForceNew bool
 
+	// IsSensitive field has Sensitive flag
+	IsSensitive bool
+
 	// Suffix custom type schema and unmarshal method name suffix
 	Suffix string
 
@@ -196,6 +199,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.setRequired(c)
 	f.setComputed(c)
 	f.setForceNew(c)
+	f.setSensitive(c)
 
 	f.setDefault(c)
 
@@ -305,6 +309,16 @@ func (f *Field) setForceNew(c *FieldBuildContext) {
 
 	if ok1 || ok2 {
 		f.IsForceNew = true
+	}
+}
+
+// setSensitive sets IsForceNew flag
+func (f *Field) setSensitive(c *FieldBuildContext) {
+	_, ok1 := config.SensitiveFields[c.GetNameWithTypeName()]
+	_, ok2 := config.SensitiveFields[c.GetPath()]
+
+	if ok1 || ok2 {
+		f.IsSensitive = true
 	}
 }
 

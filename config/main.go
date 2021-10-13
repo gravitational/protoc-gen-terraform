@@ -83,6 +83,11 @@ var (
 	// Passed from command line (--terraform_out=force=types.Metadata.Name:./_out)
 	ForceNewFields map[string]struct{} = make(map[string]struct{})
 
+	// SensitiveFields is the list of fields to mark as 'Sensitive: true'
+	//
+	// Passed from command line (--terraform_out=sensitive=types.Metadata.Name:./_out)
+	SensitiveFields map[string]struct{} = make(map[string]struct{})
+
 	// Suffixes represents map of suffixes for custom types
 	Suffixes map[string]string = make(map[string]string)
 
@@ -116,6 +121,7 @@ type config struct {
 	ComputedFields        []string               `yaml:"computed_fields,omitempty"`
 	RequiredFields        []string               `yaml:"required_fields,omitempty"`
 	ForceNew              []string               `yaml:"force_new_fields,omitempty"`
+	SensitiveFields       []string               `yaml:"sensitive,omitempty"`
 	ConfigModeAttrFields  []string               `yaml:"config_mode_attr_fields,omitempty"`
 	ConfigModeBlockFields []string               `yaml:"config_mode_block_fields,omitempty"`
 	CustomImports         []string               `yaml:"custom_imports,omitempty"`
@@ -148,6 +154,7 @@ func Read(p map[string]string) error {
 	setRequiredFields(splitArg(p["required"]))
 	setCustomImports(splitArg(p["custom_imports"]))
 	setForceNewFields(splitArg(p["force"]))
+	setSensitive(splitArg(p["sensitive"]))
 	setConfigModeAttrFields(splitArg(p["config_mode_attr"]))
 	setConfigModeBlockFields(splitArg(p["config_mode_block"]))
 
@@ -196,6 +203,7 @@ func setVarsFromConfig() error {
 	setConfigModeBlockFields(cfg.ConfigModeBlockFields)
 	setCustomImports(cfg.CustomImports)
 	setForceNewFields(cfg.ForceNew)
+	setSensitive(cfg.SensitiveFields)
 	setDefaults(cfg.Defaults)
 	setSuffixes(cfg.Suffixes)
 	setStateFunc(cfg.StateFunc)
@@ -342,6 +350,15 @@ func setForceNewFields(f []string) {
 
 	if len(f) > 0 {
 		log.Printf("Force new fields: %s", f)
+	}
+}
+
+// setSensitive parses and sets SensitiveFields
+func setSensitive(f []string) {
+	setSet(SensitiveFields, f)
+
+	if len(f) > 0 {
+		log.Printf("Sensitive fields: %s", f)
 	}
 }
 
