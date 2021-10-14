@@ -57,7 +57,7 @@ func GetBoolCustom(
 	sch *schema.Schema,
 	data *schema.ResourceData,
 ) error {
-	len, err := accessors.GetLen(path, data)
+	len, err := accessors.GetLen(path, data, "#")
 	if err != nil {
 		return trace.Wrap(err)
 	}

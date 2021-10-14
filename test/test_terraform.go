@@ -60,12 +60,12 @@ func SuppressDurationChange(k string, old string, new string, d *schema.Resource
 
 	return o == n
 }
-func GetTest(obj *Test, data *schema.ResourceData) error {
-	return accessors.Get(obj, data, SchemaTest, SchemaMetaTest)
+func FromTerraformTest(data *schema.ResourceData, obj *Test) error {
+	return accessors.FromTerraform(obj, data, SchemaTest, SchemaMetaTest)
 }
 
-func SetTest(obj *Test, data *schema.ResourceData) error {
-	return accessors.Set(obj, data, SchemaTest, SchemaMetaTest)
+func ToTerraformTest(obj *Test, data *schema.ResourceData) error {
+	return accessors.ToTerraform(obj, data, SchemaTest, SchemaMetaTest)
 }
 
 // SchemaTest returns schema for Test
