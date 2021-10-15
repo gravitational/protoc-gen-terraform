@@ -112,10 +112,11 @@ func fillTimestamps(t *Test) error {
 // buildSubjectToTerraform builds Test struct from test fixture data
 func buildSubjectToTerraform(t *testing.T) (*schema.ResourceData, error) {
 	subject := schema.TestResourceDataRaw(t, SchemaTest, map[string]interface{}{
-		"string_list":          []interface{}{"nil", "nil"},
-		"bytes_list":           []interface{}{"bytes", "bytes"},
-		"timestamp_list":       []interface{}{"nil"},
-		"duration_custom_list": []interface{}{"nil"},
+		"string_list":          []interface{}{nil, nil},
+		"bytes_list":           []interface{}{nil, nil},
+		"timestamp_list":       []interface{}{nil},
+		"duration_custom_list": []interface{}{nil},
+		"bool_custom_list":     []interface{}{nil, nil, nil},
 		"nested": []interface{}{
 			map[string]interface{}{
 				"nested_list": []interface{}{
@@ -123,8 +124,8 @@ func buildSubjectToTerraform(t *testing.T) (*schema.ResourceData, error) {
 					map[string]interface{}{},
 				},
 				"map": map[string]interface{}{
-					"nil1": "nil1",
-					"nil2": "nil2",
+					"nil1": nil,
+					"nil2": nil,
 				},
 				"map_object_nested": []interface{}{
 					map[string]interface{}{
@@ -157,8 +158,8 @@ func buildSubjectToTerraform(t *testing.T) (*schema.ResourceData, error) {
 		},
 
 		"map": map[string]interface{}{
-			"k1": "nil1",
-			"k2": "nil2",
+			"k1": nil,
+			"k2": nil,
 		},
 
 		"map_object": []interface{}{

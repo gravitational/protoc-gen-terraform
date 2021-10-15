@@ -48,21 +48,20 @@ func SchemaBoolCustom() *schema.Schema {
 	}
 }
 
-// GetBoolCustom interprets data at path as an array of boolean values.
+// FromTerraformBoolCustom interprets data at path as an array of boolean values.
 // The values are returned in target
-func GetBoolCustom(
+func FromTerraformBoolCustom(
 	path string,
 	target reflect.Value,
 	meta *accessors.SchemaMeta,
 	sch *schema.Schema,
 	data *schema.ResourceData,
 ) error {
-	len, err := accessors.GetLen(path, data, "#")
+	len, err := accessors.GetListLen(path, data)
 	if err != nil {
 		return trace.Wrap(err)
 	}
 	if len == 0 {
-		// TODO: Share with accessors
 		accessors.AssignZeroValue(target)
 		return nil
 	}
@@ -86,12 +85,23 @@ func GetBoolCustom(
 	return nil
 }
 
-// SetBoolCustom returns bool values
-func SetBoolCustom(
+// ToTerraformBoolCustom returns bool values
+func ToTerraformBoolCustom(
+	path string,
 	source reflect.Value,
 	meta *accessors.SchemaMeta,
 	sch *schema.Schema,
+	data *schema.ResourceData,
 ) (interface{}, error) {
+	l, err := accessors.GetListLen(path, data)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	if l == 0 {
+		return nil, nil
+	}
+
 	if !source.IsValid() {
 		return nil, nil
 	}

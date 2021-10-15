@@ -814,11 +814,11 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 		// BoolCustomList []bool field
 		"bool_custom_list": {
-			Name:       "BoolCustomList",
-			IsTime:     false,
-			IsDuration: false,
-			Getter:     GetBoolCustom,
-			Setter:     SetBoolCustom,
+			Name:          "BoolCustomList",
+			IsTime:        false,
+			IsDuration:    false,
+			FromTerraform: FromTerraformBoolCustom,
+			ToTerraform:   ToTerraformBoolCustom,
 		},
 		// Bytes byte[] field
 		"bytes": {
