@@ -98,6 +98,9 @@ type Field struct {
 
 	// StateFunc is field state func name
 	StateFunc string
+
+	// Path represents field path
+	Path string
 }
 
 // BuildFields builds []*Field from descriptors of specified message
@@ -210,6 +213,8 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 
 	f.setStateFunc(c)
 	f.setKind()
+
+	f.Path = c.GetPath()
 
 	return f, nil
 }

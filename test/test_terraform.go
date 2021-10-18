@@ -580,7 +580,7 @@ func GenSchemaTest() map[string]*schema.Schema {
 				},
 			},
 		},
-		// NestedNullable nested message field, nullabel
+		// NestedNullable nested message field, nullable
 		"nested_nullable": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
@@ -1132,7 +1132,7 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 				},
 			},
 		},
-		// NestedNullable nested message field, nullabel
+		// NestedNullable nested message field, nullable
 		"nested_nullable": {
 			Name:       "NestedNullable",
 			IsTime:     false,
@@ -1278,3 +1278,156 @@ func GenSchemaMetaTest() map[string]*accessors.SchemaMeta {
 		},
 	}
 }
+
+/*
+
+## test
+
+Test message definition.
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `bool` | bool | Bool bool field |
+| `bool_custom_list` |  | BoolCustomList []bool field |
+| `bytes` | string | Bytes byte[] field |
+| `bytes_list` | string list | BytesList [][]byte field |
+| `double` | float64 | Double double field |
+| `duration_custom` | string | DurationCustom time.Duration field (with casttype) |
+| `duration_custom_list` | string list | DurationCustomList []time.Duration field |
+| `duration_custom_missing` | string | DurationCustomMissing time.Duration field (with casttype) missing in input data |
+| `duration_standard` | string | DurationStandard time.Duration field (standard) |
+| `duration_standard_missing` | string | DurationStandardMissing time.Duration field (standard) missing in input data |
+| `float` | float64 | Float float field |
+| `int32` | int | Int32 int32 field |
+| `int64` | int | Int64 int64 field |
+| `map` | map | Map normal map |
+| `map_object` | set | MapObject is the object map |
+| `map_object_nullable` | set | MapObjectNullable is the object map with nullable values |
+| `nested` | object | Nested nested message field, non-nullable |
+| `nested_list` | object list | NestedList nested message array |
+| `nested_list_nullable` | object list | NestedListNullable nested message array |
+| `nested_nullable` | object | NestedNullable nested message field, nullable |
+| `nested_nullable_with_nil_value` | object | NestedNullableWithNilValue nested message field, with no value set |
+| `str` | string | Str string field |
+| `string_list` | string list | StringList []string field |
+| `string_list_empty` | string list | StringListEmpty []string field |
+| `timestamp` | string | Timestamp time.Time field |
+| `timestamp_list` | string list | TimestampList []time.Time field |
+| `timestamp_missing` | string | Timestamp time.Time field |
+| `timestamp_nullable` | string | TimestampNullable *time.Time field |
+| `timestamp_nullable_with_nil_value` | string | TimestampNullableWithNilValue *time.Time field |
+
+**nested**
+
+Nested nested message field, non-nullable
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `map` | map | Nested map repeated nested messages |
+| `map_object_nested` | set | MapObjectNested nested object map |
+| `nested_list` | object list | Nested repeated nested messages |
+| `str` | string | Str string field |
+
+
+**nested_list**
+
+Nested repeated nested messages
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `str` | string | Str string field |
+
+
+
+
+**nested_list**
+
+NestedList nested message array
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `map` | map | Nested map repeated nested messages |
+| `map_object_nested` | set | MapObjectNested nested object map |
+| `nested_list` | object list | Nested repeated nested messages |
+| `str` | string | Str string field |
+
+
+**nested_list**
+
+Nested repeated nested messages
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `str` | string | Str string field |
+
+
+
+
+**nested_list_nullable**
+
+NestedListNullable nested message array
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `map` | map | Nested map repeated nested messages |
+| `map_object_nested` | set | MapObjectNested nested object map |
+| `nested_list` | object list | Nested repeated nested messages |
+| `str` | string | Str string field |
+
+
+**nested_list**
+
+Nested repeated nested messages
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `str` | string | Str string field |
+
+
+
+
+**nested_nullable**
+
+NestedNullable nested message field, nullable
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `map` | map | Nested map repeated nested messages |
+| `map_object_nested` | set | MapObjectNested nested object map |
+| `nested_list` | object list | Nested repeated nested messages |
+| `str` | string | Str string field |
+
+
+**nested_list**
+
+Nested repeated nested messages
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `str` | string | Str string field |
+
+
+
+
+**nested_nullable_with_nil_value**
+
+NestedNullableWithNilValue nested message field, with no value set
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `map` | map | Nested map repeated nested messages |
+| `map_object_nested` | set | MapObjectNested nested object map |
+| `nested_list` | object list | Nested repeated nested messages |
+| `str` | string | Str string field |
+
+
+**nested_list**
+
+Nested repeated nested messages
+
+| Name                    | Type       | Description                               |
+|-------------------------|------------|-------------------------------------------|
+| `str` | string | Str string field |
+
+
+*/

@@ -44,6 +44,10 @@ var (
 	// VarsTpl is the template for global variables, type definitions and shared methods
 	//go:embed _tpl/vars.tpl
 	VarsTpl string
+
+	// RefTpl is the template for markdown reference
+	//go:embed _tpl/ref.tpl
+	RefTpl string
 )
 
 // Template renders template from string to the specified writer

@@ -98,10 +98,13 @@ var (
 	FieldNameReplacements map[string]string = make(map[string]string)
 
 	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
-	Sort bool = false
+	Sort bool
 
 	// UseJSONtag uses json tag as the source for schema field names
-	UseJSONTag bool = false
+	UseJSONTag bool
+
+	// Ref represents the list of a messages which needs to have markdown reference generated
+	Ref bool
 
 	// config is yaml config unmarshal struct
 	cfg config
@@ -131,6 +134,7 @@ type config struct {
 	FieldNameReplacements map[string]string      `yaml:"field_name_replacements,omitempty"`
 	Sort                  string                 `yaml:"sort,omitempty"`
 	UseJSONTag            string                 `yaml:"use_json_tag,omitempty"`
+	Ref                   string                 `yaml:"ref,omitempty"`
 }
 
 // Read reads config variables from command line or config file
@@ -163,6 +167,7 @@ func Read(p map[string]string) error {
 	setTargetPackageName(p["target_pkg"])
 	setSort(p["sort"])
 	setUseJSONTag(p["use_json_tag"])
+	setRef(p["ref"])
 
 	return nil
 }
@@ -210,6 +215,7 @@ func setVarsFromConfig() error {
 	setFieldNameReplacements(cfg.FieldNameReplacements)
 	setSort(cfg.Sort)
 	setUseJSONTag(cfg.UseJSONTag)
+	setRef(cfg.Ref)
 
 	return nil
 }
@@ -420,6 +426,27 @@ func setUseJSONTag(arg string) {
 		log.Printf("Use json tag is enabled")
 	} else {
 		log.Printf("Use json tag is disabled")
+	}
+}
+
+// setRef sets the custom duration type
+func setRef(arg string) {
+	a := strings.ToLower(trimArg(arg))
+	if a == "" {
+		return
+	}
+
+	b, err := strconv.ParseBool(a)
+	if err != nil {
+		log.Printf("Ref generation is disabled, invalid value: %v. Use 1 or true to enable, 0 or false to disable.", a)
+		return
+	}
+
+	if b {
+		Ref = true
+		log.Printf("Reference generation is enabled")
+	} else {
+		log.Printf("Reference generation is disabled")
 	}
 }
 
