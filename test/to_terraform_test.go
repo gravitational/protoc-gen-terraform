@@ -109,21 +109,102 @@ func fillTimestamps(t *Test) error {
 	return nil
 }
 
-// buildSubjectSet builds Test struct from test fixture data
-func buildSubjectSet(t *testing.T) (*schema.ResourceData, error) {
-	subject := schema.TestResourceDataRaw(t, SchemaTest, map[string]interface{}{})
+// buildSubjectToTerraform builds Test struct from test fixture data
+func buildSubjectToTerraform(t *testing.T) (*schema.ResourceData, error) {
+	subject := schema.TestResourceDataRaw(t, SchemaTest, map[string]interface{}{
+		"string_list":          []interface{}{nil, nil},
+		"bytes_list":           []interface{}{nil, nil},
+		"timestamp_list":       []interface{}{nil},
+		"duration_custom_list": []interface{}{nil},
+		"bool_custom_list":     []interface{}{nil, nil, nil},
+		"nested": []interface{}{
+			map[string]interface{}{
+				"nested_list": []interface{}{
+					map[string]interface{}{},
+					map[string]interface{}{},
+				},
+				"map": map[string]interface{}{
+					"nil1": nil,
+					"nil2": nil,
+				},
+				"map_object_nested": []interface{}{
+					map[string]interface{}{
+						"key": "obj1",
+						"value": []interface{}{
+							map[string]interface{}{},
+						},
+					},
+					map[string]interface{}{
+						"key": "obj2",
+						"value": []interface{}{
+							map[string]interface{}{},
+						},
+					},
+				},
+			},
+		},
+		"nested_nullable": []interface{}{
+			map[string]interface{}{},
+		},
+
+		// List of messages
+		"nested_list": []interface{}{
+			map[string]interface{}{},
+			map[string]interface{}{},
+		},
+		"nested_list_nullable": []interface{}{
+			map[string]interface{}{},
+			map[string]interface{}{},
+		},
+
+		"map": map[string]interface{}{
+			"k1": nil,
+			"k2": nil,
+		},
+
+		"map_object": []interface{}{
+			map[string]interface{}{
+				"key": "obj1",
+				"value": []interface{}{
+					map[string]interface{}{},
+				},
+			},
+			map[string]interface{}{
+				"key": "obj2",
+				"value": []interface{}{
+					map[string]interface{}{},
+				},
+			},
+		},
+
+		"map_object_nullable": []interface{}{
+			map[string]interface{}{
+				"key": "obj1",
+				"value": []interface{}{
+					map[string]interface{}{},
+				},
+			},
+			map[string]interface{}{
+				"key": "obj2",
+				"value": []interface{}{
+					map[string]interface{}{},
+				},
+			},
+		},
+	})
+
 	err := fillTimestamps(&test)
 	if err != nil {
 		return nil, err
 	}
 
-	err = SetTest(&test, subject)
+	err = ToTerraformTest(&test, subject)
 	return subject, err
 }
 
-// TestElementariesSet ensures decoding of elementary types
-func TestElementariesSet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestElementariesToTerraform ensures decoding of elementary types
+func TestElementariesToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to marshal test data")
 
 	assert.Equal(t, subject.Get("str"), "TestString", "schema.ResourceData['str']")
@@ -135,9 +216,9 @@ func TestElementariesSet(t *testing.T) {
 	assert.Equal(t, subject.Get("bytes"), "TestBytes", "schema.ResourceData['bytes']")
 }
 
-// TestTimesSet ensures decoding of time and duration fields
-func TestTimesSet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestTimesToTerraform ensures decoding of time and duration fields
+func TestTimesToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, test.Timestamp.Format(time.RFC3339Nano), subject.Get("timestamp"), "Test.Timestamp")
@@ -146,9 +227,9 @@ func TestTimesSet(t *testing.T) {
 	assert.Equal(t, test.TimestampNullable.Format(time.RFC3339Nano), subject.Get("timestamp_nullable"), "Test.TimestampNullable")
 }
 
-// TestArraysSet ensures decoding of arrays
-func TestArraysSet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestArraysToTerraform ensures decoding of arrays
+func TestArraysToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, []interface{}{"TestString1", "TestString2"}, subject.Get("string_list"), "Test.StringList")
@@ -167,27 +248,27 @@ func TestArraysSet(t *testing.T) {
 	}
 }
 
-// TestNestedMessageSet ensures decoding of nested messages
-func TestNestedMessageSet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestNestedMessageToTerraform ensures decoding of nested messages
+func TestNestedMessageToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, test.Nested.Str, subject.Get("nested.0.str"), "Test.Nested.Str")
 	assert.Equal(t, test.NestedNullable.Str, subject.Get("nested_nullable.0.str"), "Test.NestedNullable.Str")
 }
 
-// TestNestedMessageArraySet ensures decoding of array of messages
-func TestNestedMessageArraySet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestNestedMessageArrayToTerraform ensures decoding of array of messages
+func TestNestedMessageArrayToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, test.Nested.NestedList[0].Str, subject.Get("nested.0.nested_list.0.str"))
 	assert.Equal(t, test.Nested.NestedList[1].Str, subject.Get("nested.0.nested_list.1.str"))
 }
 
-// // TestMapGet ensures decoding of a maps
-func TestMapSet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestMapToTerraform ensures decoding of a maps
+func TestMapToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	assert.Equal(t, test.Map["k1"], subject.Get("map.k1"))
@@ -196,9 +277,9 @@ func TestMapSet(t *testing.T) {
 	assert.Equal(t, test.Nested.Map["kn1"], "vn1")
 }
 
-// TestObjectMapSet ensures decoding of maps of messages
-func TestObjectMapSet(t *testing.T) {
-	subject, err := buildSubjectSet(t)
+// TestObjectMapToTerraform ensures decoding of maps of messages
+func TestObjectMapToTerraform(t *testing.T) {
+	subject, err := buildSubjectToTerraform(t)
 	require.NoError(t, err, "failed to unmarshal test data")
 
 	m := subject.Get("map_object")

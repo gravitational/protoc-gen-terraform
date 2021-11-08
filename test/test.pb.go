@@ -71,7 +71,7 @@ type Test struct {
 	DurationCustomList []Duration `protobuf:"varint,21,rep,packed,name=DurationCustomList,proto3,casttype=Duration" json:"DurationCustomList,omitempty"`
 	// Nested nested message field, non-nullable
 	Nested Nested `protobuf:"bytes,22,opt,name=Nested,proto3" json:"Nested"`
-	// NestedNullable nested message field, nullabel
+	// NestedNullable nested message field, nullable
 	NestedNullable *Nested `protobuf:"bytes,23,opt,name=NestedNullable,proto3" json:"NestedNullable,omitempty"`
 	// NestedNullableWithNilValue nested message field, with no value set
 	NestedNullableWithNilValue *Nested `protobuf:"bytes,24,opt,name=NestedNullableWithNilValue,proto3" json:"NestedNullableWithNilValue,omitempty"`

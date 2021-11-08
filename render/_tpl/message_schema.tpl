@@ -151,6 +151,9 @@ Default: {{.Default }},
 {{- if .IsForceNew }}
 ForceNew: true,
 {{- end }}
+{{- if .IsSensitive }}
+Sensitive: true,
+{{- end }}
 {{- end -}}
 
 {{- define "configMode" -}}
