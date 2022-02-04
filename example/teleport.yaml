@@ -1,37 +1,34 @@
 ---
+default_package_name: "github.com/gravitational/teleport/api/types"
 target_package_name: "tfschema"
-default_package_name: "types"
-duration_custom_type: "Duration"
+custom_duration: "github.com/gravitational/teleport/api/types.Duration"
 sort: true
 use_json_tag: true
 
-custom_imports:
-    - "github.com/gravitational/teleport/api/types"
-
 # Top-level type names to export
 types:
-    - "types.UserV2"
-    - "types.RoleV3"
-    - "types.ProvisionTokenV2"    
-    - "types.GithubConnectorV3"
-    - "types.SAMLConnectorV2"
-    - "types.OIDCConnectorV2"
-    - "types.TrustedClusterV2"
+    - "UserV2"
+    - "RoleV4"
+    - "ProvisionTokenV2"    
+    # - "GithubConnectorV3"
+    # - "SAMLConnectorV2"
+    # - "OIDCConnectorV2"
+    # - "TrustedClusterV2"
 
 # These fields will be excluded
 exclude_fields:
     # Metadata (we id resources by name on our side)
-    - "types.Metadata.ID"
+    - "Metadata.ID"
     
     # User
-    - "types.UserSpecV2.LocalAuth" # We do not need to set user auth data
-    - "types.UserSpecV2.Expires"   # Those fields are Teleport side meta, we do not need to change them via Terraform
-    - "types.UserSpecV2.CreatedBy"
-    - "types.UserSpecV2.Status"
+    - "UserSpecV2.LocalAuth" # We do not need to set user auth data
+    - "UserSpecV2.Expires"   # Those fields are Teleport side meta, we do not need to change them via Terraform
+    - "UserSpecV2.CreatedBy"
+    - "UserSpecV2.Status"
 
     # Role
-    - "types.RoleV3.Spec.Allow.Namespaces" # These fields are not settable via API
-    - "types.RoleV3.Spec.Deny.Namespaces"
+    - "RoleV3.Spec.Allow.Namespaces" # These fields are not settable via API
+    - "RoleV3.Spec.Deny.Namespaces"
 
 # These fields will be marked as Computed: true
 computed_fields:
@@ -39,91 +36,41 @@ computed_fields:
 # These fields will be marked as Required: true 
 required_fields:
     # Metadata
-    - "types.Metadata.Name"
+    - "Metadata.Name"
 
     # Role
-    - "types.RoleV3.Spec"
+    - "RoleV3.Spec"
     
     # Provision token
-    - "types.ProvisionTokenV2.Spec"
+    - "ProvisionTokenV2.Spec"
     # This field is required because it is non-empty by default. It can't be Computed because in this case
     # user would not be able to reset all nested fields to default values. If user sets an empty Computed field
     # to empty, it keeps it's last value in the state and never gets reset to default value or deleted. 
     # So, it's a workaround.
-    - "types.ProvisionTokenV2.Spec.Options"
-    - "types.ProvisionTokenV2.Spec.Roles"
-    - "types.ProvisionTokenV2.Metadata.Expires"
+    - "ProvisionTokenV2.Spec.Options"
+    - "ProvisionTokenV2.Spec.Roles"
+    - "ProvisionTokenV2.Metadata.Expires"
 
     # Github connector
-    - "types.GithubConnectorV3.Spec"
-    - "types.GithubConnectorV3.Spec.ClientID"
-    - "types.GithubConnectorV3.Spec.ClientSecret"
-    - "types.GithubConnectorV3.Spec.TeamsToLogins"
-    - "types.GithubConnectorV3.Spec.TeamsToLogins.Team"
-    - "types.GithubConnectorV3.Spec.TeamsToLogins.Logins"
+    - "GithubConnectorV3.Spec"
+    - "GithubConnectorV3.Spec.ClientID"
+    - "GithubConnectorV3.Spec.ClientSecret"
+    - "GithubConnectorV3.Spec.TeamsToLogins"
+    - "GithubConnectorV3.Spec.TeamsToLogins.Team"
+    - "GithubConnectorV3.Spec.TeamsToLogins.Logins"
 
     # SAML connector
-    - "types.SAMLConnectorV2.Spec"
-    - "types.SAMLConnectorV2.Spec.AssertionConsumerService"
-    - "types.SAMLConnectorV2.Spec.EntityDescriptor"
-    - "types.SAMLConnectorV2.Spec.EntityDescriptorURL"
+    - "SAMLConnectorV2.Spec"
+    - "SAMLConnectorV2.Spec.AssertionConsumerService"
+    - "SAMLConnectorV2.Spec.EntityDescriptor"
+    - "SAMLConnectorV2.Spec.EntityDescriptorURL"
 
     # OIDC connector
-    - "types.OIDCConnectorV2.Spec"
+    - "OIDCConnectorV2.Spec"
 
-# These fields will be marked as ForceNew: true
-force_new_fields:
-    - "types.Metadata.Name" # We need to recreate object if it's name is changed
-
-# Field default values
-defaults:
-    # Metadata
-    "types.Metadata.Namespace": "default"    
-
-    # User
-    "types.UserV2.Version": "v2"
-    "types.UserV2.Kind": "user"
-    "types.UserV2.SubKind": ""
-
-    # Role
-    "types.RoleV3.Version": "v3"
-    "types.RoleV3.Kind": "role"
-    "types.RoleV3.SubKind": ""
-    "types.RoleV3.Spec.Options.MaxSessionTTL": "30h"
-    "types.RoleV3.Spec.Options.CertificateFormat": "standard"
-    "types.RoleV3.Spec.Allow.ReviewRequests.Where": ""
-    "types.RoleV3.Spec.Deny.ReviewRequests.Where": ""
-
-    # Provision token
-    "types.ProvisionTokenV2.Version": "v2"
-    "types.ProvisionTokenV2.Kind": "token"
-    "types.ProvisionTokenV2.SubKind": ""
-
-    # Github connector
-    "types.GithubConnectorV3.Version": "v3"
-    "types.GithubConnectorV3.Kind": "github"
-    "types.GithubConnectorV3.SubKind": ""
-
-    # SAML connector
-    "types.SAMLConnectorV2.Version": "v2"
-    "types.SAMLConnectorV2.Kind": "saml"
-    "types.SAMLConnectorV2.SubKind": ""
-
-    # OIDC connector
-    "types.OIDCConnectorV2.Version": "v2"
-    "types.OIDCConnectorV2.Kind": "oidc"
-    "types.OIDCConnectorV2.SubKind": ""
-
-    # Trusted cluster
-    "types.TrustedClusterV2.Version": "v2"
-    "types.TrustedClusterV2.Kind": "trusted_cluster"
-    "types.TrustedClusterV2.SubKind": ""
-
-# These fields will be marked as ConfigMode: schema.SchemaConfigModeAttrs
-config_mode_attr_fields:
-
-# These fields will be marked as ConfigMode: schema.SchemaConfigModeBlock
-config_mode_block_fields:
+# These fields must be marked as sensitive
+sensitive_fields:
+    - "ProvisionTokenV2.Metadata.Name"
 
 # These suffixes for custom methods called when field has custom_type flag. By default they might be weird.
 suffixes:
@@ -131,6 +78,20 @@ suffixes:
     "Labels": "Labels"
     "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
 
-# These funcs will be used as a state funcs for a fields
-state_func:
-    "types.Metadata.Expires": TruncateMs
+# Custom validators
+validators:
+    "Metadata.Expires":
+        - "validateTimeFormatRFC3339"
+
+# Time custom type
+time_type:
+  type: "TimeType"            # Implementation of attrs.Type
+  value_type: "TimeValue"     # Implementation of attrs.Value
+  cast_type: "time.Time"      # Go type of .Value
+
+# Duration custom type
+duration_type:
+  type: "DurationType"        # Implementation of attrs.Type
+  value_type: "DurationValue" # Implementation of attrs.Value
+  cast_type: "time.Duration"  # Go type of .Value
+

@@ -19,51 +19,54 @@ package plugin
 
 import (
 	"bytes"
+	"io"
 	"sort"
 
-	"github.com/gravitational/protoc-gen-terraform/config"
-	"github.com/gravitational/protoc-gen-terraform/render"
-	"github.com/gravitational/trace"
-
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gravitational/protoc-gen-terraform/desc"
+	"github.com/gravitational/protoc-gen-terraform/gen"
+	"github.com/gravitational/trace"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	// name contains plugin name
-	name = "terraform"
-
-	// schemaPkg contains name of Terraform schema package
-	schemaPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-
-	// validationPkg contains name of Terraform validation package
-	validationPkg = "github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-
-	// accessorsPkg contains SchemaMeta definition
-	accessorsPkg = "github.com/gravitational/protoc-gen-terraform/accessors"
+	// pluginName contains plugin name
+	pluginName = "terraform"
+	// SDKPackagePath represents the name of Terraform SDKPackagePath package
+	SDKPackagePath = "github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	// TypesPackagePath represents the name of Terraform types package
+	TypesPackagePath = "github.com/hashicorp/terraform-plugin-framework/types"
+	// DiagPackagePath represents the name of Terraform diag package
+	DiagPackagePath = "github.com/hashicorp/terraform-plugin-framework/diag"
+	// AttrPackagePath represents the name of Terraform attr package
+	AttrPackagePath = "github.com/hashicorp/terraform-plugin-framework/attr"
 )
 
 // Plugin is terraform generator plugin
 type Plugin struct {
 	*generator.Generator
 	generator.PluginImports
-
-	// Map of reflected messages, public just in case some post analysis is required
-	Messages []*Message
+	// Config represents the plugin configuration
+	Config *desc.Config
+	// Messages represents list of the messages in a protoc file
+	Messages []*desc.Message
+	// Imports represents import package->qualifier dictionary
+	Imports desc.Imports
 }
 
 // NewPlugin creates the new plugin
 func NewPlugin() *Plugin {
-	return &Plugin{
-		Messages: make([]*Message, 0),
-	}
+	return &Plugin{Messages: make([]*desc.Message, 0)}
 }
 
 // Init initializes plugin and sets the generator instance
 func (p *Plugin) Init(g *generator.Generator) {
-	p.Generator = g
+	var err error
 
-	err := config.Read(g.Param)
+	p.Generator = g
+	p.PluginImports = generator.NewPluginImports(p.Generator)
+
+	p.Config, err = desc.ReadConfig(g.Param)
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
@@ -71,120 +74,126 @@ func (p *Plugin) Init(g *generator.Generator) {
 
 // Name returns the name of the plugin
 func (p *Plugin) Name() string {
-	return name
+	return pluginName
+}
+
+// RegisterMessage adds a new entry to AllMessages
+func (p *Plugin) RegisterMessage(m *desc.Message) {
+	p.Messages = append(p.Messages, m)
 }
 
 // Generate goes over messages in the file passed from gogo, builds reflection structs and writes a target file
 func (p *Plugin) Generate(file *generator.FileDescriptor) {
+	var buf bytes.Buffer
+
 	log.Printf("Processing: %s", *file.Name)
 
-	// Adds Terraform package imports to target file
-	p.setImports()
+	p.addImports()
 	p.build(file)
 
-	err := p.writeVars()
+	err := p.write(p.Messages, &buf)
 	if err != nil {
 		p.Generator.Fail(err.Error())
 	}
 
-	err = p.writeSchema()
-	if err != nil {
-		p.Generator.Fail(err.Error())
-	}
-
-	if config.Ref {
-		err = p.writeRef()
-		if err != nil {
-			p.Generator.Fail(err.Error())
-		}
-	}
+	p.P(buf.String())
 }
 
-// reflect builds message dictionary from a messages in protoc file
+// GetConfig returns plugin config
+func (p *Plugin) GetConfig() *desc.Config {
+	return p.Config
+}
+
+// GetGenerator returns plugin generator
+func (p *Plugin) GetGenerator() *generator.Generator {
+	return p.Generator
+}
+
+// GetImports returns plugin imports
+func (p *Plugin) GetImports() *desc.Imports {
+	return &p.Imports
+}
+
+// build builds the message dictionary from a messages in protoc file
 func (p *Plugin) build(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
-		m, err := BuildMessage(p.Generator, message, true, "")
-
+		m, err := desc.BuildMessage(p, message, true, "")
 		if err != nil {
 			log.WithError(err).Warningf("failed to build the message %v", message.GetName())
 			continue
 		}
 
+		// A message is nil if it is not required in the output
 		if m != nil {
-			p.Messages = append(p.Messages, m)
+			p.RegisterMessage(m)
 		}
 	}
-
 	// Sort messages if required
-	if config.Sort {
+	if p.Config.Sort {
 		sort.Slice(p.Messages, func(i, j int) bool {
-			return p.Messages[i].NameSnake < p.Messages[j].NameSnake
+			return p.Messages[i].Name < p.Messages[j].Name
 		})
 	}
 }
 
-// writeVars writes top level variables and methods
-func (p *Plugin) writeVars() error {
-	var buf bytes.Buffer
-
-	err := render.Template(render.VarsTpl, p.Messages, &buf)
-	if err != nil {
-		return trace.Wrap(err)
+// addImports adds a packages to the generated file import sections
+func (p *Plugin) addImports() {
+	p.Imports = desc.NewImports()
+	if p.Config.DefaultPackageName != "" {
+		q := p.AddImport(generator.GoImportPath(p.Config.DefaultPackageName))
+		p.Imports.SetDefaultQual(string(q), p.Config.DefaultPackageName)
 	}
-	p.P(buf.String())
 
-	return nil
+	tfdiagQual := p.AddImport(DiagPackagePath)
+	tfsdkQual := p.AddImport(SDKPackagePath)
+	typesQual := p.AddImport(TypesPackagePath)
+	attrQual := p.AddImport(AttrPackagePath)
+
+	p.Imports.AddQual(string(tfdiagQual), DiagPackagePath)
+	p.Imports.AddQual(string(tfsdkQual), SDKPackagePath)
+	p.Imports.AddQual(string(typesQual), TypesPackagePath)
+	p.Imports.AddQual(string(attrQual), AttrPackagePath)
+	p.Imports.AddQual("context", "context")
+
+	for _, i := range p.Config.ExternalImports {
+		q := p.AddImport(generator.GoImportPath(i))
+		p.Imports.AddQual(string(q), i)
+	}
 }
 
-// writeSchema writes schema definition to target file
-func (p *Plugin) writeSchema() error {
-	for _, message := range p.Messages {
-		var buf bytes.Buffer
+// write writes schema and meta to output file
+func (p *Plugin) write(m []*desc.Message, out io.Writer) error {
+	c := gen.NewGeneratorContext(p.Imports)
 
-		err := render.Template(render.SchemaTpl, message, &buf)
+	for _, message := range m {
+		if !message.IsRoot {
+			continue
+		}
+
+		g := gen.NewMessageSchemaGenerator(message, c)
+		_, err := out.Write(g.Generate())
 		if err != nil {
 			return trace.Wrap(err)
 		}
-		p.P(buf.String())
-
-		buf.Reset()
-
-		err = render.Template(render.MetaTpl, message, &buf)
-		if err != nil {
-			return trace.Wrap(err)
-		}
-		p.P(buf.String())
 	}
 
-	return nil
-}
+	for _, message := range m {
+		if !message.IsRoot {
+			continue
+		}
 
-// writeRef writes markdown reference to target file
-func (p *Plugin) writeRef() error {
-	for _, message := range p.Messages {
-		var buf bytes.Buffer
-
-		err := render.Template(render.RefTpl, message, &buf)
+		f := gen.NewMessageCopyFromGenerator(message, c)
+		_, err := out.Write(f.Generate())
 		if err != nil {
 			return trace.Wrap(err)
 		}
 
-		p.P(buf.String())
+		// t := gen.NewMessageCopyToGenerator(message, c)
+		// _, err = out.Write(t.Generate())
+		// if err != nil {
+		// 	return trace.Wrap(err)
+		// }
 	}
 
 	return nil
-}
-
-// setImports sets import definitions for current file
-func (p *Plugin) setImports() {
-	p.PluginImports = generator.NewPluginImports(p.Generator)
-
-	// So those could be referenced via schema. and validation.
-	p.AddImport(schemaPkg)
-	p.AddImport(validationPkg)
-	p.AddImport(accessorsPkg)
-
-	for _, i := range config.CustomImports {
-		p.AddImport(generator.GoImportPath(i))
-	}
 }

@@ -17,23 +17,25 @@ limitations under the License.
 package main
 
 import (
-	"bytes"
 	"regexp"
 	"strings"
 
 	plugin_go "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/gogo/protobuf/vanity/command"
-	"github.com/gravitational/protoc-gen-terraform/config"
 	"github.com/gravitational/protoc-gen-terraform/plugin"
-	"github.com/gravitational/protoc-gen-terraform/render"
 	"github.com/gravitational/trace"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
+
+	_ "embed"
 )
 
 var (
 	// packageReplacementRegexp is used to replace package name in a target file
 	packageReplacementRegexp = regexp.MustCompile("package (.+)\n")
+
+	//go:embed license.txt
+	license string
 )
 
 func main() {
@@ -45,7 +47,7 @@ func main() {
 	req := command.Read()
 	resp := command.GeneratePlugin(req, p, "_terraform.go")
 
-	err := runGoImports(resp)
+	err := runGoImports(p, resp)
 	if err != nil {
 		p.Fail(err.Error())
 	}
@@ -54,7 +56,7 @@ func main() {
 }
 
 // runGoImports formats code and removes unused imports from the resulting code using goimports tool
-func runGoImports(resp *plugin_go.CodeGeneratorResponse) error {
+func runGoImports(p *plugin.Plugin, resp *plugin_go.CodeGeneratorResponse) error {
 	opts := imports.Options{
 		FormatOnly: false,
 		Comments:   true,
@@ -72,12 +74,15 @@ func runGoImports(resp *plugin_go.CodeGeneratorResponse) error {
 
 		s := string(result)
 
-		s, err = prependLicense(s)
+		s, err = prependLicense(p, s)
 		if err != nil {
 			return trace.Wrap(err)
 		}
 
-		s = replacePackageName(s)
+		if p.Config.TargetPackageName != "" {
+			s = replacePackageName(s, p.Config.TargetPackageName)
+		}
+
 		file.Content = &s
 	}
 
@@ -85,23 +90,12 @@ func runGoImports(resp *plugin_go.CodeGeneratorResponse) error {
 }
 
 // prependLicense prepends license information
-func prependLicense(s string) (string, error) {
-	var buf bytes.Buffer
-
-	err := render.Template(render.LicenseTpl, nil, &buf)
-	if err != nil {
-		return "", trace.Wrap(err)
-	}
-
-	return buf.String() + s, nil
+func prependLicense(p *plugin.Plugin, s string) (string, error) {
+	return license + s, nil
 }
 
 // replacePackageName replaces package name in target file with provided from cli
-func replacePackageName(s string) string {
-	if config.TargetPackageName == "" {
-		return s
-	}
-
+func replacePackageName(s string, target string) string {
 	// Replace one string
 	pkg := packageReplacementRegexp.FindString(s)
 	if pkg == "" {
@@ -109,5 +103,5 @@ func replacePackageName(s string) string {
 		return s
 	}
 
-	return strings.Replace(s, pkg, "package "+config.TargetPackageName+"\n", 1)
+	return strings.Replace(s, pkg, "package "+target+"\n", 1)
 }

@@ -1,0 +1,18 @@
+---
+types:
+  - Test
+duration_custom_type: Duration
+
+time_type:
+  type: "TimeType"            # Struct name of attrs.Type
+  value_type: "TimeValue"     # Struct name of attrs.Value
+  cast_type: "time.Time"      # Go type of .Value
+
+duration_type:
+  type: "DurationType"        # Struct name of attrs.Type
+  value_type: "DurationValue" # Struct name of attrs.Value
+  cast_type: "time.Duration"  # Go type of .Value
+
+plan_modifiers:
+  "Test.Str":
+    - tfsdk.UseStateForUnknown()
