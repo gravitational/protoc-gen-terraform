@@ -53,25 +53,26 @@ type TerraformType struct {
 	ElemType string
 	// ElemValueType represents Terraform attr.Value name for list/map Elem, equals ValueType by default
 	ElemValueType string
-	// IsTypeScalar is true when Type is not a real struct and is represented with numeric constant
+	// IsTypeScalar is true when Type is not a real struct and is represented with numeric constant on Terraform side
 	IsTypeScalar bool
-	// IsTypeScalar is true when ElemType is not a real struct and is represented with numeric constant
+	// IsTypeScalar is true when ElemType is not a real struct and is represented with numeric constant on Terraform side
 	IsElemTypeScalar bool
-	// CastType represents Go type for either ValueType.Value or ElemValueType.Value
-	CastType string
+	// ValueCastToType represents Go type of either ValueType.Value or ElemValueType.Value
+	ValueCastToType string
+	// ValueCastFromType represents Go type of a counterpart object field or field elem to cast from .Value
+	ValueCastFromType string
 	// IsMessage field is a nested message? (might be map or list at the same time)
 	IsMessage bool
 }
 
 // ProtobufType represents protobuf object field type information
 type ProtobufType struct {
-	// GoType represents raw go type of a source protobuf object field (with [], map)
+	// GoType represents raw go type of a source protobuf object field (builtin, struct, slice, map, pointer)
 	GoType string
-	// GoElemType represents raw go type of a slice/map element, otherwise equals GoType
+	// GoElemType represents raw go type of a slice/map element (with possible *), otherwise equals GoType
 	GoElemType string
-	// TODO: Remove
-	// GoCustomType represents a raw Go type for gogo.custom_type field
-	GoCustomType string
+	// GoElemTypeIndirect string represents raw go type slice/map element without *, otherwise equals GoElemType
+	GoElemTypeIndirect string
 }
 
 // Field represents metadata of protobuf message field descriptor
@@ -85,9 +86,6 @@ type Field struct {
 
 	TerraformType
 	ProtobufType
-
-	// SchemaValueCastType represents the go type of the .Value member of a value/elem type.
-	SchemaValueCastType string
 
 	// Suffix represents a custom type suffix used to refer to custom methods (GenSchema<Suffix>)
 	Suffix string
@@ -192,52 +190,78 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		return nil, trace.Wrap(err)
 	}
 
-	//f.SchemaValueCastType = f.getSchemaCastType(f.TerraformType)
-
 	if f.IsMessage && !c.IsMap() {
-		f.Message, err = f.getMessage(c)
+		err = f.setMessage(c)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
-		if f.Message == nil {
-			return nil, nil
-		}
-		c.plugin.RegisterMessage(f.Message)
 	}
 
 	if c.IsRepeated() {
-		f.GoElemType = f.GoType[strings.Index(f.GoType, "]")+1:]
+		f.setRepeatedGoElemType()
 	}
 
 	if c.IsMap() {
-		var typ string
-
-		// gogoprotobuf returns incorrect elem type for maps. It always contains "*", we have to override.
-		typ, f.MapValueField, err = f.getMapValueField(c)
+		err = f.setMapValues(c)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
-
-		f.ElemType = f.MapValueField.ElemType
-		f.GoType = typ
-		f.IsNullable = strings.Contains(typ, "*")
-		f.GoElemType = f.MapValueField.GoElemType
-		f.CastType = f.MapValueField.CastType
 	}
 
-	// t, v, a := c.GetTFSchemaTypes()
-	// if t != "" && v != "" && a != "" {
-	// 	f.TerraformType = c.imports.GoString(t, false)
-	// 	f.TerraformElemType = f.TerraformType
-	// 	f.TerraformValueType = c.imports.GoString(v, false)
-	// 	f.SchemaValueCastType = c.imports.GoString(a, false)
-	// }
-
+	f.setTerraformTypeOverride(c)
 	f.setCustomType(c)
+
+	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
 
 	f.Kind = f.getKind()
 
 	return f, nil
+}
+
+// setRepeatedGoElemType fixes GoElemType for current field if it's repeated
+func (f *Field) setRepeatedGoElemType() {
+	f.GoElemType = f.GoType[strings.Index(f.GoType, "]")+1:]
+}
+
+// setMapValues sets required attributes for map in the current field
+func (f *Field) setMapValues(c *FieldBuildContext) error {
+	var typ string
+	var err error
+
+	// gogoprotobuf returns incorrect elem type for maps. It always contains "*", we have to override.
+	typ, f.MapValueField, err = f.getMapValueField(c)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
+	// Otherwise, that would contain artificial protobuf Map_Entry type information
+	f.GoType = typ
+	f.IsNullable = strings.Contains(typ, "*")
+
+	f.ElemType = f.MapValueField.ElemType
+	f.ElemValueType = f.MapValueField.ElemValueType
+	f.ValueCastToType = f.MapValueField.ValueCastToType
+	f.ValueCastFromType = f.MapValueField.ValueCastFromType
+
+	f.GoElemType = f.MapValueField.GoElemType
+
+	return nil
+}
+
+// setMessage sets nested message for current field
+func (f *Field) setMessage(c *FieldBuildContext) error {
+	var err error
+
+	f.Message, err = f.getMessage(c)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+	if f.Message == nil {
+		return nil
+	}
+	c.plugin.RegisterMessage(f.Message)
+
+	return nil
 }
 
 // getMessage returns a nested message definition
@@ -286,8 +310,6 @@ func (f *Field) getKind() Kind {
 	case f.IsCustomType:
 		return Custom
 	case f.IsMap && f.MapValueField.IsMessage:
-		// Terraform SDKV2 does not support map of objects.
-		// We replace such field with list of objects having key and value fields.
 		return NestedMap // ex: map[string]struct
 	case f.IsMap:
 		return PrimitiveMap // ex: map[string]string
@@ -301,6 +323,20 @@ func (f *Field) getKind() Kind {
 	return Primitive // ex: string
 }
 
+// setSchemaCustomType sets schema type override
+func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
+	o := c.GetTerraformTypeOverride()
+	if o != nil {
+		f.Type = c.imports.GoString(o.Type, false)
+		f.ValueType = c.imports.GoString(o.ValueType, false)
+		f.ValueCastToType = c.imports.GoString(o.CastType, false)
+
+		f.ElemType = f.Type
+		f.ElemValueType = f.ValueType
+		f.ValueCastFromType = f.ValueCastToType
+	}
+}
+
 // setCustomType sets IsCustomType, GoCustomType and Suffix.
 // Please note that CustomType overrides the whole field type.
 // Repeated customtype and map customtype would be the same type.
@@ -310,7 +346,6 @@ func (f *Field) setCustomType(c *FieldBuildContext) {
 	}
 
 	f.IsCustomType = true
-	f.GoCustomType = c.GetCustomType()
 
 	v, ok := c.config.Suffixes[c.GetCustomType()]
 	if ok {
@@ -318,25 +353,6 @@ func (f *Field) setCustomType(c *FieldBuildContext) {
 		return
 	}
 
+	// Default suffix: package and type name without / and .
 	f.Suffix = strings.ReplaceAll(strings.ReplaceAll(c.GetCustomType(), "/", ""), ".", "")
 }
-
-// // Returns .Value go type from a type name
-// func (f *Field) getSchemaCastType(t string) string {
-// 	switch t {
-// 	case Int64Type:
-// 		return "int64"
-// 	case Float64Type:
-// 		return "float64"
-// 	case StringType:
-// 		return "string"
-// 	case BoolType:
-// 		return "bool"
-// 		// case TimeType:
-// 		// 	return "time.Time"
-// 		// case DurationType:
-// 		// 	return "time.Duration"
-// 	}
-
-// 	return ""
-// }

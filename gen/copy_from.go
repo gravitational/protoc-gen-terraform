@@ -2,7 +2,6 @@ package gen
 
 import (
 	"fmt"
-	"strings"
 
 	. "github.com/dave/jennifer/jen"
 	"github.com/gravitational/protoc-gen-terraform/desc"
@@ -15,20 +14,20 @@ const (
 // MessageCopyFromGenerator is the visitor struct to generate tfsdk.Schema of a message
 type MessageCopyFromGenerator struct {
 	*desc.Message
-	c GeneratorContext
+	i *desc.Imports
 }
 
 // NewMessageCopyFromGenerator returns new MessageCopyFromGenerator struct
-func NewMessageCopyFromGenerator(m *desc.Message, c GeneratorContext) *MessageCopyFromGenerator {
-	return &MessageCopyFromGenerator{Message: m, c: c}
+func NewMessageCopyFromGenerator(m *desc.Message, i *desc.Imports) *MessageCopyFromGenerator {
+	return &MessageCopyFromGenerator{Message: m, i: i}
 }
 
 // Generate generates Copy<Name>FromTerraform method
 func (m *MessageCopyFromGenerator) Generate() []byte {
 	methodName := "Copy" + m.Name + "FromTerraform"
-	tf := Id("tf").Add(m.c.Types("Object"))
+	tf := Id("tf").Id(m.i.WithPackage(Types, "Object"))
 	obj := Id("obj").Op("*").Id(m.GoType)
-	diags := Var().Id("diags").Add(m.c.DiagDiagnostics())
+	diags := Var().Id("diags").Id(m.i.WithPackage(Diag, "Diagnostics"))
 
 	// func Copy<name>FromTerraform(tf types.Object, obj *apitypes.<name>) diag.Diagnostics
 	// ... statements for a fields
@@ -36,7 +35,7 @@ func (m *MessageCopyFromGenerator) Generate() []byte {
 		Commentf("// %v copies contents of the source Terraform object into a target struct\n", methodName).
 			Func().Id(methodName).
 			Params(tf, obj).
-			Add(m.c.DiagDiagnostics()).
+			Id(m.i.WithPackage(Diag, "Diagnostics")).
 			BlockFunc(func(g *Group) {
 				g.Add(diags)
 				m.GenerateFields(g)
@@ -49,19 +48,19 @@ func (m *MessageCopyFromGenerator) Generate() []byte {
 // GenerateFields generates specific statements for CopyToTF<name> methods
 func (m *MessageCopyFromGenerator) GenerateFields(g *Group) {
 	for _, f := range m.Fields {
-		g.Add(NewFieldCopyFromGenerator(f, m.c).Generate())
+		g.Add(NewFieldCopyFromGenerator(f, m.i).Generate())
 	}
 }
 
 // FieldCopyFromGenerator is a visitor for a field
 type FieldCopyFromGenerator struct {
 	*desc.Field
-	c GeneratorContext
+	i *desc.Imports
 }
 
 // NewFieldCopyFromGenerator returns new FieldCopyFromGenerator struct
-func NewFieldCopyFromGenerator(f *desc.Field, c GeneratorContext) *FieldCopyFromGenerator {
-	return &FieldCopyFromGenerator{Field: f, c: c}
+func NewFieldCopyFromGenerator(f *desc.Field, i *desc.Imports) *FieldCopyFromGenerator {
+	return &FieldCopyFromGenerator{Field: f, i: i}
 }
 
 // Generate generates CopyFrom fragment for a field of different kind
@@ -112,10 +111,10 @@ func (f *FieldCopyFromGenerator) genPrimitiveBody(g *Group) {
 	g.If(Id("!v.Null && !v.Unknown")).BlockFunc(func(g *Group) {
 		if !f.IsNullable {
 			// obj.Float = float32(v.Value)
-			g.Id("t").Op("=").Id(f.CastType).Parens(Id("v.Value"))
+			g.Id("t").Op("=").Id(f.ValueCastFromType).Parens(Id("v.Value"))
 		} else {
 			// c := float32(v.Value)
-			g.Id("c").Op(":=").Id(strings.Replace(f.CastType, "*", "", -1)).Parens(Id("v.Value"))
+			g.Id("c").Op(":=").Id(f.ValueCastFromType).Parens(Id("v.Value"))
 			// obj.Float = &c
 			g.Id("t").Op("=&").Id("c")
 		}
@@ -155,7 +154,7 @@ func (f *FieldCopyFromGenerator) genPrimitive() *Statement {
 
 // genNested generates CopyFrom fragment for a nested object
 func (f *FieldCopyFromGenerator) genNested() *Statement {
-	m := NewMessageCopyFromGenerator(f.Message, f.c)
+	m := NewMessageCopyFromGenerator(f.Message, f.i)
 	objFieldName := "obj." + f.Name
 
 	return f.nextField(func(g *Group) {
@@ -173,7 +172,7 @@ func (f *FieldCopyFromGenerator) genNested() *Statement {
 
 			if f.IsNullable {
 				// obj.Nested = &Nested{}
-				g.Id(objFieldName).Op("=&").Id(strings.Replace(f.GoElemType, "*", "", -1)).Values()
+				g.Id(objFieldName).Op("=&").Id(f.GoElemTypeIndirect).Values()
 				// obj := obj.Nested
 				g.Id("obj").Op(":=").Id(objFieldName)
 			} else {
@@ -216,7 +215,7 @@ func (f *FieldCopyFromGenerator) genNestedListOrMap() *Statement {
 	objFieldName := "obj." + f.Name
 
 	field := f.getValueField()
-	m := NewMessageCopyFromGenerator(field.Message, f.c)
+	m := NewMessageCopyFromGenerator(field.Message, f.i)
 
 	return f.nextField(func(g *Group) {
 		f.genListOrMapIterator(g, Id(field.ElemValueType), func(g *Group) {
@@ -229,7 +228,7 @@ func (f *FieldCopyFromGenerator) genNestedListOrMap() *Statement {
 
 				if f.IsNullable {
 					// t = &Nested{}
-					g.Id("t").Op("=&").Id(strings.Replace(f.GoElemType, "*", "", -1)).Values()
+					g.Id("t").Op("=&").Id(f.GoElemTypeIndirect).Values()
 					// obj := t - obj is just an alias to reuse field generator code
 					g.Id("obj").Op(":=").Id("t")
 				} else {

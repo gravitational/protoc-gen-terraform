@@ -15,4 +15,4 @@ duration_type:
 
 plan_modifiers:
   "Test.Str":
-    - tfsdk.UseStateForUnknown()
+    - github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()

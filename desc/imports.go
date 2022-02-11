@@ -20,8 +20,8 @@ import (
 	"strings"
 )
 
-// TODO: Error if package/qual is unknown
-// TODO: Error if package/qual is duplicate
+// TODO: Return unknown type if package/qual is unknown
+// TODO: Return unknown type if package/qual is duplicate
 
 // Imports represents the collection of file imports.
 // It is responsible for type names normalization and allows types to be referenced by full package names.
@@ -99,8 +99,8 @@ func (s Imports) GoString(t string, prependDefault bool) string {
 }
 
 // WithPackage concatenates package and typ, returns normalized type name
-func (s Imports) WithPackage(path string, typ string, prependDefault bool) string {
-	return s.GoString(path+"."+typ, prependDefault)
+func (s Imports) WithPackage(path string, typ string) string {
+	return s.GoString(path+"."+typ, false)
 }
 
 // typAndMod return go type name and it's modifiers (*[])

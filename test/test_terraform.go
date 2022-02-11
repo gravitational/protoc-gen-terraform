@@ -26,6 +26,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	attr "github.com/hashicorp/terraform-plugin-framework/attr"
 	diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	types "github.com/hashicorp/terraform-plugin-framework/types"
@@ -1928,6 +1929,1546 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 						}
 					}
 				}
+			}
+		}
+	}
+	return diags
+}
+
+// CopyTestToTerraform copies contents of the source Terraform object into a target struct
+func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
+	var diags diag.Diagnostics
+	{
+		_, ok := tf.AttrTypes["str"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Str is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.String
+			v.Value = string(obj.Str)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["str"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["int32"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Int32 is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.Int64
+			v.Value = int64(obj.Int32)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["int32"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["int64"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Int64 is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.Int64
+			v.Value = int64(obj.Int64)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["int64"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["float"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Float is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.Float64
+			v.Value = float64(obj.Float)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["float"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["double"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Double is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.Float64
+			v.Value = float64(obj.Double)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["double"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["bool"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Bool is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.Bool
+			v.Value = bool(obj.Bool)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["bool"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["bytes"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Bytes is missing in the target Terraform object AttrTypes")
+		} else {
+			var v types.String
+			v.Value = string(obj.Bytes)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["bytes"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["timestamp"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Timestamp is missing in the target Terraform object AttrTypes")
+		} else {
+			var v TimeValue
+			v.Value = time.Time(obj.Timestamp)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["timestamp"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["timestamp_missing"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampMissing is missing in the target Terraform object AttrTypes")
+		} else {
+			var v TimeValue
+			v.Value = time.Time(obj.TimestampMissing)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["timestamp_missing"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["timestamp_nullable"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampNullable is missing in the target Terraform object AttrTypes")
+		} else {
+			var v TimeValue
+			if obj.TimestampNullable == nil {
+				v.Null = true
+			} else {
+				v.Value = time.Time(*obj.TimestampNullable)
+				v.Null = false
+			}
+			v.Unknown = false
+			tf.Attrs["timestamp_nullable"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["timestamp_nullable_with_nil_value"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampNullableWithNilValue is missing in the target Terraform object AttrTypes")
+		} else {
+			var v TimeValue
+			if obj.TimestampNullableWithNilValue == nil {
+				v.Null = true
+			} else {
+				v.Value = time.Time(*obj.TimestampNullableWithNilValue)
+				v.Null = false
+			}
+			v.Unknown = false
+			tf.Attrs["timestamp_nullable_with_nil_value"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["duration_standard"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationStandard is missing in the target Terraform object AttrTypes")
+		} else {
+			var v DurationValue
+			v.Value = time.Duration(obj.DurationStandard)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["duration_standard"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["duration_standard_missing"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationStandardMissing is missing in the target Terraform object AttrTypes")
+		} else {
+			var v DurationValue
+			v.Value = time.Duration(obj.DurationStandardMissing)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["duration_standard_missing"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["duration_custom"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationCustom is missing in the target Terraform object AttrTypes")
+		} else {
+			var v DurationValue
+			v.Value = time.Duration(obj.DurationCustom)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["duration_custom"] = v
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["duration_custom_missing"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationCustomMissing is missing in the target Terraform object AttrTypes")
+		} else {
+			var v DurationValue
+			v.Value = time.Duration(obj.DurationCustomMissing)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["duration_custom_missing"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["string_list"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.StringList is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.StringList can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.StringList)),
+				}
+				if obj.StringList == nil {
+					c.Null = true
+				} else {
+					for k, a := range obj.StringList {
+						var v types.String
+						v.Value = string(a)
+						v.Null = false
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["string_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["string_list_empty"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.StringListEmpty is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.StringListEmpty can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.StringListEmpty)),
+				}
+				if obj.StringListEmpty == nil {
+					c.Null = true
+				} else {
+					for k, a := range obj.StringListEmpty {
+						var v types.String
+						v.Value = string(a)
+						v.Null = false
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["string_list_empty"] = c
+			}
+		}
+	}
+	{
+		_, ok := tf.AttrTypes["bool_custom_list"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.BoolCustomList is missing in the target Terraform object AttrTypes")
+		} else {
+			v := CopyToBoolCustom(diags, obj.BoolCustomList)
+			tf.Attrs["bool_custom_list"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["bytes_list"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.BytesList is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.BytesList can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.BytesList)),
+				}
+				if obj.BytesList == nil {
+					c.Null = true
+				} else {
+					for k, a := range obj.BytesList {
+						var v types.String
+						v.Value = string(a)
+						v.Null = false
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["bytes_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["timestamp_list"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampList is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.TimestampList can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.TimestampList)),
+				}
+				if obj.TimestampList == nil {
+					c.Null = true
+				} else {
+					for k, a := range obj.TimestampList {
+						var v TimeValue
+						if a == nil {
+							v.Null = true
+						} else {
+							v.Value = time.Time(*a)
+							v.Null = false
+						}
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["timestamp_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["duration_custom_list"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationCustomList is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.DurationCustomList can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.DurationCustomList)),
+				}
+				if obj.DurationCustomList == nil {
+					c.Null = true
+				} else {
+					for k, a := range obj.DurationCustomList {
+						var v DurationValue
+						v.Value = time.Duration(a)
+						v.Null = false
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["duration_custom_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Nested is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ObjectType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.Nested can not be converted to types.ObjectType")
+			} else {
+				v := types.Object{
+
+					AttrTypes: o.AttrTypes,
+					Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+				}
+				{
+					obj := obj.Nested
+					tf := &v
+					{
+						_, ok := tf.AttrTypes["str"]
+						if !ok {
+							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.Str is missing in the target Terraform object AttrTypes")
+						} else {
+							var v types.String
+							v.Value = string(obj.Str)
+							v.Null = false
+							v.Unknown = false
+							tf.Attrs["str"] = v
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["nested_list"]
+						if !ok {
+							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.NestedList is missing in the target Terraform object AttrTypes")
+						} else {
+							o, ok := a.(types.ListType)
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A type for Test.Nested.NestedList can not be converted to types.ListType")
+							} else {
+								c := types.List{
+
+									ElemType: o.ElemType,
+									Elems:    make([]attr.Value, len(obj.NestedList)),
+								}
+								if obj.NestedList == nil {
+									c.Null = true
+								} else {
+									o := o.ElemType.(types.ObjectType)
+									for k, a := range obj.NestedList {
+										v := types.Object{
+
+											AttrTypes: o.AttrTypes,
+											Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+										}
+										if a == nil {
+											v.Null = true
+										} else {
+											obj := a
+											tf := &v
+											{
+												_, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.NestedList.Str is missing in the target Terraform object AttrTypes")
+												} else {
+													var v types.String
+													v.Value = string(obj.Str)
+													v.Null = false
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										c.Elems[k] = v
+									}
+								}
+								tf.Attrs["nested_list"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["map"]
+						if !ok {
+							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.Map is missing in the target Terraform object AttrTypes")
+						} else {
+							o, ok := a.(types.MapType)
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A type for Test.Nested.Map can not be converted to types.MapType")
+							} else {
+								c := types.Map{
+
+									ElemType: o.ElemType,
+									Elems:    make(map[string]attr.Value, len(obj.Map)),
+								}
+								if obj.Map == nil {
+									c.Null = true
+								} else {
+									for k, a := range obj.Map {
+										var v types.String
+										v.Value = string(a)
+										v.Null = false
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+								}
+								tf.Attrs["map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["map_object_nested"]
+						if !ok {
+							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.MapObjectNested is missing in the target Terraform object AttrTypes")
+						} else {
+							o, ok := a.(types.MapType)
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A type for Test.Nested.MapObjectNested can not be converted to types.MapType")
+							} else {
+								c := types.Map{
+
+									ElemType: o.ElemType,
+									Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+								}
+								if obj.MapObjectNested == nil {
+									c.Null = true
+								} else {
+									o := o.ElemType.(types.ObjectType)
+									for k, a := range obj.MapObjectNested {
+										v := types.Object{
+
+											AttrTypes: o.AttrTypes,
+											Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+										}
+										obj := a
+										tf := &v
+										{
+											_, ok := tf.AttrTypes["str"]
+											if !ok {
+												diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+											} else {
+												var v types.String
+												v.Value = string(obj.Str)
+												v.Null = false
+												v.Unknown = false
+												tf.Attrs["str"] = v
+											}
+										}
+										c.Elems[k] = v
+									}
+								}
+								tf.Attrs["map_object_nested"] = c
+							}
+						}
+					}
+				}
+				tf.Attrs["nested"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_nullable"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ObjectType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable can not be converted to types.ObjectType")
+			} else {
+				v := types.Object{
+
+					AttrTypes: o.AttrTypes,
+					Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+				}
+				if obj.NestedNullable == nil {
+					v.Null = true
+				} else {
+					{
+						obj := obj.NestedNullable
+						tf := &v
+						{
+							_, ok := tf.AttrTypes["str"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.Str is missing in the target Terraform object AttrTypes")
+							} else {
+								var v types.String
+								v.Value = string(obj.Str)
+								v.Null = false
+								v.Unknown = false
+								tf.Attrs["str"] = v
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["nested_list"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.NestedList is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.ListType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable.NestedList can not be converted to types.ListType")
+								} else {
+									c := types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]attr.Value, len(obj.NestedList)),
+									}
+									if obj.NestedList == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.NestedList {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											if a == nil {
+												v.Null = true
+											} else {
+												obj := a
+												tf := &v
+												{
+													_, ok := tf.AttrTypes["str"]
+													if !ok {
+														diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.NestedList.Str is missing in the target Terraform object AttrTypes")
+													} else {
+														var v types.String
+														v.Value = string(obj.Str)
+														v.Null = false
+														v.Unknown = false
+														tf.Attrs["str"] = v
+													}
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["nested_list"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.Map is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable.Map can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.Map)),
+									}
+									if obj.Map == nil {
+										c.Null = true
+									} else {
+										for k, a := range obj.Map {
+											var v types.String
+											v.Value = string(a)
+											v.Null = false
+											v.Unknown = false
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map_object_nested"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.MapObjectNested is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable.MapObjectNested can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+									}
+									if obj.MapObjectNested == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.MapObjectNested {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											obj := a
+											tf := &v
+											{
+												_, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+												} else {
+													var v types.String
+													v.Value = string(obj.Str)
+													v.Null = false
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map_object_nested"] = c
+								}
+							}
+						}
+					}
+				}
+				tf.Attrs["nested_nullable"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_nullable_with_nil_value"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ObjectType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue can not be converted to types.ObjectType")
+			} else {
+				v := types.Object{
+
+					AttrTypes: o.AttrTypes,
+					Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+				}
+				if obj.NestedNullableWithNilValue == nil {
+					v.Null = true
+				} else {
+					{
+						obj := obj.NestedNullableWithNilValue
+						tf := &v
+						{
+							_, ok := tf.AttrTypes["str"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.Str is missing in the target Terraform object AttrTypes")
+							} else {
+								var v types.String
+								v.Value = string(obj.Str)
+								v.Null = false
+								v.Unknown = false
+								tf.Attrs["str"] = v
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["nested_list"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.NestedList is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.ListType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue.NestedList can not be converted to types.ListType")
+								} else {
+									c := types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]attr.Value, len(obj.NestedList)),
+									}
+									if obj.NestedList == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.NestedList {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											if a == nil {
+												v.Null = true
+											} else {
+												obj := a
+												tf := &v
+												{
+													_, ok := tf.AttrTypes["str"]
+													if !ok {
+														diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.NestedList.Str is missing in the target Terraform object AttrTypes")
+													} else {
+														var v types.String
+														v.Value = string(obj.Str)
+														v.Null = false
+														v.Unknown = false
+														tf.Attrs["str"] = v
+													}
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["nested_list"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.Map is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue.Map can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.Map)),
+									}
+									if obj.Map == nil {
+										c.Null = true
+									} else {
+										for k, a := range obj.Map {
+											var v types.String
+											v.Value = string(a)
+											v.Null = false
+											v.Unknown = false
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map_object_nested"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.MapObjectNested is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue.MapObjectNested can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+									}
+									if obj.MapObjectNested == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.MapObjectNested {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											obj := a
+											tf := &v
+											{
+												_, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+												} else {
+													var v types.String
+													v.Value = string(obj.Str)
+													v.Null = false
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map_object_nested"] = c
+								}
+							}
+						}
+					}
+				}
+				tf.Attrs["nested_nullable_with_nil_value"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_list"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.NestedList can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.NestedList)),
+				}
+				if obj.NestedList == nil {
+					c.Null = true
+				} else {
+					o := o.ElemType.(types.ObjectType)
+					for k, a := range obj.NestedList {
+						v := types.Object{
+
+							AttrTypes: o.AttrTypes,
+							Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						}
+						obj := a
+						tf := &v
+						{
+							_, ok := tf.AttrTypes["str"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.Str is missing in the target Terraform object AttrTypes")
+							} else {
+								var v types.String
+								v.Value = string(obj.Str)
+								v.Null = false
+								v.Unknown = false
+								tf.Attrs["str"] = v
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["nested_list"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.NestedList is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.ListType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedList.NestedList can not be converted to types.ListType")
+								} else {
+									c := types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]attr.Value, len(obj.NestedList)),
+									}
+									if obj.NestedList == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.NestedList {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											if a == nil {
+												v.Null = true
+											} else {
+												obj := a
+												tf := &v
+												{
+													_, ok := tf.AttrTypes["str"]
+													if !ok {
+														diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.NestedList.Str is missing in the target Terraform object AttrTypes")
+													} else {
+														var v types.String
+														v.Value = string(obj.Str)
+														v.Null = false
+														v.Unknown = false
+														tf.Attrs["str"] = v
+													}
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["nested_list"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.Map is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedList.Map can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.Map)),
+									}
+									if obj.Map == nil {
+										c.Null = true
+									} else {
+										for k, a := range obj.Map {
+											var v types.String
+											v.Value = string(a)
+											v.Null = false
+											v.Unknown = false
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map_object_nested"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.MapObjectNested is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.NestedList.MapObjectNested can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+									}
+									if obj.MapObjectNested == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.MapObjectNested {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											obj := a
+											tf := &v
+											{
+												_, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+												} else {
+													var v types.String
+													v.Value = string(obj.Str)
+													v.Null = false
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map_object_nested"] = c
+								}
+							}
+						}
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["nested_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_list_nullable"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.ListType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable can not be converted to types.ListType")
+			} else {
+				c := types.List{
+
+					ElemType: o.ElemType,
+					Elems:    make([]attr.Value, len(obj.NestedListNullable)),
+				}
+				if obj.NestedListNullable == nil {
+					c.Null = true
+				} else {
+					o := o.ElemType.(types.ObjectType)
+					for k, a := range obj.NestedListNullable {
+						v := types.Object{
+
+							AttrTypes: o.AttrTypes,
+							Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						}
+						if a == nil {
+							v.Null = true
+						} else {
+							obj := a
+							tf := &v
+							{
+								_, ok := tf.AttrTypes["str"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.Str is missing in the target Terraform object AttrTypes")
+								} else {
+									var v types.String
+									v.Value = string(obj.Str)
+									v.Null = false
+									v.Unknown = false
+									tf.Attrs["str"] = v
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["nested_list"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.NestedList is missing in the target Terraform object AttrTypes")
+								} else {
+									o, ok := a.(types.ListType)
+									if !ok {
+										diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable.NestedList can not be converted to types.ListType")
+									} else {
+										c := types.List{
+
+											ElemType: o.ElemType,
+											Elems:    make([]attr.Value, len(obj.NestedList)),
+										}
+										if obj.NestedList == nil {
+											c.Null = true
+										} else {
+											o := o.ElemType.(types.ObjectType)
+											for k, a := range obj.NestedList {
+												v := types.Object{
+
+													AttrTypes: o.AttrTypes,
+													Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												}
+												if a == nil {
+													v.Null = true
+												} else {
+													obj := a
+													tf := &v
+													{
+														_, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.NestedList.Str is missing in the target Terraform object AttrTypes")
+														} else {
+															var v types.String
+															v.Value = string(obj.Str)
+															v.Null = false
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												c.Elems[k] = v
+											}
+										}
+										tf.Attrs["nested_list"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["map"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.Map is missing in the target Terraform object AttrTypes")
+								} else {
+									o, ok := a.(types.MapType)
+									if !ok {
+										diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable.Map can not be converted to types.MapType")
+									} else {
+										c := types.Map{
+
+											ElemType: o.ElemType,
+											Elems:    make(map[string]attr.Value, len(obj.Map)),
+										}
+										if obj.Map == nil {
+											c.Null = true
+										} else {
+											for k, a := range obj.Map {
+												var v types.String
+												v.Value = string(a)
+												v.Null = false
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+										}
+										tf.Attrs["map"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["map_object_nested"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.MapObjectNested is missing in the target Terraform object AttrTypes")
+								} else {
+									o, ok := a.(types.MapType)
+									if !ok {
+										diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable.MapObjectNested can not be converted to types.MapType")
+									} else {
+										c := types.Map{
+
+											ElemType: o.ElemType,
+											Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+										}
+										if obj.MapObjectNested == nil {
+											c.Null = true
+										} else {
+											o := o.ElemType.(types.ObjectType)
+											for k, a := range obj.MapObjectNested {
+												v := types.Object{
+
+													AttrTypes: o.AttrTypes,
+													Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												}
+												obj := a
+												tf := &v
+												{
+													_, ok := tf.AttrTypes["str"]
+													if !ok {
+														diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+													} else {
+														var v types.String
+														v.Value = string(obj.Str)
+														v.Null = false
+														v.Unknown = false
+														tf.Attrs["str"] = v
+													}
+												}
+												c.Elems[k] = v
+											}
+										}
+										tf.Attrs["map_object_nested"] = c
+									}
+								}
+							}
+						}
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["nested_list_nullable"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["map"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.Map is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.MapType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.Map can not be converted to types.MapType")
+			} else {
+				c := types.Map{
+
+					ElemType: o.ElemType,
+					Elems:    make(map[string]attr.Value, len(obj.Map)),
+				}
+				if obj.Map == nil {
+					c.Null = true
+				} else {
+					for k, a := range obj.Map {
+						var v types.String
+						v.Value = string(a)
+						v.Null = false
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["map"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["map_object"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.MapType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.MapObject can not be converted to types.MapType")
+			} else {
+				c := types.Map{
+
+					ElemType: o.ElemType,
+					Elems:    make(map[string]attr.Value, len(obj.MapObject)),
+				}
+				if obj.MapObject == nil {
+					c.Null = true
+				} else {
+					o := o.ElemType.(types.ObjectType)
+					for k, a := range obj.MapObject {
+						v := types.Object{
+
+							AttrTypes: o.AttrTypes,
+							Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						}
+						obj := a
+						tf := &v
+						{
+							_, ok := tf.AttrTypes["str"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.Str is missing in the target Terraform object AttrTypes")
+							} else {
+								var v types.String
+								v.Value = string(obj.Str)
+								v.Null = false
+								v.Unknown = false
+								tf.Attrs["str"] = v
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["nested_list"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.NestedList is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.ListType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.MapObject.NestedList can not be converted to types.ListType")
+								} else {
+									c := types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]attr.Value, len(obj.NestedList)),
+									}
+									if obj.NestedList == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.NestedList {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											if a == nil {
+												v.Null = true
+											} else {
+												obj := a
+												tf := &v
+												{
+													_, ok := tf.AttrTypes["str"]
+													if !ok {
+														diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.NestedList.Str is missing in the target Terraform object AttrTypes")
+													} else {
+														var v types.String
+														v.Value = string(obj.Str)
+														v.Null = false
+														v.Unknown = false
+														tf.Attrs["str"] = v
+													}
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["nested_list"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.Map is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.MapObject.Map can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.Map)),
+									}
+									if obj.Map == nil {
+										c.Null = true
+									} else {
+										for k, a := range obj.Map {
+											var v types.String
+											v.Value = string(a)
+											v.Null = false
+											v.Unknown = false
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map"] = c
+								}
+							}
+						}
+						{
+							a, ok := tf.AttrTypes["map_object_nested"]
+							if !ok {
+								diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.MapObjectNested is missing in the target Terraform object AttrTypes")
+							} else {
+								o, ok := a.(types.MapType)
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A type for Test.MapObject.MapObjectNested can not be converted to types.MapType")
+								} else {
+									c := types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+									}
+									if obj.MapObjectNested == nil {
+										c.Null = true
+									} else {
+										o := o.ElemType.(types.ObjectType)
+										for k, a := range obj.MapObjectNested {
+											v := types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+											}
+											obj := a
+											tf := &v
+											{
+												_, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+												} else {
+													var v types.String
+													v.Value = string(obj.Str)
+													v.Null = false
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+											c.Elems[k] = v
+										}
+									}
+									tf.Attrs["map_object_nested"] = c
+								}
+							}
+						}
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["map_object"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["map_object_nullable"]
+		if !ok {
+			diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable is missing in the target Terraform object AttrTypes")
+		} else {
+			o, ok := a.(types.MapType)
+			if !ok {
+				diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable can not be converted to types.MapType")
+			} else {
+				c := types.Map{
+
+					ElemType: o.ElemType,
+					Elems:    make(map[string]attr.Value, len(obj.MapObjectNullable)),
+				}
+				if obj.MapObjectNullable == nil {
+					c.Null = true
+				} else {
+					o := o.ElemType.(types.ObjectType)
+					for k, a := range obj.MapObjectNullable {
+						v := types.Object{
+
+							AttrTypes: o.AttrTypes,
+							Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						}
+						if a == nil {
+							v.Null = true
+						} else {
+							obj := a
+							tf := &v
+							{
+								_, ok := tf.AttrTypes["str"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.Str is missing in the target Terraform object AttrTypes")
+								} else {
+									var v types.String
+									v.Value = string(obj.Str)
+									v.Null = false
+									v.Unknown = false
+									tf.Attrs["str"] = v
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["nested_list"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.NestedList is missing in the target Terraform object AttrTypes")
+								} else {
+									o, ok := a.(types.ListType)
+									if !ok {
+										diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable.NestedList can not be converted to types.ListType")
+									} else {
+										c := types.List{
+
+											ElemType: o.ElemType,
+											Elems:    make([]attr.Value, len(obj.NestedList)),
+										}
+										if obj.NestedList == nil {
+											c.Null = true
+										} else {
+											o := o.ElemType.(types.ObjectType)
+											for k, a := range obj.NestedList {
+												v := types.Object{
+
+													AttrTypes: o.AttrTypes,
+													Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												}
+												if a == nil {
+													v.Null = true
+												} else {
+													obj := a
+													tf := &v
+													{
+														_, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.NestedList.Str is missing in the target Terraform object AttrTypes")
+														} else {
+															var v types.String
+															v.Value = string(obj.Str)
+															v.Null = false
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												c.Elems[k] = v
+											}
+										}
+										tf.Attrs["nested_list"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["map"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.Map is missing in the target Terraform object AttrTypes")
+								} else {
+									o, ok := a.(types.MapType)
+									if !ok {
+										diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable.Map can not be converted to types.MapType")
+									} else {
+										c := types.Map{
+
+											ElemType: o.ElemType,
+											Elems:    make(map[string]attr.Value, len(obj.Map)),
+										}
+										if obj.Map == nil {
+											c.Null = true
+										} else {
+											for k, a := range obj.Map {
+												var v types.String
+												v.Value = string(a)
+												v.Null = false
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+										}
+										tf.Attrs["map"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["map_object_nested"]
+								if !ok {
+									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.MapObjectNested is missing in the target Terraform object AttrTypes")
+								} else {
+									o, ok := a.(types.MapType)
+									if !ok {
+										diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable.MapObjectNested can not be converted to types.MapType")
+									} else {
+										c := types.Map{
+
+											ElemType: o.ElemType,
+											Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+										}
+										if obj.MapObjectNested == nil {
+											c.Null = true
+										} else {
+											o := o.ElemType.(types.ObjectType)
+											for k, a := range obj.MapObjectNested {
+												v := types.Object{
+
+													AttrTypes: o.AttrTypes,
+													Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												}
+												obj := a
+												tf := &v
+												{
+													_, ok := tf.AttrTypes["str"]
+													if !ok {
+														diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+													} else {
+														var v types.String
+														v.Value = string(obj.Str)
+														v.Null = false
+														v.Unknown = false
+														tf.Attrs["str"] = v
+													}
+												}
+												c.Elems[k] = v
+											}
+										}
+										tf.Attrs["map_object_nested"] = c
+									}
+								}
+							}
+						}
+						c.Elems[k] = v
+					}
+				}
+				tf.Attrs["map_object_nullable"] = c
 			}
 		}
 	}

@@ -27,8 +27,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// schemaType represents a struct used for the schema type overrides
-type schemaType struct {
+// SchemaType represents a struct used for the schema type overrides
+type SchemaType struct {
 	// Type is a Go attr.Type struct name
 	Type string `yaml:"type,omitempty"`
 	// ValueType is a Go attr.Value struct name
@@ -77,13 +77,13 @@ type Config struct {
 	// PlanModifiers represents the map of plan modifiers for a fields
 	PlanModifiers map[string][]string `yaml:"plan_modifiers,omitempty"`
 	// SchemaTypes represents a map of a schema field type overrides
-	SchemaTypes map[string]schemaType `yaml:"schema_types,omitempty"`
+	SchemaTypes map[string]SchemaType `yaml:"schema_types,omitempty"`
 	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
 	Sort bool `yaml:"sort,omitempty"`
 	// TimeType represents time.Time type for the Terraform Framework if set in SchemaTypes
-	TimeType *schemaType `yaml:"time_type,omitempty"`
+	TimeType *SchemaType `yaml:"time_type,omitempty"`
 	// DurationType represents time.Duration type for the Terraform Framework if set in SchemaTypes
-	DurationType *schemaType `yaml:"duration_type,omitempty"`
+	DurationType *SchemaType `yaml:"duration_type,omitempty"`
 
 	// TypesRaw types loaded from a yaml file as is
 	TypesRaw []string `yaml:"types,omitempty"`

@@ -28,31 +28,34 @@ import (
 // MessageSchemaGenerator is the decorator struct to generate tfsdk.Schema of a message
 type MessageSchemaGenerator struct {
 	*desc.Message
-	c GeneratorContext
+	i *desc.Imports
 }
 
 // NewMessageSchemaGenerator returns new MessageSchemaGenerator struct
-func NewMessageSchemaGenerator(m *desc.Message, c GeneratorContext) *MessageSchemaGenerator {
-	return &MessageSchemaGenerator{Message: m, c: c}
+func NewMessageSchemaGenerator(m *desc.Message, i *desc.Imports) *MessageSchemaGenerator {
+	return &MessageSchemaGenerator{Message: m, i: i}
 }
 
 // Generate returns Go code for message schema
 func (m *MessageSchemaGenerator) Generate() []byte {
 	id := "GenSchema" + m.Name
+	schema := m.i.WithPackage(SDK, "Schema")
+	diags := m.i.WithPackage(Diag, "Diagnostics")
+	attr := m.i.WithPackage(SDK, "Attribute")
 
 	j := Commentf("// %v returns tfsdk.Schema definition for %v\n", id, m.Name).
 		Func().
 		Id(id).
-		Params(m.c.ParamCtx()).
+		Params(Id("ctx").Id(m.i.GoString("context.Context", false))).
 		Params( // return params
-			m.c.Schema(),
-			m.c.DiagDiagnostics(),
+			Id(schema),
+			Id(diags),
 		).
 		Block(
 			Return(
-				Add(m.c.Schema()).Values(
+				Id(schema).Values(
 					Dict{
-						Id("Attributes"): Map(String()).Add(m.c.Attribute()).Values(
+						Id("Attributes"): Map(String()).Id(attr).Values(
 							m.fieldsDictSchema(),
 						),
 					},
@@ -69,7 +72,7 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() Dict {
 	d := Dict{}
 
 	for _, f := range m.Fields {
-		f := NewFieldSchemaGenerator(f, m.c)
+		f := NewFieldSchemaGenerator(f, m.i)
 		d[Lit(f.NameSnake)] = f.Generate()
 	}
 
@@ -79,12 +82,12 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() Dict {
 // FieldSchemaGenerator represents the decorator for Field code generation
 type FieldSchemaGenerator struct {
 	*desc.Field
-	c GeneratorContext
+	i *desc.Imports
 }
 
 // NewFieldSchemaGenerator returns new FieldSchemaGenerator struct
-func NewFieldSchemaGenerator(f *desc.Field, c GeneratorContext) *FieldSchemaGenerator {
-	return &FieldSchemaGenerator{Field: f, c: c}
+func NewFieldSchemaGenerator(f *desc.Field, i *desc.Imports) *FieldSchemaGenerator {
+	return &FieldSchemaGenerator{Field: f, i: i}
 }
 
 // Generate returns field schema
@@ -120,7 +123,7 @@ func (f *FieldSchemaGenerator) Generate() *Statement {
 	if len(f.Validators) > 0 {
 		v := make([]jen.Code, len(f.Validators))
 		for i, n := range f.Validators {
-			v[i] = Id(n)
+			v[i] = Id(f.i.GoString(n, false))
 		}
 
 		d[Id("Validators")] = Index().String().Values(v...)
@@ -130,10 +133,10 @@ func (f *FieldSchemaGenerator) Generate() *Statement {
 	if len(f.PlanModifiers) > 0 {
 		v := make([]jen.Code, len(f.PlanModifiers))
 		for i, n := range f.PlanModifiers {
-			v[i] = Id(n)
+			v[i] = Id(f.i.GoString(n, false))
 		}
 
-		d[Id("PlanModifiers")] = Index().Add(f.c.AttributePlanModifier()).Values(v...)
+		d[Id("PlanModifiers")] = Index().Id(f.i.WithPackage(SDK, "AttributePlanModifier")).Values(v...)
 	}
 
 	return Values(d)
@@ -145,14 +148,14 @@ func (f *FieldSchemaGenerator) schemaType() *Statement {
 	case desc.Primitive:
 		return f.primitiveSchemaTypeDef()
 	case desc.PrimitiveList:
-		return Add(f.c.Types("ListType")).Values(Dict{
+		return Id(f.Type).Values(Dict{
 			Id("ElemType"): f.primitiveSchemaTypeDef(),
 		})
 	case desc.PrimitiveMap:
-		f := NewFieldSchemaGenerator(f.MapValueField, f.c)
+		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
 
-		return Add(f.c.Types("MapType")).Values(Dict{
-			Id("ElemType"): f.primitiveSchemaTypeDef(),
+		return Id(f.Type).Values(Dict{
+			Id("ElemType"): g.primitiveSchemaTypeDef(),
 		})
 	}
 
@@ -163,15 +166,15 @@ func (f *FieldSchemaGenerator) schemaType() *Statement {
 func (f *FieldSchemaGenerator) attributes() *Statement {
 	switch f.Kind {
 	case desc.Nested:
-		m := NewMessageSchemaGenerator(f.Message, f.c)
+		m := NewMessageSchemaGenerator(f.Message, f.i)
 
 		return f.xNestedAttributes("Single", m)
 	case desc.NestedMap:
-		m := NewMessageSchemaGenerator(f.MapValueField.Message, f.c)
+		m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i)
 
 		return f.xNestedAttributes("Map", m)
 	case desc.NestedList:
-		m := NewMessageSchemaGenerator(f.Message, f.c)
+		m := NewMessageSchemaGenerator(f.Message, f.i)
 
 		return f.xNestedAttributes("List", m)
 	}
@@ -192,11 +195,11 @@ func (f *FieldSchemaGenerator) xNestedAttributes(typ string, m *MessageSchemaGen
 	var options *Statement
 
 	if typ != "Single" {
-		options = f.c.Qual(SDK, typ+"NestedAttributesOptions").Values()
+		options = Id(f.i.WithPackage(SDK, typ+"NestedAttributesOptions")).Values()
 	}
 
-	return f.c.Qual(SDK, typ+"NestedAttributes").Params(
-		Map(String()).Add(f.c.Attribute()).Values(m.fieldsDictSchema()),
+	return Id(f.i.WithPackage(SDK, typ+"NestedAttributes")).Params(
+		Map(String()).Id(f.i.WithPackage(SDK, "Attribute")).Values(m.fieldsDictSchema()),
 		options,
 	)
 }

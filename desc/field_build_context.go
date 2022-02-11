@@ -38,6 +38,7 @@ var (
 		ValueType:        Types + ".Float64",
 		ElemType:         Types + ".Float64Type",
 		ElemValueType:    Types + ".Float64",
+		ValueCastToType:  "float64",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -47,6 +48,7 @@ var (
 		ValueType:        Types + ".Int64",
 		ElemType:         Types + ".Int64Type",
 		ElemValueType:    Types + ".Int64",
+		ValueCastToType:  "int64",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -56,6 +58,7 @@ var (
 		ValueType:        Types + ".String",
 		ElemType:         Types + ".StringType",
 		ElemValueType:    Types + ".String",
+		ValueCastToType:  "string",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -65,6 +68,7 @@ var (
 		ValueType:        Types + ".Bool",
 		ElemType:         Types + ".BoolType",
 		ElemValueType:    Types + ".Bool",
+		ValueCastToType:  "bool",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -169,75 +173,76 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			return t, trace.Errorf("%v field has time type, but config.time_type is not defined", c.path)
 		}
 		t = TerraformType{
-			Type:          c.config.TimeType.Type,
-			ValueType:     c.config.TimeType.ValueType,
-			ElemType:      c.config.TimeType.Type,
-			ElemValueType: c.config.TimeType.ValueType,
-			CastType:      c.config.TimeType.CastType,
+			Type:              c.config.TimeType.Type,
+			ValueType:         c.config.TimeType.ValueType,
+			ElemType:          c.config.TimeType.Type,
+			ElemValueType:     c.config.TimeType.ValueType,
+			ValueCastToType:   c.config.TimeType.CastType,
+			ValueCastFromType: c.config.TimeType.CastType,
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
 			return t, trace.Errorf("%v field has duration type, but config.duration_type is not defined", c.path)
 		}
 		t = TerraformType{
-			Type:          c.config.DurationType.Type,
-			ValueType:     c.config.DurationType.ValueType,
-			ElemType:      c.config.DurationType.Type,
-			ElemValueType: c.config.DurationType.ValueType,
-			CastType:      c.config.DurationType.CastType,
+			Type:              c.config.DurationType.Type,
+			ValueType:         c.config.DurationType.ValueType,
+			ElemType:          c.config.DurationType.Type,
+			ElemValueType:     c.config.DurationType.ValueType,
+			ValueCastToType:   c.config.DurationType.CastType,
+			ValueCastFromType: c.config.DurationType.CastType,
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
-		t.CastType = "float64"
+		t.ValueCastFromType = "float64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(p):
 		t = float64Type
-		t.CastType = "float32"
+		t.ValueCastFromType = "float32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_INT64) || gogoproto.IsStdInt64(p):
 		t = int64Type
-		t.CastType = "int64"
+		t.ValueCastFromType = "int64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT64) || gogoproto.IsStdUInt64(p):
 		t = int64Type
-		t.CastType = "uint64"
+		t.ValueCastFromType = "uint64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_INT32) || gogoproto.IsStdInt32(p):
 		t = int64Type
-		t.CastType = "int32"
+		t.ValueCastFromType = "int32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT32) || gogoproto.IsStdUInt32(p):
 		t = int64Type
-		t.CastType = "uint32"
+		t.ValueCastFromType = "uint32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_FIXED64):
 		t = int64Type
-		t.CastType = "uint64"
+		t.ValueCastFromType = "uint64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_FIXED32):
 		t = int64Type
-		t.CastType = "uint32"
+		t.ValueCastFromType = "uint32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED32):
 		t = int64Type
-		t.CastType = "int32"
+		t.ValueCastFromType = "int32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED64):
 		t = int64Type
-		t.CastType = "int64"
+		t.ValueCastFromType = "int64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT32):
 		t = int64Type
-		t.CastType = "int32"
+		t.ValueCastFromType = "int32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
 		t = int64Type
-		t.CastType = "int64"
+		t.ValueCastFromType = "int64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_BOOL) || gogoproto.IsStdBool(p):
 		t = boolType
-		t.CastType = "bool"
+		t.ValueCastFromType = "bool"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_STRING) || gogoproto.IsStdString(p):
 		t = stringType
-		t.CastType = "string"
+		t.ValueCastFromType = "string"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_BYTES) || gogoproto.IsStdBytes(p):
 		t = stringType
-		t.CastType = "[]byte"
+		t.ValueCastFromType = "[]byte"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
 		t = stringType
-		t.CastType = "string"
+		t.ValueCastFromType = "string"
 	case c.field.IsMessage():
 		t = objectType
 		t.IsMessage = true
-		t.CastType = elemType
 	default:
 		return t, trace.Errorf("unknown field type %v", c.GetPath())
 	}
@@ -258,7 +263,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 	t.ElemValueType = c.imports.GoString(t.ElemValueType, false)
 
 	if c.IsCastType() {
-		t.CastType = elemType
+		t.ValueCastFromType = elemType
 	}
 
 	return t, nil
@@ -409,23 +414,16 @@ func (c *FieldBuildContext) GetNullable() bool {
 	return strings.Contains(c.GetGoType(), "*")
 }
 
-// GetTFSchemaTypes returns TFSchemaType overrides
-func (c *FieldBuildContext) GetTFSchemaTypes() (string, string, string) {
+// GetTerraformTypeOverride returns Schema overrides
+func (c *FieldBuildContext) GetTerraformTypeOverride() *SchemaType {
 	v, ok := c.config.SchemaTypes[c.GetPath()]
 	if !ok {
 		v, ok = c.config.SchemaTypes[c.GetNameWithTypeName()]
 	}
 
-	switch {
-	case ok:
-		return v.Type, v.ValueType, v.CastType
-	case c.IsTime() && c.config.TimeType != nil:
-		v := c.config.TimeType
-		return v.Type, v.ValueType, v.CastType
-	case c.IsDuration() && c.config.DurationType != nil:
-		v := c.config.DurationType
-		return v.Type, v.ValueType, v.CastType
+	if ok {
+		return &v
 	}
 
-	return "", "", ""
+	return nil
 }
