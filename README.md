@@ -1,6 +1,6 @@
 # protoc-gen-terraform
 
-protoc plugin to generate Terraform Framework schema definitions from gogo/protobuf .proto file.
+protoc plugin to generate Terraform Framework schema definitions and getter/setter methods from gogo/protobuf .proto files.
 
 # Installation
 
@@ -38,31 +38,30 @@ By default, generated code is assumed to reside in the same package as your go g
 Use `target_package_name` option to change the target package name:
 
 ```
---target_package_name=tfschema
+target_package_name=tfschema
 ```
 
 Please also specify the full name of the go package where your generated code is located:
 
 ```
---default_package_name="github.com/gravitational/teleport/api/types"
+default_package_name="github.com/gravitational/teleport/api/types"
 ```
 
-If your configuration uses types from external packages, please specify them in `external_imports`:
+If you use types from external packages, please specify them in `external_imports`:
 
 ```
---external_imports="github.com/gravitational/teleport/api/wrappers"
+external_imports="github.com/gravitational/teleport/api/wrappers"
 ```
 
-and reference that types in config using full package name (`github.com/gravitational/teleport/api/wrappers.Wrapper`). Generator will handle qualifiers management for you.
+and reference that types anywhere in config using full package name (`github.com/gravitational/teleport/api/wrappers.Wrapper`). Generator will handle the rest for you.
 
 ## Specifying types to export
 
 List message names you want to export in `types` option:
 
 ```
---terraform_out=types=UserV2+RoleV3,pkg=types:tfschema
+types=UserV2+RoleV3
 ```
-
 
 ## Excluding fields
 
@@ -82,20 +81,20 @@ message AuthPreference {
 }
 ```
 
-We specified `exclude_fields` option as following:
+Specify `exclude_fields` option:
 
 ```
---terraform_out=exclude_fields=Metadata.ID+AuthPreference.Metadata.Name
+exclude_fields=Metadata.ID+AuthPreference.Metadata.Name
 ```
 
-In this case, `Metadata.ID` would be omitted for both `User` and `AuthPreference`, and `Metadata.Name` would be omitted for `AuthPreference` only, there would be `User.Metadata.Name` in the generated code.
+In this case, `Metadata.ID` would be omitted for both `User` and `AuthPreference`, and `Metadata.Name` would be omitted for `AuthPreference` only. `User.Metadata.Name` won't be affected.
 
 ## Terraform Schema flags
 
 You can specify `Required: true` (`required_fields`), `Computed: true` (`computed_fields`) and `Sensitive: true` (`sensitive_fields`) flags for your Terraform schema:
 
 ```
---terraform_out=required_fields=Metadata.Name
+required_fields=Metadata.Name
 ```
 
 You also can set list of `Validators` and `PlanModifiers` using configuration file:
@@ -107,14 +106,14 @@ validators:
 
 plan_modifiers:
 	"Role.Options"
-		- "tfsdk.UseStateForUnknown()"
+		- "github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"
 ```
 
 ## Schema field naming
 
 Schema field names are extracted from `json` tag by default. If a `json` tag is missing, a snake case of a field name is used.
 
-If you need to modify schema field name, use `name_overrides` option:
+If you need to rename field in schema, use `name_overrides` option:
 
 ```yaml
 name_overrides:
@@ -173,15 +172,19 @@ func (r resource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, r
 }
 ```
 
-Source object can contain unknown values. Unknown values are treated as nulls: the target object field of an unknown field is set to zero value/nil.
+Source object can contain unknown values. Unknown values are treated as nulls: the corresponding target object field is set to zero value/nil.
 
 Source object must have all target values referenced in `Attrs`, even if they are null or unknown.
 
 ### CopyTo
 
+Copies object to Terraform object.
+
 ```go
 func CopyTestToTerraform(obj Test, tf *types.Object, updateOnly bool) error
 ```
+
+Target Terraform object must have AttrTypes for all fields of Object.
 
 ## Note on gogoproto.customtype
 
@@ -217,11 +220,6 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 
 # TODO
 
-- [ ] Finish tests
-- [ ] Change import function to match the new Framework
 - [ ] Make time format customizable
-- [ ] Check against schema
 - [ ] Ability to overwrite list and maps base types
-- [ ] Check again ability to add custom properties to types
-- [ ] Deal with validators/PlanModifiers packages
-
+- [ ] Check duplicate/unknown imports

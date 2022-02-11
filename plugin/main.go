@@ -163,14 +163,12 @@ func (p *Plugin) addImports() {
 
 // write writes schema and meta to output file
 func (p *Plugin) write(m []*desc.Message, out io.Writer) error {
-	c := gen.NewGeneratorContext(p.Imports)
-
 	for _, message := range m {
 		if !message.IsRoot {
 			continue
 		}
 
-		g := gen.NewMessageSchemaGenerator(message, c)
+		g := gen.NewMessageSchemaGenerator(message, &p.Imports)
 		_, err := out.Write(g.Generate())
 		if err != nil {
 			return trace.Wrap(err)
@@ -182,17 +180,17 @@ func (p *Plugin) write(m []*desc.Message, out io.Writer) error {
 			continue
 		}
 
-		f := gen.NewMessageCopyFromGenerator(message, c)
+		f := gen.NewMessageCopyFromGenerator(message, &p.Imports)
 		_, err := out.Write(f.Generate())
 		if err != nil {
 			return trace.Wrap(err)
 		}
 
-		// t := gen.NewMessageCopyToGenerator(message, c)
-		// _, err = out.Write(t.Generate())
-		// if err != nil {
-		// 	return trace.Wrap(err)
-		// }
+		t := gen.NewMessageCopyToGenerator(message, &p.Imports)
+		_, err = out.Write(t.Generate())
+		if err != nil {
+			return trace.Wrap(err)
+		}
 	}
 
 	return nil
