@@ -93,6 +93,12 @@ func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 			Optional:    true,
 			Type:        types.Float64Type,
 		},
+		"id": {
+			Computed: true,
+			Optional: false,
+			Required: false,
+			Type:     types.StringType,
+		},
 		"int32": {
 			Description: "Int32 int32 field",
 			Optional:    true,

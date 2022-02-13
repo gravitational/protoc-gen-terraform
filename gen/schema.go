@@ -76,7 +76,33 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() Dict {
 		d[Lit(f.NameSnake)] = f.Generate()
 	}
 
+	if len(m.Message.InjectedFields) > 0 {
+		for _, f := range m.Message.InjectedFields {
+			d[Lit(f.Name)] = m.generateInjectedField(f)
+		}
+	}
+
 	return d
+}
+
+// generateInjectedField generates code for injected field
+func (m *MessageSchemaGenerator) generateInjectedField(f desc.InjectedField) Code {
+	d := Dict{
+		Id("Type"):     Id(m.i.GoString(f.Type, false)),
+		Id("Required"): Lit(f.Required),
+		Id("Computed"): Lit(f.Computed),
+		Id("Optional"): Lit(f.Optional),
+	}
+
+	if len(f.Validators) > 0 {
+		d[Id("Validators")] = generateValidators(m.i, f.Validators)
+	}
+
+	if len(f.PlanModifiers) > 0 {
+		d[Id("PlanModifiers")] = generatePlanModifiers(m.i, f.PlanModifiers)
+	}
+
+	return Values(d)
 }
 
 // FieldSchemaGenerator represents the decorator for Field code generation
@@ -121,22 +147,12 @@ func (f *FieldSchemaGenerator) Generate() *Statement {
 
 	// Validators
 	if len(f.Validators) > 0 {
-		v := make([]jen.Code, len(f.Validators))
-		for i, n := range f.Validators {
-			v[i] = Id(f.i.GoString(n, false))
-		}
-
-		d[Id("Validators")] = Index().String().Values(v...)
+		d[Id("Validators")] = generateValidators(f.i, f.Validators)
 	}
 
-	// Validators
+	// Plan modifiers
 	if len(f.PlanModifiers) > 0 {
-		v := make([]jen.Code, len(f.PlanModifiers))
-		for i, n := range f.PlanModifiers {
-			v[i] = Id(f.i.GoString(n, false))
-		}
-
-		d[Id("PlanModifiers")] = Index().Id(f.i.WithPackage(SDK, "AttributePlanModifier")).Values(v...)
+		d[Id("PlanModifiers")] = generatePlanModifiers(f.i, f.PlanModifiers)
 	}
 
 	return Values(d)
@@ -202,4 +218,22 @@ func (f *FieldSchemaGenerator) xNestedAttributes(typ string, m *MessageSchemaGen
 		Map(String()).Id(f.i.WithPackage(SDK, "Attribute")).Values(m.fieldsDictSchema()),
 		options,
 	)
+}
+
+func generatePlanModifiers(imports *desc.Imports, pm []string) Code {
+	v := make([]jen.Code, len(pm))
+	for i, n := range pm {
+		v[i] = Id(imports.GoString(n, false))
+	}
+
+	return Index().Id(imports.WithPackage(SDK, "AttributePlanModifier")).Values(v...)
+}
+
+func generateValidators(imports *desc.Imports, vals []string) Code {
+	v := make([]jen.Code, len(vals))
+	for i, n := range vals {
+		v[i] = Id(imports.GoString(n, false))
+	}
+
+	return Index().String().Values(v...)
 }

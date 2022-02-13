@@ -142,3 +142,13 @@ func (c MessageBuildContext) GetLocationPath(l *descriptor.SourceCodeInfo_Locati
 
 	return strings.Join(s, ",")
 }
+
+// GetInjectedFields returns array of injected fields
+func (c *MessageBuildContext) GetInjectedFields() []InjectedField {
+	v, ok := c.config.InjectedFields[c.GetPath()]
+	if ok {
+		return v
+	}
+
+	return []InjectedField{}
+}

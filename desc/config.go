@@ -37,6 +37,24 @@ type SchemaType struct {
 	CastType string `yaml:"cast_type,omitempty"`
 }
 
+// InjectedField represents custom injected field descriptor
+type InjectedField struct {
+	// Name represents field schema name
+	Name string `yaml:"name,omitempty"`
+	// Type represents field type
+	Type string `yaml:"type,omitempty"`
+	// Required is the required flag
+	Required bool `yaml:"required,omitempty"`
+	// Computed is the computed flag
+	Computed bool `yaml:"computed,omitempty"`
+	// Optional is the optional flag
+	Optional bool `yaml:"optional,omitempty"`
+	// PlanModifiers is the array of PlanModifiers
+	PlanModifiers []string `yaml:"plan_modifiers,omitempty"`
+	// PlanModifiers is the array of Validators
+	Validators []string `yaml:"validators,omitempty"`
+}
+
 // Config represents the plugin config
 type Config struct {
 	// Types is the list of top level types to export. This list must be explicit.
@@ -86,6 +104,8 @@ type Config struct {
 	TimeType *SchemaType `yaml:"time_type,omitempty"`
 	// DurationType represents time.Duration type for the Terraform Framework if set in SchemaTypes
 	DurationType *SchemaType `yaml:"duration_type,omitempty"`
+	// InjectedFields represents array of fields which are missing in object, but must be injected in the schema
+	InjectedFields map[string][]InjectedField `yaml:"injected_fields,omitempty"`
 
 	// TypesRaw types loaded from a yaml file as is
 	TypesRaw []string `yaml:"types,omitempty"`
@@ -276,6 +296,10 @@ func (c *Config) dump() {
 
 	if c.UseStateForUnknownByDefault {
 		log.Printf("StateForUnknown used by default")
+	}
+
+	if len(c.InjectedFields) > 0 {
+		c.logMap("Fields are injected to: %v", c.InjectedFields)
 	}
 }
 
