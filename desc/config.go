@@ -70,7 +70,7 @@ type Config struct {
 	SensitiveFields map[string]struct{} `yaml:"-"`
 	// Suffixes represents map of suffixes for custom types
 	Suffixes map[string]string `yaml:"suffixes,omitempty"`
-	// NameOverrides represents map of CamelCased field names to under_score field names if needs replacement
+	// NameOverrides represents map of CamelCased field names to under_score field names
 	NameOverrides map[string]string `yaml:"name_overrides,omitempty"`
 	// Validators represents the map of validators for a fields
 	Validators map[string][]string `yaml:"validators,omitempty"`

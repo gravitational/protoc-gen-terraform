@@ -38,6 +38,11 @@ func (m *MessageCopyToGenerator) Generate() []byte {
 			Id(m.i.WithPackage(Diag, "Diagnostics")).
 			BlockFunc(func(g *Group) {
 				g.Add(diags)
+				g.Id("tf.Null").Op("=").False()
+				g.Id("tf.Unknown").Op("=").False()
+				g.If(Id("tf.Attrs").Op("==").Nil()).Block(
+					Id("tf.Attrs").Op("=").Make(Map(String()).Id(m.i.WithPackage(Attr, "Value"))),
+				)
 				m.GenerateFields(g)
 				g.Return(Id("diags"))
 			})
@@ -71,7 +76,7 @@ func (f *FieldCopyToGenerator) Generate() *Statement {
 	case desc.Nested:
 		return f.genNested()
 	case desc.PrimitiveList, desc.PrimitiveMap, desc.NestedList, desc.NestedMap:
-		return f.genPrimitiveListOrMap()
+		return f.genListOrMap()
 	case desc.Custom:
 		return f.genCustom()
 	}
@@ -92,39 +97,52 @@ func (f *FieldCopyToGenerator) nextField(v string, g func(g *Group)) *Statement 
 	)
 }
 
+// getAttr v, ok := tf.Attrs["name"]
+func (f *FieldCopyToGenerator) getAttr(v string, typ string, g *Group) {
+	g.List(Id(v), Id("ok")).Op(":=").Id("tf.Attrs").Index(Lit(f.Field.NameSnake)).Assert(Id(typ))
+}
+
 // genPrimitiveBody generates block which reads object field into v
 func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *Group) {
-	g.Var().Id("v").Id(f.Field.ElemValueType)
+	f.getAttr("v", f.Field.ElemValueType, g)
+	g.If(Id("!ok")).Block(
+		Id("v").Op("=").Id(f.Field.ElemValueType).Values(),
+	)
 
 	if f.IsNullable {
 		g.If(Id(fieldName).Op("==").Nil()).Block(
 			Id("v.Null").Op("=").True(),
 		).Else().Block(
 			Id("v.Value").Op("=").Id(f.GoElemTypeIndirect).Parens(Op("*").Add(Id(fieldName))),
-			Id("v.Null").Op("=").False(),
 		)
 	} else {
 		// Non-nullable fields always have value
 		g.Id("v.Value").Op("=").Id(f.ValueCastToType).Parens(Id(fieldName))
-		g.Id("v.Null").Op("=").False()
 	}
+
 	g.Id("v.Unknown").Op("=").False()
 }
 
 // genNestedBody generates block which reads message into v
-func (f *FieldCopyToGenerator) genNestedBody(m *MessageCopyToGenerator, fieldName string, g *Group) {
+func (f *FieldCopyToGenerator) genNestedBody(m *MessageCopyToGenerator, fieldName string, typ string, g *Group) {
 	copyObj := func(g *Group) {
 		g.Id("obj").Op(":=").Id(fieldName)
 		g.Id("tf").Op(":=").Id("&v")
 		m.GenerateFields(g)
 	}
 
-	// v := types.Object{Attrs: make(map[string]attr.Value, len(o.AttrTypes)), AttrTypes: o.AttrTypes}
-	g.Id("v").Op(":=").Id(f.Field.ElemValueType).Block(Dict{
-		Id("Attrs"):     Make(Map(String()).Id(f.i.WithPackage(Attr, "Value")), Len(Id("o.AttrTypes"))),
-		Id("AttrTypes"): Id("o.AttrTypes"),
-	})
-
+	f.getAttr("v", f.Field.ElemValueType, g)
+	g.If(Id("!ok")).Block(
+		// v := types.Object{Attrs: make(map[string]attr.Value, len(o.AttrTypes)), AttrTypes: o.AttrTypes}
+		Id("v").Op("=").Id(typ).Block(Dict{
+			Id("Attrs"):     Make(Map(String()).Id(f.i.WithPackage(Attr, "Value")), Len(Id("o.AttrTypes"))),
+			Id("AttrTypes"): Id("o.AttrTypes"),
+		}),
+	).Else().Block(
+		If(Id("v.Attrs").Op("==").Nil()).Block(
+			Id("v.Attrs").Op("=").Make(Map(String()).Id(f.i.WithPackage(Attr, "Value")), Len(Id("tf.AttrTypes"))),
+		),
+	)
 	if f.IsNullable {
 		// if obj.Nested == nil
 		g.If(Id(fieldName).Op("==").Nil()).Block(
@@ -133,8 +151,9 @@ func (f *FieldCopyToGenerator) genNestedBody(m *MessageCopyToGenerator, fieldNam
 			copyObj,
 		)
 	} else {
-		copyObj(g)
+		g.BlockFunc(copyObj)
 	}
+	g.Id("v.Unknown").Op("=").False()
 }
 
 // assertTo asserts a to typ
@@ -173,39 +192,15 @@ func (f *FieldCopyToGenerator) genNested() *Statement {
 	m := NewMessageCopyToGenerator(f.Message, f.i)
 	fieldName := "obj." + f.Name
 
-	copyObj := func(g *Group) {
-		g.BlockFunc(func(g *Group) {
-			g.Id("obj").Op(":=").Id(fieldName)
-			g.Id("tf").Op(":=").Id("&v")
-			m.GenerateFields(g)
-		})
-	}
-
 	return f.nextField("a", func(g *Group) {
 		f.assertTo(f.Field.ElemType, g, func(g *Group) {
-			// v := types.Object{Attrs: make(map[string]attr.Value, len(o.AttrTypes)), AttrTypes: o.AttrTypes}
-			g.Id("v").Op(":=").Id(f.Field.ValueType).Block(Dict{
-				Id("Attrs"):     Make(Map(String()).Id(f.i.WithPackage(Attr, "Value")), Len(Id("o.AttrTypes"))),
-				Id("AttrTypes"): Id("o.AttrTypes"),
-			})
-
-			if f.IsNullable {
-				// if obj.Nested == nil
-				g.If(Id(fieldName).Op("==").Nil()).Block(
-					Id("v.Null").Op("=").True(),
-				).Else().BlockFunc(
-					copyObj,
-				)
-			} else {
-				copyObj(g)
-			}
-
+			f.genNestedBody(m, fieldName, f.Field.ValueType, g)
 			g.Id("tf.Attrs").Index(Lit(f.NameSnake)).Op("=").Id("v")
 		})
 	})
 }
 
-func (f *FieldCopyToGenerator) genPrimitiveListOrMap() *Statement {
+func (f *FieldCopyToGenerator) genListOrMap() *Statement {
 	fieldName := "obj." + f.Name
 
 	var mk Code
@@ -221,15 +216,21 @@ func (f *FieldCopyToGenerator) genPrimitiveListOrMap() *Statement {
 
 	return f.nextField("a", func(g *Group) {
 		f.assertTo(f.Field.Type, g, func(g *Group) {
-			// v := types.Object{Elems: make([]attr.Value, ElemType: o.ElemType}
-			g.Id("c").Op(":=").Id(f.Field.ValueType).Block(Dict{
-				Id("Elems"):    mk,
-				Id("ElemType"): Id("o.ElemType"),
-			})
+			f.getAttr("c", f.Field.ValueType, g)
 
-			g.If(Id(fieldName)).Op("==").Nil().Block(
-				Id("c.Null").Op("=").True(),
-			).Else().BlockFunc(func(g *Group) {
+			g.If(Id("!ok")).Block(
+				// c := types.Object{Elems: make([]attr.Value, ElemType: o.ElemType}
+				Id("c").Op("=").Id(f.Field.ValueType).Block(Dict{
+					Id("Elems"):    mk,
+					Id("ElemType"): Id("o.ElemType"),
+				}),
+			).Else().Block(
+				If(Id("c.Elems").Op("==").Nil()).Block(
+					Id("c.Elems").Op("=").Add(mk),
+				),
+			)
+
+			g.If(Id(fieldName)).Op("!=").Nil().BlockFunc(func(g *Group) {
 				if (f.Kind != desc.PrimitiveList) && (f.Kind != desc.PrimitiveMap) {
 					g.Id("o").Op(":=").Id("o.ElemType").Assert(Id(f.ElemType))
 				}
@@ -239,12 +240,13 @@ func (f *FieldCopyToGenerator) genPrimitiveListOrMap() *Statement {
 						f.genPrimitiveBody("a", g)
 					} else {
 						m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
-						f.genNestedBody(m, "a", g)
+						f.genNestedBody(m, "a", f.Field.ElemValueType, g)
 					}
 					g.Id("c.Elems").Index(Id("k")).Op("=").Id("v")
 				})
 			})
 
+			g.Id("c.Unknown").Op("=").False()
 			g.Id("tf.Attrs").Index(Lit(f.NameSnake)).Op("=").Id("c")
 		})
 	})
