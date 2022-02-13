@@ -39,6 +39,8 @@ type Message struct {
 	NamePath string
 	// IsRoot indicates that the message is root in a file
 	IsRoot bool
+	// InjectedFields represents array of fields which must be injected to this message
+	InjectedFields []InjectedField
 }
 
 // BuildMessage builds Message from its protobuf descriptor.
@@ -71,12 +73,13 @@ func BuildMessage(plugin Plugin, desc *generator.Descriptor, isRoot bool, path s
 	}
 
 	message := &Message{
-		NamePath: c.GetNamePath(),
-		Name:     c.GetName(),
-		GoType:   c.GetGoType(),
-		Path:     c.GetPath(),
-		Fields:   fields,
-		IsRoot:   isRoot,
+		NamePath:       c.GetNamePath(),
+		Name:           c.GetName(),
+		GoType:         c.GetGoType(),
+		Path:           c.GetPath(),
+		Fields:         fields,
+		IsRoot:         isRoot,
+		InjectedFields: c.GetInjectedFields(),
 	}
 
 	message.RawComment, message.Comment = c.GetComment()

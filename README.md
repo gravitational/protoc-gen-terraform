@@ -119,6 +119,19 @@ use_state_for_unknown_by_default: true
 
 will add `tfsdk.UseStateForUnknown()` PlanModifier to all computed fields.
 
+## Inhjecting fields into schema
+
+There are cases when you need to add fields not existing in the object to schema. For example, artificial id field is required for Terraform acceptance tests to work. You can achieve it using `injected_fields` option:
+
+```yaml
+injected_fields:
+  Test: # Path to inject
+    -
+      name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+```
+
 ## Schema field naming
 
 Schema field names are extracted from `json` tag by default. If a `json` tag is missing, a snake case of a field name is used.
