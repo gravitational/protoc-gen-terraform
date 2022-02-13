@@ -55,8 +55,8 @@ message Test {
     // Bool bool field
     bool Bool = 6;
 
-    // Bytes byte[] field
-    bytes Bytes = 7;
+    // bytes byte[] field
+    bytes bytes = 7; // Names starting from a lower case letter are autoconverted to UpperCamelCase
 
     // Timestamp time.Time field
     google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];

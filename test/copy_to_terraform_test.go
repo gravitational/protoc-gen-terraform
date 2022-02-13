@@ -126,7 +126,7 @@ func TestCopyToList(t *testing.T) {
 	}, o.Attrs["string_list"].(types.List).Elems)
 
 	require.Equal(t, types.List{
-		Null:     true,
+		Null:     false,
 		Unknown:  false,
 		Elems:    make([]attr.Value, 0),
 		ElemType: types.StringType,

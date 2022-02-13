@@ -150,7 +150,11 @@ func (c *FieldBuildContext) GetNameWithTypeName() string {
 
 // GetName returns field name
 func (c *FieldBuildContext) GetName() string {
-	return c.field.GetName()
+	name := c.field.GetName()
+	if name[0:1] == strings.ToLower(name[0:1]) {
+		return strcase.UpperCamelCase(name)
+	}
+	return name
 }
 
 // GetPath returns a field path

@@ -105,7 +105,7 @@ validators:
 		- rfc3339TimeValidator
 
 plan_modifiers:
-	"Role.Options"
+	"Role.Options":
 		- "github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"
 ```
 
@@ -141,6 +141,8 @@ time_type:
 
 ### CopyFrom
 
+Copies Terraform data to an object.
+
 The signatures for `Test` resource would be the following:
 
 ```go
@@ -172,9 +174,11 @@ func (r resource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, r
 }
 ```
 
-Source object can contain unknown values. Unknown values are treated as nulls: the corresponding target object field is set to zero value/nil.
+The following rules apply:
+1. Source Terraform object must contain values for all target object fields.
+2. Unknown values are treated as nulls. Target object value would be set to either nil or zero value.
 
-Source object must have all target values referenced in `Attrs`, even if they are null or unknown.
+So, the source Terraform object might be Plan, State or Object.
 
 ### CopyTo
 
@@ -185,6 +189,10 @@ func CopyTestToTerraform(obj Test, tf *types.Object, updateOnly bool) error
 ```
 
 Target Terraform object must have AttrTypes for all fields of Object.
+
+The following rules apply:
+1. All attributes are marked as known.
+2. In case an attribute is present in AttrTypes, but is missing in AttrValues, it is created.
 
 ## Note on gogoproto.customtype
 
@@ -222,4 +230,3 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 
 - [ ] Make time format customizable
 - [ ] Ability to overwrite list and maps base types
-- [ ] Check duplicate/unknown imports
