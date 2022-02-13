@@ -80,6 +80,8 @@ type Config struct {
 	SchemaTypes map[string]SchemaType `yaml:"schema_types,omitempty"`
 	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
 	Sort bool `yaml:"sort,omitempty"`
+	// UseStateForUnknownByDefault represents flag, if true - appends UseStateForUnknown to all computed fields
+	UseStateForUnknownByDefault bool `yaml:"use_state_for_unknown_by_default,omitempty"`
 	// TimeType represents time.Time type for the Terraform Framework if set in SchemaTypes
 	TimeType *SchemaType `yaml:"time_type,omitempty"`
 	// DurationType represents time.Duration type for the Terraform Framework if set in SchemaTypes
@@ -270,6 +272,10 @@ func (c *Config) dump() {
 
 	if c.Sort {
 		log.Printf("Sorting is enabled")
+	}
+
+	if c.UseStateForUnknownByDefault {
+		log.Printf("StateForUnknown used by default")
 	}
 }
 
