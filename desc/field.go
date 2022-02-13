@@ -170,7 +170,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		Name:          c.GetName(),
 		NameSnake:     c.GetNameSnake(),
 		IsRequired:    c.GetFlagValue(c.config.RequiredFields),
-		IsComputed:    c.GetFlagValue(c.config.ComputedFields),
+		IsComputed:    c.IsComputed(),
 		IsSensitive:   c.GetFlagValue(c.config.SensitiveFields),
 		IsRepeated:    c.IsRepeated(),
 		IsMap:         c.IsMap(),

@@ -106,8 +106,18 @@ validators:
 
 plan_modifiers:
 	"Role.Options":
-		- "github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"
+		- "github.com/hashicorp/terraform-plugin-framework/tfsdk.RequiresReplace()"
 ```
+
+## UseStateForUnknown by default
+
+The following setting:
+
+```
+use_state_for_unknown_by_default: true
+```
+
+will add `tfsdk.UseStateForUnknown()` PlanModifier to all computed fields.
 
 ## Schema field naming
 

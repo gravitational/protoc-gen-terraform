@@ -383,6 +383,11 @@ func (c *FieldBuildContext) GetFlagValue(f map[string]struct{}) bool {
 	return ok1 || ok2
 }
 
+// IsComputed returns true if a field is computed
+func (c *FieldBuildContext) IsComputed() bool {
+	return c.GetFlagValue(c.config.ComputedFields)
+}
+
 // GetValidators returns field validators
 func (c *FieldBuildContext) GetValidators() []string {
 	v, ok := c.config.Validators[c.GetPath()]
@@ -406,6 +411,10 @@ func (c *FieldBuildContext) GetPlanModifiers() []string {
 
 	if ok {
 		return v
+	}
+
+	if c.config.UseStateForUnknownByDefault && c.IsComputed() {
+		return []string{"github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"}
 	}
 
 	return []string{}
