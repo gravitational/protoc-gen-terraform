@@ -17,7 +17,7 @@ limitations under the License.
 package test
 
 import (
-	fmt "fmt"
+	"context"
 	"testing"
 	time "time"
 
@@ -28,8 +28,7 @@ func TestCopyFromPrimitives(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	fmt.Printf("%+v", CopyTestFromTerraform(obj, &target))
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, "Test", target.Str)
 	require.Equal(t, int32(98), target.Int32)
@@ -44,7 +43,7 @@ func TestTestCopyFromTime(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{TimestampNullableWithNilValue: &timestamp}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, timestamp, target.Timestamp)
 	require.Equal(t, timestamp, *target.TimestampNullable)
@@ -58,7 +57,7 @@ func TestCopyFromNested(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{NestedNullableWithNilValue: &Nested{}}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, "Test", target.Nested.Str)
 	require.Equal(t, "Test", target.NestedNullable.Str)
@@ -70,7 +69,7 @@ func TestCopyFromList(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, []string{"el1", "el2"}, target.StringList)
 	require.Empty(t, target.StringListEmpty)
@@ -83,7 +82,7 @@ func TestCopyFromNestedList(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Len(t, target.NestedList, 1)
 	require.Equal(t, "Test", target.NestedList[0].Str)
@@ -100,7 +99,7 @@ func TestCopyFromMap(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, map[string]string{"key1": "Value1", "key2": "Value2"}, target.Map)
 	require.Equal(t, map[string]string{"key1": "Value1", "key2": "Value2"}, target.Nested.Map)
@@ -111,7 +110,7 @@ func TestCopyFromNestedMap(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, "Test1", target.MapObject["key1"].Str)
 	require.Equal(t, "Test2", target.MapObject["key2"].Str)
@@ -123,7 +122,7 @@ func TestCopyFromCustom(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(obj, &target).HasError())
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, []BoolCustom{true, false, true}, target.BoolCustomList)
 }

@@ -19,17 +19,18 @@ limitations under the License.
 package test
 
 import (
-	"context"
+	context "context"
 	fmt "fmt"
 	math "math"
 	time "time"
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	attr "github.com/hashicorp/terraform-plugin-framework/attr"
-	diag "github.com/hashicorp/terraform-plugin-framework/diag"
-	tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	types "github.com/hashicorp/terraform-plugin-framework/types"
+	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
+	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
+	github_com_hashicorp_terraform_plugin_go_tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -40,28 +41,28 @@ var _ = math.Inf
 var _ = time.Kitchen
 
 // GenSchemaTest returns tfsdk.Schema definition for Test
-func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{Attributes: map[string]tfsdk.Attribute{
+func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"bool": {
 			Description: "Bool bool field",
 			Optional:    true,
-			Type:        types.BoolType,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
 		"bool_custom_list": GenSchemaBoolCustom(ctx),
 		"bytes": {
 			Description: "bytes byte[] field",
 			Optional:    true,
-			Type:        types.StringType,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"bytes_list": {
 			Description: "BytesList [][]byte field",
 			Optional:    true,
-			Type:        types.ListType{ElemType: types.StringType},
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"double": {
 			Description: "Double double field",
 			Optional:    true,
-			Type:        types.Float64Type,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 		},
 		"duration_custom": {
 			Description: "DurationCustom time.Duration field (with casttype)",
@@ -71,7 +72,7 @@ func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 		"duration_custom_list": {
 			Description: "DurationCustomList []time.Duration field",
 			Optional:    true,
-			Type:        types.ListType{ElemType: DurationType{}},
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
 		},
 		"duration_custom_missing": {
 			Description: "DurationCustomMissing time.Duration field (with casttype) missing in input data",
@@ -91,262 +92,262 @@ func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 		"float": {
 			Description: "Float float field",
 			Optional:    true,
-			Type:        types.Float64Type,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 		},
 		"id": {
 			Computed: true,
 			Optional: false,
 			Required: false,
-			Type:     types.StringType,
+			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"int32": {
 			Description: "Int32 int32 field",
 			Optional:    true,
-			Type:        types.Int64Type,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
 		"int64": {
 			Description: "Int64 int64 field",
 			Optional:    true,
-			Type:        types.Int64Type,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
 		"map": {
 			Description: "Map normal map",
 			Optional:    true,
-			Type:        types.MapType{ElemType: types.StringType},
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"map_object": {
-			Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}, tfsdk.MapNestedAttributesOptions{}),
+			}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 			Description: "MapObject is the object map",
 			Optional:    true,
 		},
 		"map_object_nullable": {
-			Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}, tfsdk.MapNestedAttributesOptions{}),
+			}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 			Description: "MapObjectNullable is the object map with nullable values",
 			Optional:    true,
 		},
 		"nested": {
-			Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
 			Description: "Nested nested message field, non-nullable",
 			Optional:    true,
 		},
 		"nested_list": {
-			Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}, tfsdk.ListNestedAttributesOptions{}),
+			}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 			Description: "NestedList nested message array",
 			Optional:    true,
 		},
 		"nested_list_nullable": {
-			Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}, tfsdk.ListNestedAttributesOptions{}),
+			}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 			Description: "NestedListNullable nested message array",
 			Optional:    true,
 		},
 		"nested_nullable": {
-			Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
 			Description: "NestedNullable nested message field, nullabel",
 			Optional:    true,
 		},
 		"nested_nullable_with_nil_value": {
-			Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"map": {
 					Description: "Nested map repeated nested messages",
 					Optional:    true,
-					Type:        types.MapType{ElemType: types.StringType},
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"map_object_nested": {
-					Attributes: tfsdk.MapNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.MapNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributesOptions{}),
 					Description: "MapObjectNested nested object map",
 					Optional:    true,
 				},
 				"nested_list": {
-					Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{"str": {
+					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 						Description: "Str string field",
 						Optional:    true,
-						Type:        types.StringType,
-					}}, tfsdk.ListNestedAttributesOptions{}),
+						Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					}}, github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributesOptions{}),
 					Description: "Nested repeated nested messages",
 					Optional:    true,
 				},
 				"str": {
 					Description: "Str string field",
 					Optional:    true,
-					Type:        types.StringType,
+					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
 			Description: "NestedNullableWithNilValue nested message field, with no value set",
@@ -355,18 +356,18 @@ func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 		"str": {
 			Description:   "Str string field",
 			Optional:      true,
-			PlanModifiers: []tfsdk.AttributePlanModifier{tfsdk.UseStateForUnknown()},
-			Type:          types.StringType,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"string_list": {
 			Description: "StringList []string field",
 			Optional:    true,
-			Type:        types.ListType{ElemType: types.StringType},
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"string_list_empty": {
 			Description: "StringListEmpty []string field",
 			Optional:    true,
-			Type:        types.ListType{ElemType: types.StringType},
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"timestamp": {
 			Description: "Timestamp time.Time field",
@@ -376,7 +377,7 @@ func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 		"timestamp_list": {
 			Description: "TimestampList []time.Time field",
 			Optional:    true,
-			Type:        types.ListType{ElemType: TimeType{}},
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: TimeType{}},
 		},
 		"timestamp_missing": {
 			Description: "Timestamp time.Time field",
@@ -397,16 +398,16 @@ func GenSchemaTest(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 }
 
 // CopyTestFromTerraform copies contents of the source Terraform object into a target struct
-func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
-	var diags diag.Diagnostics
+func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *Test) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
 		a, ok := tf.Attrs["str"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Str is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Str"})
 		} else {
-			v, ok := a.(types.String)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Str can not be converted to types.String")
+				diags.Append(attrReadConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
 				if !v.Null && !v.Unknown {
@@ -419,11 +420,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["int32"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Int32 is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Int32"})
 		} else {
-			v, ok := a.(types.Int64)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Int32 can not be converted to types.Int64")
+				diags.Append(attrReadConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
 				var t int32
 				if !v.Null && !v.Unknown {
@@ -436,11 +437,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["int64"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Int64 is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Int64"})
 		} else {
-			v, ok := a.(types.Int64)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Int64 can not be converted to types.Int64")
+				diags.Append(attrReadConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
 				var t int64
 				if !v.Null && !v.Unknown {
@@ -453,11 +454,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["float"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Float is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Float"})
 		} else {
-			v, ok := a.(types.Float64)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Float can not be converted to types.Float64")
+				diags.Append(attrReadConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 			} else {
 				var t float32
 				if !v.Null && !v.Unknown {
@@ -470,11 +471,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["double"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Double is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Double"})
 		} else {
-			v, ok := a.(types.Float64)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Double can not be converted to types.Float64")
+				diags.Append(attrReadConversionFailureDiag{"Test.Double", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 			} else {
 				var t float64
 				if !v.Null && !v.Unknown {
@@ -487,11 +488,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["bool"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Bool is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Bool"})
 		} else {
-			v, ok := a.(types.Bool)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Bool can not be converted to types.Bool")
+				diags.Append(attrReadConversionFailureDiag{"Test.Bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 			} else {
 				var t bool
 				if !v.Null && !v.Unknown {
@@ -504,11 +505,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["bytes"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.bytes is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.bytes"})
 		} else {
-			v, ok := a.(types.String)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.bytes can not be converted to types.String")
+				diags.Append(attrReadConversionFailureDiag{"Test.bytes", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t []byte
 				if !v.Null && !v.Unknown {
@@ -521,11 +522,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["timestamp"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Timestamp is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Timestamp"})
 		} else {
 			v, ok := a.(TimeValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Timestamp can not be converted to TimeValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.Timestamp", "TimeValue"})
 			} else {
 				var t time.Time
 				if !v.Null && !v.Unknown {
@@ -538,11 +539,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["timestamp_missing"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.TimestampMissing is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.TimestampMissing"})
 		} else {
 			v, ok := a.(TimeValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.TimestampMissing can not be converted to TimeValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
 			} else {
 				var t time.Time
 				if !v.Null && !v.Unknown {
@@ -555,11 +556,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["timestamp_nullable"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.TimestampNullable is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.TimestampNullable"})
 		} else {
 			v, ok := a.(TimeValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.TimestampNullable can not be converted to TimeValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
 			} else {
 				var t *time.Time
 				if !v.Null && !v.Unknown {
@@ -573,11 +574,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["timestamp_nullable_with_nil_value"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.TimestampNullableWithNilValue is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.TimestampNullableWithNilValue"})
 		} else {
 			v, ok := a.(TimeValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.TimestampNullableWithNilValue can not be converted to TimeValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
 			} else {
 				var t *time.Time
 				if !v.Null && !v.Unknown {
@@ -591,11 +592,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["duration_standard"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.DurationStandard is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.DurationStandard"})
 		} else {
 			v, ok := a.(DurationValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.DurationStandard can not be converted to DurationValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationStandard", "DurationValue"})
 			} else {
 				var t time.Duration
 				if !v.Null && !v.Unknown {
@@ -608,11 +609,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["duration_standard_missing"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.DurationStandardMissing is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.DurationStandardMissing"})
 		} else {
 			v, ok := a.(DurationValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.DurationStandardMissing can not be converted to DurationValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationStandardMissing", "DurationValue"})
 			} else {
 				var t time.Duration
 				if !v.Null && !v.Unknown {
@@ -625,11 +626,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["duration_custom"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.DurationCustom is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.DurationCustom"})
 		} else {
 			v, ok := a.(DurationValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.DurationCustom can not be converted to DurationValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
 			} else {
 				var t Duration
 				if !v.Null && !v.Unknown {
@@ -642,11 +643,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["duration_custom_missing"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.DurationCustomMissing is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.DurationCustomMissing"})
 		} else {
 			v, ok := a.(DurationValue)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.DurationCustomMissing can not be converted to DurationValue")
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
 			} else {
 				var t Duration
 				if !v.Null && !v.Unknown {
@@ -659,18 +660,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["string_list"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.StringList is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.StringList"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.StringList can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.StringList = make([]string, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.String)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.StringList can not be converted to types.String")
+							diags.Append(attrReadConversionFailureDiag{"Test.StringList", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 						} else {
 							var t string
 							if !v.Null && !v.Unknown {
@@ -686,18 +687,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["string_list_empty"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.StringListEmpty is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.StringListEmpty"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.StringListEmpty can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.StringListEmpty = make([]string, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.String)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.StringListEmpty can not be converted to types.String")
+							diags.Append(attrReadConversionFailureDiag{"Test.StringListEmpty", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 						} else {
 							var t string
 							if !v.Null && !v.Unknown {
@@ -713,25 +714,25 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["bool_custom_list"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.BoolCustomList is missing in Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.BoolCustomList"})
 		}
 		CopyFromBoolCustom(diags, a, &obj.BoolCustomList)
 	}
 	{
 		a, ok := tf.Attrs["bytes_list"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.BytesList is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.BytesList"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.BytesList can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.BytesList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.BytesList = make([][]byte, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.String)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.BytesList can not be converted to types.String")
+							diags.Append(attrReadConversionFailureDiag{"Test.BytesList", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 						} else {
 							var t []byte
 							if !v.Null && !v.Unknown {
@@ -747,18 +748,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["timestamp_list"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.TimestampList is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.TimestampList"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.TimestampList can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.TimestampList = make([]*time.Time, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
 						v, ok := a.(TimeValue)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.TimestampList can not be converted to TimeValue")
+							diags.Append(attrReadConversionFailureDiag{"Test.TimestampList", "TimeValue"})
 						} else {
 							var t *time.Time
 							if !v.Null && !v.Unknown {
@@ -775,18 +776,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["duration_custom_list"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.DurationCustomList is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.DurationCustomList"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.DurationCustomList can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.DurationCustomList = make([]Duration, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
 						v, ok := a.(DurationValue)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.DurationCustomList can not be converted to DurationValue")
+							diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomList", "DurationValue"})
 						} else {
 							var t Duration
 							if !v.Null && !v.Unknown {
@@ -802,11 +803,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["nested"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Nested is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Nested"})
 		} else {
-			v, ok := a.(types.Object)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Nested can not be converted to types.Object")
+				diags.Append(attrReadConversionFailureDiag{"Test.Nested", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				obj.Nested = Nested{}
 				if !v.Null && !v.Unknown {
@@ -815,11 +816,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["str"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.Nested.Str is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.Nested.Str"})
 						} else {
-							v, ok := a.(types.String)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.Nested.Str can not be converted to types.String")
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							} else {
 								var t string
 								if !v.Null && !v.Unknown {
@@ -832,18 +833,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["nested_list"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.Nested.NestedList is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.Nested.NestedList"})
 						} else {
-							v, ok := a.(types.List)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.Nested.NestedList can not be converted to types.List")
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
 								obj.NestedList = make([]*OtherNested, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.Object)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.Nested.NestedList can not be converted to types.Object")
+											diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 										} else {
 											var t *OtherNested
 											if !v.Null && !v.Unknown {
@@ -853,11 +854,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 												{
 													a, ok := tf.Attrs["str"]
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "A value for Test.Nested.NestedList.Str is missing in the source Terraform object Attrs")
+														diags.Append(attrReadMissingDiag{"Test.Nested.NestedList.Str"})
 													} else {
-														v, ok := a.(types.String)
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 														if !ok {
-															diags.AddError("Error reading value from Terraform", "A value for Test.Nested.NestedList.Str can not be converted to types.String")
+															diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														} else {
 															var t string
 															if !v.Null && !v.Unknown {
@@ -878,18 +879,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["map"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.Nested.Map is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.Nested.Map"})
 						} else {
-							v, ok := a.(types.Map)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.Nested.Map can not be converted to types.Map")
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 							} else {
 								obj.Map = make(map[string]string, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.Nested.Map can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.Nested.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -905,18 +906,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["map_object_nested"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.Nested.MapObjectNested is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.Nested.MapObjectNested"})
 						} else {
-							v, ok := a.(types.Map)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.Nested.MapObjectNested can not be converted to types.Map")
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 							} else {
 								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.Object)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.Nested.MapObjectNested can not be converted to types.Object")
+											diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 										} else {
 											var t OtherNested
 											if !v.Null && !v.Unknown {
@@ -925,11 +926,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 												{
 													a, ok := tf.Attrs["str"]
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "A value for Test.Nested.MapObjectNested.Str is missing in the source Terraform object Attrs")
+														diags.Append(attrReadMissingDiag{"Test.Nested.MapObjectNested.Str"})
 													} else {
-														v, ok := a.(types.String)
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 														if !ok {
-															diags.AddError("Error reading value from Terraform", "A value for Test.Nested.MapObjectNested.Str can not be converted to types.String")
+															diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														} else {
 															var t string
 															if !v.Null && !v.Unknown {
@@ -954,11 +955,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["nested_nullable"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.NestedNullable"})
 		} else {
-			v, ok := a.(types.Object)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable can not be converted to types.Object")
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				obj.NestedNullable = nil
 				if !v.Null && !v.Unknown {
@@ -968,11 +969,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["str"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.Str is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.Str"})
 						} else {
-							v, ok := a.(types.String)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.Str can not be converted to types.String")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							} else {
 								var t string
 								if !v.Null && !v.Unknown {
@@ -985,18 +986,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["nested_list"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.NestedList is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.NestedList"})
 						} else {
-							v, ok := a.(types.List)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.NestedList can not be converted to types.List")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
 								obj.NestedList = make([]*OtherNested, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.Object)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.NestedNullable.NestedList can not be converted to types.Object")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 										} else {
 											var t *OtherNested
 											if !v.Null && !v.Unknown {
@@ -1006,11 +1007,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 												{
 													a, ok := tf.Attrs["str"]
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.NestedList.Str is missing in the source Terraform object Attrs")
+														diags.Append(attrReadMissingDiag{"Test.NestedNullable.NestedList.Str"})
 													} else {
-														v, ok := a.(types.String)
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 														if !ok {
-															diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.NestedList.Str can not be converted to types.String")
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														} else {
 															var t string
 															if !v.Null && !v.Unknown {
@@ -1031,18 +1032,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["map"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.Map is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.Map"})
 						} else {
-							v, ok := a.(types.Map)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.Map can not be converted to types.Map")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 							} else {
 								obj.Map = make(map[string]string, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.NestedNullable.Map can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -1058,18 +1059,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["map_object_nested"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.MapObjectNested is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.MapObjectNested"})
 						} else {
-							v, ok := a.(types.Map)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.MapObjectNested can not be converted to types.Map")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 							} else {
 								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.Object)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.NestedNullable.MapObjectNested can not be converted to types.Object")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 										} else {
 											var t OtherNested
 											if !v.Null && !v.Unknown {
@@ -1078,11 +1079,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 												{
 													a, ok := tf.Attrs["str"]
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.MapObjectNested.Str is missing in the source Terraform object Attrs")
+														diags.Append(attrReadMissingDiag{"Test.NestedNullable.MapObjectNested.Str"})
 													} else {
-														v, ok := a.(types.String)
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 														if !ok {
-															diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullable.MapObjectNested.Str can not be converted to types.String")
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														} else {
 															var t string
 															if !v.Null && !v.Unknown {
@@ -1107,11 +1108,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["nested_nullable_with_nil_value"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue"})
 		} else {
-			v, ok := a.(types.Object)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue can not be converted to types.Object")
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				obj.NestedNullableWithNilValue = nil
 				if !v.Null && !v.Unknown {
@@ -1121,11 +1122,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["str"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.Str is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.Str"})
 						} else {
-							v, ok := a.(types.String)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.Str can not be converted to types.String")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							} else {
 								var t string
 								if !v.Null && !v.Unknown {
@@ -1138,18 +1139,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["nested_list"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.NestedList is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.NestedList"})
 						} else {
-							v, ok := a.(types.List)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.NestedList can not be converted to types.List")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
 								obj.NestedList = make([]*OtherNested, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.Object)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.NestedNullableWithNilValue.NestedList can not be converted to types.Object")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 										} else {
 											var t *OtherNested
 											if !v.Null && !v.Unknown {
@@ -1159,11 +1160,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 												{
 													a, ok := tf.Attrs["str"]
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.NestedList.Str is missing in the source Terraform object Attrs")
+														diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.NestedList.Str"})
 													} else {
-														v, ok := a.(types.String)
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 														if !ok {
-															diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.NestedList.Str can not be converted to types.String")
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														} else {
 															var t string
 															if !v.Null && !v.Unknown {
@@ -1184,18 +1185,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["map"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.Map is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.Map"})
 						} else {
-							v, ok := a.(types.Map)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.Map can not be converted to types.Map")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 							} else {
 								obj.Map = make(map[string]string, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.NestedNullableWithNilValue.Map can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -1211,18 +1212,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 					{
 						a, ok := tf.Attrs["map_object_nested"]
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.MapObjectNested is missing in the source Terraform object Attrs")
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested"})
 						} else {
-							v, ok := a.(types.Map)
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 							if !ok {
-								diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.MapObjectNested can not be converted to types.Map")
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 							} else {
 								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 								if !v.Null && !v.Unknown {
 									for k, a := range v.Elems {
-										v, ok := a.(types.Object)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "An element value for Test.NestedNullableWithNilValue.MapObjectNested can not be converted to types.Object")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 										} else {
 											var t OtherNested
 											if !v.Null && !v.Unknown {
@@ -1231,11 +1232,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 												{
 													a, ok := tf.Attrs["str"]
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.MapObjectNested.Str is missing in the source Terraform object Attrs")
+														diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str"})
 													} else {
-														v, ok := a.(types.String)
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 														if !ok {
-															diags.AddError("Error reading value from Terraform", "A value for Test.NestedNullableWithNilValue.MapObjectNested.Str can not be converted to types.String")
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														} else {
 															var t string
 															if !v.Null && !v.Unknown {
@@ -1260,18 +1261,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["nested_list"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.NestedList is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.NestedList"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.NestedList can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.NestedList = make([]Nested, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.Object)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.NestedList can not be converted to types.Object")
+							diags.Append(attrReadConversionFailureDiag{"Test.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 						} else {
 							var t Nested
 							if !v.Null && !v.Unknown {
@@ -1280,11 +1281,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["str"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.Str is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedList.Str"})
 									} else {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.Str can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -1297,18 +1298,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["nested_list"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.NestedList is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedList.NestedList"})
 									} else {
-										v, ok := a.(types.List)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.NestedList can not be converted to types.List")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 										} else {
 											obj.NestedList = make([]*OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.NestedList.NestedList can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t *OtherNested
 														if !v.Null && !v.Unknown {
@@ -1318,11 +1319,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.NestedList.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.NestedList.NestedList.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.NestedList.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1343,18 +1344,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.Map is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedList.Map"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.Map can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.Map = make(map[string]string, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.String)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.NestedList.Map can not be converted to types.String")
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 													} else {
 														var t string
 														if !v.Null && !v.Unknown {
@@ -1370,18 +1371,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map_object_nested"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.MapObjectNested is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedList.MapObjectNested"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.MapObjectNested can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.NestedList.MapObjectNested can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t OtherNested
 														if !v.Null && !v.Unknown {
@@ -1390,11 +1391,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.MapObjectNested.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.NestedList.MapObjectNested.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.NestedList.MapObjectNested.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1423,18 +1424,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["nested_list_nullable"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.NestedListNullable"})
 		} else {
-			v, ok := a.(types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable can not be converted to types.List")
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
 				obj.NestedListNullable = make([]*Nested, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.Object)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.NestedListNullable can not be converted to types.Object")
+							diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 						} else {
 							var t *Nested
 							if !v.Null && !v.Unknown {
@@ -1444,11 +1445,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["str"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.Str is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.Str"})
 									} else {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.Str can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -1461,18 +1462,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["nested_list"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.NestedList is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.NestedList"})
 									} else {
-										v, ok := a.(types.List)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.NestedList can not be converted to types.List")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 										} else {
 											obj.NestedList = make([]*OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.NestedListNullable.NestedList can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t *OtherNested
 														if !v.Null && !v.Unknown {
@@ -1482,11 +1483,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.NestedList.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.NestedListNullable.NestedList.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.NestedList.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1507,18 +1508,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.Map is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.Map"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.Map can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.Map = make(map[string]string, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.String)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.NestedListNullable.Map can not be converted to types.String")
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 													} else {
 														var t string
 														if !v.Null && !v.Unknown {
@@ -1534,18 +1535,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map_object_nested"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.MapObjectNested is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.MapObjectNested"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.MapObjectNested can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.NestedListNullable.MapObjectNested can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t OtherNested
 														if !v.Null && !v.Unknown {
@@ -1554,11 +1555,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.MapObjectNested.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.NestedListNullable.MapObjectNested.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.NestedListNullable.MapObjectNested.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1587,18 +1588,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["map"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.Map is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.Map"})
 		} else {
-			v, ok := a.(types.Map)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.Map can not be converted to types.Map")
+				diags.Append(attrReadConversionFailureDiag{"Test.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
 				obj.Map = make(map[string]string, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.String)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.Map can not be converted to types.String")
+							diags.Append(attrReadConversionFailureDiag{"Test.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 						} else {
 							var t string
 							if !v.Null && !v.Unknown {
@@ -1614,18 +1615,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["map_object"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.MapObject is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.MapObject"})
 		} else {
-			v, ok := a.(types.Map)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.MapObject can not be converted to types.Map")
+				diags.Append(attrReadConversionFailureDiag{"Test.MapObject", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
 				obj.MapObject = make(map[string]Nested, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.Object)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.MapObject can not be converted to types.Object")
+							diags.Append(attrReadConversionFailureDiag{"Test.MapObject", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 						} else {
 							var t Nested
 							if !v.Null && !v.Unknown {
@@ -1634,11 +1635,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["str"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.Str is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObject.Str"})
 									} else {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.Str can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -1651,18 +1652,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["nested_list"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.NestedList is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObject.NestedList"})
 									} else {
-										v, ok := a.(types.List)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.NestedList can not be converted to types.List")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 										} else {
 											obj.NestedList = make([]*OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.MapObject.NestedList can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t *OtherNested
 														if !v.Null && !v.Unknown {
@@ -1672,11 +1673,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.NestedList.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.MapObject.NestedList.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.NestedList.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1697,18 +1698,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.Map is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObject.Map"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.Map can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.Map = make(map[string]string, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.String)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.MapObject.Map can not be converted to types.String")
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObject.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 													} else {
 														var t string
 														if !v.Null && !v.Unknown {
@@ -1724,18 +1725,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map_object_nested"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.MapObjectNested is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObject.MapObjectNested"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.MapObjectNested can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.MapObject.MapObjectNested can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObject.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t OtherNested
 														if !v.Null && !v.Unknown {
@@ -1744,11 +1745,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.MapObjectNested.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.MapObject.MapObjectNested.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.MapObject.MapObjectNested.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.MapObject.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1777,18 +1778,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 	{
 		a, ok := tf.Attrs["map_object_nullable"]
 		if !ok {
-			diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable is missing in the source Terraform object Attrs")
+			diags.Append(attrReadMissingDiag{"Test.MapObjectNullable"})
 		} else {
-			v, ok := a.(types.Map)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 			if !ok {
-				diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable can not be converted to types.Map")
+				diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
 				obj.MapObjectNullable = make(map[string]*Nested, len(v.Elems))
 				if !v.Null && !v.Unknown {
 					for k, a := range v.Elems {
-						v, ok := a.(types.Object)
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							diags.AddError("Error reading value from Terraform", "An element value for Test.MapObjectNullable can not be converted to types.Object")
+							diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 						} else {
 							var t *Nested
 							if !v.Null && !v.Unknown {
@@ -1798,11 +1799,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["str"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.Str is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.Str"})
 									} else {
-										v, ok := a.(types.String)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.Str can not be converted to types.String")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										} else {
 											var t string
 											if !v.Null && !v.Unknown {
@@ -1815,18 +1816,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["nested_list"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.NestedList is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.NestedList"})
 									} else {
-										v, ok := a.(types.List)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.NestedList can not be converted to types.List")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 										} else {
 											obj.NestedList = make([]*OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.MapObjectNullable.NestedList can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t *OtherNested
 														if !v.Null && !v.Unknown {
@@ -1836,11 +1837,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.NestedList.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.NestedList.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.NestedList.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1861,18 +1862,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.Map is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.Map"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.Map can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.Map = make(map[string]string, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.String)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.MapObjectNullable.Map can not be converted to types.String")
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 													} else {
 														var t string
 														if !v.Null && !v.Unknown {
@@ -1888,18 +1889,18 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 								{
 									a, ok := tf.Attrs["map_object_nested"]
 									if !ok {
-										diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.MapObjectNested is missing in the source Terraform object Attrs")
+										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.MapObjectNested"})
 									} else {
-										v, ok := a.(types.Map)
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.MapObjectNested can not be converted to types.Map")
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 										} else {
 											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
 											if !v.Null && !v.Unknown {
 												for k, a := range v.Elems {
-													v, ok := a.(types.Object)
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 													if !ok {
-														diags.AddError("Error reading value from Terraform", "An element value for Test.MapObjectNullable.MapObjectNested can not be converted to types.Object")
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
 													} else {
 														var t OtherNested
 														if !v.Null && !v.Unknown {
@@ -1908,11 +1909,11 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 															{
 																a, ok := tf.Attrs["str"]
 																if !ok {
-																	diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.MapObjectNested.Str is missing in the source Terraform object Attrs")
+																	diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.MapObjectNested.Str"})
 																} else {
-																	v, ok := a.(types.String)
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 																	if !ok {
-																		diags.AddError("Error reading value from Terraform", "A value for Test.MapObjectNullable.MapObjectNested.Str can not be converted to types.String")
+																		diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																	} else {
 																		var t string
 																		if !v.Null && !v.Unknown {
@@ -1942,21 +1943,29 @@ func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics {
 }
 
 // CopyTestToTerraform copies contents of the source Terraform object into a target struct
-func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
-	var diags diag.Diagnostics
+func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
 	if tf.Attrs == nil {
-		tf.Attrs = make(map[string]attr.Value)
+		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
 	}
 	{
-		_, ok := tf.AttrTypes["str"]
+		t, ok := tf.AttrTypes["str"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Str is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Str"})
 		} else {
-			v, ok := tf.Attrs["str"].(types.String)
+			v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				v = types.String{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Str", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = false
 			}
 			v.Value = string(obj.Str)
 			v.Unknown = false
@@ -1964,13 +1973,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["int32"]
+		t, ok := tf.AttrTypes["int32"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Int32 is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Int32"})
 		} else {
-			v, ok := tf.Attrs["int32"].(types.Int64)
+			v, ok := tf.Attrs["int32"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				v = types.Int64{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Int32", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+				v.Null = false
 			}
 			v.Value = int64(obj.Int32)
 			v.Unknown = false
@@ -1978,13 +1995,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["int64"]
+		t, ok := tf.AttrTypes["int64"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Int64 is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Int64"})
 		} else {
-			v, ok := tf.Attrs["int64"].(types.Int64)
+			v, ok := tf.Attrs["int64"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				v = types.Int64{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Int64", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+				v.Null = false
 			}
 			v.Value = int64(obj.Int64)
 			v.Unknown = false
@@ -1992,13 +2017,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["float"]
+		t, ok := tf.AttrTypes["float"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Float is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Float"})
 		} else {
-			v, ok := tf.Attrs["float"].(types.Float64)
+			v, ok := tf.Attrs["float"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				v = types.Float64{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Float", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+				}
+				v.Null = false
 			}
 			v.Value = float64(obj.Float)
 			v.Unknown = false
@@ -2006,13 +2039,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["double"]
+		t, ok := tf.AttrTypes["double"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Double is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Double"})
 		} else {
-			v, ok := tf.Attrs["double"].(types.Float64)
+			v, ok := tf.Attrs["double"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				v = types.Float64{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Double", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Double", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+				}
+				v.Null = false
 			}
 			v.Value = float64(obj.Double)
 			v.Unknown = false
@@ -2020,13 +2061,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["bool"]
+		t, ok := tf.AttrTypes["bool"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Bool is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Bool"})
 		} else {
-			v, ok := tf.Attrs["bool"].(types.Bool)
+			v, ok := tf.Attrs["bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
-				v = types.Bool{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Bool", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
+				v.Null = false
 			}
 			v.Value = bool(obj.Bool)
 			v.Unknown = false
@@ -2034,13 +2083,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["bytes"]
+		t, ok := tf.AttrTypes["bytes"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.bytes is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.bytes"})
 		} else {
-			v, ok := tf.Attrs["bytes"].(types.String)
+			v, ok := tf.Attrs["bytes"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				v = types.String{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.bytes", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.bytes", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = false
 			}
 			v.Value = string(obj.Bytes)
 			v.Unknown = false
@@ -2048,13 +2105,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["timestamp"]
+		t, ok := tf.AttrTypes["timestamp"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Timestamp is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Timestamp"})
 		} else {
 			v, ok := tf.Attrs["timestamp"].(TimeValue)
 			if !ok {
-				v = TimeValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Timestamp", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Timestamp", "TimeValue"})
+				}
+				v.Null = false
 			}
 			v.Value = time.Time(obj.Timestamp)
 			v.Unknown = false
@@ -2062,13 +2127,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["timestamp_missing"]
+		t, ok := tf.AttrTypes["timestamp_missing"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampMissing is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.TimestampMissing"})
 		} else {
 			v, ok := tf.Attrs["timestamp_missing"].(TimeValue)
 			if !ok {
-				v = TimeValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.TimestampMissing", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
+				}
+				v.Null = false
 			}
 			v.Value = time.Time(obj.TimestampMissing)
 			v.Unknown = false
@@ -2076,13 +2149,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["timestamp_nullable"]
+		t, ok := tf.AttrTypes["timestamp_nullable"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampNullable is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.TimestampNullable"})
 		} else {
 			v, ok := tf.Attrs["timestamp_nullable"].(TimeValue)
 			if !ok {
-				v = TimeValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.TimestampNullable", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
+				}
+				v.Null = false
 			}
 			if obj.TimestampNullable == nil {
 				v.Null = true
@@ -2094,13 +2175,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["timestamp_nullable_with_nil_value"]
+		t, ok := tf.AttrTypes["timestamp_nullable_with_nil_value"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampNullableWithNilValue is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.TimestampNullableWithNilValue"})
 		} else {
 			v, ok := tf.Attrs["timestamp_nullable_with_nil_value"].(TimeValue)
 			if !ok {
-				v = TimeValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.TimestampNullableWithNilValue", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
+				}
+				v.Null = false
 			}
 			if obj.TimestampNullableWithNilValue == nil {
 				v.Null = true
@@ -2112,13 +2201,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["duration_standard"]
+		t, ok := tf.AttrTypes["duration_standard"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationStandard is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.DurationStandard"})
 		} else {
 			v, ok := tf.Attrs["duration_standard"].(DurationValue)
 			if !ok {
-				v = DurationValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationStandard", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandard", "DurationValue"})
+				}
+				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationStandard)
 			v.Unknown = false
@@ -2126,13 +2223,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["duration_standard_missing"]
+		t, ok := tf.AttrTypes["duration_standard_missing"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationStandardMissing is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.DurationStandardMissing"})
 		} else {
 			v, ok := tf.Attrs["duration_standard_missing"].(DurationValue)
 			if !ok {
-				v = DurationValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationStandardMissing", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandardMissing", "DurationValue"})
+				}
+				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationStandardMissing)
 			v.Unknown = false
@@ -2140,13 +2245,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["duration_custom"]
+		t, ok := tf.AttrTypes["duration_custom"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationCustom is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.DurationCustom"})
 		} else {
 			v, ok := tf.Attrs["duration_custom"].(DurationValue)
 			if !ok {
-				v = DurationValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationCustom", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
+				}
+				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationCustom)
 			v.Unknown = false
@@ -2154,13 +2267,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["duration_custom_missing"]
+		t, ok := tf.AttrTypes["duration_custom_missing"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationCustomMissing is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.DurationCustomMissing"})
 		} else {
 			v, ok := tf.Attrs["duration_custom_missing"].(DurationValue)
 			if !ok {
-				v = DurationValue{}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationCustomMissing", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
+				}
+				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationCustomMissing)
 			v.Unknown = false
@@ -2170,29 +2291,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["string_list"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.StringList is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.StringList"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.StringList can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["string_list"].(types.List)
+				c, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.StringList)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.StringList))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 				}
 				if obj.StringList != nil {
+					t := o.ElemType
 					for k, a := range obj.StringList {
-						v, ok := tf.Attrs["string_list"].(types.String)
+						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							v = types.String{}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.StringList", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = false
 						}
 						v.Value = string(a)
 						v.Unknown = false
@@ -2207,29 +2337,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["string_list_empty"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.StringListEmpty is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.StringListEmpty"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.StringListEmpty can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["string_list_empty"].(types.List)
+				c, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.StringListEmpty)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.StringListEmpty))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty))
 					}
 				}
 				if obj.StringListEmpty != nil {
+					t := o.ElemType
 					for k, a := range obj.StringListEmpty {
-						v, ok := tf.Attrs["string_list_empty"].(types.String)
+						v, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							v = types.String{}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.StringListEmpty", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = false
 						}
 						v.Value = string(a)
 						v.Unknown = false
@@ -2242,40 +2381,49 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	{
-		_, ok := tf.AttrTypes["bool_custom_list"]
+		t, ok := tf.AttrTypes["bool_custom_list"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.BoolCustomList is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.BoolCustomList"})
 		} else {
-			v := CopyToBoolCustom(diags, obj.BoolCustomList)
+			v := CopyToBoolCustom(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"])
 			tf.Attrs["bool_custom_list"] = v
 		}
 	}
 	{
 		a, ok := tf.AttrTypes["bytes_list"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.BytesList is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.BytesList"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.BytesList can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.BytesList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["bytes_list"].(types.List)
+				c, ok := tf.Attrs["bytes_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.BytesList)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.BytesList))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
 					}
 				}
 				if obj.BytesList != nil {
+					t := o.ElemType
 					for k, a := range obj.BytesList {
-						v, ok := tf.Attrs["bytes_list"].(types.String)
+						v, ok := tf.Attrs["bytes_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							v = types.String{}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.BytesList", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.BytesList", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = false
 						}
 						v.Value = string(a)
 						v.Unknown = false
@@ -2290,29 +2438,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["timestamp_list"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.TimestampList is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.TimestampList"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.TimestampList can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["timestamp_list"].(types.List)
+				c, ok := tf.Attrs["timestamp_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.TimestampList)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.TimestampList))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
 					}
 				}
 				if obj.TimestampList != nil {
+					t := o.ElemType
 					for k, a := range obj.TimestampList {
 						v, ok := tf.Attrs["timestamp_list"].(TimeValue)
 						if !ok {
-							v = TimeValue{}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.TimestampList", err})
+							}
+							v, ok = i.(TimeValue)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "TimeValue"})
+							}
+							v.Null = false
 						}
 						if a == nil {
 							v.Null = true
@@ -2331,29 +2488,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["duration_custom_list"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.DurationCustomList is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.DurationCustomList"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.DurationCustomList can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["duration_custom_list"].(types.List)
+				c, ok := tf.Attrs["duration_custom_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.DurationCustomList)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.DurationCustomList))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
 					}
 				}
 				if obj.DurationCustomList != nil {
+					t := o.ElemType
 					for k, a := range obj.DurationCustomList {
 						v, ok := tf.Attrs["duration_custom_list"].(DurationValue)
 						if !ok {
-							v = DurationValue{}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.DurationCustomList", err})
+							}
+							v, ok = i.(DurationValue)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomList", "DurationValue"})
+							}
+							v.Null = false
 						}
 						v.Value = time.Duration(a)
 						v.Unknown = false
@@ -2368,35 +2534,43 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["nested"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Nested is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Nested"})
 		} else {
-			o, ok := a.(types.ObjectType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.Nested can not be converted to types.ObjectType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.Nested", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
 			} else {
-				v, ok := tf.Attrs["nested"].(types.Object)
+				v, ok := tf.Attrs["nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 				if !ok {
-					v = types.Object{
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 					}
 				} else {
 					if v.Attrs == nil {
-						v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 					}
 				}
 				{
 					obj := obj.Nested
 					tf := &v
 					{
-						_, ok := tf.AttrTypes["str"]
+						t, ok := tf.AttrTypes["str"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.Str is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.Nested.Str"})
 						} else {
-							v, ok := tf.Attrs["str"].(types.String)
+							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								v = types.String{}
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.Nested.Str", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = false
 							}
 							v.Value = string(obj.Str)
 							v.Unknown = false
@@ -2406,37 +2580,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["nested_list"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.NestedList is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.Nested.NestedList"})
 						} else {
-							o, ok := a.(types.ListType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.Nested.NestedList can not be converted to types.ListType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 							} else {
-								c, ok := tf.Attrs["nested_list"].(types.List)
+								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 								if !ok {
-									c = types.List{
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 										ElemType: o.ElemType,
-										Elems:    make([]attr.Value, len(obj.NestedList)),
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make([]attr.Value, len(obj.NestedList))
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 									}
 								}
 								if obj.NestedList != nil {
-									o := o.ElemType.(types.ObjectType)
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(types.Object)
+										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											v = types.Object{
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 											}
 										} else {
 											if v.Attrs == nil {
-												v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 											}
 										}
 										if a == nil {
@@ -2445,13 +2619,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 											obj := a
 											tf := &v
 											{
-												_, ok := tf.AttrTypes["str"]
+												t, ok := tf.AttrTypes["str"]
 												if !ok {
-													diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.NestedList.Str is missing in the target Terraform object AttrTypes")
+													diags.Append(attrWriteMissingDiag{"Test.Nested.NestedList.Str"})
 												} else {
-													v, ok := tf.Attrs["str"].(types.String)
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														v = types.String{}
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.Nested.NestedList.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = false
 													}
 													v.Value = string(obj.Str)
 													v.Unknown = false
@@ -2471,29 +2653,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["map"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.Map is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.Nested.Map"})
 						} else {
-							o, ok := a.(types.MapType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.Nested.Map can not be converted to types.MapType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 							} else {
-								c, ok := tf.Attrs["map"].(types.Map)
+								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 								if !ok {
-									c = types.Map{
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 										ElemType: o.ElemType,
-										Elems:    make(map[string]attr.Value, len(obj.Map)),
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make(map[string]attr.Value, len(obj.Map))
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 									}
 								}
 								if obj.Map != nil {
+									t := o.ElemType
 									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(types.String)
+										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											v = types.String{}
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Test.Nested.Map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
 										}
 										v.Value = string(a)
 										v.Unknown = false
@@ -2508,50 +2699,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["map_object_nested"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.MapObjectNested is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.Nested.MapObjectNested"})
 						} else {
-							o, ok := a.(types.MapType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.Nested.MapObjectNested can not be converted to types.MapType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 							} else {
-								c, ok := tf.Attrs["map_object_nested"].(types.Map)
+								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 								if !ok {
-									c = types.Map{
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 										ElemType: o.ElemType,
-										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 									}
 								}
 								if obj.MapObjectNested != nil {
-									o := o.ElemType.(types.ObjectType)
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(types.Object)
+										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											v = types.Object{
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 											}
 										} else {
 											if v.Attrs == nil {
-												v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 											}
 										}
 										{
 											obj := a
 											tf := &v
 											{
-												_, ok := tf.AttrTypes["str"]
+												t, ok := tf.AttrTypes["str"]
 												if !ok {
-													diags.AddError("Error writing value to Terraform", "A value type for Test.Nested.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+													diags.Append(attrWriteMissingDiag{"Test.Nested.MapObjectNested.Str"})
 												} else {
-													v, ok := tf.Attrs["str"].(types.String)
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														v = types.String{}
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.Nested.MapObjectNested.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = false
 													}
 													v.Value = string(obj.Str)
 													v.Unknown = false
@@ -2577,22 +2776,22 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["nested_nullable"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.NestedNullable"})
 		} else {
-			o, ok := a.(types.ObjectType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable can not be converted to types.ObjectType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
 			} else {
-				v, ok := tf.Attrs["nested_nullable"].(types.Object)
+				v, ok := tf.Attrs["nested_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 				if !ok {
-					v = types.Object{
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 					}
 				} else {
 					if v.Attrs == nil {
-						v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 					}
 				}
 				if obj.NestedNullable == nil {
@@ -2601,13 +2800,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					obj := obj.NestedNullable
 					tf := &v
 					{
-						_, ok := tf.AttrTypes["str"]
+						t, ok := tf.AttrTypes["str"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.Str is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.Str"})
 						} else {
-							v, ok := tf.Attrs["str"].(types.String)
+							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								v = types.String{}
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.NestedNullable.Str", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = false
 							}
 							v.Value = string(obj.Str)
 							v.Unknown = false
@@ -2617,37 +2824,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["nested_list"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.NestedList is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.NestedList"})
 						} else {
-							o, ok := a.(types.ListType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable.NestedList can not be converted to types.ListType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 							} else {
-								c, ok := tf.Attrs["nested_list"].(types.List)
+								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 								if !ok {
-									c = types.List{
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 										ElemType: o.ElemType,
-										Elems:    make([]attr.Value, len(obj.NestedList)),
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make([]attr.Value, len(obj.NestedList))
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 									}
 								}
 								if obj.NestedList != nil {
-									o := o.ElemType.(types.ObjectType)
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(types.Object)
+										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											v = types.Object{
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 											}
 										} else {
 											if v.Attrs == nil {
-												v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 											}
 										}
 										if a == nil {
@@ -2656,13 +2863,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 											obj := a
 											tf := &v
 											{
-												_, ok := tf.AttrTypes["str"]
+												t, ok := tf.AttrTypes["str"]
 												if !ok {
-													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.NestedList.Str is missing in the target Terraform object AttrTypes")
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullable.NestedList.Str"})
 												} else {
-													v, ok := tf.Attrs["str"].(types.String)
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														v = types.String{}
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullable.NestedList.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = false
 													}
 													v.Value = string(obj.Str)
 													v.Unknown = false
@@ -2682,29 +2897,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["map"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.Map is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.Map"})
 						} else {
-							o, ok := a.(types.MapType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable.Map can not be converted to types.MapType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 							} else {
-								c, ok := tf.Attrs["map"].(types.Map)
+								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 								if !ok {
-									c = types.Map{
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 										ElemType: o.ElemType,
-										Elems:    make(map[string]attr.Value, len(obj.Map)),
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make(map[string]attr.Value, len(obj.Map))
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 									}
 								}
 								if obj.Map != nil {
+									t := o.ElemType
 									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(types.String)
+										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											v = types.String{}
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Test.NestedNullable.Map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
 										}
 										v.Value = string(a)
 										v.Unknown = false
@@ -2719,50 +2943,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["map_object_nested"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.MapObjectNested is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.MapObjectNested"})
 						} else {
-							o, ok := a.(types.MapType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullable.MapObjectNested can not be converted to types.MapType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 							} else {
-								c, ok := tf.Attrs["map_object_nested"].(types.Map)
+								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 								if !ok {
-									c = types.Map{
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 										ElemType: o.ElemType,
-										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 									}
 								}
 								if obj.MapObjectNested != nil {
-									o := o.ElemType.(types.ObjectType)
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(types.Object)
+										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											v = types.Object{
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 											}
 										} else {
 											if v.Attrs == nil {
-												v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 											}
 										}
 										{
 											obj := a
 											tf := &v
 											{
-												_, ok := tf.AttrTypes["str"]
+												t, ok := tf.AttrTypes["str"]
 												if !ok {
-													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullable.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullable.MapObjectNested.Str"})
 												} else {
-													v, ok := tf.Attrs["str"].(types.String)
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														v = types.String{}
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullable.MapObjectNested.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = false
 													}
 													v.Value = string(obj.Str)
 													v.Unknown = false
@@ -2788,22 +3020,22 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["nested_nullable_with_nil_value"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue"})
 		} else {
-			o, ok := a.(types.ObjectType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue can not be converted to types.ObjectType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
 			} else {
-				v, ok := tf.Attrs["nested_nullable_with_nil_value"].(types.Object)
+				v, ok := tf.Attrs["nested_nullable_with_nil_value"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 				if !ok {
-					v = types.Object{
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 					}
 				} else {
 					if v.Attrs == nil {
-						v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 					}
 				}
 				if obj.NestedNullableWithNilValue == nil {
@@ -2812,13 +3044,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					obj := obj.NestedNullableWithNilValue
 					tf := &v
 					{
-						_, ok := tf.AttrTypes["str"]
+						t, ok := tf.AttrTypes["str"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.Str is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.Str"})
 						} else {
-							v, ok := tf.Attrs["str"].(types.String)
+							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								v = types.String{}
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.Str", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = false
 							}
 							v.Value = string(obj.Str)
 							v.Unknown = false
@@ -2828,37 +3068,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["nested_list"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.NestedList is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.NestedList"})
 						} else {
-							o, ok := a.(types.ListType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue.NestedList can not be converted to types.ListType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 							} else {
-								c, ok := tf.Attrs["nested_list"].(types.List)
+								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 								if !ok {
-									c = types.List{
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 										ElemType: o.ElemType,
-										Elems:    make([]attr.Value, len(obj.NestedList)),
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make([]attr.Value, len(obj.NestedList))
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 									}
 								}
 								if obj.NestedList != nil {
-									o := o.ElemType.(types.ObjectType)
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(types.Object)
+										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											v = types.Object{
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 											}
 										} else {
 											if v.Attrs == nil {
-												v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 											}
 										}
 										if a == nil {
@@ -2867,13 +3107,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 											obj := a
 											tf := &v
 											{
-												_, ok := tf.AttrTypes["str"]
+												t, ok := tf.AttrTypes["str"]
 												if !ok {
-													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.NestedList.Str is missing in the target Terraform object AttrTypes")
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.NestedList.Str"})
 												} else {
-													v, ok := tf.Attrs["str"].(types.String)
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														v = types.String{}
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.NestedList.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = false
 													}
 													v.Value = string(obj.Str)
 													v.Unknown = false
@@ -2893,29 +3141,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["map"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.Map is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.Map"})
 						} else {
-							o, ok := a.(types.MapType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue.Map can not be converted to types.MapType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 							} else {
-								c, ok := tf.Attrs["map"].(types.Map)
+								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 								if !ok {
-									c = types.Map{
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 										ElemType: o.ElemType,
-										Elems:    make(map[string]attr.Value, len(obj.Map)),
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make(map[string]attr.Value, len(obj.Map))
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 									}
 								}
 								if obj.Map != nil {
+									t := o.ElemType
 									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(types.String)
+										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
-											v = types.String{}
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.Map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
 										}
 										v.Value = string(a)
 										v.Unknown = false
@@ -2930,50 +3187,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 					{
 						a, ok := tf.AttrTypes["map_object_nested"]
 						if !ok {
-							diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.MapObjectNested is missing in the target Terraform object AttrTypes")
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested"})
 						} else {
-							o, ok := a.(types.MapType)
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 							if !ok {
-								diags.AddError("Error writing value to Terraform", "A type for Test.NestedNullableWithNilValue.MapObjectNested can not be converted to types.MapType")
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 							} else {
-								c, ok := tf.Attrs["map_object_nested"].(types.Map)
+								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 								if !ok {
-									c = types.Map{
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 										ElemType: o.ElemType,
-										Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 									}
 								} else {
 									if c.Elems == nil {
-										c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 									}
 								}
 								if obj.MapObjectNested != nil {
-									o := o.ElemType.(types.ObjectType)
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(types.Object)
+										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
-											v = types.Object{
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 											}
 										} else {
 											if v.Attrs == nil {
-												v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 											}
 										}
 										{
 											obj := a
 											tf := &v
 											{
-												_, ok := tf.AttrTypes["str"]
+												t, ok := tf.AttrTypes["str"]
 												if !ok {
-													diags.AddError("Error writing value to Terraform", "A value type for Test.NestedNullableWithNilValue.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str"})
 												} else {
-													v, ok := tf.Attrs["str"].(types.String)
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 													if !ok {
-														v = types.String{}
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.MapObjectNested.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = false
 													}
 													v.Value = string(obj.Str)
 													v.Unknown = false
@@ -2999,50 +3264,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["nested_list"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.NestedList"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.NestedList can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["nested_list"].(types.List)
+				c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.NestedList)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.NestedList))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 					}
 				}
 				if obj.NestedList != nil {
-					o := o.ElemType.(types.ObjectType)
+					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.NestedList {
-						v, ok := tf.Attrs["nested_list"].(types.Object)
+						v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							v = types.Object{
+							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 								AttrTypes: o.AttrTypes,
-								Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 							}
 						} else {
 							if v.Attrs == nil {
-								v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 							}
 						}
 						{
 							obj := a
 							tf := &v
 							{
-								_, ok := tf.AttrTypes["str"]
+								t, ok := tf.AttrTypes["str"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.Str is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.Str"})
 								} else {
-									v, ok := tf.Attrs["str"].(types.String)
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 									if !ok {
-										v = types.String{}
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.NestedList.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = false
 									}
 									v.Value = string(obj.Str)
 									v.Unknown = false
@@ -3052,37 +3325,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["nested_list"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.NestedList is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.NestedList"})
 								} else {
-									o, ok := a.(types.ListType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.NestedList.NestedList can not be converted to types.ListType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 									} else {
-										c, ok := tf.Attrs["nested_list"].(types.List)
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											c = types.List{
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 												ElemType: o.ElemType,
-												Elems:    make([]attr.Value, len(obj.NestedList)),
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make([]attr.Value, len(obj.NestedList))
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 										}
 										if obj.NestedList != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(types.Object)
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												if a == nil {
@@ -3091,13 +3364,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.NestedList.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.NestedList.NestedList.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedList.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3117,29 +3398,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.Map is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.Map"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.NestedList.Map can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map"].(types.Map)
+										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.Map)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.Map))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 											}
 										}
 										if obj.Map != nil {
+											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(types.String)
+												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
-													v = types.String{}
+													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+													if err != nil {
+														diags.Append(attrWriteGeneralError{"Test.NestedList.Map", err})
+													}
+													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+													}
+													v.Null = false
 												}
 												v.Value = string(a)
 												v.Unknown = false
@@ -3154,50 +3444,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map_object_nested"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.MapObjectNested is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.MapObjectNested"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.NestedList.MapObjectNested can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map_object_nested"].(types.Map)
+										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 											}
 										}
 										if obj.MapObjectNested != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(types.Object)
+												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												{
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.NestedList.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.NestedList.MapObjectNested.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedList.MapObjectNested.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3227,37 +3525,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["nested_list_nullable"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.NestedListNullable"})
 		} else {
-			o, ok := a.(types.ListType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable can not be converted to types.ListType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["nested_list_nullable"].(types.List)
+				c, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
-					c = types.List{
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 						ElemType: o.ElemType,
-						Elems:    make([]attr.Value, len(obj.NestedListNullable)),
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make([]attr.Value, len(obj.NestedListNullable))
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable))
 					}
 				}
 				if obj.NestedListNullable != nil {
-					o := o.ElemType.(types.ObjectType)
+					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.NestedListNullable {
-						v, ok := tf.Attrs["nested_list_nullable"].(types.Object)
+						v, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							v = types.Object{
+							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 								AttrTypes: o.AttrTypes,
-								Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 							}
 						} else {
 							if v.Attrs == nil {
-								v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 							}
 						}
 						if a == nil {
@@ -3266,13 +3564,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							obj := a
 							tf := &v
 							{
-								_, ok := tf.AttrTypes["str"]
+								t, ok := tf.AttrTypes["str"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.Str is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.Str"})
 								} else {
-									v, ok := tf.Attrs["str"].(types.String)
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 									if !ok {
-										v = types.String{}
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.NestedListNullable.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = false
 									}
 									v.Value = string(obj.Str)
 									v.Unknown = false
@@ -3282,37 +3588,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["nested_list"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.NestedList is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.NestedList"})
 								} else {
-									o, ok := a.(types.ListType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable.NestedList can not be converted to types.ListType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 									} else {
-										c, ok := tf.Attrs["nested_list"].(types.List)
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											c = types.List{
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 												ElemType: o.ElemType,
-												Elems:    make([]attr.Value, len(obj.NestedList)),
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make([]attr.Value, len(obj.NestedList))
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 										}
 										if obj.NestedList != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(types.Object)
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												if a == nil {
@@ -3321,13 +3627,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.NestedList.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.NestedList.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedListNullable.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3347,29 +3661,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.Map is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.Map"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable.Map can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map"].(types.Map)
+										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.Map)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.Map))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 											}
 										}
 										if obj.Map != nil {
+											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(types.String)
+												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
-													v = types.String{}
+													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+													if err != nil {
+														diags.Append(attrWriteGeneralError{"Test.NestedListNullable.Map", err})
+													}
+													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+													}
+													v.Null = false
 												}
 												v.Value = string(a)
 												v.Unknown = false
@@ -3384,50 +3707,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map_object_nested"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.MapObjectNested is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.MapObjectNested"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.NestedListNullable.MapObjectNested can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map_object_nested"].(types.Map)
+										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 											}
 										}
 										if obj.MapObjectNested != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(types.Object)
+												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												{
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.NestedListNullable.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.MapObjectNested.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedListNullable.MapObjectNested.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3457,29 +3788,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["map"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.Map is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.Map"})
 		} else {
-			o, ok := a.(types.MapType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.Map can not be converted to types.MapType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 			} else {
-				c, ok := tf.Attrs["map"].(types.Map)
+				c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 				if !ok {
-					c = types.Map{
+					c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 						ElemType: o.ElemType,
-						Elems:    make(map[string]attr.Value, len(obj.Map)),
+						Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make(map[string]attr.Value, len(obj.Map))
+						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 					}
 				}
 				if obj.Map != nil {
+					t := o.ElemType
 					for k, a := range obj.Map {
-						v, ok := tf.Attrs["map"].(types.String)
+						v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							v = types.String{}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.Map", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = false
 						}
 						v.Value = string(a)
 						v.Unknown = false
@@ -3494,50 +3834,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["map_object"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.MapObject"})
 		} else {
-			o, ok := a.(types.MapType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.MapObject can not be converted to types.MapType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.MapObject", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 			} else {
-				c, ok := tf.Attrs["map_object"].(types.Map)
+				c, ok := tf.Attrs["map_object"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 				if !ok {
-					c = types.Map{
+					c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 						ElemType: o.ElemType,
-						Elems:    make(map[string]attr.Value, len(obj.MapObject)),
+						Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObject)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make(map[string]attr.Value, len(obj.MapObject))
+						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObject))
 					}
 				}
 				if obj.MapObject != nil {
-					o := o.ElemType.(types.ObjectType)
+					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.MapObject {
-						v, ok := tf.Attrs["map_object"].(types.Object)
+						v, ok := tf.Attrs["map_object"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							v = types.Object{
+							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 								AttrTypes: o.AttrTypes,
-								Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 							}
 						} else {
 							if v.Attrs == nil {
-								v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 							}
 						}
 						{
 							obj := a
 							tf := &v
 							{
-								_, ok := tf.AttrTypes["str"]
+								t, ok := tf.AttrTypes["str"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.Str is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObject.Str"})
 								} else {
-									v, ok := tf.Attrs["str"].(types.String)
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 									if !ok {
-										v = types.String{}
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.MapObject.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = false
 									}
 									v.Value = string(obj.Str)
 									v.Unknown = false
@@ -3547,37 +3895,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["nested_list"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.NestedList is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObject.NestedList"})
 								} else {
-									o, ok := a.(types.ListType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.MapObject.NestedList can not be converted to types.ListType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 									} else {
-										c, ok := tf.Attrs["nested_list"].(types.List)
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											c = types.List{
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 												ElemType: o.ElemType,
-												Elems:    make([]attr.Value, len(obj.NestedList)),
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make([]attr.Value, len(obj.NestedList))
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 										}
 										if obj.NestedList != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(types.Object)
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												if a == nil {
@@ -3586,13 +3934,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.NestedList.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.MapObject.NestedList.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.MapObject.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3612,29 +3968,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.Map is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObject.Map"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.MapObject.Map can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map"].(types.Map)
+										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.Map)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.Map))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 											}
 										}
 										if obj.Map != nil {
+											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(types.String)
+												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
-													v = types.String{}
+													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+													if err != nil {
+														diags.Append(attrWriteGeneralError{"Test.MapObject.Map", err})
+													}
+													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+													}
+													v.Null = false
 												}
 												v.Value = string(a)
 												v.Unknown = false
@@ -3649,50 +4014,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map_object_nested"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.MapObjectNested is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObject.MapObjectNested"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.MapObject.MapObjectNested can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map_object_nested"].(types.Map)
+										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 											}
 										}
 										if obj.MapObjectNested != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(types.Object)
+												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												{
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.MapObject.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.MapObject.MapObjectNested.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.MapObject.MapObjectNested.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3722,37 +4095,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 	{
 		a, ok := tf.AttrTypes["map_object_nullable"]
 		if !ok {
-			diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable is missing in the target Terraform object AttrTypes")
+			diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable"})
 		} else {
-			o, ok := a.(types.MapType)
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 			if !ok {
-				diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable can not be converted to types.MapType")
+				diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 			} else {
-				c, ok := tf.Attrs["map_object_nullable"].(types.Map)
+				c, ok := tf.Attrs["map_object_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 				if !ok {
-					c = types.Map{
+					c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 						ElemType: o.ElemType,
-						Elems:    make(map[string]attr.Value, len(obj.MapObjectNullable)),
+						Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNullable)),
 					}
 				} else {
 					if c.Elems == nil {
-						c.Elems = make(map[string]attr.Value, len(obj.MapObjectNullable))
+						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNullable))
 					}
 				}
 				if obj.MapObjectNullable != nil {
-					o := o.ElemType.(types.ObjectType)
+					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.MapObjectNullable {
-						v, ok := tf.Attrs["map_object_nullable"].(types.Object)
+						v, ok := tf.Attrs["map_object_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
-							v = types.Object{
+							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 								AttrTypes: o.AttrTypes,
-								Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 							}
 						} else {
 							if v.Attrs == nil {
-								v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 							}
 						}
 						if a == nil {
@@ -3761,13 +4134,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							obj := a
 							tf := &v
 							{
-								_, ok := tf.AttrTypes["str"]
+								t, ok := tf.AttrTypes["str"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.Str is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.Str"})
 								} else {
-									v, ok := tf.Attrs["str"].(types.String)
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 									if !ok {
-										v = types.String{}
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = false
 									}
 									v.Value = string(obj.Str)
 									v.Unknown = false
@@ -3777,37 +4158,37 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["nested_list"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.NestedList is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.NestedList"})
 								} else {
-									o, ok := a.(types.ListType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable.NestedList can not be converted to types.ListType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 									} else {
-										c, ok := tf.Attrs["nested_list"].(types.List)
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 										if !ok {
-											c = types.List{
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
 												ElemType: o.ElemType,
-												Elems:    make([]attr.Value, len(obj.NestedList)),
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make([]attr.Value, len(obj.NestedList))
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 										}
 										if obj.NestedList != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(types.Object)
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												if a == nil {
@@ -3816,13 +4197,21 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.NestedList.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.NestedList.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3842,29 +4231,38 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.Map is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.Map"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable.Map can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map"].(types.Map)
+										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.Map)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.Map))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
 											}
 										}
 										if obj.Map != nil {
+											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(types.String)
+												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
-													v = types.String{}
+													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+													if err != nil {
+														diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.Map", err})
+													}
+													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+													}
+													v.Null = false
 												}
 												v.Value = string(a)
 												v.Unknown = false
@@ -3879,50 +4277,58 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 							{
 								a, ok := tf.AttrTypes["map_object_nested"]
 								if !ok {
-									diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.MapObjectNested is missing in the target Terraform object AttrTypes")
+									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.MapObjectNested"})
 								} else {
-									o, ok := a.(types.MapType)
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
 									if !ok {
-										diags.AddError("Error writing value to Terraform", "A type for Test.MapObjectNullable.MapObjectNested can not be converted to types.MapType")
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
 									} else {
-										c, ok := tf.Attrs["map_object_nested"].(types.Map)
+										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
 										if !ok {
-											c = types.Map{
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
 
 												ElemType: o.ElemType,
-												Elems:    make(map[string]attr.Value, len(obj.MapObjectNested)),
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
 											}
 										} else {
 											if c.Elems == nil {
-												c.Elems = make(map[string]attr.Value, len(obj.MapObjectNested))
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
 											}
 										}
 										if obj.MapObjectNested != nil {
-											o := o.ElemType.(types.ObjectType)
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(types.Object)
+												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
-													v = types.Object{
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
 														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]attr.Value, len(o.AttrTypes)),
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
 													}
 												} else {
 													if v.Attrs == nil {
-														v.Attrs = make(map[string]attr.Value, len(tf.AttrTypes))
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
 													}
 												}
 												{
 													obj := a
 													tf := &v
 													{
-														_, ok := tf.AttrTypes["str"]
+														t, ok := tf.AttrTypes["str"]
 														if !ok {
-															diags.AddError("Error writing value to Terraform", "A value type for Test.MapObjectNullable.MapObjectNested.Str is missing in the target Terraform object AttrTypes")
+															diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.MapObjectNested.Str"})
 														} else {
-															v, ok := tf.Attrs["str"].(types.String)
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 															if !ok {
-																v = types.String{}
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.MapObjectNested.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = false
 															}
 															v.Value = string(obj.Str)
 															v.Unknown = false
@@ -3950,4 +4356,112 @@ func CopyTestToTerraform(obj Test, tf *types.Object) diag.Diagnostics {
 		}
 	}
 	return diags
+}
+
+// attrReadMissingDiag represents diagnostic message on an attribute missing in the source object
+type attrReadMissingDiag struct {
+	Path string
+}
+
+func (d attrReadMissingDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrReadMissingDiag) Summary() string {
+	return "Error reading from Terraform object"
+}
+
+func (d attrReadMissingDiag) Detail() string {
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attrs", d.Path)
+}
+
+func (d attrReadMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrReadConversionFailureDiag represents diagnostic message on a failed type conversion on read
+type attrReadConversionFailureDiag struct {
+	Path string
+	Type string
+}
+
+func (d attrReadConversionFailureDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrReadConversionFailureDiag) Summary() string {
+	return "Error reading from Terraform object"
+}
+
+func (d attrReadConversionFailureDiag) Detail() string {
+	return fmt.Sprintf("A value for %v can not be converted to %v", d.Path, d.Type)
+}
+
+func (d attrReadConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteMissingDiag represents diagnostic message on an attribute missing in the target object
+type attrWriteMissingDiag struct {
+	Path string
+}
+
+func (d attrWriteMissingDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteMissingDiag) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteMissingDiag) Detail() string {
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object AttrTypes", d.Path)
+}
+
+func (d attrWriteMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteConversionFailureDiag represents diagnostic message on a failed type conversion on write
+type attrWriteConversionFailureDiag struct {
+	Path string
+	Type string
+}
+
+func (d attrWriteConversionFailureDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteConversionFailureDiag) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteConversionFailureDiag) Detail() string {
+	return fmt.Sprintf("A value for %v can not be converted to %v", d.Path, d.Type)
+}
+
+func (d attrWriteConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteGeneralError represents diagnostic message on a generic error on write
+type attrWriteGeneralError struct {
+	Path string
+	Err  error
+}
+
+func (d attrWriteGeneralError) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteGeneralError) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteGeneralError) Detail() string {
+	return fmt.Sprintf("%s: %s", d.Path, d.Err.Error())
+}
+
+func (d attrWriteGeneralError) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }

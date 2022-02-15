@@ -17,6 +17,7 @@ limitations under the License.
 package test
 
 import (
+	"context"
 	fmt "fmt"
 	"testing"
 	time "time"
@@ -29,7 +30,7 @@ import (
 func TestCopyToTerraformPrimitives(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	fmt.Printf("%+v", diags)
 	require.False(t, diags.HasError())
 
@@ -65,7 +66,7 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 func TestCopyToTime(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, timestamp, o.Attrs["timestamp"].(TimeValue).Value)
@@ -81,7 +82,7 @@ func TestCopyToTime(t *testing.T) {
 func TestCopyToDuration(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, duration, o.Attrs["duration_standard"].(DurationValue).Value)
@@ -96,7 +97,7 @@ func TestCopyToDuration(t *testing.T) {
 func TestCopyToNested(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(
@@ -117,7 +118,7 @@ func TestCopyToNested(t *testing.T) {
 func TestCopyToList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, []attr.Value{
@@ -151,7 +152,7 @@ func TestCopyToList(t *testing.T) {
 func TestCopyToNestedList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	nestedList := o.Attrs["nested_list"].(types.List)
@@ -217,7 +218,7 @@ func TestCopyToNestedList(t *testing.T) {
 func TestCopyToMap(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	m := o.Attrs["map"].(types.Map).Elems
@@ -229,7 +230,7 @@ func TestCopyToMap(t *testing.T) {
 func TestCopyToCustom(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(

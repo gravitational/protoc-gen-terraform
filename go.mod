@@ -6,12 +6,11 @@ require (
 	github.com/dave/jennifer v1.4.1
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gogo/protobuf v1.3.2
-	github.com/gravitational/teleport/api v0.0.0-20220202235453-0d65746fa7be
 	github.com/gravitational/trace v1.1.15
 	github.com/hashicorp/terraform-plugin-framework v0.5.0
 	github.com/hashicorp/terraform-plugin-go v0.6.0
 	github.com/hashicorp/yamux v0.0.0-20210826001029-26ff87cf9493 // indirect
-	github.com/jinzhu/copier v0.3.2
+	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/oklog/run v1.1.0 // indirect

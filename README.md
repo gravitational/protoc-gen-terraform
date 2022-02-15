@@ -29,7 +29,7 @@ See [Makefile](Makefile) for details.
 
 # Options
 
-Options could be set either using cli args or [YAML](example/teleport.yaml). Path to config file can be specified with `config` argument. Be advised that some options could be set in config file only.
+Options could be set either using cli args or [YAML](test/config.yaml). Path to config file can be specified with `config` argument. Be advised that some options could be set in config file only.
 
 ## Setting target and default package name
 
@@ -214,7 +214,7 @@ func CopyTestToTerraform(obj Test, tf *types.Object, updateOnly bool) error
 Target Terraform object must have AttrTypes for all fields of Object.
 
 The following rules apply:
-1. All attributes are marked as known.
+1. All target attributes are marked as known.
 2. In case an attribute is present in AttrTypes, but is missing in AttrValues, it is created.
 
 ## Note on gogoproto.customtype
