@@ -56,21 +56,25 @@ func CopyFromBoolCustom(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom
 }
 
 // CopyToBoolCustom copies source value to the target
-func CopyToBoolCustom(diags diag.Diagnostics, obj []BoolCustom) attr.Value {
-	v := types.List{
-		Null:     true,
-		Unknown:  false,
-		ElemType: types.BoolType,
-	}
-
-	if len(obj) > 0 {
-		v.Null = false
-		v.Elems = make([]attr.Value, len(obj))
-
-		for i, b := range obj {
-			v.Elems[i] = types.Bool{Null: false, Unknown: false, Value: bool(b)}
+func CopyToBoolCustom(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value) attr.Value {
+	value, ok := v.(types.List)
+	if !ok {
+		value = types.List{
+			Null:     true,
+			Unknown:  false,
+			ElemType: types.BoolType,
 		}
 	}
 
-	return v
+	if len(obj) > 0 {
+		if value.Elems == nil {
+			value.Elems = make([]attr.Value, len(obj))
+		}
+
+		for i, b := range obj {
+			value.Elems[i] = types.Bool{Null: false, Unknown: false, Value: bool(b)}
+		}
+	}
+
+	return value
 }

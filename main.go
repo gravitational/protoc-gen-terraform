@@ -22,7 +22,6 @@ import (
 
 	plugin_go "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/gogo/protobuf/vanity/command"
-	"github.com/gravitational/protoc-gen-terraform/plugin"
 	"github.com/gravitational/trace"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
@@ -42,7 +41,7 @@ func main() {
 	log.Infof("protoc-gen-terraform %s", Version)
 	log.Infof("protoc-gen-terraform build hash: %s", Sha)
 
-	p := plugin.NewPlugin()
+	p := NewPlugin()
 
 	req := command.Read()
 	resp := command.GeneratePlugin(req, p, "_terraform.go")
@@ -56,7 +55,7 @@ func main() {
 }
 
 // runGoImports formats code and removes unused imports from the resulting code using goimports tool
-func runGoImports(p *plugin.Plugin, resp *plugin_go.CodeGeneratorResponse) error {
+func runGoImports(p *Plugin, resp *plugin_go.CodeGeneratorResponse) error {
 	opts := imports.Options{
 		FormatOnly: false,
 		Comments:   true,
@@ -90,7 +89,7 @@ func runGoImports(p *plugin.Plugin, resp *plugin_go.CodeGeneratorResponse) error
 }
 
 // prependLicense prepends license information
-func prependLicense(p *plugin.Plugin, s string) (string, error) {
+func prependLicense(p *Plugin, s string) (string, error) {
 	return license + s, nil
 }
 

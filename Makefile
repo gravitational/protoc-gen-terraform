@@ -27,15 +27,13 @@ test: build
 		-I$(PWD) \
 		-I$(PWD)/test \
 		-I$(shell go list -m -f {{.Dir}} github.com/gogo/protobuf) \
-		-I$(SRCPATH) \
 		--gogo_out=test \
 		test.proto
 
 	@protoc \
 		-I$(PWD) \
 		-I$(PWD)/test \
-		-I./vendor/github.com/gogo/protobuf \
-		-I$(SRCPATH) \
+		-I$(shell go list -m -f {{.Dir}} github.com/gogo/protobuf) \
 		--plugin=$(BINFILE) \
 		--terraform_out=config=test/config.yaml:test \
 		test.proto
