@@ -45,7 +45,7 @@ test: build
 	@protoc \
 		-I$(pwd)/test \
 		-I$(pwd) \
-		-I./vendor/github.com/gogo/protobuf \
+		-I$(shell go list -m -f {{.Dir}} github.com/gogo/protobuf) \
 		-I$(srcpath) \
 		--plugin=./_build/protoc-gen-terraform \
 		--terraform_out=ref=true,target_pkg=test,types=Test,sort=true,custom_duration=Duration:test \
