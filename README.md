@@ -151,12 +151,26 @@ If your proto generated objects use type alias for duration fields, you can set 
 
 ```yaml
 time_type:
-    type: "TimeType"
-    value_type: "Time"
-    cast_type: "time.Time"
+    type: "TimeType"                    # attr.Type
+    value_type: "TimeValue"             # attr.Value
+    cast_to_type: "time.Time"           # TimeValue.Value type
+	cast_from_type: "time.Time"         # Go object field type
+	type_constructor: UseRFC3339Time()  # Function to put into schema definition Type, will generate TimeType{} if missing
 ```
 
-`type` is a go type name for a field's `attr.Type`, `value` is a go type for a field's `attr.Value`, `cast_type` is a go type to cast `{value_type}.Value` from.
+## Custom duration value
+
+If you schema uses the following definition for the duration fields:
+
+```golang
+int64 MaxSessionTTL = 2 [ (gogoproto.casttype) = "Duration" ];
+```
+
+you can set the `duration_custom_type` to make such fields act as duration custom type:
+
+```
+duration_custom_type=Duration
+```
 
 ## Generated methods
 

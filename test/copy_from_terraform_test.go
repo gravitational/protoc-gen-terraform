@@ -37,6 +37,7 @@ func TestCopyFromPrimitives(t *testing.T) {
 	require.Equal(t, float64(0.76), target.Double)
 	require.Equal(t, true, target.Bool)
 	require.Equal(t, []byte("Test"), target.Bytes)
+	require.Equal(t, Mode_ON, target.Mode)
 }
 
 func TestTestCopyFromTime(t *testing.T) {

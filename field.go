@@ -39,7 +39,7 @@ const (
 	PrimitiveMapKind Kind = 5
 	// ObjectMapKind represents kind of a field containing a map of a nested objects (map[string]T)
 	ObjectMapKind Kind = 6
-	// Custom represents kind of a field containing a custom type
+	// CustomKind represents kind of a field containing a custom type
 	CustomKind Kind = 7
 )
 
@@ -63,6 +63,8 @@ type TerraformType struct {
 	ValueCastFromType string
 	// IsMessage field is a nested message? (might be map or list at the same time)
 	IsMessage bool
+	// TypeConstructor represents expression which is used to initialize type in schema
+	TypeConstructor string
 }
 
 // ProtobufType represents protobuf object field type information
@@ -329,7 +331,9 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 	if o != nil {
 		f.Type = o.Type
 		f.ValueType = o.ValueType
-		f.ValueCastToType = o.CastType
+		f.ValueCastToType = o.CastToType
+		f.ValueCastFromType = o.CastFromType
+		f.TypeConstructor = o.TypeConstructor
 
 		f.ElemType = f.Type
 		f.ElemValueType = f.ValueType

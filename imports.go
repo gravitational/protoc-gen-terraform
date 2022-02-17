@@ -51,18 +51,17 @@ func NewImports(pluginImports generator.PluginImports) Imports {
 	return Imports{pluginImports, make(map[string]generator.Single)}
 }
 
-// WithExplicitPackage concatenates package and typ, returns normalized type name
+// WithPackage concatenates package and typ, returns normalized type name
 func (i Imports) WithPackage(pkg, typ string) string {
 	return i.WithType(pkg + "." + typ)
 }
 
-// WithDefaultPackage takes type name and default package name. Package name is converted to qualifier.
-// Default package name gets prepended if package name is missing.
+// WithType takes type name with full package name prepended. Package name is converted to qualifier.
 // It handles with array and map elem types, but leaves keys intact.
 func (i Imports) WithType(t string) string {
 	typ, mod := i.typAndMod(t)
 
-	if !strings.Contains(typ, ".") {
+	if !strings.Contains(i.typBeforeBracket(typ), ".") {
 		return t
 	}
 
@@ -73,7 +72,7 @@ func (i Imports) WithType(t string) string {
 func (i Imports) PrependPackageNameIfMissing(t, pkg string) string {
 	typ, mod := i.typAndMod(t)
 
-	if strings.Contains(typ, ".") || pkg == "" || i.isBuiltinType(typ) {
+	if strings.Contains(i.typBeforeBracket(typ), ".") || pkg == "" || i.isBuiltinType(typ) {
 		return t
 	}
 
@@ -94,9 +93,9 @@ func (i Imports) isBuiltinType(t string) bool {
 }
 
 func (i Imports) appendQual(typ, mod string) string {
-	n := strings.LastIndex(typ, ".")
-	path := typ[0:n]
-	name := typ[n+1:]
+	pos := strings.LastIndex(i.typBeforeBracket(typ), ".")
+	path := typ[0:pos]
+	name := typ[pos+1:]
 
 	var qualifier string
 
@@ -113,6 +112,16 @@ func (i Imports) appendQual(typ, mod string) string {
 	}
 
 	return mod + qualifier + "." + name
+}
+
+// typBeforeBracket returns type of a function
+func (i Imports) typBeforeBracket(typ string) string {
+	pos := strings.Index(typ, "(")
+	if pos > -1 {
+		return typ[0:pos]
+	}
+
+	return typ
 }
 
 // typAndMod return go type name and it's modifiers (*[])

@@ -259,6 +259,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				j.Id("c").Op("=").Id(f.i.WithType(f.Field.ValueType)).Block(j.Dict{
 					j.Id("Elems"):    mk,
 					j.Id("ElemType"): j.Id("o.ElemType"),
+					j.Id("Null"):     j.True(),
 				}),
 			).Else().Block(
 				j.If(j.Id("c.Elems").Op("==").Nil()).Block(
@@ -282,6 +283,11 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 					}
 					g.Id("c.Elems").Index(j.Id("k")).Op("=").Id("v")
 				})
+
+				// if len(obj.Test) > 0
+				g.If(j.Len(j.Id(fieldName))).Op(">").Lit(0).Block(
+					g.Id("c.Null").Op("=").False(),
+				)
 			})
 
 			g.Id("c.Unknown").Op("=").False()

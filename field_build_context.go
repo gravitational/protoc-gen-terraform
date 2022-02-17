@@ -141,7 +141,7 @@ func NewMapValueFieldBuildContext(c *FieldBuildContext, field *FieldDescriptorPr
 		typeName:            c.typeName,
 		imports:             c.imports,
 		path:                c.path,
-		goType:              t,
+		goType:              c.imports.PrependPackageNameIfMissing(t, c.config.DefaultPackageName),
 	}, nil
 }
 
@@ -193,8 +193,9 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ValueType:         c.config.TimeType.ValueType,
 			ElemType:          c.config.TimeType.Type,
 			ElemValueType:     c.config.TimeType.ValueType,
-			ValueCastToType:   c.config.TimeType.CastType,
-			ValueCastFromType: c.config.TimeType.CastType,
+			ValueCastToType:   c.config.TimeType.CastToType,
+			ValueCastFromType: c.config.TimeType.CastFromType,
+			TypeConstructor:   c.config.TimeType.TypeConstructor,
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
@@ -205,8 +206,9 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ValueType:         c.config.DurationType.ValueType,
 			ElemType:          c.config.DurationType.Type,
 			ElemValueType:     c.config.DurationType.ValueType,
-			ValueCastToType:   c.config.DurationType.CastType,
-			ValueCastFromType: c.config.DurationType.CastType,
+			ValueCastToType:   c.config.DurationType.CastToType,
+			ValueCastFromType: c.config.DurationType.CastFromType,
+			TypeConstructor:   c.config.DurationType.TypeConstructor,
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
@@ -254,8 +256,8 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t = stringType
 		t.ValueCastFromType = "[]byte"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_ENUM):
-		t = stringType
-		t.ValueCastFromType = "string"
+		t = int64Type
+		t.ValueCastFromType = elemType
 	case c.field.IsMessage():
 		t = objectType
 		t.IsMessage = true
@@ -360,7 +362,7 @@ func (c *FieldBuildContext) GetMapValueFieldDescriptorAndType() (string, *FieldD
 		return "", nil, trace.Errorf("map value descriptor is nil %v", c.GetPath())
 	}
 
-	return m.GoType, &FieldDescriptorProtoExt{m.ValueField}, nil
+	return c.imports.PrependPackageNameIfMissing(m.GoType, c.config.DefaultPackageName), &FieldDescriptorProtoExt{m.ValueField}, nil
 }
 
 // GetNameSnake returns field snake name
