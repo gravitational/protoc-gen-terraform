@@ -204,6 +204,10 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 		return j.Id(f.i.WithType(f.ElemType))
 	}
 
+	if f.TypeConstructor != "" {
+		return j.Id(f.i.WithType(f.TypeConstructor))
+	}
+
 	return j.Id(f.i.WithType(f.ElemType)).Values()
 }
 
@@ -236,5 +240,5 @@ func generateValidators(imports *Imports, vals []string) j.Code {
 		v[i] = j.Id(imports.WithType(n))
 	}
 
-	return j.Index().String().Values(v...)
+	return j.Index().Id(imports.WithPackage(SDK, "AttributeValidator")).Values(v...)
 }

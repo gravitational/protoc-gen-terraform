@@ -33,8 +33,12 @@ type SchemaType struct {
 	Type string `yaml:"type,omitempty"`
 	// ValueType is a Go attr.Value struct name
 	ValueType string `yaml:"value_type,omitempty"`
-	// CastType is a Go attr.Value .Value member type
-	CastType string `yaml:"cast_type,omitempty"`
+	// CastToType is a Go attr.Value .Value member type
+	CastToType string `yaml:"cast_to_type,omitempty"`
+	// CastToType is a go type of the object field
+	CastFromType string `yaml:"cast_from_type,omitempty"`
+	// TypeConstructor represents statement used to produce empty type value in schema
+	TypeConstructor string `yaml:"type_constructor,omitempty"`
 }
 
 // InjectedField represents custom injected field descriptor

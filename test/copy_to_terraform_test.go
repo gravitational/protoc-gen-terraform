@@ -75,7 +75,7 @@ func TestCopyToTime(t *testing.T) {
 
 	require.Equal(t, time.Time{}, o.Attrs["timestamp_missing"].(TimeValue).Value)
 	require.False(t, o.Attrs["timestamp_missing"].(TimeValue).Unknown)
-	// TODO: Should be missing because it's a complex value
+	// Handle empty time value
 	// require.True(t, o.Attrs["timestamp_missing"].(TimeValue).Null)
 }
 
@@ -127,7 +127,7 @@ func TestCopyToList(t *testing.T) {
 	}, o.Attrs["string_list"].(types.List).Elems)
 
 	require.Equal(t, types.List{
-		Null:     false,
+		Null:     true,
 		Unknown:  false,
 		Elems:    make([]attr.Value, 0),
 		ElemType: types.StringType,
@@ -139,8 +139,8 @@ func TestCopyToList(t *testing.T) {
 	}, o.Attrs["bytes_list"].(types.List).Elems)
 
 	require.Equal(t, []attr.Value{
-		TimeValue{Null: false, Unknown: false, Value: timestamp},
-		TimeValue{Null: false, Unknown: false, Value: timestamp},
+		TimeValue{Null: false, Unknown: false, Value: timestamp, Format: time.RFC3339},
+		TimeValue{Null: false, Unknown: false, Value: timestamp, Format: time.RFC3339},
 	}, o.Attrs["timestamp_list"].(types.List).Elems)
 
 	require.Equal(t, []attr.Value{

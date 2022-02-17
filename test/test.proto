@@ -35,6 +35,12 @@ option (gogoproto.goproto_getters_all) = false;
 //   - byte arrays, which are treated as strings by default
 //
 
+enum Mode {
+    UNKNOWN = 0;
+    ON = 1;
+    OFF = 2;
+}
+
 // Test message definition.
 message Test {
     // Str string field
@@ -123,6 +129,9 @@ message Test {
 
     // MapObjectNullable is the object map with nullable values
     map<string, Nested> MapObjectNullable = 30 [ (gogoproto.nullable) = true ];
+
+    // Mode is the enum value
+    Mode Mode = 31;
 }
 
 // Nested message definition

@@ -402,6 +402,7 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 					},
 				},
 			},
+			"mode": types.Int64{Value: 1},
 		},
 		AttrTypes: obj.AttrTypes,
 	}
@@ -424,55 +425,3 @@ func copyToTerraformObject(t *testing.T) types.Object {
 		AttrTypes: obj.AttrTypes,
 	}
 }
-
-// var (
-// 	// copyToTerraformObject is the target Terraform template object for CopyTo* tests
-// 	copyToTerraformObject = types.Object{
-// 		Attrs: map[string]attr.Value{
-// 			"str":    types.String{Unknown: true},
-// 			"int32":  types.Int64{Unknown: true},
-// 			"int64":  types.Int64{Unknown: true},
-// 			"float":  types.Float64{Unknown: true},
-// 			"double": types.Float64{Unknown: true},
-// 			"bool":   types.Bool{Unknown: true},
-// 			"bytes":  types.String{Unknown: true},
-
-// 			"timestamp":                         TimeValue{Unknown: true},
-// 			"timestamp_missing":                 TimeValue{Unknown: true},
-// 			"timestamp_nullable":                TimeValue{Unknown: true},
-// 			"timestamp_nullable_with_nil_value": TimeValue{Unknown: true},
-// 			"duration_standard":                 DurationValue{Unknown: true},
-// 			"duration_standard_missing":         DurationValue{Unknown: true},
-// 			"duration_custom":                   DurationValue{Unknown: true},
-// 			"duration_custom_missing":           DurationValue{Unknown: true},
-
-// 			"nested": types.Object{
-// 				Attrs: map[string]attr.Value{
-// 					"str": types.String{Unknown: true},
-// 				},
-// 				AttrTypes: map[string]attr.Type{
-// 					"str": types.StringType,
-// 				},
-// 			},
-
-// 			"nested_nullable": types.Object{
-// 				Attrs: map[string]attr.Value{
-// 					"str": types.String{Unknown: true},
-// 				},
-// 				AttrTypes: map[string]attr.Type{
-// 					"str": types.StringType,
-// 				},
-// 			},
-
-// 			"nested_nullable_with_nil_value": types.Object{
-// 				Attrs: map[string]attr.Value{
-// 					"str": types.String{Unknown: true},
-// 				},
-// 				AttrTypes: map[string]attr.Type{
-// 					"str": types.StringType,
-// 				},
-// 			},
-// 		},
-// 	}
-
-// )
