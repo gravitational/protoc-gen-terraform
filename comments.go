@@ -17,36 +17,18 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
 // Comment represents a wrapper over a string containing a comment
 type Comment string
 
-// SlashSlash appends "//" to comment
-func (s Comment) SlashSlash(addSpace bool) string {
-	var r []string
-
-	l := strings.Split(string(s), "\n")
-
-	for _, s := range l {
-		if strings.TrimSpace(s) == "" {
-			continue
-		}
-
-		v := "//%v"
-		if addSpace {
-			v = "// %v"
-		}
-
-		r = append(r, fmt.Sprintf(v, s))
-	}
-
-	return strings.Join(r, "\n")
-}
-
 // ToSingleLine returns multiline comment as a single string
 func (s Comment) ToSingleLine() string {
-	return strings.TrimSpace(strings.Join(strings.Split(string(s), "\n"), " "))
+	lines := strings.Split(string(s), "\n")
+	for i, l := range lines {
+		lines[i] = strings.TrimSpace(l)
+	}
+
+	return strings.TrimSpace(strings.Join(lines, " "))
 }

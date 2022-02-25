@@ -124,7 +124,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 	}
 
 	d := j.Dict{
-		j.Id("Description"): j.Lit(f.RawComment),
+		j.Id("Description"): j.Lit(f.Comment),
 		j.Id("Type"):        f.schemaType(), // nils are automatically omitted
 		j.Id("Attributes"):  f.attributes(),
 	}

@@ -29,9 +29,7 @@ type Message struct {
 	GoType string
 	// Fields contains the collection of fields
 	Fields []*Field
-	// RawComment is field comment in proto file without // prepended
-	RawComment string
-	// Comment is field comment in proto file with // prepended
+	// Comment is field comment in proto file
 	Comment string
 	// Path represents path to the current message in proto file (types.UserV2.Metadata)
 	Path string
@@ -82,7 +80,7 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 		InjectedFields: c.GetInjectedFields(),
 	}
 
-	message.RawComment, message.Comment = c.GetComment()
+	message.Comment = c.GetComment()
 
 	return message, nil
 }

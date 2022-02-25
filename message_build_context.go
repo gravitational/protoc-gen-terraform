@@ -71,17 +71,17 @@ func (c MessageBuildContext) GetGoType() string {
 }
 
 // GetComment returns the message source code comment and it's raw text
-func (c MessageBuildContext) GetComment() (string, string) {
+func (c MessageBuildContext) GetComment() string {
 	p := c.desc.Path()
 
 	for _, l := range c.desc.File().GetSourceCodeInfo().GetLocation() {
 		if c.GetLocationPath(l) == p {
 			c := Comment(strings.Trim(l.GetLeadingComments(), "\n"))
-			return c.ToSingleLine(), c.SlashSlash(false)
+			return c.ToSingleLine()
 		}
 	}
 
-	return "", ""
+	return ""
 }
 
 // IsExcluded returns true if the message is not specified in the type list
