@@ -40,7 +40,7 @@ func TestCopyFromPrimitives(t *testing.T) {
 	require.Equal(t, Mode_ON, target.Mode)
 }
 
-func TestTestCopyFromTime(t *testing.T) {
+func TestCopyFromTime(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{TimestampNullableWithNilValue: &timestamp}

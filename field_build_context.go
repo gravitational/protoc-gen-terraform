@@ -316,19 +316,19 @@ func (c *FieldBuildContext) IsCastType() bool {
 	return c.field.IsCastType()
 }
 
-// GetComment returns field comment as a single line and as a block comment
-func (c *FieldBuildContext) GetComment() (string, string) {
+// GetComment returns field comment as a single line
+func (c *FieldBuildContext) GetComment() string {
 	// ",2," marks that we are extracting comment for a message field. See descriptor.SourceCodeInfo source for details.
 	p := c.desc.Path() + ",2," + strconv.Itoa(c.index)
 
 	for _, l := range c.desc.File().GetSourceCodeInfo().GetLocation() {
 		if c.GetLocationPath(l) == p {
 			c := Comment(strings.TrimSpace(strings.Trim(l.GetLeadingComments(), "\n")))
-			return c.ToSingleLine(), c.SlashSlash(false)
+			return c.ToSingleLine()
 		}
 	}
 
-	return "", ""
+	return ""
 }
 
 // GetMessageDescriptor returns underlying field message descriptor

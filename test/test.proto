@@ -44,7 +44,7 @@ enum Mode {
 // Test message definition.
 message Test {
     // Str string field
-    string Str = 1;
+    string Str = 1 [ (gogoproto.jsontag) = "str1" ];
 
     // Int32 int32 field
     int32 Int32 = 2;
@@ -109,7 +109,7 @@ message Test {
     // Nested nested message field, non-nullable
     Nested Nested = 22 [ (gogoproto.nullable) = false ];
 
-    // NestedNullable nested message field, nullabel
+    // NestedNullable nested message field, nullable
     Nested NestedNullable = 23 [ (gogoproto.nullable) = true ];
 
     // NestedNullableWithNilValue nested message field, with no value set
@@ -132,6 +132,9 @@ message Test {
 
     // Mode is the enum value
     Mode Mode = 31;
+
+    // Excluded is the excluded field
+    bool Excluded = 32;
 }
 
 // Nested message definition

@@ -22,8 +22,8 @@ func (d Duration) String() string {
 // BoolCustom custom bool array
 type BoolCustom bool
 
-// GenSchemaBoolCustom generates custom field schema (bool list)
-func GenSchemaBoolCustom(_ context.Context) tfsdk.Attribute {
+// GenSchemaBoolSpecial generates custom field schema (bool list)
+func GenSchemaBoolSpecial(_ context.Context) tfsdk.Attribute {
 	return tfsdk.Attribute{
 		Type: types.ListType{
 			ElemType: types.BoolType,
@@ -31,8 +31,8 @@ func GenSchemaBoolCustom(_ context.Context) tfsdk.Attribute {
 	}
 }
 
-// CopyFromBoolCustom copies target value to the source
-func CopyFromBoolCustom(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom) {
+// CopyFromBoolSpecial copies target value to the source
+func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom) {
 	v, ok := tf.(types.List)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
@@ -55,8 +55,8 @@ func CopyFromBoolCustom(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom
 	*obj = arr
 }
 
-// CopyToBoolCustom copies source value to the target
-func CopyToBoolCustom(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value) attr.Value {
+// CopyToBoolSpecial copies source value to the target
+func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{

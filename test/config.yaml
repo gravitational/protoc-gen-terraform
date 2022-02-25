@@ -2,12 +2,30 @@
 types:
   - Test
 duration_custom_type: Duration
+use_state_for_unknown_by_default: true
+sort: true
+target_package_name: test
+# default_package_name: test - since source and target package names equal, there's no need for this
+
+exclude_fields:
+  - Test.Excluded
+computed_fields:
+  - Test.Str
+required_fields:
+  - Test.Str
+sensitive_fields:
+  - Test.Str
+suffixes:
+  BoolCustom: BoolSpecial
+
+name_overrides:
+  Test.Str: "str"
 
 time_type:
-  type: "TimeType"            # Struct name of attrs.Type
-  value_type: "TimeValue"     # Struct name of attrs.Value
-  cast_to_type: "time.Time"   # Go type of .Value
-  cast_from_type: "time.Time" # Go type of an object field
+  type: "TimeType"                # Struct name of attrs.Type
+  value_type: "TimeValue"         # Struct name of attrs.Value
+  cast_to_type: "time.Time"       # Go type of .Value
+  cast_from_type: "time.Time"     # Go type of an object field
   type_constructor: UseRFC3339Time()
 
 duration_type:
@@ -26,3 +44,7 @@ injected_fields:
 plan_modifiers:
   "Test.Str":
     - github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()
+
+validators:
+  "Test.Str":
+    - UseMockValidator()

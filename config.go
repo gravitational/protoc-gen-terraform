@@ -27,6 +27,30 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// flagMap represents flag map
+type flagMap map[string]struct{}
+
+// UnmarshalYAML unmarshals values from yaml
+func (lm *flagMap) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	//Unmarshal time to string then convert to time.Time manually
+	var list []string
+	if err := unmarshal(&list); err != nil {
+		return err
+	}
+
+	*lm = flagMapFromArray(list)
+	return nil
+}
+
+// listMapFrom array converts array of strings to flag map
+func flagMapFromArray(v []string) flagMap {
+	r := make(flagMap)
+	for _, n := range v {
+		r[n] = struct{}{}
+	}
+	return r
+}
+
 // SchemaType represents a struct used for the schema type overrides
 type SchemaType struct {
 	// Type is a Go attr.Type struct name
@@ -64,31 +88,33 @@ type Config struct {
 	// Types is the list of top level types to export. This list must be explicit.
 	//
 	// Passed from command line (--terraform_out=types=types.UserV2:./_out)
-	Types map[string]struct{} `yaml:"-"`
+	Types flagMap `yaml:"types"`
 	// DurationCustomType this type name will be treated as a custom extendee of time.Duration
 	DurationCustomType string `yaml:"duration_custom_type,omitempty"`
 	// ExcludeFields is the list of fields to ignore.
 	//
 	// Passed from command line (--terraform_out=excludeFields=types.UserV2.Expires:./_out)
-	ExcludeFields map[string]struct{} `yaml:"-"`
+	ExcludeFields flagMap `yaml:"exclude_fields"`
 	// TargetPackageName sets the name of the target package
 	TargetPackageName string `yaml:"target_package_name,omitempty"`
 	// DefaultPackageName represents the package name of the proto-generated code
 	DefaultPackageName string `yaml:"default_package_name,omitempty"`
-	// CustomImports adds external imports to the target file
-	ExternalImports []string `yaml:"external_imports,omitempty"`
+	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
+	Sort bool `yaml:"sort,omitempty"`
+	// UseStateForUnknownByDefault represents flag, if true - appends UseStateForUnknown to all computed fields
+	UseStateForUnknownByDefault bool `yaml:"use_state_for_unknown_by_default,omitempty"`
 	// ComputedFields is the list of fields to mark as 'Computed: true'
 	//
 	// Passed from command line (--terraform_out=computed=types.UserV2.Kind:./_out)
-	ComputedFields map[string]struct{} `yaml:"-"`
+	ComputedFields flagMap `yaml:"computed_fields"`
 	// RequiredFields is the list of fields to mark as 'Required: true'
 	//
 	// Passed from command line (--terraform_out=required=types.Metadata.Name:./_out)
-	RequiredFields map[string]struct{} `yaml:"-"`
+	RequiredFields flagMap `yaml:"required_fields"`
 	// SensitiveFields is the list of fields to mark as 'Sensitive: true'
 	//
 	// Passed from command line (--terraform_out=sensitive=types.Token.Name:./_out)
-	SensitiveFields map[string]struct{} `yaml:"-"`
+	SensitiveFields flagMap `yaml:"sensitive_fields"`
 	// Suffixes represents map of suffixes for custom types
 	Suffixes map[string]string `yaml:"suffixes,omitempty"`
 	// NameOverrides represents map of CamelCased field names to under_score field names
@@ -99,29 +125,12 @@ type Config struct {
 	PlanModifiers map[string][]string `yaml:"plan_modifiers,omitempty"`
 	// SchemaTypes represents a map of a schema field type overrides
 	SchemaTypes map[string]SchemaType `yaml:"schema_types,omitempty"`
-	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
-	Sort bool `yaml:"sort,omitempty"`
-	// UseStateForUnknownByDefault represents flag, if true - appends UseStateForUnknown to all computed fields
-	UseStateForUnknownByDefault bool `yaml:"use_state_for_unknown_by_default,omitempty"`
 	// TimeType represents time.Time type for the Terraform Framework if set in SchemaTypes
 	TimeType *SchemaType `yaml:"time_type,omitempty"`
 	// DurationType represents time.Duration type for the Terraform Framework if set in SchemaTypes
 	DurationType *SchemaType `yaml:"duration_type,omitempty"`
 	// InjectedFields represents array of fields which are missing in object, but must be injected in the schema
 	InjectedFields map[string][]InjectedField `yaml:"injected_fields,omitempty"`
-
-	// TypesRaw types loaded from a yaml file as is
-	TypesRaw []string `yaml:"types,omitempty"`
-	// ComputedFieldsRaw computed fields loaded from a yaml file as is
-	ComputedFieldsRaw []string `yaml:"computed_fields,omitempty"`
-	// RequiredFieldsRaw required fields loaded from a yaml file as is
-	RequiredFieldsRaw []string `yaml:"required_fields,omitempty"`
-	// SensitiveFieldsRaw sensitive fields loaded from a yaml file as is
-	SensitiveFieldsRaw []string `yaml:"sensitive_fields,omitempty"`
-	// ForceNewFieldsRaw force new fields loaded from a yaml file as is
-	ForceNewFieldsRaw []string `yaml:"force_new_fields,omitempty"`
-	// ExcludeFieldsRaw exclude fields loaded from a yaml file as is
-	ExcludeFieldsRaw []string `yaml:"exclude_fields,omitempty"`
 
 	// params represents CLI params passed from the plugin
 	params map[string]string `yaml:"-"`
@@ -145,9 +154,8 @@ func ReadConfig(params map[string]string) (*Config, error) {
 		return nil, trace.Wrap(err)
 	}
 
-	err = c.validate()
-	if err != nil {
-		return nil, trace.Wrap(err)
+	if len(c.Types) == 0 {
+		return nil, trace.Errorf("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
 	}
 
 	c.dump()
@@ -165,7 +173,7 @@ func (c *Config) getStringParam(name string, d string) string {
 }
 
 // getSliceParam trims, splits to elements and returns []string CLI param value
-func (c *Config) getSliceParam(name string, d []string) []string {
+func (c *Config) getSliceParam(name string, d flagMap) flagMap {
 	v := c.getStringParam(name, "")
 
 	// Prevents returning slice with an empty single element
@@ -173,7 +181,7 @@ func (c *Config) getSliceParam(name string, d []string) []string {
 		return d
 	}
 
-	return strings.Split(v, paramDelimiter)
+	return flagMapFromArray(strings.Split(v, paramDelimiter))
 }
 
 // getBoolParam returns bool CLI param value, false by default
@@ -190,15 +198,6 @@ func (c *Config) getBoolParam(name string, d bool) bool {
 	}
 
 	return b
-}
-
-// decodeRawValue converts []string (usual type for a field list) to map[string]struct{}
-func (c *Config) decodeRawValue(v []string) map[string]struct{} {
-	r := make(map[string]struct{})
-	for _, n := range v {
-		r[n] = struct{}{}
-	}
-	return r
 }
 
 // readFromYaml reads configuration from a yaml file passed in the config parameter
@@ -224,33 +223,16 @@ func (c *Config) readFromYaml() error {
 
 // readFromCLI reads configuration from the CLI param
 func (c *Config) readFromCLI() error {
-	c.TypesRaw = c.getSliceParam("types", c.TypesRaw)
-	c.ExcludeFieldsRaw = c.getSliceParam("exclude_fields", c.ExcludeFieldsRaw)
-	c.ComputedFieldsRaw = c.getSliceParam("computed_fields", c.ComputedFieldsRaw)
-	c.RequiredFieldsRaw = c.getSliceParam("required_fields", c.RequiredFieldsRaw)
-	c.ForceNewFieldsRaw = c.getSliceParam("force_new", c.ForceNewFieldsRaw)
-	c.SensitiveFieldsRaw = c.getSliceParam("sensitive", c.SensitiveFieldsRaw)
+	c.Types = c.getSliceParam("types", c.Types)
+	c.ExcludeFields = c.getSliceParam("exclude_fields", c.ExcludeFields)
+	c.ComputedFields = c.getSliceParam("computed_fields", c.ComputedFields)
+	c.RequiredFields = c.getSliceParam("required_fields", c.RequiredFields)
+	c.SensitiveFields = c.getSliceParam("sensitive", c.SensitiveFields)
 
 	c.DefaultPackageName = c.getStringParam("default_package_name", c.DefaultPackageName)
 	c.TargetPackageName = c.getStringParam("target_package_name", c.TargetPackageName)
 	c.DurationCustomType = c.getStringParam("custom_duration", c.DurationCustomType)
-	c.ExternalImports = c.getSliceParam("external_imports", c.ExternalImports)
 	c.Sort = c.getBoolParam("sort", c.Sort)
-
-	return nil
-}
-
-// validate validates the configuration
-func (c *Config) validate() error {
-	c.Types = c.decodeRawValue(c.TypesRaw)
-	c.ExcludeFields = c.decodeRawValue(c.ExcludeFieldsRaw)
-	c.ComputedFields = c.decodeRawValue(c.ComputedFieldsRaw)
-	c.RequiredFields = c.decodeRawValue(c.RequiredFieldsRaw)
-	c.SensitiveFields = c.decodeRawValue(c.SensitiveFieldsRaw)
-
-	if len(c.Types) == 0 {
-		return trace.Errorf("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
-	}
 
 	return nil
 }
@@ -266,10 +248,6 @@ func (c *Config) dump() {
 
 	if c.TargetPackageName != "" {
 		log.Printf("Target package name: %v", c.TargetPackageName)
-	}
-
-	if len(c.ExternalImports) > 0 {
-		log.Printf("Exetrnal imports: %v", c.ExternalImports)
 	}
 
 	if c.DurationCustomType != "" {

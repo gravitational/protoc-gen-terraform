@@ -12,14 +12,16 @@ go install github.com/gravitational/protoc-gen-terraform
 
 # Usage
 
+Given that you have `gogo/protobuf` and `gravitational/teleport/api` in your $GOSRC dir:
+
 ```
 mkdir -p ./tfschema
 protoc \
-    -I$(teleport_dir)/api/types \
-    -I$(teleport_dir)/vendor/github.com/gogo/protobuf \
-    -I$(srcpath) \
-    --plugin=./_build/protoc-gen-terraform \
-    --terraform_out=types=types.UserV2+types.RoleV3,pkg=types:tfschema \
+    -I$(go env GOPATH)/src/github.com/gravitational/teleport/api/types \
+    -I$(go env GOPATH)/src/github.com/gogo/protobuf \
+    -I$(go env GOPATH)/src \
+    --plugin=./build/protoc-gen-terraform \
+    --terraform_out=types=RoleSpecV4,pkg=types:tfschema \
     types.proto
 ```
 

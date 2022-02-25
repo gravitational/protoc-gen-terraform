@@ -1,3 +1,4 @@
+# Get the current directory relative to Makefile location
 PWD = $(realpath $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
 
 PACKAGE_VERSION = $(shell cat $(PWD)/VERSION)

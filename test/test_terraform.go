@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2021 Gravitational, Inc.
+Copyright 2015-2022 Gravitational, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"bool_custom_list": GenSchemaBoolCustom(ctx),
+		"bool_custom_list": GenSchemaBoolSpecial(ctx),
 		"bytes": {
 			Description: "bytes byte[] field",
 			Optional:    true,
@@ -321,7 +321,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
-			Description: "NestedNullable nested message field, nullabel",
+			Description: "NestedNullable nested message field, nullable",
 			Optional:    true,
 		},
 		"nested_nullable_with_nil_value": {
@@ -359,10 +359,13 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 		},
 		"str": {
+			Computed:      true,
 			Description:   "Str string field",
-			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Required:      true,
+			Sensitive:     true,
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Validators:    []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
 		},
 		"string_list": {
 			Description: "StringList []string field",
@@ -406,70 +409,70 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *Test) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
-		a, ok := tf.Attrs["str"]
+		a, ok := tf.Attrs["bool"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Str"})
+			diags.Append(attrReadMissingDiag{"Test.Bool"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.Bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+			} else {
+				var t bool
+				if !v.Null && !v.Unknown {
+					t = bool(v.Value)
+				}
+				obj.Bool = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["bool_custom_list"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.BoolCustomList"})
+		}
+		CopyFromBoolSpecial(diags, a, &obj.BoolCustomList)
+	}
+	{
+		a, ok := tf.Attrs["bytes"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.bytes"})
 		} else {
 			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				diags.Append(attrReadConversionFailureDiag{"Test.bytes", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
-				var t string
+				var t []byte
 				if !v.Null && !v.Unknown {
-					t = string(v.Value)
+					t = []byte(v.Value)
 				}
-				obj.Str = t
+				obj.Bytes = t
 			}
 		}
 	}
 	{
-		a, ok := tf.Attrs["int32"]
+		a, ok := tf.Attrs["bytes_list"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Int32"})
+			diags.Append(attrReadMissingDiag{"Test.BytesList"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				diags.Append(attrReadConversionFailureDiag{"Test.BytesList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				var t int32
+				obj.BytesList = make([][]byte, len(v.Elems))
 				if !v.Null && !v.Unknown {
-					t = int32(v.Value)
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.BytesList", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+						} else {
+							var t []byte
+							if !v.Null && !v.Unknown {
+								t = []byte(v.Value)
+							}
+							obj.BytesList[k] = t
+						}
+					}
 				}
-				obj.Int32 = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["int64"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Int64"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
-			} else {
-				var t int64
-				if !v.Null && !v.Unknown {
-					t = int64(v.Value)
-				}
-				obj.Int64 = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["float"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Float"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
-			} else {
-				var t float32
-				if !v.Null && !v.Unknown {
-					t = float32(v.Value)
-				}
-				obj.Float = t
 			}
 		}
 	}
@@ -491,106 +494,63 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		}
 	}
 	{
-		a, ok := tf.Attrs["bool"]
+		a, ok := tf.Attrs["duration_custom"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Bool"})
+			diags.Append(attrReadMissingDiag{"Test.DurationCustom"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			v, ok := a.(DurationValue)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
 			} else {
-				var t bool
+				var t Duration
 				if !v.Null && !v.Unknown {
-					t = bool(v.Value)
+					t = Duration(v.Value)
 				}
-				obj.Bool = t
+				obj.DurationCustom = t
 			}
 		}
 	}
 	{
-		a, ok := tf.Attrs["bytes"]
+		a, ok := tf.Attrs["duration_custom_list"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.bytes"})
+			diags.Append(attrReadMissingDiag{"Test.DurationCustomList"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.bytes", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				var t []byte
+				obj.DurationCustomList = make([]Duration, len(v.Elems))
 				if !v.Null && !v.Unknown {
-					t = []byte(v.Value)
+					for k, a := range v.Elems {
+						v, ok := a.(DurationValue)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomList", "DurationValue"})
+						} else {
+							var t Duration
+							if !v.Null && !v.Unknown {
+								t = Duration(v.Value)
+							}
+							obj.DurationCustomList[k] = t
+						}
+					}
 				}
-				obj.Bytes = t
 			}
 		}
 	}
 	{
-		a, ok := tf.Attrs["timestamp"]
+		a, ok := tf.Attrs["duration_custom_missing"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Timestamp"})
+			diags.Append(attrReadMissingDiag{"Test.DurationCustomMissing"})
 		} else {
-			v, ok := a.(TimeValue)
+			v, ok := a.(DurationValue)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Timestamp", "TimeValue"})
+				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
 			} else {
-				var t time.Time
+				var t Duration
 				if !v.Null && !v.Unknown {
-					t = time.Time(v.Value)
+					t = Duration(v.Value)
 				}
-				obj.Timestamp = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["timestamp_missing"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.TimestampMissing"})
-		} else {
-			v, ok := a.(TimeValue)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
-			} else {
-				var t time.Time
-				if !v.Null && !v.Unknown {
-					t = time.Time(v.Value)
-				}
-				obj.TimestampMissing = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["timestamp_nullable"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.TimestampNullable"})
-		} else {
-			v, ok := a.(TimeValue)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
-			} else {
-				var t *time.Time
-				if !v.Null && !v.Unknown {
-					c := time.Time(v.Value)
-					t = &c
-				}
-				obj.TimestampNullable = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["timestamp_nullable_with_nil_value"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.TimestampNullableWithNilValue"})
-		} else {
-			v, ok := a.(TimeValue)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
-			} else {
-				var t *time.Time
-				if !v.Null && !v.Unknown {
-					c := time.Time(v.Value)
-					t = &c
-				}
-				obj.TimestampNullableWithNilValue = t
+				obj.DurationCustomMissing = t
 			}
 		}
 	}
@@ -629,964 +589,53 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		}
 	}
 	{
-		a, ok := tf.Attrs["duration_custom"]
+		a, ok := tf.Attrs["float"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.DurationCustom"})
+			diags.Append(attrReadMissingDiag{"Test.Float"})
 		} else {
-			v, ok := a.(DurationValue)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
+				diags.Append(attrReadConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 			} else {
-				var t Duration
+				var t float32
 				if !v.Null && !v.Unknown {
-					t = Duration(v.Value)
+					t = float32(v.Value)
 				}
-				obj.DurationCustom = t
+				obj.Float = t
 			}
 		}
 	}
 	{
-		a, ok := tf.Attrs["duration_custom_missing"]
+		a, ok := tf.Attrs["int32"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.DurationCustomMissing"})
+			diags.Append(attrReadMissingDiag{"Test.Int32"})
 		} else {
-			v, ok := a.(DurationValue)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
+				diags.Append(attrReadConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
-				var t Duration
+				var t int32
 				if !v.Null && !v.Unknown {
-					t = Duration(v.Value)
+					t = int32(v.Value)
 				}
-				obj.DurationCustomMissing = t
+				obj.Int32 = t
 			}
 		}
 	}
 	{
-		a, ok := tf.Attrs["string_list"]
+		a, ok := tf.Attrs["int64"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.StringList"})
+			diags.Append(attrReadMissingDiag{"Test.Int64"})
 		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+				diags.Append(attrReadConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
-				obj.StringList = make([]string, len(v.Elems))
+				var t int64
 				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.StringList", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-						} else {
-							var t string
-							if !v.Null && !v.Unknown {
-								t = string(v.Value)
-							}
-							obj.StringList[k] = t
-						}
-					}
+					t = int64(v.Value)
 				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["string_list_empty"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.StringListEmpty"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-			} else {
-				obj.StringListEmpty = make([]string, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.StringListEmpty", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-						} else {
-							var t string
-							if !v.Null && !v.Unknown {
-								t = string(v.Value)
-							}
-							obj.StringListEmpty[k] = t
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["bool_custom_list"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.BoolCustomList"})
-		}
-		CopyFromBoolCustom(diags, a, &obj.BoolCustomList)
-	}
-	{
-		a, ok := tf.Attrs["bytes_list"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.BytesList"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.BytesList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-			} else {
-				obj.BytesList = make([][]byte, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.BytesList", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-						} else {
-							var t []byte
-							if !v.Null && !v.Unknown {
-								t = []byte(v.Value)
-							}
-							obj.BytesList[k] = t
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["timestamp_list"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.TimestampList"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.TimestampList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-			} else {
-				obj.TimestampList = make([]*time.Time, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(TimeValue)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.TimestampList", "TimeValue"})
-						} else {
-							var t *time.Time
-							if !v.Null && !v.Unknown {
-								c := time.Time(v.Value)
-								t = &c
-							}
-							obj.TimestampList[k] = t
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["duration_custom_list"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.DurationCustomList"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-			} else {
-				obj.DurationCustomList = make([]Duration, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(DurationValue)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.DurationCustomList", "DurationValue"})
-						} else {
-							var t Duration
-							if !v.Null && !v.Unknown {
-								t = Duration(v.Value)
-							}
-							obj.DurationCustomList[k] = t
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["nested"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.Nested"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.Nested", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.Nested = Nested{}
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj := &obj.Nested
-					{
-						a, ok := tf.Attrs["str"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.Nested.Str"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Str = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["nested_list"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.Nested.NestedList"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-							} else {
-								obj.NestedList = make([]*OtherNested, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-										} else {
-											var t *OtherNested
-											if !v.Null && !v.Unknown {
-												tf := v
-												t = &OtherNested{}
-												obj := t
-												{
-													a, ok := tf.Attrs["str"]
-													if !ok {
-														diags.Append(attrReadMissingDiag{"Test.Nested.NestedList.Str"})
-													} else {
-														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														} else {
-															var t string
-															if !v.Null && !v.Unknown {
-																t = string(v.Value)
-															}
-															obj.Str = t
-														}
-													}
-												}
-											}
-											obj.NestedList[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["map"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.Nested.Map"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-							} else {
-								obj.Map = make(map[string]string, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.Nested.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Map[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["map_object_nested"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.Nested.MapObjectNested"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-							} else {
-								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-										} else {
-											var t OtherNested
-											if !v.Null && !v.Unknown {
-												tf := v
-												obj := &t
-												{
-													a, ok := tf.Attrs["str"]
-													if !ok {
-														diags.Append(attrReadMissingDiag{"Test.Nested.MapObjectNested.Str"})
-													} else {
-														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														} else {
-															var t string
-															if !v.Null && !v.Unknown {
-																t = string(v.Value)
-															}
-															obj.Str = t
-														}
-													}
-												}
-											}
-											obj.MapObjectNested[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["nested_nullable"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.NestedNullable"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.NestedNullable = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.NestedNullable = &Nested{}
-					obj := obj.NestedNullable
-					{
-						a, ok := tf.Attrs["str"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullable.Str"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Str = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["nested_list"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullable.NestedList"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-							} else {
-								obj.NestedList = make([]*OtherNested, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-										} else {
-											var t *OtherNested
-											if !v.Null && !v.Unknown {
-												tf := v
-												t = &OtherNested{}
-												obj := t
-												{
-													a, ok := tf.Attrs["str"]
-													if !ok {
-														diags.Append(attrReadMissingDiag{"Test.NestedNullable.NestedList.Str"})
-													} else {
-														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														} else {
-															var t string
-															if !v.Null && !v.Unknown {
-																t = string(v.Value)
-															}
-															obj.Str = t
-														}
-													}
-												}
-											}
-											obj.NestedList[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["map"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullable.Map"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-							} else {
-								obj.Map = make(map[string]string, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Map[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["map_object_nested"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullable.MapObjectNested"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-							} else {
-								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-										} else {
-											var t OtherNested
-											if !v.Null && !v.Unknown {
-												tf := v
-												obj := &t
-												{
-													a, ok := tf.Attrs["str"]
-													if !ok {
-														diags.Append(attrReadMissingDiag{"Test.NestedNullable.MapObjectNested.Str"})
-													} else {
-														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														} else {
-															var t string
-															if !v.Null && !v.Unknown {
-																t = string(v.Value)
-															}
-															obj.Str = t
-														}
-													}
-												}
-											}
-											obj.MapObjectNested[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["nested_nullable_with_nil_value"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				obj.NestedNullableWithNilValue = nil
-				if !v.Null && !v.Unknown {
-					tf := v
-					obj.NestedNullableWithNilValue = &Nested{}
-					obj := obj.NestedNullableWithNilValue
-					{
-						a, ok := tf.Attrs["str"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.Str"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							} else {
-								var t string
-								if !v.Null && !v.Unknown {
-									t = string(v.Value)
-								}
-								obj.Str = t
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["nested_list"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.NestedList"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-							} else {
-								obj.NestedList = make([]*OtherNested, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-										} else {
-											var t *OtherNested
-											if !v.Null && !v.Unknown {
-												tf := v
-												t = &OtherNested{}
-												obj := t
-												{
-													a, ok := tf.Attrs["str"]
-													if !ok {
-														diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.NestedList.Str"})
-													} else {
-														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														} else {
-															var t string
-															if !v.Null && !v.Unknown {
-																t = string(v.Value)
-															}
-															obj.Str = t
-														}
-													}
-												}
-											}
-											obj.NestedList[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["map"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.Map"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-							} else {
-								obj.Map = make(map[string]string, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Map[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-					{
-						a, ok := tf.Attrs["map_object_nested"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-							} else {
-								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
-								if !v.Null && !v.Unknown {
-									for k, a := range v.Elems {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-										} else {
-											var t OtherNested
-											if !v.Null && !v.Unknown {
-												tf := v
-												obj := &t
-												{
-													a, ok := tf.Attrs["str"]
-													if !ok {
-														diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str"})
-													} else {
-														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														} else {
-															var t string
-															if !v.Null && !v.Unknown {
-																t = string(v.Value)
-															}
-															obj.Str = t
-														}
-													}
-												}
-											}
-											obj.MapObjectNested[k] = t
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["nested_list"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.NestedList"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-			} else {
-				obj.NestedList = make([]Nested, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-						} else {
-							var t Nested
-							if !v.Null && !v.Unknown {
-								tf := v
-								obj := &t
-								{
-									a, ok := tf.Attrs["str"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedList.Str"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Str = t
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["nested_list"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedList.NestedList"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-										} else {
-											obj.NestedList = make([]*OtherNested, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-													} else {
-														var t *OtherNested
-														if !v.Null && !v.Unknown {
-															tf := v
-															t = &OtherNested{}
-															obj := t
-															{
-																a, ok := tf.Attrs["str"]
-																if !ok {
-																	diags.Append(attrReadMissingDiag{"Test.NestedList.NestedList.Str"})
-																} else {
-																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																	if !ok {
-																		diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																	} else {
-																		var t string
-																		if !v.Null && !v.Unknown {
-																			t = string(v.Value)
-																		}
-																		obj.Str = t
-																	}
-																}
-															}
-														}
-														obj.NestedList[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["map"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedList.Map"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-										} else {
-											obj.Map = make(map[string]string, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-													} else {
-														var t string
-														if !v.Null && !v.Unknown {
-															t = string(v.Value)
-														}
-														obj.Map[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["map_object_nested"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedList.MapObjectNested"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-										} else {
-											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-													} else {
-														var t OtherNested
-														if !v.Null && !v.Unknown {
-															tf := v
-															obj := &t
-															{
-																a, ok := tf.Attrs["str"]
-																if !ok {
-																	diags.Append(attrReadMissingDiag{"Test.NestedList.MapObjectNested.Str"})
-																} else {
-																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																	if !ok {
-																		diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																	} else {
-																		var t string
-																		if !v.Null && !v.Unknown {
-																			t = string(v.Value)
-																		}
-																		obj.Str = t
-																	}
-																}
-															}
-														}
-														obj.MapObjectNested[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-							obj.NestedList[k] = t
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["nested_list_nullable"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.NestedListNullable"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-			} else {
-				obj.NestedListNullable = make([]*Nested, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
-						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-						if !ok {
-							diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-						} else {
-							var t *Nested
-							if !v.Null && !v.Unknown {
-								tf := v
-								t = &Nested{}
-								obj := t
-								{
-									a, ok := tf.Attrs["str"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.Str"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Str = t
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["nested_list"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.NestedList"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-										} else {
-											obj.NestedList = make([]*OtherNested, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-													} else {
-														var t *OtherNested
-														if !v.Null && !v.Unknown {
-															tf := v
-															t = &OtherNested{}
-															obj := t
-															{
-																a, ok := tf.Attrs["str"]
-																if !ok {
-																	diags.Append(attrReadMissingDiag{"Test.NestedListNullable.NestedList.Str"})
-																} else {
-																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																	if !ok {
-																		diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																	} else {
-																		var t string
-																		if !v.Null && !v.Unknown {
-																			t = string(v.Value)
-																		}
-																		obj.Str = t
-																	}
-																}
-															}
-														}
-														obj.NestedList[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["map"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.Map"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-										} else {
-											obj.Map = make(map[string]string, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
-													} else {
-														var t string
-														if !v.Null && !v.Unknown {
-															t = string(v.Value)
-														}
-														obj.Map[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["map_object_nested"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.MapObjectNested"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
-										} else {
-											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-													} else {
-														var t OtherNested
-														if !v.Null && !v.Unknown {
-															tf := v
-															obj := &t
-															{
-																a, ok := tf.Attrs["str"]
-																if !ok {
-																	diags.Append(attrReadMissingDiag{"Test.NestedListNullable.MapObjectNested.Str"})
-																} else {
-																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																	if !ok {
-																		diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																	} else {
-																		var t string
-																		if !v.Null && !v.Unknown {
-																			t = string(v.Value)
-																		}
-																		obj.Str = t
-																	}
-																}
-															}
-														}
-														obj.MapObjectNested[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-							obj.NestedListNullable[k] = t
-						}
-					}
-				}
+				obj.Int64 = t
 			}
 		}
 	}
@@ -1637,69 +686,6 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							if !v.Null && !v.Unknown {
 								tf := v
 								obj := &t
-								{
-									a, ok := tf.Attrs["str"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.MapObject.Str"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Str = t
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["nested_list"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.MapObject.NestedList"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-										} else {
-											obj.NestedList = make([]*OtherNested, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-													} else {
-														var t *OtherNested
-														if !v.Null && !v.Unknown {
-															tf := v
-															t = &OtherNested{}
-															obj := t
-															{
-																a, ok := tf.Attrs["str"]
-																if !ok {
-																	diags.Append(attrReadMissingDiag{"Test.MapObject.NestedList.Str"})
-																} else {
-																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																	if !ok {
-																		diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																	} else {
-																		var t string
-																		if !v.Null && !v.Unknown {
-																			t = string(v.Value)
-																		}
-																		obj.Str = t
-																	}
-																}
-															}
-														}
-														obj.NestedList[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
 								{
 									a, ok := tf.Attrs["map"]
 									if !ok {
@@ -1772,6 +758,69 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										}
 									}
 								}
+								{
+									a, ok := tf.Attrs["nested_list"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.MapObject.NestedList"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+										} else {
+											obj.NestedList = make([]*OtherNested, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+													} else {
+														var t *OtherNested
+														if !v.Null && !v.Unknown {
+															tf := v
+															t = &OtherNested{}
+															obj := t
+															{
+																a, ok := tf.Attrs["str"]
+																if !ok {
+																	diags.Append(attrReadMissingDiag{"Test.MapObject.NestedList.Str"})
+																} else {
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																	if !ok {
+																		diags.Append(attrReadConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																	} else {
+																		var t string
+																		if !v.Null && !v.Unknown {
+																			t = string(v.Value)
+																		}
+																		obj.Str = t
+																	}
+																}
+															}
+														}
+														obj.NestedList[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["str"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.MapObject.Str"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Str = t
+										}
+									}
+								}
 							}
 							obj.MapObject[k] = t
 						}
@@ -1801,69 +850,6 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 								tf := v
 								t = &Nested{}
 								obj := t
-								{
-									a, ok := tf.Attrs["str"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.Str"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										} else {
-											var t string
-											if !v.Null && !v.Unknown {
-												t = string(v.Value)
-											}
-											obj.Str = t
-										}
-									}
-								}
-								{
-									a, ok := tf.Attrs["nested_list"]
-									if !ok {
-										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.NestedList"})
-									} else {
-										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
-										} else {
-											obj.NestedList = make([]*OtherNested, len(v.Elems))
-											if !v.Null && !v.Unknown {
-												for k, a := range v.Elems {
-													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-													if !ok {
-														diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
-													} else {
-														var t *OtherNested
-														if !v.Null && !v.Unknown {
-															tf := v
-															t = &OtherNested{}
-															obj := t
-															{
-																a, ok := tf.Attrs["str"]
-																if !ok {
-																	diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.NestedList.Str"})
-																} else {
-																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																	if !ok {
-																		diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																	} else {
-																		var t string
-																		if !v.Null && !v.Unknown {
-																			t = string(v.Value)
-																		}
-																		obj.Str = t
-																	}
-																}
-															}
-														}
-														obj.NestedList[k] = t
-													}
-												}
-											}
-										}
-									}
-								}
 								{
 									a, ok := tf.Attrs["map"]
 									if !ok {
@@ -1936,6 +922,69 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										}
 									}
 								}
+								{
+									a, ok := tf.Attrs["nested_list"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.NestedList"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+										} else {
+											obj.NestedList = make([]*OtherNested, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+													} else {
+														var t *OtherNested
+														if !v.Null && !v.Unknown {
+															tf := v
+															t = &OtherNested{}
+															obj := t
+															{
+																a, ok := tf.Attrs["str"]
+																if !ok {
+																	diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.NestedList.Str"})
+																} else {
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																	if !ok {
+																		diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																	} else {
+																		var t string
+																		if !v.Null && !v.Unknown {
+																			t = string(v.Value)
+																		}
+																		obj.Str = t
+																	}
+																}
+															}
+														}
+														obj.NestedList[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["str"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.MapObjectNullable.Str"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Str = t
+										}
+									}
+								}
 							}
 							obj.MapObjectNullable[k] = t
 						}
@@ -1961,6 +1010,960 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			}
 		}
 	}
+	{
+		a, ok := tf.Attrs["nested"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.Nested"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.Nested", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.Nested = Nested{}
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj := &obj.Nested
+					{
+						a, ok := tf.Attrs["map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.Nested.Map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+							} else {
+								obj.Map = make(map[string]string, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.Nested.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Map[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["map_object_nested"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.Nested.MapObjectNested"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+							} else {
+								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+										} else {
+											var t OtherNested
+											if !v.Null && !v.Unknown {
+												tf := v
+												obj := &t
+												{
+													a, ok := tf.Attrs["str"]
+													if !ok {
+														diags.Append(attrReadMissingDiag{"Test.Nested.MapObjectNested.Str"})
+													} else {
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrReadConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														} else {
+															var t string
+															if !v.Null && !v.Unknown {
+																t = string(v.Value)
+															}
+															obj.Str = t
+														}
+													}
+												}
+											}
+											obj.MapObjectNested[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["nested_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.Nested.NestedList"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.NestedList = make([]*OtherNested, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+										} else {
+											var t *OtherNested
+											if !v.Null && !v.Unknown {
+												tf := v
+												t = &OtherNested{}
+												obj := t
+												{
+													a, ok := tf.Attrs["str"]
+													if !ok {
+														diags.Append(attrReadMissingDiag{"Test.Nested.NestedList.Str"})
+													} else {
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrReadConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														} else {
+															var t string
+															if !v.Null && !v.Unknown {
+																t = string(v.Value)
+															}
+															obj.Str = t
+														}
+													}
+												}
+											}
+											obj.NestedList[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["str"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.Nested.Str"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.Str = t
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["nested_list"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.NestedList"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+			} else {
+				obj.NestedList = make([]Nested, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+						} else {
+							var t Nested
+							if !v.Null && !v.Unknown {
+								tf := v
+								obj := &t
+								{
+									a, ok := tf.Attrs["map"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedList.Map"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+										} else {
+											obj.Map = make(map[string]string, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+													} else {
+														var t string
+														if !v.Null && !v.Unknown {
+															t = string(v.Value)
+														}
+														obj.Map[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["map_object_nested"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedList.MapObjectNested"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+										} else {
+											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+													} else {
+														var t OtherNested
+														if !v.Null && !v.Unknown {
+															tf := v
+															obj := &t
+															{
+																a, ok := tf.Attrs["str"]
+																if !ok {
+																	diags.Append(attrReadMissingDiag{"Test.NestedList.MapObjectNested.Str"})
+																} else {
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																	if !ok {
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																	} else {
+																		var t string
+																		if !v.Null && !v.Unknown {
+																			t = string(v.Value)
+																		}
+																		obj.Str = t
+																	}
+																}
+															}
+														}
+														obj.MapObjectNested[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["nested_list"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedList.NestedList"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+										} else {
+											obj.NestedList = make([]*OtherNested, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+													} else {
+														var t *OtherNested
+														if !v.Null && !v.Unknown {
+															tf := v
+															t = &OtherNested{}
+															obj := t
+															{
+																a, ok := tf.Attrs["str"]
+																if !ok {
+																	diags.Append(attrReadMissingDiag{"Test.NestedList.NestedList.Str"})
+																} else {
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																	if !ok {
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																	} else {
+																		var t string
+																		if !v.Null && !v.Unknown {
+																			t = string(v.Value)
+																		}
+																		obj.Str = t
+																	}
+																}
+															}
+														}
+														obj.NestedList[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["str"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedList.Str"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Str = t
+										}
+									}
+								}
+							}
+							obj.NestedList[k] = t
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["nested_list_nullable"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.NestedListNullable"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+			} else {
+				obj.NestedListNullable = make([]*Nested, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+						} else {
+							var t *Nested
+							if !v.Null && !v.Unknown {
+								tf := v
+								t = &Nested{}
+								obj := t
+								{
+									a, ok := tf.Attrs["map"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.Map"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+										} else {
+											obj.Map = make(map[string]string, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+													} else {
+														var t string
+														if !v.Null && !v.Unknown {
+															t = string(v.Value)
+														}
+														obj.Map[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["map_object_nested"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.MapObjectNested"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+										} else {
+											obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+													} else {
+														var t OtherNested
+														if !v.Null && !v.Unknown {
+															tf := v
+															obj := &t
+															{
+																a, ok := tf.Attrs["str"]
+																if !ok {
+																	diags.Append(attrReadMissingDiag{"Test.NestedListNullable.MapObjectNested.Str"})
+																} else {
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																	if !ok {
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																	} else {
+																		var t string
+																		if !v.Null && !v.Unknown {
+																			t = string(v.Value)
+																		}
+																		obj.Str = t
+																	}
+																}
+															}
+														}
+														obj.MapObjectNested[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["nested_list"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.NestedList"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+										} else {
+											obj.NestedList = make([]*OtherNested, len(v.Elems))
+											if !v.Null && !v.Unknown {
+												for k, a := range v.Elems {
+													v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+													if !ok {
+														diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+													} else {
+														var t *OtherNested
+														if !v.Null && !v.Unknown {
+															tf := v
+															t = &OtherNested{}
+															obj := t
+															{
+																a, ok := tf.Attrs["str"]
+																if !ok {
+																	diags.Append(attrReadMissingDiag{"Test.NestedListNullable.NestedList.Str"})
+																} else {
+																	v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																	if !ok {
+																		diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																	} else {
+																		var t string
+																		if !v.Null && !v.Unknown {
+																			t = string(v.Value)
+																		}
+																		obj.Str = t
+																	}
+																}
+															}
+														}
+														obj.NestedList[k] = t
+													}
+												}
+											}
+										}
+									}
+								}
+								{
+									a, ok := tf.Attrs["str"]
+									if !ok {
+										diags.Append(attrReadMissingDiag{"Test.NestedListNullable.Str"})
+									} else {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Str = t
+										}
+									}
+								}
+							}
+							obj.NestedListNullable[k] = t
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["nested_nullable"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.NestedNullable"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.NestedNullable = nil
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj.NestedNullable = &Nested{}
+					obj := obj.NestedNullable
+					{
+						a, ok := tf.Attrs["map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.Map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+							} else {
+								obj.Map = make(map[string]string, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Map[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["map_object_nested"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.MapObjectNested"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+							} else {
+								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+										} else {
+											var t OtherNested
+											if !v.Null && !v.Unknown {
+												tf := v
+												obj := &t
+												{
+													a, ok := tf.Attrs["str"]
+													if !ok {
+														diags.Append(attrReadMissingDiag{"Test.NestedNullable.MapObjectNested.Str"})
+													} else {
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														} else {
+															var t string
+															if !v.Null && !v.Unknown {
+																t = string(v.Value)
+															}
+															obj.Str = t
+														}
+													}
+												}
+											}
+											obj.MapObjectNested[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["nested_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.NestedList"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.NestedList = make([]*OtherNested, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+										} else {
+											var t *OtherNested
+											if !v.Null && !v.Unknown {
+												tf := v
+												t = &OtherNested{}
+												obj := t
+												{
+													a, ok := tf.Attrs["str"]
+													if !ok {
+														diags.Append(attrReadMissingDiag{"Test.NestedNullable.NestedList.Str"})
+													} else {
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														} else {
+															var t string
+															if !v.Null && !v.Unknown {
+																t = string(v.Value)
+															}
+															obj.Str = t
+														}
+													}
+												}
+											}
+											obj.NestedList[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["str"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullable.Str"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.Str = t
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["nested_nullable_with_nil_value"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.NestedNullableWithNilValue = nil
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj.NestedNullableWithNilValue = &Nested{}
+					obj := obj.NestedNullableWithNilValue
+					{
+						a, ok := tf.Attrs["map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.Map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+							} else {
+								obj.Map = make(map[string]string, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.Map[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["map_object_nested"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+							} else {
+								obj.MapObjectNested = make(map[string]OtherNested, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+										} else {
+											var t OtherNested
+											if !v.Null && !v.Unknown {
+												tf := v
+												obj := &t
+												{
+													a, ok := tf.Attrs["str"]
+													if !ok {
+														diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str"})
+													} else {
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														} else {
+															var t string
+															if !v.Null && !v.Unknown {
+																t = string(v.Value)
+															}
+															obj.Str = t
+														}
+													}
+												}
+											}
+											obj.MapObjectNested[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["nested_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.NestedList"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.NestedList = make([]*OtherNested, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github_com_hashicorp_terraform_plugin_framework_types.Object"})
+										} else {
+											var t *OtherNested
+											if !v.Null && !v.Unknown {
+												tf := v
+												t = &OtherNested{}
+												obj := t
+												{
+													a, ok := tf.Attrs["str"]
+													if !ok {
+														diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.NestedList.Str"})
+													} else {
+														v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														} else {
+															var t string
+															if !v.Null && !v.Unknown {
+																t = string(v.Value)
+															}
+															obj.Str = t
+														}
+													}
+												}
+											}
+											obj.NestedList[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["str"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.NestedNullableWithNilValue.Str"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.Str = t
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["str"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.Str"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.Str = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["string_list"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.StringList"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+			} else {
+				obj.StringList = make([]string, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.StringList", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+						} else {
+							var t string
+							if !v.Null && !v.Unknown {
+								t = string(v.Value)
+							}
+							obj.StringList[k] = t
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["string_list_empty"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.StringListEmpty"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+			} else {
+				obj.StringListEmpty = make([]string, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.StringListEmpty", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+						} else {
+							var t string
+							if !v.Null && !v.Unknown {
+								t = string(v.Value)
+							}
+							obj.StringListEmpty[k] = t
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["timestamp"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.Timestamp"})
+		} else {
+			v, ok := a.(TimeValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.Timestamp", "TimeValue"})
+			} else {
+				var t time.Time
+				if !v.Null && !v.Unknown {
+					t = time.Time(v.Value)
+				}
+				obj.Timestamp = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["timestamp_list"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.TimestampList"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampList", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+			} else {
+				obj.TimestampList = make([]*time.Time, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(TimeValue)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"Test.TimestampList", "TimeValue"})
+						} else {
+							var t *time.Time
+							if !v.Null && !v.Unknown {
+								c := time.Time(v.Value)
+								t = &c
+							}
+							obj.TimestampList[k] = t
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["timestamp_missing"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.TimestampMissing"})
+		} else {
+			v, ok := a.(TimeValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
+			} else {
+				var t time.Time
+				if !v.Null && !v.Unknown {
+					t = time.Time(v.Value)
+				}
+				obj.TimestampMissing = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["timestamp_nullable"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.TimestampNullable"})
+		} else {
+			v, ok := a.(TimeValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
+			} else {
+				var t *time.Time
+				if !v.Null && !v.Unknown {
+					c := time.Time(v.Value)
+					t = &c
+				}
+				obj.TimestampNullable = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["timestamp_nullable_with_nil_value"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.TimestampNullableWithNilValue"})
+		} else {
+			v, ok := a.(TimeValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
+			} else {
+				var t *time.Time
+				if !v.Null && !v.Unknown {
+					c := time.Time(v.Value)
+					t = &c
+				}
+				obj.TimestampNullableWithNilValue = t
+			}
+		}
+	}
 	return diags
 }
 
@@ -1971,116 +1974,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 	tf.Unknown = false
 	if tf.Attrs == nil {
 		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
-	}
-	{
-		t, ok := tf.AttrTypes["str"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Str"})
-		} else {
-			v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.Str", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.Str) == ""
-			}
-			v.Value = string(obj.Str)
-			v.Unknown = false
-			tf.Attrs["str"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["int32"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Int32"})
-		} else {
-			v, ok := tf.Attrs["int32"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.Int32", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
-				}
-				v.Null = int64(obj.Int32) == 0
-			}
-			v.Value = int64(obj.Int32)
-			v.Unknown = false
-			tf.Attrs["int32"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["int64"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Int64"})
-		} else {
-			v, ok := tf.Attrs["int64"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.Int64", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
-				}
-				v.Null = int64(obj.Int64) == 0
-			}
-			v.Value = int64(obj.Int64)
-			v.Unknown = false
-			tf.Attrs["int64"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["float"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Float"})
-		} else {
-			v, ok := tf.Attrs["float"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.Float", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
-				}
-				v.Null = float64(obj.Float) == 0
-			}
-			v.Value = float64(obj.Float)
-			v.Unknown = false
-			tf.Attrs["float"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["double"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Double"})
-		} else {
-			v, ok := tf.Attrs["double"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.Double", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.Double", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
-				}
-				v.Null = float64(obj.Double) == 0
-			}
-			v.Value = float64(obj.Double)
-			v.Unknown = false
-			tf.Attrs["double"] = v
-		}
 	}
 	{
 		t, ok := tf.AttrTypes["bool"]
@@ -2105,6 +1998,15 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 		}
 	}
 	{
+		t, ok := tf.AttrTypes["bool_custom_list"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.BoolCustomList"})
+		} else {
+			v := CopyToBoolSpecial(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"])
+			tf.Attrs["bool_custom_list"] = v
+		}
+	}
+	{
 		t, ok := tf.AttrTypes["bytes"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.bytes"})
@@ -2124,301 +2026,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 			v.Value = string(obj.Bytes)
 			v.Unknown = false
 			tf.Attrs["bytes"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["timestamp"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Timestamp"})
-		} else {
-			v, ok := tf.Attrs["timestamp"].(TimeValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.Timestamp", err})
-				}
-				v, ok = i.(TimeValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.Timestamp", "TimeValue"})
-				}
-				v.Null = false
-			}
-			v.Value = time.Time(obj.Timestamp)
-			v.Unknown = false
-			tf.Attrs["timestamp"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["timestamp_missing"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.TimestampMissing"})
-		} else {
-			v, ok := tf.Attrs["timestamp_missing"].(TimeValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.TimestampMissing", err})
-				}
-				v, ok = i.(TimeValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
-				}
-				v.Null = false
-			}
-			v.Value = time.Time(obj.TimestampMissing)
-			v.Unknown = false
-			tf.Attrs["timestamp_missing"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["timestamp_nullable"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.TimestampNullable"})
-		} else {
-			v, ok := tf.Attrs["timestamp_nullable"].(TimeValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.TimestampNullable", err})
-				}
-				v, ok = i.(TimeValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
-				}
-				v.Null = false
-			}
-			if obj.TimestampNullable == nil {
-				v.Null = true
-			} else {
-				v.Null = false
-				v.Value = time.Time(*obj.TimestampNullable)
-			}
-			v.Unknown = false
-			tf.Attrs["timestamp_nullable"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["timestamp_nullable_with_nil_value"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.TimestampNullableWithNilValue"})
-		} else {
-			v, ok := tf.Attrs["timestamp_nullable_with_nil_value"].(TimeValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.TimestampNullableWithNilValue", err})
-				}
-				v, ok = i.(TimeValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
-				}
-				v.Null = false
-			}
-			if obj.TimestampNullableWithNilValue == nil {
-				v.Null = true
-			} else {
-				v.Null = false
-				v.Value = time.Time(*obj.TimestampNullableWithNilValue)
-			}
-			v.Unknown = false
-			tf.Attrs["timestamp_nullable_with_nil_value"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["duration_standard"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.DurationStandard"})
-		} else {
-			v, ok := tf.Attrs["duration_standard"].(DurationValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.DurationStandard", err})
-				}
-				v, ok = i.(DurationValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandard", "DurationValue"})
-				}
-				v.Null = false
-			}
-			v.Value = time.Duration(obj.DurationStandard)
-			v.Unknown = false
-			tf.Attrs["duration_standard"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["duration_standard_missing"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.DurationStandardMissing"})
-		} else {
-			v, ok := tf.Attrs["duration_standard_missing"].(DurationValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.DurationStandardMissing", err})
-				}
-				v, ok = i.(DurationValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandardMissing", "DurationValue"})
-				}
-				v.Null = false
-			}
-			v.Value = time.Duration(obj.DurationStandardMissing)
-			v.Unknown = false
-			tf.Attrs["duration_standard_missing"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["duration_custom"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.DurationCustom"})
-		} else {
-			v, ok := tf.Attrs["duration_custom"].(DurationValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.DurationCustom", err})
-				}
-				v, ok = i.(DurationValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
-				}
-				v.Null = false
-			}
-			v.Value = time.Duration(obj.DurationCustom)
-			v.Unknown = false
-			tf.Attrs["duration_custom"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["duration_custom_missing"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.DurationCustomMissing"})
-		} else {
-			v, ok := tf.Attrs["duration_custom_missing"].(DurationValue)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.DurationCustomMissing", err})
-				}
-				v, ok = i.(DurationValue)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
-				}
-				v.Null = false
-			}
-			v.Value = time.Duration(obj.DurationCustomMissing)
-			v.Unknown = false
-			tf.Attrs["duration_custom_missing"] = v
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["string_list"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.StringList"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-			} else {
-				c, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-				if !ok {
-					c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-						ElemType: o.ElemType,
-						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
-						Null:     true,
-					}
-				} else {
-					if c.Elems == nil {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
-					}
-				}
-				if obj.StringList != nil {
-					t := o.ElemType
-					for k, a := range obj.StringList {
-						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-						if !ok {
-							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-							if err != nil {
-								diags.Append(attrWriteGeneralError{"Test.StringList", err})
-							}
-							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							}
-							v.Null = string(a) == ""
-						}
-						v.Value = string(a)
-						v.Unknown = false
-						c.Elems[k] = v
-					}
-					if len(obj.StringList) > 0 {
-						c.Null = false
-					}
-				}
-				c.Unknown = false
-				tf.Attrs["string_list"] = c
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["string_list_empty"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.StringListEmpty"})
-		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-			} else {
-				c, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-				if !ok {
-					c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-						ElemType: o.ElemType,
-						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty)),
-						Null:     true,
-					}
-				} else {
-					if c.Elems == nil {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty))
-					}
-				}
-				if obj.StringListEmpty != nil {
-					t := o.ElemType
-					for k, a := range obj.StringListEmpty {
-						v, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-						if !ok {
-							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-							if err != nil {
-								diags.Append(attrWriteGeneralError{"Test.StringListEmpty", err})
-							}
-							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-							}
-							v.Null = string(a) == ""
-						}
-						v.Value = string(a)
-						v.Unknown = false
-						c.Elems[k] = v
-					}
-					if len(obj.StringListEmpty) > 0 {
-						c.Null = false
-					}
-				}
-				c.Unknown = false
-				tf.Attrs["string_list_empty"] = c
-			}
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["bool_custom_list"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.BoolCustomList"})
-		} else {
-			v := CopyToBoolCustom(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"])
-			tf.Attrs["bool_custom_list"] = v
 		}
 	}
 	{
@@ -2472,58 +2079,47 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["timestamp_list"]
+		t, ok := tf.AttrTypes["double"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.TimestampList"})
+			diags.Append(attrWriteMissingDiag{"Test.Double"})
 		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			v, ok := tf.Attrs["double"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-			} else {
-				c, ok := tf.Attrs["timestamp_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Double", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 				if !ok {
-					c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-						ElemType: o.ElemType,
-						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList)),
-						Null:     true,
-					}
-				} else {
-					if c.Elems == nil {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
-					}
+					diags.Append(attrWriteConversionFailureDiag{"Test.Double", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
-				if obj.TimestampList != nil {
-					t := o.ElemType
-					for k, a := range obj.TimestampList {
-						v, ok := tf.Attrs["timestamp_list"].(TimeValue)
-						if !ok {
-							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-							if err != nil {
-								diags.Append(attrWriteGeneralError{"Test.TimestampList", err})
-							}
-							v, ok = i.(TimeValue)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "TimeValue"})
-							}
-							v.Null = false
-						}
-						if a == nil {
-							v.Null = true
-						} else {
-							v.Null = false
-							v.Value = time.Time(*a)
-						}
-						v.Unknown = false
-						c.Elems[k] = v
-					}
-					if len(obj.TimestampList) > 0 {
-						c.Null = false
-					}
-				}
-				c.Unknown = false
-				tf.Attrs["timestamp_list"] = c
+				v.Null = float64(obj.Double) == 0
 			}
+			v.Value = float64(obj.Double)
+			v.Unknown = false
+			tf.Attrs["double"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["duration_custom"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.DurationCustom"})
+		} else {
+			v, ok := tf.Attrs["duration_custom"].(DurationValue)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationCustom", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
+				}
+				v.Null = false
+			}
+			v.Value = time.Duration(obj.DurationCustom)
+			v.Unknown = false
+			tf.Attrs["duration_custom"] = v
 		}
 	}
 	{
@@ -2577,1325 +2173,135 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["nested"]
+		t, ok := tf.AttrTypes["duration_custom_missing"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.Nested"})
+			diags.Append(attrWriteMissingDiag{"Test.DurationCustomMissing"})
 		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			v, ok := tf.Attrs["duration_custom_missing"].(DurationValue)
 			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.Nested", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationCustomMissing", err})
+				}
+				v, ok = i.(DurationValue)
 				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
 				}
-				{
-					obj := obj.Nested
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["str"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.Nested.Str"})
-						} else {
-							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"Test.Nested.Str", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Str) == ""
-							}
-							v.Value = string(obj.Str)
-							v.Unknown = false
-							tf.Attrs["str"] = v
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["nested_list"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.Nested.NestedList"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-							} else {
-								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-										ElemType: o.ElemType,
-										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-									}
-								}
-								if obj.NestedList != nil {
-									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-											}
-										} else {
-											if v.Attrs == nil {
-												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-											}
-										}
-										if a == nil {
-											v.Null = true
-										} else {
-											obj := a
-											tf := &v
-											{
-												t, ok := tf.AttrTypes["str"]
-												if !ok {
-													diags.Append(attrWriteMissingDiag{"Test.Nested.NestedList.Str"})
-												} else {
-													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-														if err != nil {
-															diags.Append(attrWriteGeneralError{"Test.Nested.NestedList.Str", err})
-														}
-														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														}
-														v.Null = string(obj.Str) == ""
-													}
-													v.Value = string(obj.Str)
-													v.Unknown = false
-													tf.Attrs["str"] = v
-												}
-											}
-										}
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.NestedList) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["nested_list"] = c
-							}
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["map"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.Nested.Map"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-							} else {
-								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-										ElemType: o.ElemType,
-										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
-									}
-								}
-								if obj.Map != nil {
-									t := o.ElemType
-									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-											if err != nil {
-												diags.Append(attrWriteGeneralError{"Test.Nested.Map", err})
-											}
-											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-											}
-											v.Null = false
-										}
-										v.Value = string(a)
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.Map) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["map"] = c
-							}
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["map_object_nested"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.Nested.MapObjectNested"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-							} else {
-								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-										ElemType: o.ElemType,
-										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
-									}
-								}
-								if obj.MapObjectNested != nil {
-									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-											}
-										} else {
-											if v.Attrs == nil {
-												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-											}
-										}
-										{
-											obj := a
-											tf := &v
-											{
-												t, ok := tf.AttrTypes["str"]
-												if !ok {
-													diags.Append(attrWriteMissingDiag{"Test.Nested.MapObjectNested.Str"})
-												} else {
-													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-														if err != nil {
-															diags.Append(attrWriteGeneralError{"Test.Nested.MapObjectNested.Str", err})
-														}
-														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														}
-														v.Null = string(obj.Str) == ""
-													}
-													v.Value = string(obj.Str)
-													v.Unknown = false
-													tf.Attrs["str"] = v
-												}
-											}
-										}
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.MapObjectNested) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["map_object_nested"] = c
-							}
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["nested"] = v
+				v.Null = false
 			}
+			v.Value = time.Duration(obj.DurationCustomMissing)
+			v.Unknown = false
+			tf.Attrs["duration_custom_missing"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["nested_nullable"]
+		t, ok := tf.AttrTypes["duration_standard"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.NestedNullable"})
+			diags.Append(attrWriteMissingDiag{"Test.DurationStandard"})
 		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			v, ok := tf.Attrs["duration_standard"].(DurationValue)
 			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["nested_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationStandard", err})
+				}
+				v, ok = i.(DurationValue)
 				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandard", "DurationValue"})
 				}
-				if obj.NestedNullable == nil {
-					v.Null = true
-				} else {
-					obj := obj.NestedNullable
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["str"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.Str"})
-						} else {
-							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"Test.NestedNullable.Str", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Str) == ""
-							}
-							v.Value = string(obj.Str)
-							v.Unknown = false
-							tf.Attrs["str"] = v
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["nested_list"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.NestedList"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-							} else {
-								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-										ElemType: o.ElemType,
-										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-									}
-								}
-								if obj.NestedList != nil {
-									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-											}
-										} else {
-											if v.Attrs == nil {
-												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-											}
-										}
-										if a == nil {
-											v.Null = true
-										} else {
-											obj := a
-											tf := &v
-											{
-												t, ok := tf.AttrTypes["str"]
-												if !ok {
-													diags.Append(attrWriteMissingDiag{"Test.NestedNullable.NestedList.Str"})
-												} else {
-													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-														if err != nil {
-															diags.Append(attrWriteGeneralError{"Test.NestedNullable.NestedList.Str", err})
-														}
-														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														}
-														v.Null = string(obj.Str) == ""
-													}
-													v.Value = string(obj.Str)
-													v.Unknown = false
-													tf.Attrs["str"] = v
-												}
-											}
-										}
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.NestedList) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["nested_list"] = c
-							}
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["map"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.Map"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-							} else {
-								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-										ElemType: o.ElemType,
-										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
-									}
-								}
-								if obj.Map != nil {
-									t := o.ElemType
-									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-											if err != nil {
-												diags.Append(attrWriteGeneralError{"Test.NestedNullable.Map", err})
-											}
-											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-											}
-											v.Null = false
-										}
-										v.Value = string(a)
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.Map) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["map"] = c
-							}
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["map_object_nested"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.MapObjectNested"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-							} else {
-								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-										ElemType: o.ElemType,
-										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
-									}
-								}
-								if obj.MapObjectNested != nil {
-									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-											}
-										} else {
-											if v.Attrs == nil {
-												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-											}
-										}
-										{
-											obj := a
-											tf := &v
-											{
-												t, ok := tf.AttrTypes["str"]
-												if !ok {
-													diags.Append(attrWriteMissingDiag{"Test.NestedNullable.MapObjectNested.Str"})
-												} else {
-													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-														if err != nil {
-															diags.Append(attrWriteGeneralError{"Test.NestedNullable.MapObjectNested.Str", err})
-														}
-														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														}
-														v.Null = string(obj.Str) == ""
-													}
-													v.Value = string(obj.Str)
-													v.Unknown = false
-													tf.Attrs["str"] = v
-												}
-											}
-										}
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.MapObjectNested) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["map_object_nested"] = c
-							}
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["nested_nullable"] = v
+				v.Null = false
 			}
+			v.Value = time.Duration(obj.DurationStandard)
+			v.Unknown = false
+			tf.Attrs["duration_standard"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["nested_nullable_with_nil_value"]
+		t, ok := tf.AttrTypes["duration_standard_missing"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue"})
+			diags.Append(attrWriteMissingDiag{"Test.DurationStandardMissing"})
 		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			v, ok := tf.Attrs["duration_standard_missing"].(DurationValue)
 			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["nested_nullable_with_nil_value"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.DurationStandardMissing", err})
+				}
+				v, ok = i.(DurationValue)
 				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
+					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandardMissing", "DurationValue"})
 				}
-				if obj.NestedNullableWithNilValue == nil {
-					v.Null = true
-				} else {
-					obj := obj.NestedNullableWithNilValue
-					tf := &v
-					{
-						t, ok := tf.AttrTypes["str"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.Str"})
-						} else {
-							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-							if !ok {
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.Str", err})
-								}
-								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-								}
-								v.Null = string(obj.Str) == ""
-							}
-							v.Value = string(obj.Str)
-							v.Unknown = false
-							tf.Attrs["str"] = v
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["nested_list"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.NestedList"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-							} else {
-								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-										ElemType: o.ElemType,
-										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-									}
-								}
-								if obj.NestedList != nil {
-									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-											}
-										} else {
-											if v.Attrs == nil {
-												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-											}
-										}
-										if a == nil {
-											v.Null = true
-										} else {
-											obj := a
-											tf := &v
-											{
-												t, ok := tf.AttrTypes["str"]
-												if !ok {
-													diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.NestedList.Str"})
-												} else {
-													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-														if err != nil {
-															diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.NestedList.Str", err})
-														}
-														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														}
-														v.Null = string(obj.Str) == ""
-													}
-													v.Value = string(obj.Str)
-													v.Unknown = false
-													tf.Attrs["str"] = v
-												}
-											}
-										}
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.NestedList) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["nested_list"] = c
-							}
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["map"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.Map"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-							} else {
-								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-										ElemType: o.ElemType,
-										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
-									}
-								}
-								if obj.Map != nil {
-									t := o.ElemType
-									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-											if err != nil {
-												diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.Map", err})
-											}
-											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-											}
-											v.Null = false
-										}
-										v.Value = string(a)
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.Map) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["map"] = c
-							}
-						}
-					}
-					{
-						a, ok := tf.AttrTypes["map_object_nested"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-							} else {
-								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-								if !ok {
-									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-										ElemType: o.ElemType,
-										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
-										Null:     true,
-									}
-								} else {
-									if c.Elems == nil {
-										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
-									}
-								}
-								if obj.MapObjectNested != nil {
-									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-										if !ok {
-											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-												AttrTypes: o.AttrTypes,
-												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-											}
-										} else {
-											if v.Attrs == nil {
-												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-											}
-										}
-										{
-											obj := a
-											tf := &v
-											{
-												t, ok := tf.AttrTypes["str"]
-												if !ok {
-													diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str"})
-												} else {
-													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-														if err != nil {
-															diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.MapObjectNested.Str", err})
-														}
-														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-														if !ok {
-															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-														}
-														v.Null = string(obj.Str) == ""
-													}
-													v.Value = string(obj.Str)
-													v.Unknown = false
-													tf.Attrs["str"] = v
-												}
-											}
-										}
-										v.Unknown = false
-										c.Elems[k] = v
-									}
-									if len(obj.MapObjectNested) > 0 {
-										c.Null = false
-									}
-								}
-								c.Unknown = false
-								tf.Attrs["map_object_nested"] = c
-							}
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["nested_nullable_with_nil_value"] = v
+				v.Null = false
 			}
+			v.Value = time.Duration(obj.DurationStandardMissing)
+			v.Unknown = false
+			tf.Attrs["duration_standard_missing"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["nested_list"]
+		t, ok := tf.AttrTypes["float"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.NestedList"})
+			diags.Append(attrWriteMissingDiag{"Test.Float"})
 		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			v, ok := tf.Attrs["float"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-			} else {
-				c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Float", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 				if !ok {
-					c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-						ElemType: o.ElemType,
-						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-						Null:     true,
-					}
-				} else {
-					if c.Elems == nil {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-					}
+					diags.Append(attrWriteConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
-				if obj.NestedList != nil {
-					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-					for k, a := range obj.NestedList {
-						v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-						if !ok {
-							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-								AttrTypes: o.AttrTypes,
-								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-							}
-						} else {
-							if v.Attrs == nil {
-								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-							}
-						}
-						{
-							obj := a
-							tf := &v
-							{
-								t, ok := tf.AttrTypes["str"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedList.Str"})
-								} else {
-									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-									if !ok {
-										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-										if err != nil {
-											diags.Append(attrWriteGeneralError{"Test.NestedList.Str", err})
-										}
-										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										}
-										v.Null = string(obj.Str) == ""
-									}
-									v.Value = string(obj.Str)
-									v.Unknown = false
-									tf.Attrs["str"] = v
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["nested_list"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedList.NestedList"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-									} else {
-										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-												ElemType: o.ElemType,
-												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-											}
-										}
-										if obj.NestedList != nil {
-											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-												if !ok {
-													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-													}
-												} else {
-													if v.Attrs == nil {
-														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-													}
-												}
-												if a == nil {
-													v.Null = true
-												} else {
-													obj := a
-													tf := &v
-													{
-														t, ok := tf.AttrTypes["str"]
-														if !ok {
-															diags.Append(attrWriteMissingDiag{"Test.NestedList.NestedList.Str"})
-														} else {
-															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-															if !ok {
-																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-																if err != nil {
-																	diags.Append(attrWriteGeneralError{"Test.NestedList.NestedList.Str", err})
-																}
-																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																if !ok {
-																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																}
-																v.Null = string(obj.Str) == ""
-															}
-															v.Value = string(obj.Str)
-															v.Unknown = false
-															tf.Attrs["str"] = v
-														}
-													}
-												}
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.NestedList) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["nested_list"] = c
-									}
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["map"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedList.Map"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-									} else {
-										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-												ElemType: o.ElemType,
-												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
-											}
-										}
-										if obj.Map != nil {
-											t := o.ElemType
-											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-												if !ok {
-													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-													if err != nil {
-														diags.Append(attrWriteGeneralError{"Test.NestedList.Map", err})
-													}
-													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-													}
-													v.Null = false
-												}
-												v.Value = string(a)
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.Map) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["map"] = c
-									}
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["map_object_nested"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedList.MapObjectNested"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-									} else {
-										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-												ElemType: o.ElemType,
-												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
-											}
-										}
-										if obj.MapObjectNested != nil {
-											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-												if !ok {
-													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-													}
-												} else {
-													if v.Attrs == nil {
-														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-													}
-												}
-												{
-													obj := a
-													tf := &v
-													{
-														t, ok := tf.AttrTypes["str"]
-														if !ok {
-															diags.Append(attrWriteMissingDiag{"Test.NestedList.MapObjectNested.Str"})
-														} else {
-															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-															if !ok {
-																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-																if err != nil {
-																	diags.Append(attrWriteGeneralError{"Test.NestedList.MapObjectNested.Str", err})
-																}
-																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																if !ok {
-																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																}
-																v.Null = string(obj.Str) == ""
-															}
-															v.Value = string(obj.Str)
-															v.Unknown = false
-															tf.Attrs["str"] = v
-														}
-													}
-												}
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.MapObjectNested) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["map_object_nested"] = c
-									}
-								}
-							}
-						}
-						v.Unknown = false
-						c.Elems[k] = v
-					}
-					if len(obj.NestedList) > 0 {
-						c.Null = false
-					}
-				}
-				c.Unknown = false
-				tf.Attrs["nested_list"] = c
+				v.Null = float64(obj.Float) == 0
 			}
+			v.Value = float64(obj.Float)
+			v.Unknown = false
+			tf.Attrs["float"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["nested_list_nullable"]
+		t, ok := tf.AttrTypes["int32"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.NestedListNullable"})
+			diags.Append(attrWriteMissingDiag{"Test.Int32"})
 		} else {
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			v, ok := tf.Attrs["int32"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-			} else {
-				c, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Int32", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 				if !ok {
-					c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-						ElemType: o.ElemType,
-						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable)),
-						Null:     true,
-					}
-				} else {
-					if c.Elems == nil {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable))
-					}
+					diags.Append(attrWriteConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				if obj.NestedListNullable != nil {
-					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-					for k, a := range obj.NestedListNullable {
-						v, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-						if !ok {
-							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-								AttrTypes: o.AttrTypes,
-								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-							}
-						} else {
-							if v.Attrs == nil {
-								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-							}
-						}
-						if a == nil {
-							v.Null = true
-						} else {
-							obj := a
-							tf := &v
-							{
-								t, ok := tf.AttrTypes["str"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.Str"})
-								} else {
-									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-									if !ok {
-										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-										if err != nil {
-											diags.Append(attrWriteGeneralError{"Test.NestedListNullable.Str", err})
-										}
-										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										}
-										v.Null = string(obj.Str) == ""
-									}
-									v.Value = string(obj.Str)
-									v.Unknown = false
-									tf.Attrs["str"] = v
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["nested_list"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.NestedList"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-									} else {
-										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-												ElemType: o.ElemType,
-												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-											}
-										}
-										if obj.NestedList != nil {
-											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-												if !ok {
-													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-													}
-												} else {
-													if v.Attrs == nil {
-														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-													}
-												}
-												if a == nil {
-													v.Null = true
-												} else {
-													obj := a
-													tf := &v
-													{
-														t, ok := tf.AttrTypes["str"]
-														if !ok {
-															diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.NestedList.Str"})
-														} else {
-															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-															if !ok {
-																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-																if err != nil {
-																	diags.Append(attrWriteGeneralError{"Test.NestedListNullable.NestedList.Str", err})
-																}
-																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																if !ok {
-																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																}
-																v.Null = string(obj.Str) == ""
-															}
-															v.Value = string(obj.Str)
-															v.Unknown = false
-															tf.Attrs["str"] = v
-														}
-													}
-												}
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.NestedList) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["nested_list"] = c
-									}
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["map"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.Map"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-									} else {
-										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-												ElemType: o.ElemType,
-												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
-											}
-										}
-										if obj.Map != nil {
-											t := o.ElemType
-											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-												if !ok {
-													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-													if err != nil {
-														diags.Append(attrWriteGeneralError{"Test.NestedListNullable.Map", err})
-													}
-													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-													if !ok {
-														diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-													}
-													v.Null = false
-												}
-												v.Value = string(a)
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.Map) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["map"] = c
-									}
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["map_object_nested"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.MapObjectNested"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
-									} else {
-										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
-
-												ElemType: o.ElemType,
-												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
-											}
-										}
-										if obj.MapObjectNested != nil {
-											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-												if !ok {
-													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-													}
-												} else {
-													if v.Attrs == nil {
-														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-													}
-												}
-												{
-													obj := a
-													tf := &v
-													{
-														t, ok := tf.AttrTypes["str"]
-														if !ok {
-															diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.MapObjectNested.Str"})
-														} else {
-															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-															if !ok {
-																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-																if err != nil {
-																	diags.Append(attrWriteGeneralError{"Test.NestedListNullable.MapObjectNested.Str", err})
-																}
-																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																if !ok {
-																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																}
-																v.Null = string(obj.Str) == ""
-															}
-															v.Value = string(obj.Str)
-															v.Unknown = false
-															tf.Attrs["str"] = v
-														}
-													}
-												}
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.MapObjectNested) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["map_object_nested"] = c
-									}
-								}
-							}
-						}
-						v.Unknown = false
-						c.Elems[k] = v
-					}
-					if len(obj.NestedListNullable) > 0 {
-						c.Null = false
-					}
-				}
-				c.Unknown = false
-				tf.Attrs["nested_list_nullable"] = c
+				v.Null = int64(obj.Int32) == 0
 			}
+			v.Value = int64(obj.Int32)
+			v.Unknown = false
+			tf.Attrs["int32"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["int64"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.Int64"})
+		} else {
+			v, ok := tf.Attrs["int64"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Int64", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+				v.Null = int64(obj.Int64) == 0
+			}
+			v.Value = int64(obj.Int64)
+			v.Unknown = false
+			tf.Attrs["int64"] = v
 		}
 	}
 	{
@@ -3988,105 +2394,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						{
 							obj := a
 							tf := &v
-							{
-								t, ok := tf.AttrTypes["str"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.MapObject.Str"})
-								} else {
-									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-									if !ok {
-										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-										if err != nil {
-											diags.Append(attrWriteGeneralError{"Test.MapObject.Str", err})
-										}
-										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										}
-										v.Null = string(obj.Str) == ""
-									}
-									v.Value = string(obj.Str)
-									v.Unknown = false
-									tf.Attrs["str"] = v
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["nested_list"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.MapObject.NestedList"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-									} else {
-										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-												ElemType: o.ElemType,
-												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-											}
-										}
-										if obj.NestedList != nil {
-											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-												if !ok {
-													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-													}
-												} else {
-													if v.Attrs == nil {
-														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-													}
-												}
-												if a == nil {
-													v.Null = true
-												} else {
-													obj := a
-													tf := &v
-													{
-														t, ok := tf.AttrTypes["str"]
-														if !ok {
-															diags.Append(attrWriteMissingDiag{"Test.MapObject.NestedList.Str"})
-														} else {
-															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-															if !ok {
-																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-																if err != nil {
-																	diags.Append(attrWriteGeneralError{"Test.MapObject.NestedList.Str", err})
-																}
-																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																if !ok {
-																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																}
-																v.Null = string(obj.Str) == ""
-															}
-															v.Value = string(obj.Str)
-															v.Unknown = false
-															tf.Attrs["str"] = v
-														}
-													}
-												}
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.NestedList) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["nested_list"] = c
-									}
-								}
-							}
 							{
 								a, ok := tf.AttrTypes["map"]
 								if !ok {
@@ -4212,6 +2519,105 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 									}
 								}
 							}
+							{
+								a, ok := tf.AttrTypes["nested_list"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.MapObject.NestedList"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+									} else {
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+												ElemType: o.ElemType,
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+											}
+										}
+										if obj.NestedList != nil {
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+											for k, a := range obj.NestedList {
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												if !ok {
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+														AttrTypes: o.AttrTypes,
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+													}
+												} else {
+													if v.Attrs == nil {
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+													}
+												}
+												if a == nil {
+													v.Null = true
+												} else {
+													obj := a
+													tf := &v
+													{
+														t, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.Append(attrWriteMissingDiag{"Test.MapObject.NestedList.Str"})
+														} else {
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+															if !ok {
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.MapObject.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = string(obj.Str) == ""
+															}
+															v.Value = string(obj.Str)
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.NestedList) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["nested_list"] = c
+									}
+								}
+							}
+							{
+								t, ok := tf.AttrTypes["str"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.MapObject.Str"})
+								} else {
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+									if !ok {
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.MapObject.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = string(obj.Str) == ""
+									}
+									v.Value = string(obj.Str)
+									v.Unknown = false
+									tf.Attrs["str"] = v
+								}
+							}
 						}
 						v.Unknown = false
 						c.Elems[k] = v
@@ -4267,105 +2673,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						} else {
 							obj := a
 							tf := &v
-							{
-								t, ok := tf.AttrTypes["str"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.Str"})
-								} else {
-									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-									if !ok {
-										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-										if err != nil {
-											diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.Str", err})
-										}
-										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-										if !ok {
-											diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-										}
-										v.Null = string(obj.Str) == ""
-									}
-									v.Value = string(obj.Str)
-									v.Unknown = false
-									tf.Attrs["str"] = v
-								}
-							}
-							{
-								a, ok := tf.AttrTypes["nested_list"]
-								if !ok {
-									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.NestedList"})
-								} else {
-									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
-									if !ok {
-										diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
-									} else {
-										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
-										if !ok {
-											c = github_com_hashicorp_terraform_plugin_framework_types.List{
-
-												ElemType: o.ElemType,
-												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
-												Null:     true,
-											}
-										} else {
-											if c.Elems == nil {
-												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
-											}
-										}
-										if obj.NestedList != nil {
-											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-												if !ok {
-													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-														AttrTypes: o.AttrTypes,
-														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-													}
-												} else {
-													if v.Attrs == nil {
-														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-													}
-												}
-												if a == nil {
-													v.Null = true
-												} else {
-													obj := a
-													tf := &v
-													{
-														t, ok := tf.AttrTypes["str"]
-														if !ok {
-															diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.NestedList.Str"})
-														} else {
-															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-															if !ok {
-																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-																if err != nil {
-																	diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.NestedList.Str", err})
-																}
-																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-																if !ok {
-																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-																}
-																v.Null = string(obj.Str) == ""
-															}
-															v.Value = string(obj.Str)
-															v.Unknown = false
-															tf.Attrs["str"] = v
-														}
-													}
-												}
-												v.Unknown = false
-												c.Elems[k] = v
-											}
-											if len(obj.NestedList) > 0 {
-												c.Null = false
-											}
-										}
-										c.Unknown = false
-										tf.Attrs["nested_list"] = c
-									}
-								}
-							}
 							{
 								a, ok := tf.AttrTypes["map"]
 								if !ok {
@@ -4491,6 +2798,105 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 									}
 								}
 							}
+							{
+								a, ok := tf.AttrTypes["nested_list"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.NestedList"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+									} else {
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+												ElemType: o.ElemType,
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+											}
+										}
+										if obj.NestedList != nil {
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+											for k, a := range obj.NestedList {
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												if !ok {
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+														AttrTypes: o.AttrTypes,
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+													}
+												} else {
+													if v.Attrs == nil {
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+													}
+												}
+												if a == nil {
+													v.Null = true
+												} else {
+													obj := a
+													tf := &v
+													{
+														t, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.NestedList.Str"})
+														} else {
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+															if !ok {
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = string(obj.Str) == ""
+															}
+															v.Value = string(obj.Str)
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.NestedList) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["nested_list"] = c
+									}
+								}
+							}
+							{
+								t, ok := tf.AttrTypes["str"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.MapObjectNullable.Str"})
+								} else {
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+									if !ok {
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.MapObjectNullable.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = string(obj.Str) == ""
+									}
+									v.Value = string(obj.Str)
+									v.Unknown = false
+									tf.Attrs["str"] = v
+								}
+							}
 						}
 						v.Unknown = false
 						c.Elems[k] = v
@@ -4524,6 +2930,1603 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 			v.Value = int64(obj.Mode)
 			v.Unknown = false
 			tf.Attrs["mode"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.Nested"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.Nested", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				{
+					obj := obj.Nested
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.Nested.Map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+							} else {
+								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
+									}
+								}
+								if obj.Map != nil {
+									t := o.ElemType
+									for k, a := range obj.Map {
+										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Test.Nested.Map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
+										}
+										v.Value = string(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.Map) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["map_object_nested"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.Nested.MapObjectNested"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+							} else {
+								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
+									}
+								}
+								if obj.MapObjectNested != nil {
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+									for k, a := range obj.MapObjectNested {
+										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+											}
+										} else {
+											if v.Attrs == nil {
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+											}
+										}
+										{
+											obj := a
+											tf := &v
+											{
+												t, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.Append(attrWriteMissingDiag{"Test.Nested.MapObjectNested.Str"})
+												} else {
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.Nested.MapObjectNested.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = string(obj.Str) == ""
+													}
+													v.Value = string(obj.Str)
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.MapObjectNested) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["map_object_nested"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["nested_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.Nested.NestedList"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+									}
+								}
+								if obj.NestedList != nil {
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+									for k, a := range obj.NestedList {
+										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+											}
+										} else {
+											if v.Attrs == nil {
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+											}
+										}
+										if a == nil {
+											v.Null = true
+										} else {
+											obj := a
+											tf := &v
+											{
+												t, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.Append(attrWriteMissingDiag{"Test.Nested.NestedList.Str"})
+												} else {
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.Nested.NestedList.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = string(obj.Str) == ""
+													}
+													v.Value = string(obj.Str)
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.NestedList) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["nested_list"] = c
+							}
+						}
+					}
+					{
+						t, ok := tf.AttrTypes["str"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.Nested.Str"})
+						} else {
+							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.Nested.Str", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.Str) == ""
+							}
+							v.Value = string(obj.Str)
+							v.Unknown = false
+							tf.Attrs["str"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["nested"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_list"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.NestedList"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+			} else {
+				c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+						ElemType: o.ElemType,
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+					}
+				}
+				if obj.NestedList != nil {
+					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+					for k, a := range obj.NestedList {
+						v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						if !ok {
+							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+								AttrTypes: o.AttrTypes,
+								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+							}
+						} else {
+							if v.Attrs == nil {
+								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+							}
+						}
+						{
+							obj := a
+							tf := &v
+							{
+								a, ok := tf.AttrTypes["map"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.Map"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+									} else {
+										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+												ElemType: o.ElemType,
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
+											}
+										}
+										if obj.Map != nil {
+											t := o.ElemType
+											for k, a := range obj.Map {
+												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+												if !ok {
+													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+													if err != nil {
+														diags.Append(attrWriteGeneralError{"Test.NestedList.Map", err})
+													}
+													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+													}
+													v.Null = false
+												}
+												v.Value = string(a)
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.Map) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["map"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["map_object_nested"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.MapObjectNested"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+									} else {
+										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+												ElemType: o.ElemType,
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
+											}
+										}
+										if obj.MapObjectNested != nil {
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+											for k, a := range obj.MapObjectNested {
+												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												if !ok {
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+														AttrTypes: o.AttrTypes,
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+													}
+												} else {
+													if v.Attrs == nil {
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+													}
+												}
+												{
+													obj := a
+													tf := &v
+													{
+														t, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.Append(attrWriteMissingDiag{"Test.NestedList.MapObjectNested.Str"})
+														} else {
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+															if !ok {
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedList.MapObjectNested.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = string(obj.Str) == ""
+															}
+															v.Value = string(obj.Str)
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.MapObjectNested) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["map_object_nested"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["nested_list"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.NestedList"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+									} else {
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+												ElemType: o.ElemType,
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+											}
+										}
+										if obj.NestedList != nil {
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+											for k, a := range obj.NestedList {
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												if !ok {
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+														AttrTypes: o.AttrTypes,
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+													}
+												} else {
+													if v.Attrs == nil {
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+													}
+												}
+												if a == nil {
+													v.Null = true
+												} else {
+													obj := a
+													tf := &v
+													{
+														t, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.Append(attrWriteMissingDiag{"Test.NestedList.NestedList.Str"})
+														} else {
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+															if !ok {
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedList.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = string(obj.Str) == ""
+															}
+															v.Value = string(obj.Str)
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.NestedList) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["nested_list"] = c
+									}
+								}
+							}
+							{
+								t, ok := tf.AttrTypes["str"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedList.Str"})
+								} else {
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+									if !ok {
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.NestedList.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = string(obj.Str) == ""
+									}
+									v.Value = string(obj.Str)
+									v.Unknown = false
+									tf.Attrs["str"] = v
+								}
+							}
+						}
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.NestedList) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["nested_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_list_nullable"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.NestedListNullable"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+			} else {
+				c, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+						ElemType: o.ElemType,
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable))
+					}
+				}
+				if obj.NestedListNullable != nil {
+					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+					for k, a := range obj.NestedListNullable {
+						v, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						if !ok {
+							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+								AttrTypes: o.AttrTypes,
+								Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+							}
+						} else {
+							if v.Attrs == nil {
+								v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+							}
+						}
+						if a == nil {
+							v.Null = true
+						} else {
+							obj := a
+							tf := &v
+							{
+								a, ok := tf.AttrTypes["map"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.Map"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+									} else {
+										c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+												ElemType: o.ElemType,
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
+											}
+										}
+										if obj.Map != nil {
+											t := o.ElemType
+											for k, a := range obj.Map {
+												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+												if !ok {
+													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+													if err != nil {
+														diags.Append(attrWriteGeneralError{"Test.NestedListNullable.Map", err})
+													}
+													v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+													}
+													v.Null = false
+												}
+												v.Value = string(a)
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.Map) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["map"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["map_object_nested"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.MapObjectNested"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+									} else {
+										c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+												ElemType: o.ElemType,
+												Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
+											}
+										}
+										if obj.MapObjectNested != nil {
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+											for k, a := range obj.MapObjectNested {
+												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												if !ok {
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+														AttrTypes: o.AttrTypes,
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+													}
+												} else {
+													if v.Attrs == nil {
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+													}
+												}
+												{
+													obj := a
+													tf := &v
+													{
+														t, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.MapObjectNested.Str"})
+														} else {
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+															if !ok {
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedListNullable.MapObjectNested.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = string(obj.Str) == ""
+															}
+															v.Value = string(obj.Str)
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.MapObjectNested) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["map_object_nested"] = c
+									}
+								}
+							}
+							{
+								a, ok := tf.AttrTypes["nested_list"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.NestedList"})
+								} else {
+									o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+									if !ok {
+										diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+									} else {
+										c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+										if !ok {
+											c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+												ElemType: o.ElemType,
+												Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+												Null:     true,
+											}
+										} else {
+											if c.Elems == nil {
+												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+											}
+										}
+										if obj.NestedList != nil {
+											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+											for k, a := range obj.NestedList {
+												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												if !ok {
+													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+														AttrTypes: o.AttrTypes,
+														Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+													}
+												} else {
+													if v.Attrs == nil {
+														v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+													}
+												}
+												if a == nil {
+													v.Null = true
+												} else {
+													obj := a
+													tf := &v
+													{
+														t, ok := tf.AttrTypes["str"]
+														if !ok {
+															diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.NestedList.Str"})
+														} else {
+															v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+															if !ok {
+																i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+																if err != nil {
+																	diags.Append(attrWriteGeneralError{"Test.NestedListNullable.NestedList.Str", err})
+																}
+																v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+																if !ok {
+																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+																}
+																v.Null = string(obj.Str) == ""
+															}
+															v.Value = string(obj.Str)
+															v.Unknown = false
+															tf.Attrs["str"] = v
+														}
+													}
+												}
+												v.Unknown = false
+												c.Elems[k] = v
+											}
+											if len(obj.NestedList) > 0 {
+												c.Null = false
+											}
+										}
+										c.Unknown = false
+										tf.Attrs["nested_list"] = c
+									}
+								}
+							}
+							{
+								t, ok := tf.AttrTypes["str"]
+								if !ok {
+									diags.Append(attrWriteMissingDiag{"Test.NestedListNullable.Str"})
+								} else {
+									v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+									if !ok {
+										i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+										if err != nil {
+											diags.Append(attrWriteGeneralError{"Test.NestedListNullable.Str", err})
+										}
+										v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+										}
+										v.Null = string(obj.Str) == ""
+									}
+									v.Value = string(obj.Str)
+									v.Unknown = false
+									tf.Attrs["str"] = v
+								}
+							}
+						}
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.NestedListNullable) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["nested_list_nullable"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_nullable"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.NestedNullable"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["nested_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.NestedNullable == nil {
+					v.Null = true
+				} else {
+					obj := obj.NestedNullable
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.Map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+							} else {
+								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
+									}
+								}
+								if obj.Map != nil {
+									t := o.ElemType
+									for k, a := range obj.Map {
+										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Test.NestedNullable.Map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
+										}
+										v.Value = string(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.Map) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["map_object_nested"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.MapObjectNested"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+							} else {
+								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
+									}
+								}
+								if obj.MapObjectNested != nil {
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+									for k, a := range obj.MapObjectNested {
+										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+											}
+										} else {
+											if v.Attrs == nil {
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+											}
+										}
+										{
+											obj := a
+											tf := &v
+											{
+												t, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullable.MapObjectNested.Str"})
+												} else {
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullable.MapObjectNested.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = string(obj.Str) == ""
+													}
+													v.Value = string(obj.Str)
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.MapObjectNested) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["map_object_nested"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["nested_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.NestedList"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+									}
+								}
+								if obj.NestedList != nil {
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+									for k, a := range obj.NestedList {
+										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+											}
+										} else {
+											if v.Attrs == nil {
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+											}
+										}
+										if a == nil {
+											v.Null = true
+										} else {
+											obj := a
+											tf := &v
+											{
+												t, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullable.NestedList.Str"})
+												} else {
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullable.NestedList.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = string(obj.Str) == ""
+													}
+													v.Value = string(obj.Str)
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.NestedList) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["nested_list"] = c
+							}
+						}
+					}
+					{
+						t, ok := tf.AttrTypes["str"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullable.Str"})
+						} else {
+							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.NestedNullable.Str", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.Str) == ""
+							}
+							v.Value = string(obj.Str)
+							v.Unknown = false
+							tf.Attrs["str"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["nested_nullable"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["nested_nullable_with_nil_value"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["nested_nullable_with_nil_value"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.NestedNullableWithNilValue == nil {
+					v.Null = true
+				} else {
+					obj := obj.NestedNullableWithNilValue
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.Map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+							} else {
+								c, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Map))
+									}
+								}
+								if obj.Map != nil {
+									t := o.ElemType
+									for k, a := range obj.Map {
+										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.Map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
+										}
+										v.Value = string(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.Map) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["map_object_nested"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+							} else {
+								c, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+										ElemType: o.ElemType,
+										Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.MapObjectNested))
+									}
+								}
+								if obj.MapObjectNested != nil {
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+									for k, a := range obj.MapObjectNested {
+										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+											}
+										} else {
+											if v.Attrs == nil {
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+											}
+										}
+										{
+											obj := a
+											tf := &v
+											{
+												t, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str"})
+												} else {
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.MapObjectNested.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = string(obj.Str) == ""
+													}
+													v.Value = string(obj.Str)
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.MapObjectNested) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["map_object_nested"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["nested_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.NestedList"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList)),
+										Null:     true,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+									}
+								}
+								if obj.NestedList != nil {
+									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+									for k, a := range obj.NestedList {
+										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										if !ok {
+											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+												AttrTypes: o.AttrTypes,
+												Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+											}
+										} else {
+											if v.Attrs == nil {
+												v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+											}
+										}
+										if a == nil {
+											v.Null = true
+										} else {
+											obj := a
+											tf := &v
+											{
+												t, ok := tf.AttrTypes["str"]
+												if !ok {
+													diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.NestedList.Str"})
+												} else {
+													v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+													if !ok {
+														i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+														if err != nil {
+															diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.NestedList.Str", err})
+														}
+														v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+														if !ok {
+															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+														}
+														v.Null = string(obj.Str) == ""
+													}
+													v.Value = string(obj.Str)
+													v.Unknown = false
+													tf.Attrs["str"] = v
+												}
+											}
+										}
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.NestedList) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["nested_list"] = c
+							}
+						}
+					}
+					{
+						t, ok := tf.AttrTypes["str"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.NestedNullableWithNilValue.Str"})
+						} else {
+							v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.NestedNullableWithNilValue.Str", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.Str) == ""
+							}
+							v.Value = string(obj.Str)
+							v.Unknown = false
+							tf.Attrs["str"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["nested_nullable_with_nil_value"] = v
+			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["str"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.Str"})
+		} else {
+			v, ok := tf.Attrs["str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Str", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.Str) == ""
+			}
+			v.Value = string(obj.Str)
+			v.Unknown = false
+			tf.Attrs["str"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["string_list"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.StringList"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+			} else {
+				c, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+						ElemType: o.ElemType,
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+					}
+				}
+				if obj.StringList != nil {
+					t := o.ElemType
+					for k, a := range obj.StringList {
+						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.StringList", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = string(a) == ""
+						}
+						v.Value = string(a)
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.StringList) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["string_list"] = c
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["string_list_empty"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.StringListEmpty"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+			} else {
+				c, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+						ElemType: o.ElemType,
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty))
+					}
+				}
+				if obj.StringListEmpty != nil {
+					t := o.ElemType
+					for k, a := range obj.StringListEmpty {
+						v, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.StringListEmpty", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = string(a) == ""
+						}
+						v.Value = string(a)
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.StringListEmpty) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["string_list_empty"] = c
+			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["timestamp"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.Timestamp"})
+		} else {
+			v, ok := tf.Attrs["timestamp"].(TimeValue)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Timestamp", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Timestamp", "TimeValue"})
+				}
+				v.Null = false
+			}
+			v.Value = time.Time(obj.Timestamp)
+			v.Unknown = false
+			tf.Attrs["timestamp"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["timestamp_list"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.TimestampList"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+			} else {
+				c, ok := tf.Attrs["timestamp_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+						ElemType: o.ElemType,
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
+					}
+				}
+				if obj.TimestampList != nil {
+					t := o.ElemType
+					for k, a := range obj.TimestampList {
+						v, ok := tf.Attrs["timestamp_list"].(TimeValue)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.TimestampList", err})
+							}
+							v, ok = i.(TimeValue)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "TimeValue"})
+							}
+							v.Null = false
+						}
+						if a == nil {
+							v.Null = true
+						} else {
+							v.Null = false
+							v.Value = time.Time(*a)
+						}
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.TimestampList) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["timestamp_list"] = c
+			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["timestamp_missing"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.TimestampMissing"})
+		} else {
+			v, ok := tf.Attrs["timestamp_missing"].(TimeValue)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.TimestampMissing", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
+				}
+				v.Null = false
+			}
+			v.Value = time.Time(obj.TimestampMissing)
+			v.Unknown = false
+			tf.Attrs["timestamp_missing"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["timestamp_nullable"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.TimestampNullable"})
+		} else {
+			v, ok := tf.Attrs["timestamp_nullable"].(TimeValue)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.TimestampNullable", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
+				}
+				v.Null = false
+			}
+			if obj.TimestampNullable == nil {
+				v.Null = true
+			} else {
+				v.Null = false
+				v.Value = time.Time(*obj.TimestampNullable)
+			}
+			v.Unknown = false
+			tf.Attrs["timestamp_nullable"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["timestamp_nullable_with_nil_value"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.TimestampNullableWithNilValue"})
+		} else {
+			v, ok := tf.Attrs["timestamp_nullable_with_nil_value"].(TimeValue)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.TimestampNullableWithNilValue", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
+				}
+				v.Null = false
+			}
+			if obj.TimestampNullableWithNilValue == nil {
+				v.Null = true
+			} else {
+				v.Null = false
+				v.Value = time.Time(*obj.TimestampNullableWithNilValue)
+			}
+			v.Unknown = false
+			tf.Attrs["timestamp_nullable_with_nil_value"] = v
 		}
 	}
 	return diags

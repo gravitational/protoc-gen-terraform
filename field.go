@@ -119,8 +119,6 @@ type Field struct {
 	// MapValueField represents a Field of map value
 	MapValueField *Field
 
-	// RawComment is field comment in proto file without // prepended
-	RawComment string
 	// Comment is field comment in proto file with // prepended
 	Comment string
 
@@ -168,8 +166,6 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		return nil, nil
 	}
 
-	rawComment, comment := c.GetComment()
-
 	f := &Field{
 		Name:          c.GetName(),
 		NameSnake:     c.GetNameSnake(),
@@ -182,8 +178,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		Validators:    c.GetValidators(),
 		PlanModifiers: c.GetPlanModifiers(),
 		Path:          c.GetPath(),
-		RawComment:    rawComment,
-		Comment:       comment,
+		Comment:       c.GetComment(),
 	}
 
 	f.GoType = c.GetGoType()
