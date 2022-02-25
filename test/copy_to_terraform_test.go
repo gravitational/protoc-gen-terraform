@@ -18,7 +18,6 @@ package test
 
 import (
 	"context"
-	fmt "fmt"
 	"testing"
 	time "time"
 
@@ -31,7 +30,6 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
-	fmt.Printf("%+v", diags)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, "TestString", o.Attrs["str"].(types.String).Value)

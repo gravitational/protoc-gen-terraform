@@ -61,6 +61,8 @@ type TerraformType struct {
 	ValueCastToType string
 	// ValueCastFromType represents Go type of a counterpart object field or field elem to cast from .Value
 	ValueCastFromType string
+	// ZeroValue represents zero value for a type
+	ZeroValue string
 	// IsMessage field is a nested message? (might be map or list at the same time)
 	IsMessage bool
 	// TypeConstructor represents expression which is used to initialize type in schema

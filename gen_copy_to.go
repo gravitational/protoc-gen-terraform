@@ -118,40 +118,47 @@ func (f *FieldCopyToGenerator) getAttr(v string, typ string, g *j.Group) {
 }
 
 // genZeroValue generates zero value from an empty AttrType
-func (f *FieldCopyToGenerator) genZeroValue(g *j.Group) {
-	// This generates an empty attr.Value from a Terraform type
-	// v, err = t.ValueFromTerraform(ctx, tftypes.NewValue(t.TerraformType(ctx, nil)))
-	g.List(j.Id("i"), j.Id("err")).Op(":=").Id("t.ValueFromTerraform").Call(
-		j.Id("ctx"),
-		j.Id(f.i.WithPackage(TFTypes, "NewValue")).Call(
-			j.Id("t.TerraformType").Call(j.Id("ctx")), j.Nil(),
-		),
-	)
+func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
+	return func(g *j.Group) {
+		// This generates an empty attr.Value from a Terraform type
+		// v, err = t.ValueFromTerraform(ctx, tftypes.NewValue(t.TerraformType(ctx, nil)))
+		g.List(j.Id("i"), j.Id("err")).Op(":=").Id("t.ValueFromTerraform").Call(
+			j.Id("ctx"),
+			j.Id(f.i.WithPackage(TFTypes, "NewValue")).Call(
+				j.Id("t.TerraformType").Call(j.Id("ctx")), j.Nil(),
+			),
+		)
 
-	// if err != nil { diags.AddError }
-	g.If(j.Id("err != nil")).Block(
-		j.Id("diags.Append").Call(j.Id("attrWriteGeneralError").Values(j.Lit(f.Path), j.Id("err"))),
-	)
+		// if err != nil { diags.AddError }
+		g.If(j.Id("err != nil")).Block(
+			j.Id("diags.Append").Call(j.Id("attrWriteGeneralError").Values(j.Lit(f.Path), j.Id("err"))),
+		)
 
-	// v, ok = i.(types.Time)
-	g.List(j.Id("v"), j.Id("ok")).Op("=").Id("i").Assert(j.Id(f.i.WithType(f.ElemValueType)))
+		// v, ok = i.(types.Time)
+		g.List(j.Id("v"), j.Id("ok")).Op("=").Id("i").Assert(j.Id(f.i.WithType(f.ElemValueType)))
 
-	// if !ok { diags.AddError }
-	g.If(j.Id("!ok")).BlockFunc(f.errAttrConversionFailure(f.Path, f.ElemValueType))
+		// if !ok { diags.AddError }
+		g.If(j.Id("!ok")).BlockFunc(f.errAttrConversionFailure(f.Path, f.ElemValueType))
 
-	// v.Null = false
-	g.Id("v.Null").Op("=").False()
+		// v.Null = v.Value == ""
+		if f.ZeroValue != "" {
+			g.Id("v.Null").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Op("==").Id(f.ZeroValue)
+		} else {
+			g.Id("v.Null").Op("=").False()
+		}
+	}
 }
 
 // genPrimitiveBody generates block which reads object field into v
 func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *j.Group) {
 	f.getAttr("v", f.i.WithType(f.Field.ElemValueType), g)
-	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue)
+	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue(fieldName))
 
 	if f.IsNullable {
 		g.If(j.Id(fieldName).Op("==").Nil()).Block(
 			j.Id("v.Null").Op("=").True(),
 		).Else().Block(
+			j.Id("v.Null").Op("=").False(),
 			j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
 		)
 	} else {
@@ -286,7 +293,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 
 				// if len(obj.Test) > 0
 				g.If(j.Len(j.Id(fieldName))).Op(">").Lit(0).Block(
-					g.Id("c.Null").Op("=").False(),
+					j.Id("c.Null").Op("=").False(),
 				)
 			})
 

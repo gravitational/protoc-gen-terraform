@@ -34,6 +34,7 @@ var (
 		ElemType:         Types + ".Float64Type",
 		ElemValueType:    Types + ".Float64",
 		ValueCastToType:  "float64",
+		ZeroValue:        "0",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -44,6 +45,7 @@ var (
 		ElemType:         Types + ".Int64Type",
 		ElemValueType:    Types + ".Int64",
 		ValueCastToType:  "int64",
+		ZeroValue:        "0",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -54,6 +56,7 @@ var (
 		ElemType:         Types + ".StringType",
 		ElemValueType:    Types + ".String",
 		ValueCastToType:  "string",
+		ZeroValue:        `""`,
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
@@ -64,6 +67,7 @@ var (
 		ElemType:         Types + ".BoolType",
 		ElemValueType:    Types + ".Bool",
 		ValueCastToType:  "bool",
+		ZeroValue:        "false",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}
