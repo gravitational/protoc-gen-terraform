@@ -9,6 +9,7 @@ import (
 func TestConfig(t *testing.T) {
 	cfg, err := ReadConfig(map[string]string{"config": "test/config.yaml", "types": "foo+bar"})
 	require.NoError(t, err)
+
 	require.Equal(t, cfg.Types, flagMap{"foo": struct{}{}, "bar": struct{}{}})
 	require.Equal(t, cfg.DurationCustomType, "Duration")
 	require.Equal(t, cfg.UseStateForUnknownByDefault, true)
