@@ -31,7 +31,7 @@ See [Makefile](Makefile) for details.
 
 # Options
 
-Options could be set either using cli args or [YAML](test/config.yaml). Path to config file can be specified with `config` argument. Be advised that some options could be set in config file only.
+Options can be set using either CLI args or [YAML](test/config.yaml). The path to the config file can be specified with `config` argument. Be advised that some options can only be set via the config file
 
 ## Setting target and default package name
 
