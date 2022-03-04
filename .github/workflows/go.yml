@@ -1,0 +1,31 @@
+name: Go
+
+on:
+  - push
+  - pull_request
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        version: '3.x'
+
+    - name: Install protoc-gen-gogo
+      run: go install github.com/gogo/protobuf/protoc-gen-gogo
+
+    - name: Build
+      run: make build
+
+    - name: Test
+      run: make test

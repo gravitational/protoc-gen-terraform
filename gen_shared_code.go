@@ -31,10 +31,12 @@ type Generator interface {
 	Write(io.Writer) (int, error)
 }
 
+// SharedCodeGenerator generates shared code fragments
 type SharedCodeGenerator struct {
 	i *Imports
 }
 
+// NewSharedCodeGenerator returns new SharedCodeGenerator
 func NewSharedCodeGenerator(i *Imports) SharedCodeGenerator {
 	return SharedCodeGenerator{i}
 }
