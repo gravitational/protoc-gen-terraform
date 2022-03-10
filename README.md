@@ -33,6 +33,12 @@ See [Makefile](Makefile) for details.
 
 Options can be set using either CLI args or [YAML](test/config.yaml). The path to the config file can be specified with `config` argument. Be advised that some options can only be set via the config file
 
+## Printing version
+
+```protoc-gen-terraform version```
+
+will print version number, build SHA and quit.
+
 ## Setting target and default package name
 
 By default, generated code is assumed to reside in the same package as your go generated code.
