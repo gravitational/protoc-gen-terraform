@@ -16,10 +16,12 @@ limitations under the License.
 
 package main
 
-var (
-	// Version package version, specified in Makefile using ldflags
-	Version = `Not specified, use --ldflags "-X main.Version "1.0.0""`
+import (
+	_ "embed"
+)
 
-	// Sha git commit sha, passed from Makefile with ldflags
-	Sha = "Not specified"
+//go:generate bash -c "git describe --tags --abbrev=0 | tr -d '\n' > VERSION"
+var (
+	//go:embed VERSION
+	Version string
 )

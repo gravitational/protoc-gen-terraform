@@ -33,12 +33,6 @@ See [Makefile](Makefile) for details.
 
 Options can be set using either CLI args or [YAML](test/config.yaml). The path to the config file can be specified with `config` argument. Be advised that some options can only be set via the config file
 
-## Printing version
-
-```protoc-gen-terraform version```
-
-will print version number, build SHA and quit.
-
 ## Setting target and default package name
 
 By default, generated code is assumed to reside in the same package as your go generated code.
@@ -168,7 +162,7 @@ time_type:
 
 ## Custom duration value
 
-If you schema uses the following definition for the duration fields:
+If your schema uses the following definition for the duration fields:
 
 ```golang
 int64 MaxSessionTTL = 2 [ (gogoproto.casttype) = "Duration" ];
@@ -271,7 +265,17 @@ cd build.assets
 make build test PROTOC_PLATFORM=linux-aarch_64
 ```
 
-# TODO
+# Printing version
 
-- [ ] Make time format customizable
-- [ ] Ability to overwrite list and maps base types
+```protoc-gen-terraform version```
+
+will print version number and quit.
+
+# Releasing the new version
+
+Current version number resides in the VERSION file. To update the file contents from current git tag, run:
+
+```
+git tag v1.1.1
+go generate
+```
