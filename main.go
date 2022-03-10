@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"os"
 	"regexp"
 	"strings"
 
@@ -38,8 +39,12 @@ var (
 )
 
 func main() {
-	log.Infof("protoc-gen-terraform %s", Version)
+	log.Infof("protoc-gen-terraform v%s", Version)
 	log.Infof("protoc-gen-terraform build hash: %s", Sha)
+
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		return
+	}
 
 	p := NewPlugin()
 
