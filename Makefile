@@ -16,11 +16,11 @@ clean:
 
 .PHONY: build
 build: clean
-	go build -o $(BINFILE) -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(PACKAGE_VERSION)"
+	go build -o $(BINFILE)
 
 .PHONY: install
 install: build
-	go install -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(PACKAGE_VERSION)"
+	go install
 
 .PHONY: test
 test: build

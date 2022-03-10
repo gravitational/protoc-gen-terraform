@@ -39,8 +39,7 @@ var (
 )
 
 func main() {
-	log.Infof("protoc-gen-terraform v%s", Version)
-	log.Infof("protoc-gen-terraform build hash: %s", Sha)
+	log.Infof("protoc-gen-terraform %s", Version)
 
 	if len(os.Args) > 1 && os.Args[1] == "version" {
 		return
