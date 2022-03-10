@@ -20,7 +20,7 @@ import (
 	_ "embed"
 )
 
-//go:generate bash -c "git describe --tags --abbrev=0 | tr -d '\n' > VERSION"
+//go:generate bash -c "git describe --tags $(git rev-list --tags --max-count=1) | tr -d '\n' > VERSION"
 var (
 	//go:embed VERSION
 	Version string
