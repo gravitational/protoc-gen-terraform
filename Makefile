@@ -1,54 +1,42 @@
-include version.mk
+# Get the current directory relative to Makefile location
+PWD = $(realpath $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+
+PACKAGE_VERSION = $(shell cat $(PWD)/VERSION)
+BUILD_DIR = build
+BINFILE = $(PWD)/$(BUILD_DIR)/protoc-gen-terraform
+
+GOPATH = $(shell go env GOPATH)
+SRCPATH = $(GOPATH)/src
 
 .PHONY: clean
-
 clean:
-	@mkdir -p ./_build
-	rm -rf ./_build/*
+	@mkdir -p ./$(BUILD_DIR)
+	@rm -rf ./$(BUILD_DIR)/*
 	go clean
 
 .PHONY: build
 build: clean
-	go build -o _build/protoc-gen-terraform -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(package_version)"
+	go build -o $(BINFILE)
 
 .PHONY: install
 install: build
-	go install -ldflags "-X main.Sha=`git rev-parse HEAD` -X main.Version=$(package_version)"
-
-pwd = $(realpath $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
-
-gopath = $(shell go env GOPATH)
-srcpath = $(gopath)/src
-teleport_url = github.com/gravitational/teleport
-teleport_repo = https://$(teleport_url)
-teleport_dir = $(srcpath)/$(teleport_url)
-out_dir := "$(pwd)/_out"
-
-.PHONY: teleport
-teleport: build
-ifeq ("$(wildcard $(teleport_dir))", "")
-	$(warning Teleport source code is required to build this example!)
-	$(warning git clone ${teleport_repo} ${teleport_dir} to proceed)
-	$(error Teleport source code is required to build this example)
-endif
-	@mkdir -p ./_out
-	@protoc \
-		-I$(teleport_dir)/api/types \
-		-I$(teleport_dir)/vendor/github.com/gogo/protobuf \
-		-I$(srcpath) \
-		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=config=example/teleport.yaml:${out_dir} \
-		types.proto
+	go install
 
 .PHONY: test
 test: build
 	@protoc \
-		-I$(pwd)/test \
-		-I$(pwd) \
+		-I$(PWD) \
+		-I$(PWD)/test \
 		-I$(shell go list -m -f {{.Dir}} github.com/gogo/protobuf) \
-		-I$(srcpath) \
-		--plugin=./_build/protoc-gen-terraform \
-		--terraform_out=ref=true,target_pkg=test,types=Test,sort=true,custom_duration=Duration:test \
 		--gogo_out=test \
 		test.proto
-	@go test -v ./test
+
+	@protoc \
+		-I$(PWD) \
+		-I$(PWD)/test \
+		-I$(shell go list -m -f {{.Dir}} github.com/gogo/protobuf) \
+		--plugin=$(BINFILE) \
+		--terraform_out=config=test/config.yaml:test \
+		test.proto
+
+	@go test ./...

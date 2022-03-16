@@ -17,7 +17,6 @@ package test;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
 
 option (gogoproto.marshaler_all) = false;
 option (gogoproto.unmarshaler_all) = false;
@@ -36,10 +35,16 @@ option (gogoproto.goproto_getters_all) = false;
 //   - byte arrays, which are treated as strings by default
 //
 
+enum Mode {
+    UNKNOWN = 0;
+    ON = 1;
+    OFF = 2;
+}
+
 // Test message definition.
 message Test {
     // Str string field
-    string Str = 1;
+    string Str = 1 [ (gogoproto.jsontag) = "str1" ];
 
     // Int32 int32 field
     int32 Int32 = 2;
@@ -56,8 +61,8 @@ message Test {
     // Bool bool field
     bool Bool = 6;
 
-    // Bytes byte[] field
-    bytes Bytes = 7;
+    // bytes byte[] field
+    bytes bytes = 7; // Names starting from a lower case letter are autoconverted to UpperCamelCase
 
     // Timestamp time.Time field
     google.protobuf.Timestamp Timestamp = 8 [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
@@ -120,10 +125,16 @@ message Test {
     map<string, string> Map = 27;
 
     // MapObject is the object map
-    map<string, Nested> MapObject = 29 [ (gogoproto.nullable) = false ];    
+    map<string, Nested> MapObject = 29 [ (gogoproto.nullable) = false ];
 
     // MapObjectNullable is the object map with nullable values
-    map<string, Nested> MapObjectNullable = 30;
+    map<string, Nested> MapObjectNullable = 30 [ (gogoproto.nullable) = true ];
+
+    // Mode is the enum value
+    Mode Mode = 31;
+
+    // Excluded is the excluded field
+    bool Excluded = 32;
 }
 
 // Nested message definition
@@ -138,7 +149,7 @@ message Nested {
     map<string, string> Map = 3;
 
     // MapObjectNested nested object map
-    map<string, OtherNested> MapObjectNested = 4;
+    map<string, OtherNested> MapObjectNested = 4 [ (gogoproto.nullable) = false ];
 }
 
 // OtherNested message nested into nested message
