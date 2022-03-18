@@ -17,11 +17,18 @@ limitations under the License.
 package main
 
 import (
-	_ "embed"
+	"strings"
 )
 
-//go:generate bash -c "git describe --tags $(git rev-list --tags --max-count=1) | tr -d '\n' > VERSION"
-var (
-	//go:embed VERSION
-	Version string
-)
+// Comment represents a wrapper over a string containing a comment
+type Comment string
+
+// ToSingleLine returns multiline comment as a single string
+func (s Comment) ToSingleLine() string {
+	lines := strings.Split(string(s), "\n")
+	for i, l := range lines {
+		lines[i] = strings.TrimSpace(l)
+	}
+
+	return strings.TrimSpace(strings.Join(lines, " "))
+}

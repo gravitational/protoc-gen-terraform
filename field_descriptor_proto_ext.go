@@ -14,14 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package plugin
+package main
 
 import (
 	"strings"
 
 	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
-	"github.com/gravitational/protoc-gen-terraform/config"
 )
 
 const (
@@ -54,13 +53,13 @@ func (f *FieldDescriptorProtoExt) IsTime() bool {
 }
 
 // IsDuration returns true if field stores a duration value (protobuf or cast to a standard library type)
-func (f *FieldDescriptorProtoExt) IsDuration() bool {
+func (f *FieldDescriptorProtoExt) IsDuration(durationCustomType string) bool {
 	ct := f.GetCastType()
 	t := f.TypeName
 
 	isStdDuration := gogoproto.IsStdDuration(f.FieldDescriptorProto)
 	isGoogleDuration := (t != nil && strings.HasSuffix(*t, protobufDurationTypeName))
-	isCastToCustomDuration := ct == config.DurationCustomType
+	isCastToCustomDuration := durationCustomType != "" && ct == durationCustomType
 	isCastToDuration := ct == "time.Duration"
 
 	return isStdDuration || isGoogleDuration || isCastToDuration || isCastToCustomDuration
@@ -71,12 +70,12 @@ func (f *FieldDescriptorProtoExt) IsMessage() bool {
 	return f.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
 }
 
-// IsCastType returns true if field has gogoprotobuf.casttype flag
+// IsCastType returns true if field has gogoproto.casttype flag
 func (f *FieldDescriptorProtoExt) IsCastType() bool {
 	return gogoproto.IsCastType(f.FieldDescriptorProto)
 }
 
-// IsCustomType returns true if field has gogoprotobuf.customtype flag
+// IsCustomType returns true if field has gogoproto.customtype flag
 func (f *FieldDescriptorProtoExt) IsCustomType() bool {
 	return gogoproto.IsCustomType(f.FieldDescriptorProto)
 }

@@ -1,70 +1,256 @@
 # protoc-gen-terraform
 
-Generates Terraform schema and unmarshalling methods from gogo/protobuf .proto file.
+protoc plugin to generate Terraform Framework schema definitions and getter/setter methods from gogo/protobuf .proto files.
 
 # Installation
 
-Install the generator package. 
+Install the generator binary.
 
 ```
-go install github.com/gravitational/protoc-gen-terraform@latest
+go install github.com/gravitational/protoc-gen-terraform
 ```
 
 # Usage
 
+Given that you have `gogo/protobuf` and `gravitational/teleport/api` in your $GOSRC dir:
+
 ```
-mkdir -p ./_out
+mkdir -p ./tfschema
 protoc \
-    -I$(teleport_dir)/api/types \
-    -I$(teleport_dir)/vendor/github.com/gogo/protobuf \
-    -I$(srcpath) \
-    --plugin=./_build/protoc-gen-terraform \
-    --terraform_out=types=types.UserV2+types.RoleV3,pkg=types:_out \
+    -I$(go env GOPATH)/src/github.com/gravitational/teleport/api/types \
+    -I$(go env GOPATH)/src/github.com/gogo/protobuf \
+    -I$(go env GOPATH)/src \
+    --plugin=./build/protoc-gen-terraform \
+    --terraform_out=types=RoleSpecV4,pkg=types:tfschema \
     types.proto
 ```
 
-This will generate `types_terraform.go` in _out directory. This file will contain `SchemaUserV2`, `SchemaRolesV3` along with `SchemaMetaUserV2`, `SchemaMetaRolesV3`.
+This command will generate `types_terraform.go` in `tfschema` folder. 
 
 See [Makefile](Makefile) for details.
 
-Options:
+# Options
 
-* `types` - the list of top level types to export (with namespace).
-* `exclude_fields` - list of a fields to exclude from export including type name (with namespace, ex: 'types.UserV2.Name`). Fields could also be addressed via full path in a structure (ex: `types.UserV2.Spec.Allow.Logins`). This distinction is needed if a field needs to have a different behaviour in different parent structs even if it belongs to a same type. For example, `Metadata.Expires` must be excluded for `User` and is required for `Token`.
-* `pkg` - default package name to prepend to type names with no package reference. This option is required if the target package of Terraform generated code is different from the package of original protobuf generated code.
-* `target_pkg` - the name of the target package
-* `custom_duration` - the name of custom Duration type, if used
-* `custom_imports` - comma-separated package list to add into generated file
-* `required` - list of a generated Terraform schema fields to mark as `Required: true`
-* `computed` - list of a generated Terraform schema fields to mark as `Computed: true`
-* `force_new` - list of a generated Terraform schema fields to mark as `ForceNew: true`
-* `config_mode_attr` - list of a generated Terraform schema fields to mark as `SchemaConfigMode: schema.SchemaConfigModeAttr`
-* `config_mode_block` - list of a generated Terraform schema fields to mark as `SchemaConfigMode: schema.SchemaConfigModeBlock`
-* `suffixes` - map of overrides of method names generated for `gogo.customtype` fields (available in config file only)
-* `snake_name_replacements` - map of schema field name overrides (`"AWSARNs" -> "aws_arns"`)
-* `defaults` - default values for a fields in generated Terraform schema (available in config file only). Note that default value type in YAML file is taken into account.
+Options can be set using either CLI args or [YAML](test/config.yaml). The path to the config file can be specified with `config` argument. Be advised that some options can only be set via the config file
 
-All config variables could be set in [YAML](example/teleport.yaml). Path to config file can be specified using `config` variable. 
+## Setting target and default package name
 
-# Usage
+By default, generated code is assumed to reside in the same package as your go generated code.
 
-See [get](example/get_test.go) and [set](example/get_test.go) tests for details.
+Use `target_package_name` option to change the target package name:
+
+```
+target_package_name=tfschema
+```
+
+Please also specify the full name of the go package where your generated code is located:
+
+```
+default_package_name="github.com/gravitational/teleport/api/types"
+```
+
+If you use types from external packages, please specify them in `external_imports`:
+
+```
+external_imports="github.com/gravitational/teleport/api/wrappers"
+```
+
+and reference that types anywhere in config using full package name (`github.com/gravitational/teleport/api/wrappers.Wrapper`). Generator will handle the rest for you.
+
+## Specifying types to export
+
+List message names you want to export in `types` option:
+
+```
+types=UserV2+RoleV3
+```
+
+## Excluding fields
+
+Let's consider we have the following proto definition:
+
+```proto
+message Metadata {
+	string ID = 1;
+}
+
+message User {
+	Metadata Metadata = 1;
+}
+
+message AuthPreference {
+	Metadata Metadata = 1;
+}
+```
+
+Specify `exclude_fields` option:
+
+```
+exclude_fields=Metadata.ID+AuthPreference.Metadata.Name
+```
+
+In this case, `Metadata.ID` would be omitted for both `User` and `AuthPreference`, and `Metadata.Name` would be omitted for `AuthPreference` only. `User.Metadata.Name` won't be affected.
+
+## Terraform Schema flags
+
+You can specify `Required: true` (`required_fields`), `Computed: true` (`computed_fields`) and `Sensitive: true` (`sensitive_fields`) flags for your Terraform schema:
+
+```
+required_fields=Metadata.Name
+```
+
+You also can set list of `Validators` and `PlanModifiers` using configuration file:
+
+```yaml
+validators:
+	"Metadata.Expires":
+		- rfc3339TimeValidator
+
+plan_modifiers:
+	"Role.Options":
+		- "github.com/hashicorp/terraform-plugin-framework/tfsdk.RequiresReplace()"
+```
+
+## UseStateForUnknown by default
+
+The following setting:
+
+```
+use_state_for_unknown_by_default: true
+```
+
+will add `tfsdk.UseStateForUnknown()` PlanModifier to all computed fields.
+
+## Injecting fields into schema
+
+There are cases when you need to add fields not existing in the object to schema. For example, artificial id field is required for Terraform acceptance tests to work. You can achieve it using `injected_fields` option:
+
+```yaml
+injected_fields:
+  Test: # Path to inject
+    -
+      name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+```
+
+## Schema field naming
+
+Schema field names are extracted from `json` tag by default. If a `json` tag is missing, a snake case of a field name is used.
+
+If you need to rename field in schema, use `name_overrides` option:
+
+```yaml
+name_overrides:
+	"Role.Spec.AWSRoleARNs": aws_arns 
+```
+
+## Custom fields
+
+If your proto generated objects use type alias for duration fields, you can set `custom_duration` to the name of a custom duration type.
+
+`time_type`, `duration_type` and `schema_types` options are used to override Terraform types.
+
+```yaml
+time_type:
+    type: "TimeType"                    # attr.Type
+    value_type: "TimeValue"             # attr.Value
+    cast_to_type: "time.Time"           # TimeValue.Value type
+	cast_from_type: "time.Time"         # Go object field type
+	type_constructor: UseRFC3339Time()  # Function to put into schema definition Type, will generate TimeType{} if missing
+```
+
+## Custom duration value
+
+If your schema uses the following definition for the duration fields:
+
+```golang
+int64 MaxSessionTTL = 2 [ (gogoproto.casttype) = "Duration" ];
+```
+
+you can set the `duration_custom_type` to make such fields act as duration custom type:
+
+```
+duration_custom_type=Duration
+```
+
+## Generated methods
+
+`Copy*ToTerraform` and `Copy*FromTerraform` methods are generated for every .proto message. They convert Terraform state object to go proto type and vice versa using normal go assignment operations (no reflect).
+
+### CopyFrom
+
+Copies Terraform data to an object.
+
+The signatures for `Test` resource would be the following:
+
+```go
+// CopyTestFromTerraform copies Terraform object fields to obj
+// tf must have all the object attrs present (including null and unknown). 
+// Hence, tf must be the result of req.Plan.Get or similar Terraform method.
+// Otherwise, error would be returned.
+func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics
+```
+
+They can be used as following:
+
+```go
+// Create template resource create method
+func (r resource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+	var plan types.Object
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	obj := types.Object{}
+	diags := tfschema.CopyObjFromTerraform(plan, &obj)	
+	resp.Diagnostics.Append(diags...)	
+	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+```
+
+The following rules apply:
+1. Source Terraform object must contain values for all target object fields.
+2. Unknown values are treated as nulls. Target object value would be set to either nil or zero value.
+
+So, the source Terraform object might be Plan, State or Object.
+
+### CopyTo
+
+Copies object to Terraform object.
+
+```go
+func CopyTestToTerraform(obj Test, tf *types.Object, updateOnly bool) error
+```
+
+Target Terraform object must have AttrTypes for all fields of Object.
+
+The following rules apply:
+1. All target attributes are marked as known.
+2. In case an attribute is present in AttrTypes, but is missing in AttrValues, it is created.
+
+## Note on gogoproto.customtype
+
+If a field has `gogoproto.customtype` flag, schema and converters for this field can not be generated automatically. You need to define `Gen<type>Schema`, `Copy<type>FromTerraform`, `Copy<type>ToTerraform` methods.
+
+`suffixes` option can be used to control method names:
+
+```yaml
+suffixes:
+    "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
+```
+
+In the example above, `GenTraitsSchema` method will be called. Without this option, method name would be `GenGithubComGravitationalTeleportApiTypesWrappersTraits`.
 
 # Testing
 
 Run:
 
 ```make test```
-
-# Note on maps of messages
-
-Terraform does not support map of resources. If a field in protoc object is map of messages, it could not be defined in Terraform. This case is emulated via generating list with `key` and `value` fields instead. See `MapObject` field of [`Test`](test/custom_types.go) struct for example.
-
-Map of arrays of elementary types are not supported as well.
-
-# Note on gogoproto.customtype
-
-If a field has `gogoproto.customtype` flag, it can not be automatically unmarshalled from `ResourceData`. You need to define your own custom `Get<type>` and `Set<type>` methods. See [test/custom_types.go](test/custom_types.go) for example.
 
 # Build and test using Docker
 
@@ -79,13 +265,17 @@ cd build.assets
 make build test PROTOC_PLATFORM=linux-aarch_64
 ```
 
-# TODO
+# Printing version
 
-- [ ] Oneof is not supported yet
-- [x] Extract comments from original protoc file
-- [x] Add argument to provide custom duration type
-- [x] Add argument to provide custom imports for target file
-- [ ] Add argument which will represent specific []byte fields as byte lists on Terraform side
-- [x] Manually replace target package name
-- [x] Run goimports to remove unused packages
-- [x] Separate config file
+```protoc-gen-terraform version```
+
+will print version number and quit.
+
+# Releasing the new version
+
+Current version number resides in the VERSION file. To update the file contents from current git tag, run:
+
+```
+git tag v1.1.1
+go generate
+```

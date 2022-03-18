@@ -1,29 +1,14 @@
-/*
-Copyright 2015-2021 Gravitational, Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package test
 
 import (
+	"context"
 	fmt "fmt"
-	"reflect"
 	time "time"
 
-	"github.com/gravitational/protoc-gen-terraform/accessors"
-	"github.com/gravitational/trace"
-	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	diag "github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Duration custom duration type
@@ -37,85 +22,59 @@ func (d Duration) String() string {
 // BoolCustom custom bool array
 type BoolCustom bool
 
-// SchemaBoolCustom returns schema for custom bool array
-func SchemaBoolCustom() *schema.Schema {
-	return &schema.Schema{
-		Type:     schema.TypeList,
-		Required: true,
-		Elem: &schema.Schema{
-			Type: schema.TypeBool,
+// GenSchemaBoolSpecial generates custom field schema (bool list)
+func GenSchemaBoolSpecial(_ context.Context) tfsdk.Attribute {
+	return tfsdk.Attribute{
+		Type: types.ListType{
+			ElemType: types.BoolType,
 		},
 	}
 }
 
-// FromTerraformBoolCustom interprets data at path as an array of boolean values.
-// The values are returned in target
-func FromTerraformBoolCustom(
-	path string,
-	target reflect.Value,
-	meta *accessors.SchemaMeta,
-	sch *schema.Schema,
-	data *schema.ResourceData,
-) error {
-	len, err := accessors.GetListLen(path, data)
-	if err != nil {
-		return trace.Wrap(err)
-	}
-	if len == 0 {
-		accessors.AssignZeroValue(target)
-		return nil
+// CopyFromBoolSpecial copies target value to the source
+func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom) {
+	v, ok := tf.(types.List)
+	if !ok {
+		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
+		return
 	}
 
-	t := make([]BoolCustom, len)
-
-	for i := 0; i < len; i++ {
-		p := fmt.Sprintf("%v.%v", path, i)
-
-		raw := data.Get(p)
-		v, ok := raw.(bool)
+	arr := make([]BoolCustom, len(v.Elems))
+	for i, raw := range v.Elems {
+		el, ok := raw.(types.Bool)
 		if !ok {
-			return trace.Errorf("can not convert %T to bool", raw)
+			diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", raw))
+			return
 		}
 
-		t[i] = BoolCustom(v)
+		if !el.Null && !el.Unknown {
+			arr[i] = BoolCustom(el.Value)
+		}
 	}
 
-	target.Set(reflect.ValueOf(t))
-
-	return nil
+	*obj = arr
 }
 
-// ToTerraformBoolCustom returns bool values
-func ToTerraformBoolCustom(
-	path string,
-	source reflect.Value,
-	meta *accessors.SchemaMeta,
-	sch *schema.Schema,
-	data *schema.ResourceData,
-) (interface{}, error) {
-	l, err := accessors.GetListLen(path, data)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	if l == 0 {
-		return nil, nil
-	}
-
-	if !source.IsValid() {
-		return nil, nil
-	}
-
-	c, ok := source.Interface().([]BoolCustom)
+// CopyToBoolSpecial copies source value to the target
+func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value) attr.Value {
+	value, ok := v.(types.List)
 	if !ok {
-		return nil, fmt.Errorf("can not convert %T to []BoolCustom", c)
+		value = types.List{
+			Null:     true,
+			Unknown:  false,
+			ElemType: types.BoolType,
+		}
 	}
 
-	r := make([]interface{}, len(c))
+	if len(obj) > 0 {
+		if value.Elems == nil {
+			value.Elems = make([]attr.Value, len(obj))
+		}
 
-	for i, v := range c {
-		r[i] = bool(v)
+		for i, b := range obj {
+			value.Elems[i] = types.Bool{Null: false, Unknown: false, Value: bool(b)}
+		}
 	}
 
-	return r, nil
+	return value
 }
