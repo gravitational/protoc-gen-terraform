@@ -77,6 +77,10 @@ type ProtobufType struct {
 	GoElemType string
 	// GoElemTypeIndirect string represents raw go type slice/map element without *, otherwise equals GoElemType
 	GoElemTypeIndirect string
+	// OneOfType represents go type for OneOf type wrapper
+	OneOfType string
+	// OneOfName represents OneOf field name within the parent struct
+	OneOfName string
 }
 
 // Field represents metadata of protobuf message field descriptor
@@ -213,6 +217,11 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
 
 	f.Kind = f.getKind()
+
+	if c.IsOneOf() {
+		f.OneOfName = c.GetOneOfFieldName()
+		f.OneOfType = c.GetOneOfTypeName()
+	}
 
 	return f, nil
 }

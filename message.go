@@ -39,6 +39,8 @@ type Message struct {
 	IsRoot bool
 	// InjectedFields represents array of fields which must be injected to this message
 	InjectedFields []InjectedField
+	// OneOfNames represents the list of the fields which are OneOfs in this message
+	OneOfNames []string
 }
 
 // BuildMessage builds Message from its protobuf descriptor.
@@ -56,9 +58,9 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 		return nil, nil
 	}
 
-	if c.HasOneOf() {
-		return nil, trace.Errorf("oneOf messages are not supported yet %v", c.GetGoType())
-	}
+	// if c.HasOneOf() {
+	// 	return nil, trace.Errorf("oneOf messages are not supported yet %v", c.GetGoType())
+	// }
 
 	fields, err := BuildFields(c)
 	if err != nil {
@@ -78,6 +80,7 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 		Fields:         fields,
 		IsRoot:         isRoot,
 		InjectedFields: c.GetInjectedFields(),
+		OneOfNames:     c.GetOneOfNames(),
 	}
 
 	message.Comment = c.GetComment()

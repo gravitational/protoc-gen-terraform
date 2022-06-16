@@ -21,6 +21,8 @@ import (
 	"testing"
 	time "time"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -126,4 +128,37 @@ func TestCopyFromCustom(t *testing.T) {
 	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
 	require.Equal(t, []BoolCustom{true, false, true}, target.BoolCustomList)
+}
+
+func TestCopyFromOneOfScalarBranch(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+	obj.Attrs["branch3"] = types.String{Value: "Test"}
+
+	target := Test{}
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+
+	require.Equal(t, "Test", target.OneOf.(*Test_Branch3).Branch3)
+}
+
+func TestCopyFromOneOfObjectBranch(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+	obj.Attrs["branch2"] = types.Object{
+		Attrs: map[string]attr.Value{
+			"int32": types.Int64{Value: 5},
+		},
+	}
+
+	target := Test{}
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+
+	require.Equal(t, int32(5), target.OneOf.(*Test_Branch2).Branch2.Int32)
+}
+
+func TestCopyFromOneOfObjectNoBranch(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+
+	target := Test{}
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+
+	require.Equal(t, nil, target.OneOf)
 }

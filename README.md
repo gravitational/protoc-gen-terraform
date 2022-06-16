@@ -71,15 +71,15 @@ Let's consider we have the following proto definition:
 
 ```proto
 message Metadata {
-	string ID = 1;
+    string ID = 1;
 }
 
 message User {
-	Metadata Metadata = 1;
+    Metadata Metadata = 1;
 }
 
 message AuthPreference {
-	Metadata Metadata = 1;
+    Metadata Metadata = 1;
 }
 ```
 
@@ -103,12 +103,12 @@ You also can set list of `Validators` and `PlanModifiers` using configuration fi
 
 ```yaml
 validators:
-	"Metadata.Expires":
-		- rfc3339TimeValidator
+    "Metadata.Expires":
+        - rfc3339TimeValidator
 
 plan_modifiers:
-	"Role.Options":
-		- "github.com/hashicorp/terraform-plugin-framework/tfsdk.RequiresReplace()"
+    "Role.Options":
+        - "github.com/hashicorp/terraform-plugin-framework/tfsdk.RequiresReplace()"
 ```
 
 ## UseStateForUnknown by default
@@ -142,7 +142,7 @@ If you need to rename field in schema, use `name_overrides` option:
 
 ```yaml
 name_overrides:
-	"Role.Spec.AWSRoleARNs": aws_arns 
+    "Role.Spec.AWSRoleARNs": aws_arns 
 ```
 
 ## Custom fields
@@ -156,8 +156,8 @@ time_type:
     type: "TimeType"                    # attr.Type
     value_type: "TimeValue"             # attr.Value
     cast_to_type: "time.Time"           # TimeValue.Value type
-	cast_from_type: "time.Time"         # Go object field type
-	type_constructor: UseRFC3339Time()  # Function to put into schema definition Type, will generate TimeType{} if missing
+    cast_from_type: "time.Time"         # Go object field type
+    type_constructor: UseRFC3339Time()  # Function to put into schema definition Type, will generate TimeType{} if missing
 ```
 
 ## Custom duration value
@@ -197,19 +197,19 @@ They can be used as following:
 ```go
 // Create template resource create method
 func (r resource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
-	var plan types.Object
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
+    var plan types.Object
+    diags := req.Plan.Get(ctx, &plan)
+    resp.Diagnostics.Append(diags...)
+    if resp.Diagnostics.HasError() {
+        return
+    }
 
-	obj := types.Object{}
-	diags := tfschema.CopyObjFromTerraform(plan, &obj)	
-	resp.Diagnostics.Append(diags...)	
-	if resp.Diagnostics.HasError() {
-		return
-	}
+    obj := types.Object{}
+    diags := tfschema.CopyObjFromTerraform(plan, &obj)	
+    resp.Diagnostics.Append(diags...)	
+    if resp.Diagnostics.HasError() {
+        return
+    }
 }
 ```
 

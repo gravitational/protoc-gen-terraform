@@ -135,6 +135,17 @@ message Test {
 
     // Excluded is the excluded field
     bool Excluded = 32;
+
+    oneof OneOf {
+        // Branch1 is the first oneOf branch
+        Branch1 Branch1 = 33;
+
+        // Branch2 is the second oneOf branch
+        Branch2 Branch2 = 34;
+
+        // Branch3 is the third branch which is simple string
+        string Branch3 = 35;
+    }
 }
 
 // Nested message definition
@@ -156,4 +167,16 @@ message Nested {
 message OtherNested {
     // Str string field
     string Str = 1;
+}
+
+// Branch1 message is OneOf branch 1
+message Branch1 {
+    // Str string field
+    string Str = 1;
+}
+
+// Branch2 message is OneOf branch 2
+message Branch2 {
+    // Int32 int field
+    int32 Int32 = 1;
 }

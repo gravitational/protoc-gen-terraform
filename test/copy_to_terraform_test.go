@@ -29,7 +29,7 @@ import (
 func TestCopyToTerraformPrimitives(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, "TestString", o.Attrs["str"].(types.String).Value)
@@ -64,7 +64,7 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 func TestCopyToTime(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, timestamp, o.Attrs["timestamp"].(TimeValue).Value)
@@ -80,7 +80,7 @@ func TestCopyToTime(t *testing.T) {
 func TestCopyToDuration(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, duration, o.Attrs["duration_standard"].(DurationValue).Value)
@@ -95,7 +95,7 @@ func TestCopyToDuration(t *testing.T) {
 func TestCopyToNested(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(
@@ -116,7 +116,7 @@ func TestCopyToNested(t *testing.T) {
 func TestCopyToList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(t, []attr.Value{
@@ -150,7 +150,7 @@ func TestCopyToList(t *testing.T) {
 func TestCopyToNestedList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	nestedList := o.Attrs["nested_list"].(types.List)
@@ -216,7 +216,7 @@ func TestCopyToNestedList(t *testing.T) {
 func TestCopyToMap(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	m := o.Attrs["map"].(types.Map).Elems
@@ -228,7 +228,7 @@ func TestCopyToMap(t *testing.T) {
 func TestCopyToCustom(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	require.False(t, diags.HasError())
 
 	require.Equal(
@@ -240,4 +240,46 @@ func TestCopyToCustom(t *testing.T) {
 		},
 		o.Attrs["bool_custom_list"].(types.List).Elems,
 	)
+}
+
+func TestCopyToOneOfBranch3(t *testing.T) {
+	o := copyToTerraformObject(t)
+	testObj := createTestObj()
+	testObj.OneOf = &Test_Branch3{Branch3: "Test"}
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	require.False(t, diags.HasError())
+
+	require.Equal(
+		t,
+		types.String{Null: false, Unknown: false, Value: "Test"},
+		o.Attrs["branch3"].(types.String),
+	)
+}
+
+func TestCopyToOneOfBranch2(t *testing.T) {
+	o := copyToTerraformObject(t)
+	testObj := createTestObj()
+	testObj.OneOf = &Test_Branch2{Branch2: &Branch2{Int32: 5}}
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	require.False(t, diags.HasError())
+
+	require.Equal(
+		t,
+		types.Int64{Null: false, Unknown: false, Value: 5},
+		o.Attrs["branch2"].(types.Object).Attrs["int32"],
+	)
+}
+
+func TestCopyToOneOfNoBranch(t *testing.T) {
+	o := copyToTerraformObject(t)
+	testObj := createTestObj()
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	require.False(t, diags.HasError())
+
+	require.True(t, o.Attrs["branch1"].(types.Object).Null)
+	require.True(t, o.Attrs["branch2"].(types.Object).Null)
+	require.True(t, o.Attrs["branch3"].(types.String).Null)
 }

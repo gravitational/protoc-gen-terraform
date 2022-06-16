@@ -29,9 +29,10 @@ import (
 var (
 	timestamp = time.Now()
 	duration  = 5 * time.Minute
+)
 
-	// testObj represents a template object to test Copy*ToTerraform
-	testObj = Test{
+func createTestObj() Test {
+	return Test{
 		Str:    "TestString",
 		Int32:  888,
 		Int64:  999,
@@ -92,7 +93,7 @@ var (
 
 		Map: map[string]string{"key1": "value1", "key2": "value2"},
 	}
-)
+}
 
 // copyFromTerraformObject returns a base object used in CopyFrom* tests
 func copyFromTerraformObject(t *testing.T) types.Object {
@@ -402,7 +403,10 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 					},
 				},
 			},
-			"mode": types.Int64{Value: 1},
+			"mode":    types.Int64{Value: 1},
+			"branch1": types.Object{Null: true},
+			"branch2": types.Object{Null: true},
+			"branch3": types.String{Null: true},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

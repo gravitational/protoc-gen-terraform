@@ -90,17 +90,6 @@ func (c MessageBuildContext) IsExcluded() bool {
 	return !ok
 }
 
-// HasOneOf returns true if the message has at least one oneOf field
-func (c MessageBuildContext) HasOneOf() bool {
-	for _, field := range c.desc.GetField() {
-		if field.OneofIndex != nil {
-			return true
-		}
-	}
-
-	return false
-}
-
 // GetName returns the message name
 func (c MessageBuildContext) GetName() string {
 	return c.desc.GetName()
@@ -145,4 +134,13 @@ func (c *MessageBuildContext) GetInjectedFields() []InjectedField {
 	}
 
 	return []InjectedField{}
+}
+
+// GetOneOfNames returns the names of OneOf groups in this message
+func (c *MessageBuildContext) GetOneOfNames() []string {
+	s := make([]string, len(c.desc.OneofDecl))
+	for i, d := range c.desc.OneofDecl {
+		s[i] = d.GetName()
+	}
+	return s
 }

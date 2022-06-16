@@ -225,6 +225,10 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 	fieldName := "obj." + f.Name
 
 	return f.nextField("t", func(g *j.Group) {
+		if f.OneOfName != "" {
+			f.genOneOfStub(g)
+		}
+
 		f.genPrimitiveBody(fieldName, g)
 		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})
@@ -236,11 +240,26 @@ func (f *FieldCopyToGenerator) genObject() *j.Statement {
 	fieldName := "obj." + f.Name
 
 	return f.nextField("a", func(g *j.Group) {
+		if f.OneOfName != "" {
+			f.genOneOfStub(g)
+		}
+
 		f.assertTo(f.Field.ElemType, g, func(g *j.Group) {
 			f.genObjectBody(m, fieldName, f.Field.ValueType, g)
 			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 		})
 	})
+}
+
+func (f *FieldCopyToGenerator) genOneOfStub(g *j.Group) {
+	// {
+	//     obj, ok := obj.OneOf.(*Test_Branch3)
+	//     if !ok { obj = &Test_Branch3{} }
+	// }
+	g.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj." + f.OneOfName).Assert(j.Id("*" + f.i.WithType(f.OneOfType)))
+	g.If(j.Id("!ok")).Block(
+		j.Id("obj").Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(),
+	)
 }
 
 func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
