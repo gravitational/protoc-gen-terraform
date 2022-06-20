@@ -146,7 +146,18 @@ message Test {
         // Branch3 is the third branch which is simple string
         string Branch3 = 35;
     }
+
+    oneof OneOfWithEmptyMessage {
+        // EmptyMessageBranch is the oneof branch triggered by empty message
+        EmptyMessageBranch EmptyMessageBranch = 36;
+
+        // StringBranch is the oneof branch triggered by string value
+        string StringBranch = 37;
+    }
 }
+
+// EmptyMessageBranch message for empty oneof branch
+message EmptyMessageBranch {}
 
 // Nested message definition
 message Nested {

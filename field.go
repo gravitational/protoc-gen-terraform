@@ -81,6 +81,8 @@ type ProtobufType struct {
 	OneOfType string
 	// OneOfName represents OneOf field name within the parent struct
 	OneOfName string
+	// IsPlaceholder represents flag, which indicates that this field is used as a placeholder for a message with no fields
+	IsPlaceholder bool
 }
 
 // Field represents metadata of protobuf message field descriptor
@@ -132,9 +134,17 @@ type Field struct {
 
 // BuildFields builds []*Field from a descriptors of the specified message
 func BuildFields(m MessageBuildContext) ([]*Field, error) {
-	fields := make([]*Field, 0)
+	messageFields := m.desc.GetField()
 
-	for i, field := range m.desc.GetField() {
+	fields := make([]*Field, 0, len(messageFields))
+
+	// Inject artificial field when message has no fields
+	if len(messageFields) == 0 {
+		fields = append(fields, BuildPlaceholderField(m.GetPath()))
+		return fields, nil
+	}
+
+	for i, field := range messageFields {
 		fieldExt := &FieldDescriptorProtoExt{field}
 
 		c, err := NewFieldBuildContext(m, fieldExt, i)
@@ -224,6 +234,29 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 	}
 
 	return f, nil
+}
+
+// BuildPlaceholderField represents no-field-message single field placeholder
+func BuildPlaceholderField(basePath string) *Field {
+
+	return &Field{
+		Kind:       PrimitiveKind,
+		Name:       "active",
+		NameSnake:  "active",
+		IsComputed: true,
+		Comment:    "Automatically generated field preventing empty message errors",
+
+		ProtobufType: ProtobufType{
+			GoType:             "bool",
+			GoElemType:         "bool",
+			GoElemTypeIndirect: "bool",
+			IsPlaceholder:      true,
+		},
+
+		TerraformType: boolType,
+		Path:          basePath + ".active",
+	}
+
 }
 
 // setRepeatedGoElemType fixes GoElemType for current field if it's repeated

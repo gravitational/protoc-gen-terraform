@@ -246,6 +246,10 @@ suffixes:
 
 In the example above, `GenTraitsSchema` method will be called. Without this option, method name would be `GenGithubComGravitationalTeleportApiTypesWrappersTraits`.
 
+# Note on empty messages
+
+Protobuf allows to define messages with no fields. Terraform treats such objects as errors. If a message has no fields, generator defines an artificial `active` field in the schema. It will always be null.
+
 # Testing
 
 Run:

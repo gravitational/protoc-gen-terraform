@@ -144,3 +144,8 @@ func (c *MessageBuildContext) GetOneOfNames() []string {
 	}
 	return s
 }
+
+// IsEmpty returns true if the message has no fields defined
+func (c *MessageBuildContext) IsEmpty() bool {
+	return len(c.desc.GetField()) == 0
+}

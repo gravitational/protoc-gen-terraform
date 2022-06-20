@@ -112,6 +112,16 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        DurationType{},
 		},
+		"empty_message_branch": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
+				Computed:    true,
+				Description: "Automatically generated field preventing empty message errors",
+				Optional:    true,
+				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+			}}),
+			Description: "EmptyMessageBranch is the oneof branch triggered by empty message",
+			Optional:    true,
+		},
 		"float": {
 			Description: "Float float field",
 			Optional:    true,
@@ -390,6 +400,11 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Validators:    []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
 		},
+		"string_branch": {
+			Description: "StringBranch is the oneof branch triggered by string value",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"string_list": {
 			Description: "StringList []string field",
 			Optional:    true,
@@ -432,6 +447,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *Test) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	obj.OneOf = nil
+	obj.OneOfWithEmptyMessage = nil
 	{
 		a, ok := tf.Attrs["bool"]
 		if !ok {
@@ -698,6 +714,22 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = time.Duration(v.Value)
 				}
 				obj.DurationStandardMissing = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["empty_message_branch"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.EmptyMessageBranch"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.EmptyMessageBranch", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				if !v.Null && !v.Unknown {
+					b := &EmptyMessageBranch{}
+					obj.OneOfWithEmptyMessage = &Test_EmptyMessageBranch{EmptyMessageBranch: b}
+				}
 			}
 		}
 	}
@@ -1926,6 +1958,25 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		}
 	}
 	{
+		a, ok := tf.Attrs["string_branch"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.StringBranch"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.StringBranch", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfWithEmptyMessage = &Test_StringBranch{StringBranch: t}
+				}
+			}
+		}
+	}
+	{
 		a, ok := tf.Attrs["string_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Test.StringList"})
@@ -2491,6 +2542,62 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 			v.Value = time.Duration(obj.DurationStandardMissing)
 			v.Unknown = false
 			tf.Attrs["duration_standard_missing"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["empty_message_branch"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.EmptyMessageBranch"})
+		} else {
+			obj, ok := obj.OneOfWithEmptyMessage.(*Test_EmptyMessageBranch)
+			if !ok {
+				obj = &Test_EmptyMessageBranch{}
+			}
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.EmptyMessageBranch", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["empty_message_branch"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.EmptyMessageBranch == nil {
+					v.Null = true
+				} else {
+					tf := &v
+					{
+						t, ok := tf.AttrTypes["active"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.EmptyMessageBranch.active"})
+						} else {
+							v, ok := tf.Attrs["active"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.EmptyMessageBranch.active", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.EmptyMessageBranch.active", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+								}
+								v.Null = true
+							}
+							v.Unknown = false
+							tf.Attrs["active"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["empty_message_branch"] = v
+			}
 		}
 	}
 	{
@@ -4529,6 +4636,32 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 			v.Value = string(obj.Str)
 			v.Unknown = false
 			tf.Attrs["str"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["string_branch"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.StringBranch"})
+		} else {
+			obj, ok := obj.OneOfWithEmptyMessage.(*Test_StringBranch)
+			if !ok {
+				obj = &Test_StringBranch{}
+			}
+			v, ok := tf.Attrs["string_branch"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.StringBranch", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.StringBranch", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.StringBranch) == ""
+			}
+			v.Value = string(obj.StringBranch)
+			v.Unknown = false
+			tf.Attrs["string_branch"] = v
 		}
 	}
 	{

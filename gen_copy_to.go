@@ -140,6 +140,11 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 		// if !ok { diags.AddError }
 		g.If(j.Id("!ok")).BlockFunc(f.errAttrConversionFailure(f.Path, f.ElemValueType))
 
+		if f.IsPlaceholder {
+			g.Id("v.Null").Op("=").True()
+			return
+		}
+
 		// v.Null = v.Value == ""
 		if f.ZeroValue != "" {
 			g.Id("v.Null").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Op("==").Id(f.ZeroValue)
@@ -154,16 +159,18 @@ func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *j.Group) {
 	f.getAttr("v", f.i.WithType(f.Field.ElemValueType), g)
 	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue(fieldName))
 
-	if f.IsNullable {
-		g.If(j.Id(fieldName).Op("==").Nil()).Block(
-			j.Id("v.Null").Op("=").True(),
-		).Else().Block(
-			j.Id("v.Null").Op("=").False(),
-			j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
-		)
-	} else {
-		// Non-nullable fields always have value
-		g.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
+	if !f.IsPlaceholder {
+		if f.IsNullable {
+			g.If(j.Id(fieldName).Op("==").Nil()).Block(
+				j.Id("v.Null").Op("=").True(),
+			).Else().Block(
+				j.Id("v.Null").Op("=").False(),
+				j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
+			)
+		} else {
+			// Non-nullable fields always have value
+			g.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
+		}
 	}
 
 	g.Id("v.Unknown").Op("=").False()
@@ -172,9 +179,13 @@ func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *j.Group) {
 // genObjectBody generates block which reads message into v
 func (f *FieldCopyToGenerator) genObjectBody(m *MessageCopyToGenerator, fieldName string, typ string, g *j.Group) {
 	copyObj := func(g *j.Group) {
-		g.Id("obj").Op(":=").Id(fieldName)
-		g.Id("tf").Op(":=").Id("&v")
-		m.GenerateFields(g)
+		if len(m.Fields) > 0 {
+			if !m.IsEmpty {
+				g.Id("obj").Op(":=").Id(fieldName)
+			}
+			g.Id("tf").Op(":=").Id("&v")
+			m.GenerateFields(g)
+		}
 	}
 
 	f.getAttr("v", f.Field.ElemValueType, g)

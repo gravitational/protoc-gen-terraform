@@ -184,20 +184,22 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 			}
 			// if !v.Null
 			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
-				// tf := v
-				g.Id("tf").Op(":=").Id("v")
+				if !m.IsEmpty {
+					// tf := v
+					g.Id("tf").Op(":=").Id("v")
 
-				if f.IsNullable {
-					// obj.Nested = &Nested{}
-					g.Id(objFieldName).Op("=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
-					// obj := obj.Nested
-					g.Id("obj").Op(":=").Id(objFieldName)
-				} else {
-					// obj := &obj.Nested
-					g.Id("obj").Op(":=&").Id(objFieldName)
+					if f.IsNullable {
+						// obj.Nested = &Nested{}
+						g.Id(objFieldName).Op("=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
+						// obj := obj.Nested
+						g.Id("obj").Op(":=").Id(objFieldName)
+					} else {
+						// obj := &obj.Nested
+						g.Id("obj").Op(":=&").Id(objFieldName)
+					}
+
+					m.GenerateFields(g)
 				}
-
-				m.GenerateFields(g)
 			})
 		} else {
 			// We do not need nullable checks because all oneOf branches are nullable by design
@@ -209,11 +211,11 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 					j.Id(f.Name): j.Id("b"),
 				})
 
-				g.Id("obj").Op(":=").Id("b")
-
-				g.Id("tf").Op(":=").Id("v")
-
-				m.GenerateFields(g)
+				if !m.IsEmpty {
+					g.Id("obj").Op(":=").Id("b")
+					g.Id("tf").Op(":=").Id("v")
+					m.GenerateFields(g)
+				}
 			})
 		}
 	})
