@@ -54,6 +54,12 @@ func (m *MessageCopyFromGenerator) Generate(writer io.Writer) (int, error) {
 
 // GenerateFields generates specific statements for CopyToTF<name> methods
 func (m *MessageCopyFromGenerator) GenerateFields(g *j.Group) {
+	// Reset all oneOf fields in advance, otherwise if all oneOf branches would be null in the passed
+	// object, the oneOf field won't be nil
+	for _, m := range m.OneOfNames {
+		g.Add(j.Id("obj." + m).Op("=").Nil())
+	}
+
 	for _, f := range m.Fields {
 		g.Add(NewFieldCopyFromGenerator(f, m.i).Generate())
 	}
@@ -145,11 +151,20 @@ func (f *FieldCopyFromGenerator) genListOrMapIterator(g *j.Group, typ *j.Stateme
 	})
 }
 
-// genPrimitive generates CopyFrom fragment for a primitive field
+// genPrimitive generates CopyFrom fragment for a primitive field, wrapped by oneOf extraction
 func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 	return f.nextField(func(g *j.Group) {
 		f.genPrimitiveBody(g)
-		g.Id("obj." + f.Name).Op("=").Id("t")
+		if f.OneOfName == "" {
+			g.Id("obj." + f.Name).Op("=").Id("t")
+		} else {
+			// Do not set empty oneOf value to not override values possibly set by other branches
+			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
+					j.Id(f.Name): j.Id("t"),
+				})
+			})
+		}
 	})
 }
 
@@ -159,30 +174,50 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 	objFieldName := "obj." + f.Name
 
 	return f.nextField(func(g *j.Group) {
-		if f.IsNullable {
-			// obj.Nested = nil
-			g.Id(objFieldName).Op("=").Nil()
-		} else {
-			// obj.Nested = Nested{}
-			g.Id(objFieldName).Op("=").Id(f.i.WithType(f.GoElemType)).Values()
-		}
-		// if !v.Null
-		g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
-			// tf := v
-			g.Id("tf").Op(":=").Id("v")
-
+		if f.OneOfName == "" {
 			if f.IsNullable {
-				// obj.Nested = &Nested{}
-				g.Id(objFieldName).Op("=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
-				// obj := obj.Nested
-				g.Id("obj").Op(":=").Id(objFieldName)
+				// obj.Nested = nil
+				g.Id(objFieldName).Op("=").Nil()
 			} else {
-				// obj := &obj.Nested
-				g.Id("obj").Op(":=&").Id(objFieldName)
+				// obj.Nested = Nested{}
+				g.Id(objFieldName).Op("=").Id(f.i.WithType(f.GoElemType)).Values()
 			}
+			// if !v.Null
+			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+				if !m.IsEmpty {
+					// tf := v
+					g.Id("tf").Op(":=").Id("v")
 
-			m.GenerateFields(g)
-		})
+					if f.IsNullable {
+						// obj.Nested = &Nested{}
+						g.Id(objFieldName).Op("=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
+						// obj := obj.Nested
+						g.Id("obj").Op(":=").Id(objFieldName)
+					} else {
+						// obj := &obj.Nested
+						g.Id("obj").Op(":=&").Id(objFieldName)
+					}
+
+					m.GenerateFields(g)
+				}
+			})
+		} else {
+			// We do not need nullable checks because all oneOf branches are nullable by design
+			// We do not need to assign OneOf explicitly to not overrite other OneOf branch values
+			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+				g.Id("b").Op(":=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
+
+				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
+					j.Id(f.Name): j.Id("b"),
+				})
+
+				if !m.IsEmpty {
+					g.Id("obj").Op(":=").Id("b")
+					g.Id("tf").Op(":=").Id("v")
+					m.GenerateFields(g)
+				}
+			})
+		}
 	})
 }
 

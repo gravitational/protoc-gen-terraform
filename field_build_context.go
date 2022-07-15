@@ -353,6 +353,11 @@ func (c *FieldBuildContext) IsMap() bool {
 	return c.gen.IsMap(c.field.FieldDescriptorProto)
 }
 
+// IsOneOf returns true if this field belongs to a OneOf group
+func (c *FieldBuildContext) IsOneOf() bool {
+	return c.field.OneofIndex != nil
+}
+
 // GetMapValueFieldDescriptorAndType returns field descriptor for a map field
 func (c *FieldBuildContext) GetMapValueFieldDescriptorAndType() (string, *FieldDescriptorProtoExt, error) {
 	m := c.gen.GoMapType(nil, c.field.FieldDescriptorProto)
@@ -452,4 +457,31 @@ func (c *FieldBuildContext) GetTerraformTypeOverride() *SchemaType {
 	}
 
 	return nil
+}
+
+// GetOneOfFieldName returns OneOf container name
+func (c *FieldBuildContext) GetOneOfFieldName() string {
+	if !c.IsOneOf() {
+		return ""
+	}
+
+	return c.desc.OneofDecl[*c.field.OneofIndex].GetName()
+}
+
+// GetOneOfTypeName returns OneOf container go name
+func (c *FieldBuildContext) GetOneOfTypeName() string {
+	if !c.IsOneOf() {
+		return ""
+	}
+
+	name := c.MessageBuildContext.GetName() + "_" + c.GetName()
+
+	if c.desc.GoImportPath() == rootPackage {
+		if c.config.DefaultPackageName == "" {
+			return name
+		}
+		return c.config.DefaultPackageName + "." + name
+	}
+
+	return name
 }
