@@ -26,11 +26,6 @@ import (
 //go:embed shared_code.go.tpl
 var shared string
 
-// Generator interface represents generic generator interface
-type Generator interface {
-	Write(io.Writer) (int, error)
-}
-
 // SharedCodeGenerator generates shared code fragments
 type SharedCodeGenerator struct {
 	i *Imports
