@@ -94,14 +94,15 @@ func (t TimeValue) Type(_ context.Context) attr.Type {
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
-func (t TimeValue) ToTerraformValue(_ context.Context) (interface{}, error) {
+func (t TimeValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
 	if t.Null {
-		return nil, nil
+		return tftypes.NewValue(tftypes.String, nil), nil
 	}
 	if t.Unknown {
-		return tftypes.UnknownValue, nil
+		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
 	}
-	return t.Value.Truncate(timeThreshold).Format(t.Format), nil
+
+	return tftypes.NewValue(tftypes.String, t.Value.Truncate(timeThreshold).Format(t.Format)), nil
 }
 
 // Equal returns true if `other` is a *String and has the same value as `s`.
@@ -119,6 +120,29 @@ func (t TimeValue) Equal(other attr.Value) bool {
 	return t.Value == o.Value
 }
 
+// IsNull returns true if receiver is null
+func (t TimeValue) IsNull() bool {
+	return t.Null
+}
+
+// IsUnknown returns true if receiver is unknown
+func (t TimeValue) IsUnknown() bool {
+	return t.Unknown
+}
+
+// String returns the string representation of the receiver
+func (t TimeValue) String() string {
+	if t.Unknown {
+		return attr.UnknownValueString
+	}
+
+	if t.Null {
+		return attr.NullValueString
+	}
+
+	return t.Value.String()
+}
+
 // DurationType represents time.Time Terraform type which is stored in RFC3339 format, nanoseconds truncated
 type DurationType struct {
 	attr.Type
@@ -126,7 +150,7 @@ type DurationType struct {
 
 // ApplyTerraform5AttributePathStep is not implemented for TimeType
 func (t DurationType) ApplyTerraform5AttributePathStep(step tftypes.AttributePathStep) (interface{}, error) {
-	return nil, fmt.Errorf("cannot apply AttributePathStep %T to %s", step, t.String())
+	return tftypes.Value{}, fmt.Errorf("cannot apply AttributePathStep %T to %s", step, t.String())
 }
 
 // String returns string representation of TimeType
@@ -192,7 +216,7 @@ func (t DurationValue) Type(_ context.Context) attr.Type {
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
-func (t DurationValue) ToTerraformValue(_ context.Context) (interface{}, error) {
+func (t DurationValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
 	if t.Null {
 		return tftypes.NewValue(tftypes.String, nil), nil
 	}
@@ -215,4 +239,27 @@ func (t DurationValue) Equal(other attr.Value) bool {
 		return false
 	}
 	return t.Value == o.Value
+}
+
+// IsNull returns true if receiver is null
+func (t DurationValue) IsNull() bool {
+	return t.Null
+}
+
+// IsUnknown returns true if receiver is unknown
+func (t DurationValue) IsUnknown() bool {
+	return t.Unknown
+}
+
+// String returns the string representation of the receiver
+func (t DurationValue) String() string {
+	if t.Unknown {
+		return attr.UnknownValueString
+	}
+
+	if t.Null {
+		return attr.NullValueString
+	}
+
+	return t.String()
 }

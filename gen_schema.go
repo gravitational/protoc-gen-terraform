@@ -215,10 +215,6 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 func (f *FieldSchemaGenerator) xNestedAttributes(typ string, m *MessageSchemaGenerator) *j.Statement {
 	var options *j.Statement
 
-	if typ != "Single" {
-		options = j.Id(f.i.WithPackage(SDK, typ+"NestedAttributesOptions")).Values()
-	}
-
 	return j.Id(f.i.WithPackage(SDK, typ+"NestedAttributes")).Params(
 		j.Map(j.String()).Id(f.i.WithPackage(SDK, "Attribute")).Values(m.fieldsDictSchema()),
 		options,

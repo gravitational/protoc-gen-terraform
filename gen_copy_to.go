@@ -6,10 +6,6 @@ import (
 	j "github.com/dave/jennifer/jen"
 )
 
-const (
-	errWriting = "Error writing value to Terraform"
-)
-
 // MessageCopyToGenerator is the visitor struct to generate tfsdk.Schema of a message
 type MessageCopyToGenerator struct {
 	*Message
