@@ -476,12 +476,9 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 
 	name := c.MessageBuildContext.GetName() + "_" + c.GetName()
 
-	if c.desc.GoImportPath() == rootPackage {
-		if c.config.DefaultPackageName == "" {
-			return name
-		}
-		return c.config.DefaultPackageName + "." + name
+	if c.config.DefaultPackageName == "" {
+		return name
 	}
 
-	return name
+	return c.config.DefaultPackageName + "." + name
 }

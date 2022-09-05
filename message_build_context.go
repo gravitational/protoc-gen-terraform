@@ -60,14 +60,11 @@ func NewMessageBuildContext(plugin *Plugin, desc *generator.Descriptor, path str
 func (c MessageBuildContext) GetGoType() string {
 	name := c.desc.GetName()
 
-	if c.desc.GoImportPath() == rootPackage {
-		if c.config.DefaultPackageName == "" {
-			return name
-		}
-		return c.config.DefaultPackageName + "." + name
+	if c.config.DefaultPackageName == "" {
+		return name
 	}
 
-	return name
+	return c.config.DefaultPackageName + "." + name
 }
 
 // GetComment returns the message source code comment and it's raw text
