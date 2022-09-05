@@ -147,6 +147,41 @@ func TestCopyToList(t *testing.T) {
 	}, o.Attrs["duration_custom_list"].(types.List).Elems)
 }
 
+func TestCopyTo_ChangeListSize(t *testing.T) {
+	o := copyToTerraformObject(t)
+
+	testObject := createTestObj()
+
+	// Start with two elements.
+	diags := CopyTestToTerraform(context.Background(), testObject, &o)
+	require.False(t, diags.HasError())
+
+	require.Equal(t, []attr.Value{
+		types.String{Null: false, Unknown: false, Value: "el1"},
+		types.String{Null: false, Unknown: false, Value: "el2"},
+	}, o.Attrs["string_list"].(types.List).Elems)
+
+	// Increase to 3, array access must not panic.
+	testObject.StringList = []string{"el1", "el2", "el3"}
+	diags = CopyTestToTerraform(context.Background(), testObject, &o)
+	require.False(t, diags.HasError())
+
+	require.Equal(t, []attr.Value{
+		types.String{Null: false, Unknown: false, Value: "el1"},
+		types.String{Null: false, Unknown: false, Value: "el2"},
+		types.String{Null: false, Unknown: false, Value: "el3"},
+	}, o.Attrs["string_list"].(types.List).Elems)
+
+	// Decrease to a single element, others should be removed.
+	testObject.StringList = []string{"elX"}
+	diags = CopyTestToTerraform(context.Background(), testObject, &o)
+	require.False(t, diags.HasError())
+
+	require.Equal(t, []attr.Value{
+		types.String{Null: false, Unknown: false, Value: "elX"},
+	}, o.Attrs["string_list"].(types.List).Elems)
+}
+
 func TestCopyToNestedList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
