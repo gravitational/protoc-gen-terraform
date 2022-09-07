@@ -17,6 +17,8 @@ limitations under the License.
 package main
 
 import (
+	"strings"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	"github.com/gravitational/trace"
 )
@@ -53,6 +55,21 @@ type Message struct {
 // nil returned means that operation was successful, but message needs to be skipped.
 func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path string) (*Message, error) {
 	c := NewMessageBuildContext(plugin, desc, path)
+
+	// Remove full type name for *top level* types whose package is the DefaultPackageName.
+	// The configuration for top-level type names is (example)
+	// types:
+	//     - "AppV3"
+	//     - "RoleV5"
+	// If those types exist at config.DefaultPackageName, they are replaced with the actual type name:
+	// Example github.com/gravitational/teleport/api/types.RoleOptions becomes RoleOptions
+	// Otherwise, the configuration would look like this
+	// types:
+	//     - "types.AppV3"
+	//     - "types.RoleV5"
+	if isRoot && strings.HasPrefix(c.GetGoType(), c.config.DefaultPackageName) {
+		c.path = c.GetName()
+	}
 
 	// Check if message is specified in export type list
 	if c.IsExcluded() && isRoot {
