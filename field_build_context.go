@@ -432,7 +432,7 @@ func (c *FieldBuildContext) GetPlanModifiers() []string {
 	}
 
 	if c.config.UseStateForUnknownByDefault && c.IsComputed() {
-		return []string{"github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"}
+		return []string{"github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"}
 	}
 
 	return []string{}

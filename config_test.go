@@ -24,7 +24,7 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, cfg.Suffixes, map[string]string{"BoolCustom": "BoolSpecial"})
 	require.Equal(t, cfg.NameOverrides, map[string]string{"Test.Str": "str"})
 
-	require.Equal(t, cfg.PlanModifiers, map[string][]string{"Test.Str": {"github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"}})
+	require.Equal(t, cfg.PlanModifiers, map[string][]string{"Test.Str": {"github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"}})
 	require.Equal(t, cfg.Validators, map[string][]string{"Test.Str": {"UseMockValidator()"}})
 
 	require.Equal(t, cfg.TimeType, &SchemaType{

@@ -119,7 +119,7 @@ The following setting:
 use_state_for_unknown_by_default: true
 ```
 
-will add `tfsdk.UseStateForUnknown()` PlanModifier to all computed fields.
+will add `resource.UseStateForUnknown()` PlanModifier to all computed fields.
 
 ## Injecting fields into schema
 

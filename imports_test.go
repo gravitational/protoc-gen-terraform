@@ -41,6 +41,6 @@ func TestSet(t *testing.T) {
 	require.Equal(t, s.PrependPackageNameIfMissing("[]Test", "test"), "[]test.Test")
 
 	require.Equal(t, s.WithType("UseValidator(1)"), "UseValidator(1)")
-	require.Equal(t, s.WithType("github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"), "github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()")
+	require.Equal(t, s.WithType("github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"), "github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()")
 	require.Equal(t, s.WithType(`UseValidator("teleport.dev/origin")`), `UseValidator("teleport.dev/origin")`)
 }
