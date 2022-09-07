@@ -306,6 +306,16 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				} else {
 					g.Id("o").Op(":=").Id("o.ElemType").Assert(j.Id(f.i.WithType(f.ElemType)))
 				}
+
+				if f.IsRepeated {
+					// It might happen that we changed the number of elements.
+					// This check creates a new array if that's the case.
+					// Otherwise, we would have a panic at the last line in the For loop or extra elements.
+					g.If(j.Len(j.Id(fieldName)).Op("!=").Len(j.Id("c.Elems"))).Block(
+						j.Id("c.Elems").Op("=").Add(mk),
+					)
+				}
+
 				// for k, a := range obj.List
 				g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id(fieldName).BlockFunc(func(g *j.Group) {
 					if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
