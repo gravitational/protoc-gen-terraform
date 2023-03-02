@@ -26,7 +26,10 @@ import (
 func TestSet(t *testing.T) {
 	gen := generator.New()
 	imports := generator.NewPluginImports(gen)
-	s := NewImports(imports)
+	importPathOverrides := map[string]string{
+		"types": "example.com/package/types",
+	}
+	s := NewImports(imports, importPathOverrides)
 
 	require.Equal(t, s.WithType("string"), "string")
 	require.Equal(t, s.WithType("[]string"), "[]string")
@@ -43,4 +46,8 @@ func TestSet(t *testing.T) {
 	require.Equal(t, s.WithType("UseValidator(1)"), "UseValidator(1)")
 	require.Equal(t, s.WithType("github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"), "github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()")
 	require.Equal(t, s.WithType(`UseValidator("teleport.dev/origin")`), `UseValidator("teleport.dev/origin")`)
+
+	require.Equal(t, s.WithType("types.Values"), "example_com_package_types.Values")
+	require.Equal(t, s.WithType("*types.Values"), "*example_com_package_types.Values")
+	require.Equal(t, s.PrependPackageNameIfMissing("[]Test", "types"), "[]example_com_package_types.Test")
 }

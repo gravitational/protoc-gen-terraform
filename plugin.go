@@ -78,7 +78,7 @@ func (p *Plugin) Generate(file *generator.FileDescriptor) {
 
 	log.Printf("Processing: %s", *file.Name)
 
-	p.Imports = NewImports(p.PluginImports)
+	p.Imports = NewImports(p.PluginImports, p.Config.ImportPathOverrides)
 	p.build(file)
 
 	err := p.write(p.Messages, &buf)
