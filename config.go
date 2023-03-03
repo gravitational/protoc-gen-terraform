@@ -131,9 +131,9 @@ type Config struct {
 	DurationType *SchemaType `yaml:"duration_type,omitempty"`
 	// InjectedFields represents array of fields which are missing in object, but must be injected in the schema
 	InjectedFields map[string][]InjectedField `yaml:"injected_fields,omitempty"`
-	// ImportPathOverrides represents fully qualified golang import paths which
+	// ImportPathOverrides represents fully qualified go import paths which
 	// should be used for the given package names, it can be used when the
-	// correct import path is not correctly found automatically.
+	// correct import path is not found automatically.
 	ImportPathOverrides map[string]string `yaml:"import_path_overrides,omitempty"`
 
 	// params represents CLI params passed from the plugin
