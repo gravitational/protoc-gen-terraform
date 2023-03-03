@@ -49,13 +49,14 @@ Please also specify the full name of the go package where your generated code is
 default_package_name="github.com/gravitational/teleport/api/types"
 ```
 
-If you use types from external packages, please specify them in `external_imports`:
+If package import paths are not being correctly found automatically, use the
+`import_path_overrides` field in the yaml config to override the import path for
+specific package names.
 
+```yaml
+import_path_overrides:
+    "types": "github.com/gravitational/teleport/api/types"
 ```
-external_imports="github.com/gravitational/teleport/api/wrappers"
-```
-
-and reference that types anywhere in config using full package name (`github.com/gravitational/teleport/api/wrappers.Wrapper`). Generator will handle the rest for you.
 
 ## Specifying types to export
 

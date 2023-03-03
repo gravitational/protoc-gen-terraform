@@ -117,11 +117,13 @@ type Test struct {
 	// Excluded is the excluded field
 	Excluded bool `protobuf:"varint,32,opt,name=Excluded,proto3" json:"Excluded,omitempty"`
 	// Types that are valid to be assigned to OneOf:
+	//
 	//	*Test_Branch1
 	//	*Test_Branch2
 	//	*Test_Branch3
 	OneOf isTest_OneOf `protobuf_oneof:"OneOf"`
 	// Types that are valid to be assigned to OneOfWithEmptyMessage:
+	//
 	//	*Test_EmptyMessageBranch
 	//	*Test_StringBranch
 	OneOfWithEmptyMessage isTest_OneOfWithEmptyMessage `protobuf_oneof:"OneOfWithEmptyMessage"`

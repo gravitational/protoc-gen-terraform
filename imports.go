@@ -44,11 +44,15 @@ type Imports struct {
 
 	// qualifiers represents the map of package names to qualifiers
 	qualifiers map[string]generator.Single
+
+	// importPathOverrides holds import paths that should be used for the
+	// included package names.
+	importPathOverrides map[string]string
 }
 
 // NewImports returns an empty Imports struct with default import set
-func NewImports(pluginImports generator.PluginImports) Imports {
-	return Imports{pluginImports, make(map[string]generator.Single)}
+func NewImports(pluginImports generator.PluginImports, importPathOverrides map[string]string) Imports {
+	return Imports{pluginImports, make(map[string]generator.Single), importPathOverrides}
 }
 
 // WithPackage concatenates package and typ, returns normalized type name
@@ -104,6 +108,9 @@ func (i Imports) appendQual(typ, mod string) string {
 	if ok {
 		qualifier = s.Name()
 	} else {
+		if override, ok := i.importPathOverrides[path]; ok {
+			path = override
+		}
 		// Register new qualifier
 		single := i.pluginImports.NewImport(path)
 		single.Use()
