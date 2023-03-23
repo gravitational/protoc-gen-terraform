@@ -5,10 +5,10 @@ go 1.18
 require (
 	github.com/dave/jennifer v1.4.1
 	github.com/gogo/protobuf v1.3.2
-	github.com/gravitational/trace v1.1.15
+	github.com/gravitational/trace v1.2.1
 	github.com/hashicorp/terraform-plugin-framework v0.10.0
 	github.com/hashicorp/terraform-plugin-go v0.12.0
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sirupsen/logrus v1.9.0
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/testify v1.7.2
 	golang.org/x/tools v0.1.7
@@ -23,7 +23,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/hashicorp/go-hclog v1.2.1 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.6.0 // indirect
-	github.com/jonboulle/clockwork v0.2.2 // indirect
+	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
