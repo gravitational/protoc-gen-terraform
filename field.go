@@ -20,6 +20,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gravitational/trace"
 )
 
@@ -158,7 +159,7 @@ func BuildFields(m MessageBuildContext) ([]*Field, error) {
 		}
 
 		if f != nil {
-			fields = append(fields, f)
+			fields = append(fields, f...)
 		}
 	}
 
@@ -173,7 +174,7 @@ func BuildFields(m MessageBuildContext) ([]*Field, error) {
 }
 
 // BuildField builds Field structure
-func BuildField(c *FieldBuildContext) (*Field, error) {
+func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	var err error
 
 	if c.IsExcluded() {
@@ -208,6 +209,11 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
+
+		// If this is an embedded field, return message's fields instead of creating another field
+		if gogoproto.IsEmbed(c.field.FieldDescriptorProto) {
+			return f.Message.Fields, nil
+		}
 	}
 
 	if c.IsRepeated() {
@@ -233,7 +239,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		f.OneOfType = c.GetOneOfTypeName()
 	}
 
-	return f, nil
+	return []*Field{f}, nil
 }
 
 // BuildPlaceholderField represents no-field-message single field placeholder
@@ -270,10 +276,15 @@ func (f *Field) setMapValues(c *FieldBuildContext) error {
 	var err error
 
 	// gogoprotobuf returns incorrect elem type for maps. It always contains "*", we have to override.
-	typ, f.MapValueField, err = f.getMapValueField(c)
+	typ, fs, err := f.getMapValueField(c)
 	if err != nil {
 		return trace.Wrap(err)
 	}
+
+	if len(fs) == 0 {
+		return trace.BadParameter("expected at least one field")
+	}
+	f.MapValueField = fs[0]
 
 	// Otherwise, that would contain artificial protobuf Map_Entry type information
 	f.GoType = typ
@@ -324,7 +335,7 @@ func (f *Field) getMessage(c *FieldBuildContext) (*Message, error) {
 }
 
 // getMapValueField returns map value field for a field
-func (f *Field) getMapValueField(c *FieldBuildContext) (string, *Field, error) {
+func (f *Field) getMapValueField(c *FieldBuildContext) (string, []*Field, error) {
 	// For some reason, gogoprotobuf incorrectly treats nullable status when map value is a message.
 	// We have to override it.
 	typ, d, err := c.GetMapValueFieldDescriptorAndType()
