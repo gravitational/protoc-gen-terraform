@@ -162,3 +162,13 @@ func TestCopyFromOneOfObjectNoBranch(t *testing.T) {
 
 	require.Equal(t, nil, target.OneOf)
 }
+
+func TestCopyFromEmbeddedField(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+
+	target := Test{}
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+
+	require.Equal(t, "embdtest1", target.EmbStr)
+	require.Equal(t, "embdtest2", target.EmbeddedNestedField.EmbNStr)
+}

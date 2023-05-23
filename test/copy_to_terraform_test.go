@@ -318,3 +318,18 @@ func TestCopyToOneOfNoBranch(t *testing.T) {
 	require.True(t, o.Attrs["branch2"].(types.Object).Null)
 	require.True(t, o.Attrs["branch3"].(types.String).Null)
 }
+
+func TestCopyToEmbeddedField(t *testing.T) {
+	o := copyToTerraformObject(t)
+	testObj := createTestObj()
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	require.False(t, diags.HasError())
+
+	require.Equal(t, "embdtest1", o.Attrs["embedded_string"].(types.String).Value)
+	require.False(t, o.Attrs["embedded_string"].(types.String).Unknown)
+	require.False(t, o.Attrs["embedded_string"].(types.String).Null)
+
+	require.Equal(t, "embdtest2", o.Attrs["embedded_nested_field"].(types.Object).Attrs["embedded_nested_string"].(types.String).Value)
+
+}
