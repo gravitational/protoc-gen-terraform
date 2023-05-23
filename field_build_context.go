@@ -180,11 +180,7 @@ func (c *FieldBuildContext) GetName() string {
 
 // GetPath returns a field path
 func (c *FieldBuildContext) GetPath() string {
-	// if !gogoproto.IsEmbed(c.field.FieldDescriptorProto) {
-	// 	return c.path
-	// }
 	return c.path
-	// return ""
 }
 
 // GetTerraformType returns terraform type meta information
