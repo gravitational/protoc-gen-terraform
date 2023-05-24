@@ -156,7 +156,7 @@ message Test {
     }
 
     // EmbeddedField encapsulates fields which can be shared among various types
-    EmbeddedField EmbField = 38 [
+    EmbeddedField EmbeddedField = 38 [
         (gogoproto.nullable) = false,
         (gogoproto.jsontag) = "",
         (gogoproto.embed) = true
@@ -201,14 +201,14 @@ message Branch2 {
 
 // EmbeddedField encapsulates fields which can be shared among various types
 message EmbeddedField {
-  // EmbStr string field
-  string EmbStr = 1[(gogoproto.jsontag) = "embedded_string"];
+  // EmbeddedString string field
+  string EmbeddedString = 1[(gogoproto.jsontag) = "embedded_string"];
   //  Nested EmbeddedNestedField field
   EmbeddedNestedField EmbeddedNestedField = 2;
 }
 
 message EmbeddedNestedField {
-     // EmbNStr string field
-    string EmbNStr = 1[(gogoproto.jsontag) = "embedded_nested_string"];
+     // EmbeddedNestedString string field
+    string EmbeddedNestedString = 1[(gogoproto.jsontag) = "embedded_nested_string"];
   }
 

@@ -114,7 +114,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		},
 		"embedded_nested_field": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"embedded_nested_string": {
-				Description: "EmbNStr string field",
+				Description: "EmbeddedNestedString string field",
 				Optional:    true,
 				Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			}}),
@@ -122,7 +122,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 		},
 		"embedded_string": {
-			Description: "EmbStr string field",
+			Description: "EmbeddedString string field",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
@@ -732,23 +732,6 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		}
 	}
 	{
-		a, ok := tf.Attrs["embedded_string"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Test.EmbStr"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Test.EmbStr", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.Null && !v.Unknown {
-					t = string(v.Value)
-				}
-				obj.EmbStr = t
-			}
-		}
-	}
-	{
 		a, ok := tf.Attrs["embedded_nested_field"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Test.EmbeddedNestedField"})
@@ -765,21 +748,38 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					{
 						a, ok := tf.Attrs["embedded_nested_string"]
 						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.EmbeddedNestedField.EmbNStr"})
+							diags.Append(attrReadMissingDiag{"Test.EmbeddedNestedField.EmbeddedNestedString"})
 						} else {
 							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedNestedField.EmbNStr", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedNestedField.EmbeddedNestedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							} else {
 								var t string
 								if !v.Null && !v.Unknown {
 									t = string(v.Value)
 								}
-								obj.EmbNStr = t
+								obj.EmbeddedNestedString = t
 							}
 						}
 					}
 				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["embedded_string"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.EmbeddedString"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.EmbeddedString = t
 			}
 		}
 	}
@@ -2617,28 +2617,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["embedded_string"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Test.EmbStr"})
-		} else {
-			v, ok := tf.Attrs["embedded_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Test.EmbStr", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Test.EmbStr", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-				}
-				v.Null = string(obj.EmbStr) == ""
-			}
-			v.Value = string(obj.EmbStr)
-			v.Unknown = false
-			tf.Attrs["embedded_string"] = v
-		}
-	}
-	{
 		a, ok := tf.AttrTypes["embedded_nested_field"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.EmbeddedNestedField"})
@@ -2667,21 +2645,21 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 					{
 						t, ok := tf.AttrTypes["embedded_nested_string"]
 						if !ok {
-							diags.Append(attrWriteMissingDiag{"Test.EmbeddedNestedField.EmbNStr"})
+							diags.Append(attrWriteMissingDiag{"Test.EmbeddedNestedField.EmbeddedNestedString"})
 						} else {
 							v, ok := tf.Attrs["embedded_nested_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 							if !ok {
 								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 								if err != nil {
-									diags.Append(attrWriteGeneralError{"Test.EmbeddedNestedField.EmbNStr", err})
+									diags.Append(attrWriteGeneralError{"Test.EmbeddedNestedField.EmbeddedNestedString", err})
 								}
 								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
 								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedNestedField.EmbNStr", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+									diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedNestedField.EmbeddedNestedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.EmbNStr) == ""
+								v.Null = string(obj.EmbeddedNestedString) == ""
 							}
-							v.Value = string(obj.EmbNStr)
+							v.Value = string(obj.EmbeddedNestedString)
 							v.Unknown = false
 							tf.Attrs["embedded_nested_string"] = v
 						}
@@ -2690,6 +2668,28 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 				v.Unknown = false
 				tf.Attrs["embedded_nested_field"] = v
 			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["embedded_string"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.EmbeddedString"})
+		} else {
+			v, ok := tf.Attrs["embedded_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.EmbeddedString", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.EmbeddedString) == ""
+			}
+			v.Value = string(obj.EmbeddedString)
+			v.Unknown = false
+			tf.Attrs["embedded_string"] = v
 		}
 	}
 	{

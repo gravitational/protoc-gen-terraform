@@ -169,6 +169,6 @@ func TestCopyFromEmbeddedField(t *testing.T) {
 	target := Test{}
 	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
 
-	require.Equal(t, "embdtest1", target.EmbStr)
-	require.Equal(t, "embdtest2", target.EmbeddedNestedField.EmbNStr)
+	require.Equal(t, "embdtest1", target.EmbeddedString)
+	require.Equal(t, "embdtest2", target.EmbeddedNestedField.EmbeddedNestedString)
 }

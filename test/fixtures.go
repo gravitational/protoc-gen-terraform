@@ -94,9 +94,9 @@ func createTestObj() Test {
 		Map: map[string]string{"key1": "value1", "key2": "value2"},
 
 		EmbeddedField: EmbeddedField{
-			EmbStr: "embdtest1",
+			EmbeddedString: "embdtest1",
 			EmbeddedNestedField: &EmbeddedNestedField{
-				EmbNStr: "embdtest2",
+				EmbeddedNestedString: "embdtest2",
 			},
 		},
 	}
