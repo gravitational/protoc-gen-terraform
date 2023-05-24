@@ -422,16 +422,6 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 					"embedded_nested_string": types.String{Value: "embdtest2"},
 				},
 			},
-			// "emb_field": types.Object{
-			// 	Attrs: map[string]attr.Value{
-			// 		"EmbStr": types.String{Value: "embdtest1"},
-			// 		"embedded_nested_field": types.Object{
-			// 			Attrs: map[string]attr.Value{
-			// 				"EmbNStr": types.String{Value: "embdtest2"},
-			// 			},
-			// 		},
-			// 	},
-			// },
 		},
 		AttrTypes: obj.AttrTypes,
 	}

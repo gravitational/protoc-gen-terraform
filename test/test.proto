@@ -204,7 +204,7 @@ message EmbeddedField {
   // EmbStr string field
   string EmbStr = 1[(gogoproto.jsontag) = "embedded_string"];
   //  Nested EmbeddedNestedField field
-  EmbeddedNestedField EmbeddedNestedField = 4;
+  EmbeddedNestedField EmbeddedNestedField = 2;
 }
 
 message EmbeddedNestedField {
