@@ -92,6 +92,11 @@ func createTestObj() Test {
 		},
 
 		Map: map[string]string{"key1": "value1", "key2": "value2"},
+
+		Embedded: &Embedded{
+			EmbeddedOne: 1,
+			EmbeddedTwo: 2,
+		},
 	}
 }
 
@@ -409,6 +414,9 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 			"branch3":              types.String{Null: true},
 			"empty_message_branch": types.Object{Null: true},
 			"string_branch":        types.String{Null: true},
+
+			"embedded_one": types.Int64{Value: 1},
+			"embedded_two": types.Int64{Value: 2},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

@@ -100,6 +100,9 @@ func (f *FieldCopyFromGenerator) errAttrConversionFailure(path string, typ strin
 
 // nextField reads current field value from Terraform object and asserts it's type against expected
 func (f *FieldCopyFromGenerator) nextField(g func(g *j.Group)) *j.Statement {
+	if f.IsEmbed {
+		return j.BlockFunc(g)
+	}
 	return j.Block(
 		// a, ok := ft.Attrs["key"]
 		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attrs").Index(j.Lit(f.NameSnake)),
@@ -182,11 +185,12 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 				// obj.Nested = Nested{}
 				g.Id(objFieldName).Op("=").Id(f.i.WithType(f.GoElemType)).Values()
 			}
-			// if !v.Null
-			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+			fn := func(g *j.Group) {
 				if !m.IsEmpty {
-					// tf := v
-					g.Id("tf").Op(":=").Id("v")
+					if !f.IsEmbed {
+						// tf := v
+						g.Id("tf").Op(":=").Id("v")
+					}
 
 					if f.IsNullable {
 						// obj.Nested = &Nested{}
@@ -200,7 +204,13 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 
 					m.GenerateFields(g)
 				}
-			})
+			}
+			if f.IsEmbed {
+				g.BlockFunc(fn)
+			} else {
+				// if !v.Null
+				g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(fn)
+			}
 		} else {
 			// We do not need nullable checks because all oneOf branches are nullable by design
 			// We do not need to assign OneOf explicitly to not overrite other OneOf branch values

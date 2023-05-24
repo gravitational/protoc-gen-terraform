@@ -112,6 +112,16 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        DurationType{},
 		},
+		"embedded_one": {
+			Description: "EmbeddedOne int field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+		},
+		"embedded_two": {
+			Description: "EmbeddedTwo int field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+		},
 		"empty_message_branch": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
 				Computed:    true,
@@ -714,6 +724,47 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = time.Duration(v.Value)
 				}
 				obj.DurationStandardMissing = t
+			}
+		}
+	}
+	{
+		obj.Embedded = nil
+		{
+			obj.Embedded = &Embedded{}
+			obj := obj.Embedded
+			{
+				a, ok := tf.Attrs["embedded_one"]
+				if !ok {
+					diags.Append(attrReadMissingDiag{"Test.AnEmbeddedField.EmbeddedOne"})
+				} else {
+					v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+					if !ok {
+						diags.Append(attrReadConversionFailureDiag{"Test.AnEmbeddedField.EmbeddedOne", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+					} else {
+						var t int32
+						if !v.Null && !v.Unknown {
+							t = int32(v.Value)
+						}
+						obj.EmbeddedOne = t
+					}
+				}
+			}
+			{
+				a, ok := tf.Attrs["embedded_two"]
+				if !ok {
+					diags.Append(attrReadMissingDiag{"Test.AnEmbeddedField.EmbeddedTwo"})
+				} else {
+					v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+					if !ok {
+						diags.Append(attrReadConversionFailureDiag{"Test.AnEmbeddedField.EmbeddedTwo", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+					} else {
+						var t int32
+						if !v.Null && !v.Unknown {
+							t = int32(v.Value)
+						}
+						obj.EmbeddedTwo = t
+					}
+				}
 			}
 		}
 	}
@@ -2223,7 +2274,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						}
 					}
 				}
-				v.Unknown = false
 				tf.Attrs["branch1"] = v
 			}
 		}
@@ -2281,7 +2331,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						}
 					}
 				}
-				v.Unknown = false
 				tf.Attrs["branch2"] = v
 			}
 		}
@@ -2551,6 +2600,57 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 		}
 	}
 	{
+		{
+			{
+				obj := obj.Embedded
+				{
+					t, ok := tf.AttrTypes["embedded_one"]
+					if !ok {
+						diags.Append(attrWriteMissingDiag{"Test.AnEmbeddedField.EmbeddedOne"})
+					} else {
+						v, ok := tf.Attrs["embedded_one"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.AnEmbeddedField.EmbeddedOne", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.AnEmbeddedField.EmbeddedOne", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+							}
+							v.Null = int64(obj.EmbeddedOne) == 0
+						}
+						v.Value = int64(obj.EmbeddedOne)
+						v.Unknown = false
+						tf.Attrs["embedded_one"] = v
+					}
+				}
+				{
+					t, ok := tf.AttrTypes["embedded_two"]
+					if !ok {
+						diags.Append(attrWriteMissingDiag{"Test.AnEmbeddedField.EmbeddedTwo"})
+					} else {
+						v, ok := tf.Attrs["embedded_two"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Test.AnEmbeddedField.EmbeddedTwo", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Test.AnEmbeddedField.EmbeddedTwo", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+							}
+							v.Null = int64(obj.EmbeddedTwo) == 0
+						}
+						v.Value = int64(obj.EmbeddedTwo)
+						v.Unknown = false
+						tf.Attrs["embedded_two"] = v
+					}
+				}
+			}
+		}
+	}
+	{
 		a, ok := tf.AttrTypes["empty_message_branch"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.EmptyMessageBranch"})
@@ -2601,7 +2701,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						}
 					}
 				}
-				v.Unknown = false
 				tf.Attrs["empty_message_branch"] = v
 			}
 		}
@@ -2875,7 +2974,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.MapObjectNested) > 0 {
@@ -2955,7 +3053,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.NestedList) > 0 {
@@ -2990,7 +3087,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 								}
 							}
 						}
-						v.Unknown = false
 						c.Elems[k] = v
 					}
 					if len(obj.MapObject) > 0 {
@@ -3157,7 +3253,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.MapObjectNested) > 0 {
@@ -3237,7 +3332,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.NestedList) > 0 {
@@ -3272,7 +3366,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 								}
 							}
 						}
-						v.Unknown = false
 						c.Elems[k] = v
 					}
 					if len(obj.MapObjectNullable) > 0 {
@@ -3443,7 +3536,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 												}
 											}
 										}
-										v.Unknown = false
 										c.Elems[k] = v
 									}
 									if len(obj.MapObjectNested) > 0 {
@@ -3523,7 +3615,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 												}
 											}
 										}
-										v.Unknown = false
 										c.Elems[k] = v
 									}
 									if len(obj.NestedList) > 0 {
@@ -3558,7 +3649,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						}
 					}
 				}
-				v.Unknown = false
 				tf.Attrs["nested"] = v
 			}
 		}
@@ -3719,7 +3809,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.MapObjectNested) > 0 {
@@ -3799,7 +3888,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.NestedList) > 0 {
@@ -3834,7 +3922,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 								}
 							}
 						}
-						v.Unknown = false
 						c.Elems[k] = v
 					}
 					if len(obj.NestedList) > 0 {
@@ -4004,7 +4091,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.MapObjectNested) > 0 {
@@ -4084,7 +4170,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 														}
 													}
 												}
-												v.Unknown = false
 												c.Elems[k] = v
 											}
 											if len(obj.NestedList) > 0 {
@@ -4119,7 +4204,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 								}
 							}
 						}
-						v.Unknown = false
 						c.Elems[k] = v
 					}
 					if len(obj.NestedListNullable) > 0 {
@@ -4270,7 +4354,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 												}
 											}
 										}
-										v.Unknown = false
 										c.Elems[k] = v
 									}
 									if len(obj.MapObjectNested) > 0 {
@@ -4350,7 +4433,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 												}
 											}
 										}
-										v.Unknown = false
 										c.Elems[k] = v
 									}
 									if len(obj.NestedList) > 0 {
@@ -4385,7 +4467,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						}
 					}
 				}
-				v.Unknown = false
 				tf.Attrs["nested_nullable"] = v
 			}
 		}
@@ -4529,7 +4610,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 												}
 											}
 										}
-										v.Unknown = false
 										c.Elems[k] = v
 									}
 									if len(obj.MapObjectNested) > 0 {
@@ -4609,7 +4689,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 												}
 											}
 										}
-										v.Unknown = false
 										c.Elems[k] = v
 									}
 									if len(obj.NestedList) > 0 {
@@ -4644,7 +4723,6 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 						}
 					}
 				}
-				v.Unknown = false
 				tf.Attrs["nested_nullable_with_nil_value"] = v
 			}
 		}

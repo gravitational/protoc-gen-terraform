@@ -22,7 +22,6 @@ import (
 
 	"io"
 
-	"github.com/dave/jennifer/jen"
 	j "github.com/dave/jennifer/jen"
 )
 
@@ -73,8 +72,15 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() j.Dict {
 	d := j.Dict{}
 
 	for _, f := range m.Fields {
-		f := NewFieldSchemaGenerator(f, m.i)
-		d[j.Lit(f.NameSnake)] = f.Generate()
+		if f.IsEmbed {
+			for _, f := range f.Message.Fields {
+				f := NewFieldSchemaGenerator(f, m.i)
+				d[j.Lit(f.NameSnake)] = f.Generate()
+			}
+		} else {
+			f := NewFieldSchemaGenerator(f, m.i)
+			d[j.Lit(f.NameSnake)] = f.Generate()
+		}
 	}
 
 	if len(m.Message.InjectedFields) > 0 {
@@ -222,7 +228,7 @@ func (f *FieldSchemaGenerator) xNestedAttributes(typ string, m *MessageSchemaGen
 }
 
 func generatePlanModifiers(imports *Imports, pm []string) j.Code {
-	v := make([]jen.Code, len(pm))
+	v := make([]j.Code, len(pm))
 	for i, n := range pm {
 		v[i] = j.Id(imports.WithType(n))
 	}
@@ -231,7 +237,7 @@ func generatePlanModifiers(imports *Imports, pm []string) j.Code {
 }
 
 func generateValidators(imports *Imports, vals []string) j.Code {
-	v := make([]jen.Code, len(vals))
+	v := make([]j.Code, len(vals))
 	for i, n := range vals {
 		v[i] = j.Id(imports.WithType(n))
 	}

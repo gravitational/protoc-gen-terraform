@@ -80,6 +80,11 @@ func (f *FieldDescriptorProtoExt) IsCustomType() bool {
 	return gogoproto.IsCustomType(f.FieldDescriptorProto)
 }
 
+// IsEmbed returns true if the field has the gogoproto.embed flag set to true
+func (f *FieldDescriptorProtoExt) IsEmbed() bool {
+	return gogoproto.IsEmbed(f.FieldDescriptorProto)
+}
+
 // GetCastType returns field cast type name
 func (f *FieldDescriptorProtoExt) GetCastType() string {
 	return gogoproto.GetCastType(f.FieldDescriptorProto)

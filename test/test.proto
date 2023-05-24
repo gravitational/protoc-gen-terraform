@@ -154,6 +154,11 @@ message Test {
         // StringBranch is the oneof branch triggered by string value
         string StringBranch = 37;
     }
+
+    // It's important that the name of this field doesn't match the name of the
+    // message, as golang expects this field to be referred to as its type as
+    // opposed to its field name.
+    Embedded AnEmbeddedField = 38 [ (gogoproto.embed) = true ];
 }
 
 // EmptyMessageBranch message for empty oneof branch
@@ -190,4 +195,13 @@ message Branch1 {
 message Branch2 {
     // Int32 int field
     int32 Int32 = 1;
+}
+
+// Embedded message is embedded into the parent message
+message Embedded {
+    // EmbeddedOne int field
+    int32 EmbeddedOne = 1;
+
+    // EmbeddedTwo int field
+    int32 EmbeddedTwo = 2;
 }

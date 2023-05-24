@@ -115,6 +115,8 @@ type Field struct {
 	IsNullable bool
 	// IsSensitive is field sensitive? (password, token)
 	IsSensitive bool
+	// IsEmbed is field embedded?
+	IsEmbed bool
 	// Validators represents the array of field validators for a field
 	Validators []string
 	// PlanModifiers represents the array of plan modifiers for a field
@@ -189,6 +191,7 @@ func BuildField(c *FieldBuildContext) (*Field, error) {
 		IsRepeated:    c.IsRepeated(),
 		IsMap:         c.IsMap(),
 		IsNullable:    c.GetNullable(),
+		IsEmbed:       c.IsEmbed(),
 		Validators:    c.GetValidators(),
 		PlanModifiers: c.GetPlanModifiers(),
 		Path:          c.GetPath(),

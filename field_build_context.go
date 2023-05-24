@@ -89,6 +89,7 @@ type FieldBuildContext struct {
 	imports  *Imports
 	path     string
 	goType   string
+	isEmbed  bool
 }
 
 // NewFieldBuildContext creates FieldBuildContext
@@ -127,6 +128,7 @@ func NewFieldBuildContext(m MessageBuildContext, field *FieldDescriptorProtoExt,
 		imports:             m.imports,
 		path:                path,
 		goType:              m.imports.PrependPackageNameIfMissing(t, m.config.DefaultPackageName),
+		isEmbed:             field.IsEmbed(),
 	}
 
 	return c, nil
@@ -166,6 +168,16 @@ func (c *FieldBuildContext) GetNameWithTypeName() string {
 
 // GetName returns field name
 func (c *FieldBuildContext) GetName() string {
+	if c.IsEmbed() {
+		// Return the name of the struct with no prepended package or pointer.
+		goType := strings.TrimPrefix(c.GetGoType(), "*")
+		goTypeSplit := strings.SplitN(goType, ".", 2)
+		if len(goTypeSplit) == 2 {
+			return goTypeSplit[1]
+		}
+		return goType
+	}
+
 	name := c.field.GetName()
 	if name[0:1] == strings.ToLower(name[0:1]) {
 		return strcase.UpperCamelCase(name)
@@ -314,6 +326,11 @@ func (c *FieldBuildContext) GetCustomType() string {
 // IsCastType returns true if fields has gogo.cast_type flag
 func (c *FieldBuildContext) IsCastType() bool {
 	return c.field.IsCastType()
+}
+
+// IsEmbed returns true if the field has gogo.embed flag set to true
+func (c *FieldBuildContext) IsEmbed() bool {
+	return c.isEmbed
 }
 
 // GetComment returns field comment as a single line

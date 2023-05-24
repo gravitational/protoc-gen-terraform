@@ -97,6 +97,9 @@ func (f *FieldCopyToGenerator) Generate() *j.Statement {
 
 // nextField reads current field value from Terraform object and asserts it's type against expected
 func (f *FieldCopyToGenerator) nextField(v string, g func(g *j.Group)) *j.Statement {
+	if f.IsEmbed {
+		return j.BlockFunc(g)
+	}
 	return j.Block(
 		// _, ok := ft.AttrsTypes["key"]
 		j.List(j.Id(v), j.Id("ok")).Op(":=").Id("tf.AttrTypes").Index(j.Lit(f.NameSnake)),
@@ -179,9 +182,16 @@ func (f *FieldCopyToGenerator) genObjectBody(m *MessageCopyToGenerator, fieldNam
 			if !m.IsEmpty {
 				g.Id("obj").Op(":=").Id(fieldName)
 			}
-			g.Id("tf").Op(":=").Id("&v")
+			if !f.IsEmbed {
+				g.Id("tf").Op(":=").Id("&v")
+			}
 			m.GenerateFields(g)
 		}
+	}
+
+	if f.IsEmbed {
+		g.BlockFunc(copyObj)
+		return
 	}
 
 	f.getAttr("v", f.Field.ElemValueType, g)
@@ -206,7 +216,6 @@ func (f *FieldCopyToGenerator) genObjectBody(m *MessageCopyToGenerator, fieldNam
 	} else {
 		g.BlockFunc(copyObj)
 	}
-	g.Id("v.Unknown").Op("=").False()
 }
 
 // assertTo asserts a to typ
@@ -251,10 +260,16 @@ func (f *FieldCopyToGenerator) genObject() *j.Statement {
 			f.genOneOfStub(g)
 		}
 
-		f.assertTo(f.Field.ElemType, g, func(g *j.Group) {
-			f.genObjectBody(m, fieldName, f.Field.ValueType, g)
-			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
-		})
+		if f.IsEmbed {
+			g.BlockFunc(func(g *j.Group) {
+				f.genObjectBody(m, fieldName, f.Field.ValueType, g)
+			})
+		} else {
+			f.assertTo(f.Field.ElemType, g, func(g *j.Group) {
+				f.genObjectBody(m, fieldName, f.Field.ValueType, g)
+				g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
+			})
+		}
 	})
 }
 
