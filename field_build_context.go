@@ -95,6 +95,11 @@ type FieldBuildContext struct {
 func NewFieldBuildContext(m MessageBuildContext, field *FieldDescriptorProtoExt, index int) (*FieldBuildContext, error) {
 	typeName := m.GetName() + "." + field.GetName()
 	path := m.GetPath() + "." + field.GetName()
+	// If the field is an embedded field, path should be
+	// message name, instead of full path to message name.
+	if gogoproto.IsEmbed(field.FieldDescriptorProto) {
+		path = m.GetName()
+	}
 
 	var t string
 

@@ -112,6 +112,20 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        DurationType{},
 		},
+		"embedded_nested_field": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"embedded_nested_string": {
+				Description: "EmbeddedNestedString string field",
+				Optional:    true,
+				Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			}}),
+			Description: "Nested EmbeddedNestedField field",
+			Optional:    true,
+		},
+		"embedded_string": {
+			Description: "EmbeddedString string field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"empty_message_branch": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
 				Computed:    true,
@@ -714,6 +728,58 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = time.Duration(v.Value)
 				}
 				obj.DurationStandardMissing = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["embedded_nested_field"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.EmbeddedNestedField"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedNestedField", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.EmbeddedNestedField = nil
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj.EmbeddedNestedField = &EmbeddedNestedField{}
+					obj := obj.EmbeddedNestedField
+					{
+						a, ok := tf.Attrs["embedded_nested_string"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Test.EmbeddedNestedField.EmbeddedNestedString"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedNestedField.EmbeddedNestedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							} else {
+								var t string
+								if !v.Null && !v.Unknown {
+									t = string(v.Value)
+								}
+								obj.EmbeddedNestedString = t
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["embedded_string"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.EmbeddedString"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.EmbeddedString = t
 			}
 		}
 	}
@@ -2548,6 +2614,82 @@ func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp
 			v.Value = time.Duration(obj.DurationStandardMissing)
 			v.Unknown = false
 			tf.Attrs["duration_standard_missing"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["embedded_nested_field"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.EmbeddedNestedField"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedNestedField", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["embedded_nested_field"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.EmbeddedNestedField == nil {
+					v.Null = true
+				} else {
+					obj := obj.EmbeddedNestedField
+					tf := &v
+					{
+						t, ok := tf.AttrTypes["embedded_nested_string"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Test.EmbeddedNestedField.EmbeddedNestedString"})
+						} else {
+							v, ok := tf.Attrs["embedded_nested_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Test.EmbeddedNestedField.EmbeddedNestedString", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedNestedField.EmbeddedNestedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								}
+								v.Null = string(obj.EmbeddedNestedString) == ""
+							}
+							v.Value = string(obj.EmbeddedNestedString)
+							v.Unknown = false
+							tf.Attrs["embedded_nested_string"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["embedded_nested_field"] = v
+			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["embedded_string"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.EmbeddedString"})
+		} else {
+			v, ok := tf.Attrs["embedded_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.EmbeddedString", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.EmbeddedString) == ""
+			}
+			v.Value = string(obj.EmbeddedString)
+			v.Unknown = false
+			tf.Attrs["embedded_string"] = v
 		}
 	}
 	{

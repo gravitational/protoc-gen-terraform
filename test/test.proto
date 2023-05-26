@@ -154,6 +154,13 @@ message Test {
         // StringBranch is the oneof branch triggered by string value
         string StringBranch = 37;
     }
+
+    // EmbeddedField encapsulates fields which can be shared among various types
+    EmbeddedField EmbeddedField = 38 [
+        (gogoproto.nullable) = false,
+        (gogoproto.jsontag) = "",
+        (gogoproto.embed) = true
+      ];
 }
 
 // EmptyMessageBranch message for empty oneof branch
@@ -191,3 +198,17 @@ message Branch2 {
     // Int32 int field
     int32 Int32 = 1;
 }
+
+// EmbeddedField encapsulates fields which can be shared among various types
+message EmbeddedField {
+  // EmbeddedString string field
+  string EmbeddedString = 1 [(gogoproto.jsontag) = "embedded_string"];
+  //  Nested EmbeddedNestedField field
+  EmbeddedNestedField EmbeddedNestedField = 2;
+}
+
+message EmbeddedNestedField {
+     // EmbeddedNestedString string field
+    string EmbeddedNestedString = 1 [(gogoproto.jsontag) = "embedded_nested_string"];
+  }
+
