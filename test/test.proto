@@ -202,7 +202,7 @@ message Branch2 {
 // EmbeddedField encapsulates fields which can be shared among various types
 message EmbeddedField {
   // EmbeddedString string field
-  string EmbeddedString = 1[(gogoproto.jsontag) = "embedded_string"];
+  string EmbeddedString = 1 [(gogoproto.jsontag) = "embedded_string"];
   //  Nested EmbeddedNestedField field
   EmbeddedNestedField EmbeddedNestedField = 2;
 }
