@@ -21,7 +21,7 @@ func NewMessageCopyToGenerator(m *Message, i *Imports) *MessageCopyToGenerator {
 func (m *MessageCopyToGenerator) Generate(writer io.Writer) (int, error) {
 	methodName := "Copy" + m.Name + "ToTerraform"
 	tf := j.Id("tf").Op("*").Id(m.i.WithPackage(Types, "Object"))
-	obj := j.Id("obj").Id(m.i.WithType(m.GoType))
+	obj := j.Id("obj").Op("*").Id(m.i.WithType(m.GoType))
 	diags := j.Var().Id("diags").Id(m.i.WithPackage(Diag, "Diagnostics"))
 	ctx := j.Id("ctx").Id(m.i.WithPackage("context", "Context"))
 

@@ -2198,7 +2198,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 }
 
 // CopyTestToTerraform copies contents of the source Terraform object into a target struct
-func CopyTestToTerraform(ctx context.Context, obj Test, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false

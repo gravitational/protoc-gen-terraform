@@ -31,8 +31,8 @@ var (
 	duration  = 5 * time.Minute
 )
 
-func createTestObj() Test {
-	return Test{
+func createTestObj() *Test {
+	return &Test{
 		Str:    "TestString",
 		Int32:  888,
 		Int64:  999,
