@@ -161,6 +161,18 @@ message Test {
         (gogoproto.jsontag) = "",
         (gogoproto.embed) = true
       ];
+
+    MaxAgeDuration EmbedNullable = 39 [
+        (gogoproto.jsontag) = "",
+        (gogoproto.embed) = true
+      ];
+}
+
+message MaxAgeDuration {
+    int64 Value = 1 [
+        (gogoproto.jsontag) = "max_age",
+        (gogoproto.casttype) = "Duration"
+    ];
 }
 
 // EmptyMessageBranch message for empty oneof branch

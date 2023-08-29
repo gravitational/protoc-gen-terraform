@@ -422,6 +422,7 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 					"embedded_nested_string": types.String{Value: "embdtest2"},
 				},
 			},
+			"max_age": DurationValue{Value: duration},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

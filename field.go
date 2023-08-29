@@ -112,6 +112,14 @@ type Field struct {
 	IsComputed bool
 	// IsCustomType field has gogo.customtype flag?
 	IsCustomType bool
+	// ParentIsOptionalEmbed indicates whether the current field is being embedded.
+	ParentIsOptionalEmbed bool
+	// ParentIsOptionalEmbedFullType is the <package>.Type of the parent.
+	// Eg github_teleport_types.MaxAge
+	ParentIsOptionalEmbedFullType string
+	// ParentIsOptionalEmbedFieldName is the Type of the embedded field.
+	// Eg MaxAge
+	ParentIsOptionalEmbedFieldName string
 	// IsNullable represents field nullable state
 	IsNullable bool
 	// IsSensitive is field sensitive? (password, token)
@@ -212,7 +220,27 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 		// If this is an embedded field, return message's fields instead of creating another field
 		if gogoproto.IsEmbed(c.field.FieldDescriptorProto) {
-			return f.Message.Fields, nil
+			if !c.GetNullable() {
+				return f.Message.Fields, nil
+			}
+
+			// For nullable and embedded fields, we must initialize it before being able to access their children.
+			// Otherwise, we would get a panic.
+			children := make([]*Field, 0, len(f.Message.Fields))
+			for _, f := range f.Message.Fields {
+				typeWithPackageName := strings.TrimPrefix(c.goType, "*")
+
+				embeddedFieldName := typeWithPackageName
+				if stringPositionDot := strings.LastIndex(typeWithPackageName, "."); stringPositionDot != -1 {
+					embeddedFieldName = typeWithPackageName[stringPositionDot+1:]
+				}
+
+				f.ParentIsOptionalEmbed = true
+				f.ParentIsOptionalEmbedFullType = typeWithPackageName
+				f.ParentIsOptionalEmbedFieldName = embeddedFieldName
+				children = append(children, f)
+			}
+			return children, nil
 		}
 	}
 

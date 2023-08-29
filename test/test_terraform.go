@@ -230,6 +230,11 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Description: "MapObjectNullable is the object map with nullable values",
 			Optional:    true,
 		},
+		"max_age": {
+			Description: "",
+			Optional:    true,
+			Type:        DurationType{},
+		},
 		"mode": {
 			Description: "Mode is the enum value",
 			Optional:    true,
@@ -2191,6 +2196,26 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = &c
 				}
 				obj.TimestampNullableWithNilValue = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["max_age"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.Value"})
+		} else {
+			v, ok := a.(DurationValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.Value", "DurationValue"})
+			} else {
+				var t Duration
+				if !v.Null && !v.Unknown {
+					t = Duration(v.Value)
+				}
+				if obj.MaxAgeDuration == nil {
+					obj.MaxAgeDuration = &MaxAgeDuration{}
+				}
+				obj.Value = t
 			}
 		}
 	}
@@ -5099,6 +5124,31 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 			}
 			v.Unknown = false
 			tf.Attrs["timestamp_nullable_with_nil_value"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["max_age"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.Value"})
+		} else {
+			v, ok := tf.Attrs["max_age"].(DurationValue)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.Value", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.Value", "DurationValue"})
+				}
+				v.Null = false
+			}
+			if obj.MaxAgeDuration == nil {
+				obj.MaxAgeDuration = &MaxAgeDuration{}
+			}
+			v.Value = time.Duration(obj.Value)
+			v.Unknown = false
+			tf.Attrs["max_age"] = v
 		}
 	}
 	return diags
