@@ -156,6 +156,15 @@ func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *j.Group) {
 	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue(fieldName))
 
 	if !f.IsPlaceholder {
+		// Parent might be nullable, so we must create it.
+		if f.ParentIsOptionalEmbed {
+			// 	if obj.<type> == nil {
+			// 		obj.<type> = &<package>.<type>{}
+			// 	}
+			g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
+				j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("=").Id("&" + f.ParentIsOptionalEmbedFullType + "{}"),
+			)
+		}
 		if f.IsNullable {
 			g.If(j.Id(fieldName).Op("==").Nil()).Block(
 				j.Id("v.Null").Op("=").True(),

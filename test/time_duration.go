@@ -261,5 +261,5 @@ func (t DurationValue) String() string {
 		return attr.NullValueString
 	}
 
-	return t.String()
+	return t.Value.String()
 }
