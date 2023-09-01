@@ -181,3 +181,17 @@ func TestCopyFromNullableEmbeddedField(t *testing.T) {
 
 	require.Equal(t, Duration(5*time.Minute), target.Value)
 }
+
+func TestCopyFromNullableEmbeddedFieldWithoutValue(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+
+	// set a null value
+	obj.Attrs["max_age"] = DurationValue{Null: true}
+
+	target := Test{}
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	require.False(t, diags.HasError(), diags)
+
+	// should be nil
+	require.Nil(t, target.MaxAgeDuration)
+}

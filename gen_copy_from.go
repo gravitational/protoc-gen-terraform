@@ -155,26 +155,29 @@ func (f *FieldCopyFromGenerator) genListOrMapIterator(g *j.Group, typ *j.Stateme
 func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 	return f.nextField(func(g *j.Group) {
 		f.genPrimitiveBody(g)
-		if f.OneOfName == "" {
 
-			// Parent might be nullable, so we must create it.
-			if f.ParentIsOptionalEmbed {
-				// 	if obj.<type> == nil {
-				// 		obj.<type> = &<package>.<type>{}
-				// 	}
-				g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
-					j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("=").Id("&" + f.ParentIsOptionalEmbedFullType + "{}"),
-				)
-			}
-			g.Id("obj." + f.Name).Op("=").Id("t")
-		} else {
+		if f.OneOfName != "" {
 			// Do not set empty oneOf value to not override values possibly set by other branches
 			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
 				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
 					j.Id(f.Name): j.Id("t"),
 				})
 			})
+			return
 		}
+
+		if f.ParentIsOptionalEmbed {
+			// If the current value is Null or Unknown, we should not set the parent field, otherwise we will get the default values for all the inner fields.
+			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+				g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
+					j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("=").Id("&" + f.ParentIsOptionalEmbedFullType + "{}"),
+				)
+				g.Id("obj." + f.Name).Op("=").Id("t")
+			})
+			return
+		}
+
+		g.Id("obj." + f.Name).Op("=").Id("t")
 	})
 }
 
