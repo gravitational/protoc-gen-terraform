@@ -2212,10 +2212,12 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 				if !v.Null && !v.Unknown {
 					t = Duration(v.Value)
 				}
-				if obj.MaxAgeDuration == nil {
-					obj.MaxAgeDuration = &MaxAgeDuration{}
+				if !v.Null && !v.Unknown {
+					if obj.MaxAgeDuration == nil {
+						obj.MaxAgeDuration = &MaxAgeDuration{}
+					}
+					obj.Value = t
 				}
-				obj.Value = t
 			}
 		}
 	}
@@ -5144,9 +5146,10 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			if obj.MaxAgeDuration == nil {
-				obj.MaxAgeDuration = &MaxAgeDuration{}
+				v.Null = true
+			} else {
+				v.Value = time.Duration(obj.Value)
 			}
-			v.Value = time.Duration(obj.Value)
 			v.Unknown = false
 			tf.Attrs["max_age"] = v
 		}

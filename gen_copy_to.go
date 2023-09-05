@@ -156,29 +156,28 @@ func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *j.Group) {
 	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue(fieldName))
 
 	if !f.IsPlaceholder {
-		// Parent might be nullable, so we must create it.
 		if f.ParentIsOptionalEmbed {
-			// 	if obj.<type> == nil {
-			// 		obj.<type> = &<package>.<type>{}
-			// 	}
 			g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
-				j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("=").Id("&" + f.ParentIsOptionalEmbedFullType + "{}"),
-			)
-		}
-		if f.IsNullable {
-			g.If(j.Id(fieldName).Op("==").Nil()).Block(
 				j.Id("v.Null").Op("=").True(),
-			).Else().Block(
-				j.Id("v.Null").Op("=").False(),
-				j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
-			)
+			).Else().Block(f.genAssignValue(fieldName))
 		} else {
-			// Non-nullable fields always have value
-			g.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
+			g.Add(f.genAssignValue(fieldName))
 		}
 	}
 
 	g.Id("v.Unknown").Op("=").False()
+}
+
+func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
+	if f.IsNullable {
+		return j.If(j.Id(fieldName).Op("==").Nil()).Block(
+			j.Id("v.Null").Op("=").True(),
+		).Else().Block(
+			j.Id("v.Null").Op("=").False(),
+			j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
+		)
+	}
+	return j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
 }
 
 // genObjectBody generates block which reads message into v
