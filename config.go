@@ -135,6 +135,9 @@ type Config struct {
 	// should be used for the given package names, it can be used when the
 	// correct import path is not found automatically.
 	ImportPathOverrides map[string]string `yaml:"import_path_overrides,omitempty"`
+	// CustomTypes fields marks fields as custom types like the
+	// "gogoproto.customtype" tag would do.
+	CustomTypes map[string]string `yaml:"custom_types,omitempty"`
 
 	// params represents CLI params passed from the plugin
 	params map[string]string `yaml:"-"`
