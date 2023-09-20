@@ -434,6 +434,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
+		"string_override": GenSchemaStringCustom(ctx),
 		"timestamp": {
 			Description: "Timestamp time.Time field",
 			Optional:    true,
@@ -2100,6 +2101,13 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 				}
 			}
 		}
+	}
+	{
+		a, ok := tf.Attrs["string_override"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.StringOverride"})
+		}
+		CopyFromStringCustom(diags, a, &obj.StringOverride)
 	}
 	{
 		a, ok := tf.Attrs["timestamp"]
@@ -4970,6 +4978,15 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				c.Unknown = false
 				tf.Attrs["string_list_empty"] = c
 			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["string_override"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.StringOverride"})
+		} else {
+			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attrs["string_override"])
+			tf.Attrs["string_override"] = v
 		}
 	}
 	{
