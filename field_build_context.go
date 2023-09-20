@@ -17,7 +17,6 @@ limitations under the License.
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 
@@ -419,7 +418,6 @@ func (c *FieldBuildContext) IsComputed() bool {
 
 // GetValidators returns field validators
 func (c *FieldBuildContext) GetValidators() []string {
-	log.Infof("Looking up validator %s or %s \n", c.GetPath(), c.GetNameWithTypeName())
 	v, ok := c.config.Validators[c.GetPath()]
 	if !ok {
 		v, ok = c.config.Validators[c.GetNameWithTypeName()]
