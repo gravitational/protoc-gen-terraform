@@ -195,3 +195,12 @@ func TestCopyFromNullableEmbeddedFieldWithoutValue(t *testing.T) {
 	// should be nil
 	require.Nil(t, target.MaxAgeDuration)
 }
+
+func TestCopyFromStringOverride(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+
+	target := Test{}
+	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+
+	require.Equal(t, "a/b/c", target.StringOverride)
+}

@@ -423,6 +423,11 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 				},
 			},
 			"max_age": DurationValue{Value: duration},
+			"string_override": types.List{Elems: []attr.Value{
+				types.String{Value: "a"},
+				types.String{Value: "b"},
+				types.String{Value: "c"},
+			}},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

@@ -48,3 +48,6 @@ plan_modifiers:
 validators:
   "Test.Str":
     - UseMockValidator()
+
+custom_types:
+  "Test.StringOverride": StringCustom
