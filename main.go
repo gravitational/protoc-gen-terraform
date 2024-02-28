@@ -26,6 +26,8 @@ import (
 	"github.com/gravitational/trace"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/pluginpb"
 
 	_ "embed"
 )
@@ -55,7 +57,32 @@ func main() {
 		p.Fail(err.Error())
 	}
 
-	command.Write(resp)
+	// Convert the gogo response to a regular protobuf response. This allows us
+	// to pack in the SupportedFeatures field, which indicates that the optional
+	// field is supported.
+	response := &pluginpb.CodeGeneratorResponse{}
+	response.Error = resp.Error
+	response.File = make([]*pluginpb.CodeGeneratorResponse_File, 0, len(resp.File))
+	for _, file := range resp.File {
+		response.File = append(response.File, &pluginpb.CodeGeneratorResponse_File{
+			Name:           file.Name,
+			InsertionPoint: file.InsertionPoint,
+			Content:        file.Content,
+		})
+	}
+	features := uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+	response.SupportedFeatures = &features
+
+	// Send back the results. The code below was taken from the vanity command,
+	// but it now uses the regular response instead of the gogo specific one.
+	data, err := proto.Marshal(response)
+	if err != nil {
+		p.Fail(err.Error(), "failed to marshal output proto")
+	}
+	_, err = os.Stdout.Write(data)
+	if err != nil {
+		p.Fail(err.Error(), "failed to write output proto")
+	}
 }
 
 // runGoImports formats code and removes unused imports from the resulting code using goimports tool
