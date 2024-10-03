@@ -130,8 +130,11 @@ type Test struct {
 	// EmbeddedField encapsulates fields which can be shared among various types
 	EmbeddedField   `protobuf:"bytes,38,opt,name=EmbeddedField,proto3,embedded=EmbeddedField" json:""`
 	*MaxAgeDuration `protobuf:"bytes,39,opt,name=EmbedNullable,proto3,embedded=EmbedNullable" json:""`
-	// BoolCustomOverride []bool field, gogoproto.customtype is not set but there
-	// is custom_type override in the configuration
+	// StringOverride is represented by a single string in the go struct, but by
+	// a list of strings in the Terraform Schema. The plugin's configuration
+	// specifies a custom_type (StringCustom), the generator should use the
+	// functions "GenSchemaStringCustom", "CopyFromStringCustom",
+	// "CopyToStringCustom" instead of attempting to generate them.
 	StringOverride       string   `protobuf:"bytes,40,opt,name=StringOverride,proto3" json:"StringOverride,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

@@ -24,11 +24,13 @@ func (d Duration) String() string {
 type BoolCustom bool
 
 // GenSchemaBoolSpecial generates custom field schema (bool list)
-func GenSchemaBoolSpecial(_ context.Context) tfsdk.Attribute {
+func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
 	return tfsdk.Attribute{
 		Type: types.ListType{
 			ElemType: types.BoolType,
 		},
+		Description: attr.Description,
+		Optional:    attr.Optional,
 	}
 }
 
@@ -84,7 +86,7 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v 
 // single go string by joining all elements with "/".
 
 // GenSchemaStringCustom returns the StringCustom schema.
-func GenSchemaStringCustom(_ context.Context) tfsdk.Attribute {
+func GenSchemaStringCustom(_ context.Context, _ tfsdk.Attribute) tfsdk.Attribute {
 	return tfsdk.Attribute{
 		Type: types.ListType{
 			ElemType: types.StringType,

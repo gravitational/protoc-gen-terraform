@@ -119,10 +119,6 @@ func NewFieldSchemaGenerator(f *Field, i *Imports) *FieldSchemaGenerator {
 
 // Generate returns field schema
 func (f *FieldSchemaGenerator) Generate() *j.Statement {
-	if f.Kind == CustomKind {
-		return j.Id("GenSchema" + f.Suffix).Call(j.Id("ctx"))
-	}
-
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
 		j.Id("Type"):        f.schemaType(), // nils are automatically omitted
@@ -154,6 +150,10 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 	// Plan modifiers
 	if len(f.PlanModifiers) > 0 {
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, f.PlanModifiers)
+	}
+
+	if f.Kind == CustomKind {
+		return j.Id("GenSchema"+f.Suffix).Call(j.Id("ctx"), j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d))
 	}
 
 	return j.Values(d)
