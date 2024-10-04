@@ -48,7 +48,10 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"bool_custom_list": GenSchemaBoolSpecial(ctx),
+		"bool_custom_list": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+			Description: "BoolCustomList []bool field",
+			Optional:    true,
+		}),
 		"branch1": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
 				Description: "Str string field",
@@ -434,7 +437,10 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"string_override": GenSchemaStringCustom(ctx),
+		"string_override": GenSchemaStringCustom(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+			Description: "StringOverride is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
+			Optional:    true,
+		}),
 		"timestamp": {
 			Description: "Timestamp time.Time field",
 			Optional:    true,
