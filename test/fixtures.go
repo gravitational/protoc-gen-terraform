@@ -428,6 +428,8 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 				types.String{Value: "b"},
 				types.String{Value: "c"},
 			}},
+			"foo": types.String{Null: true},
+			"bar": types.String{Value: "ham"},
 		},
 		AttrTypes: obj.AttrTypes,
 	}
