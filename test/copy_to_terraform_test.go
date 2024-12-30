@@ -30,7 +30,7 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "TestString", o.Attrs["str"].(types.String).Value)
 	require.False(t, o.Attrs["str"].(types.String).Unknown)
@@ -65,7 +65,7 @@ func TestCopyToTime(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, timestamp, o.Attrs["timestamp"].(TimeValue).Value)
 	require.False(t, o.Attrs["timestamp"].(TimeValue).Unknown)
@@ -81,7 +81,7 @@ func TestCopyToDuration(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, duration, o.Attrs["duration_standard"].(DurationValue).Value)
 	require.False(t, o.Attrs["duration_standard"].(DurationValue).Unknown)
@@ -96,7 +96,7 @@ func TestCopyToNested(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(
 		t,
@@ -117,7 +117,7 @@ func TestCopyToList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "el1"},
@@ -154,7 +154,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 
 	// Start with two elements.
 	diags := CopyTestToTerraform(context.Background(), testObject, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "el1"},
@@ -164,7 +164,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	// Increase to 3, array access must not panic.
 	testObject.StringList = []string{"el1", "el2", "el3"}
 	diags = CopyTestToTerraform(context.Background(), testObject, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "el1"},
@@ -175,7 +175,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	// Decrease to a single element, others should be removed.
 	testObject.StringList = []string{"elX"}
 	diags = CopyTestToTerraform(context.Background(), testObject, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "elX"},
@@ -186,7 +186,7 @@ func TestCopyToNestedList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	nestedList := o.Attrs["nested_list"].(types.List)
 	firstEl := nestedList.Elems[0].(types.Object)
@@ -252,7 +252,7 @@ func TestCopyToMap(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	m := o.Attrs["map"].(types.Map).Elems
 
@@ -264,7 +264,7 @@ func TestCopyToCustom(t *testing.T) {
 	o := copyToTerraformObject(t)
 
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(
 		t,
@@ -283,7 +283,7 @@ func TestCopyToOneOfBranch3(t *testing.T) {
 	testObj.OneOf = &Test_Branch3{Branch3: "Test"}
 
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(
 		t,
@@ -298,7 +298,7 @@ func TestCopyToOneOfBranch2(t *testing.T) {
 	testObj.OneOf = &Test_Branch2{Branch2: &Branch2{Int32: 5}}
 
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(
 		t,
@@ -312,7 +312,7 @@ func TestCopyToOneOfNoBranch(t *testing.T) {
 	testObj := createTestObj()
 
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.True(t, o.Attrs["branch1"].(types.Object).Null)
 	require.True(t, o.Attrs["branch2"].(types.Object).Null)
@@ -324,12 +324,26 @@ func TestCopyToEmbeddedField(t *testing.T) {
 	testObj := createTestObj()
 
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
-	require.False(t, diags.HasError())
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "embdtest1", o.Attrs["embedded_string"].(types.String).Value)
 	require.False(t, o.Attrs["embedded_string"].(types.String).Unknown)
 	require.False(t, o.Attrs["embedded_string"].(types.String).Null)
 
 	require.Equal(t, "embdtest2", o.Attrs["embedded_nested_field"].(types.Object).Attrs["embedded_nested_string"].(types.String).Value)
+}
 
+func TestCopyToOneOfLowercase(t *testing.T) {
+	o := copyToTerraformObject(t)
+	testObj := createTestObj()
+	testObj.LowerSnakeOneof = &Test_Foo{Foo: "1234"}
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+
+	require.Equal(
+		t,
+		types.String{Null: false, Unknown: false, Value: "1234"},
+		o.Attrs["foo"].(types.String),
+	)
 }

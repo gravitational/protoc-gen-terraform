@@ -233,3 +233,15 @@ func TestCopyFromStringOverride(t *testing.T) {
 
 	require.Equal(t, "a/b/c", target.StringOverride)
 }
+
+func TestCopyFromOneOfLowercase(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+
+	target := Test{}
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
+
+	v, ok := target.LowerSnakeOneof.(*Test_Bar)
+	require.True(t, ok)
+	require.Equal(t, "ham", v.Bar)
+}
