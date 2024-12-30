@@ -484,7 +484,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	obj.OneOf = nil
 	obj.OneOfWithEmptyMessage = nil
-	obj.lower_snake_oneof = nil
+	obj.LowerSnakeOneof = nil
 	{
 		a, ok := tf.Attrs["bar"]
 		if !ok {
@@ -499,7 +499,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = string(v.Value)
 				}
 				if !v.Null && !v.Unknown {
-					obj.lower_snake_oneof = &Test_Bar{Bar: t}
+					obj.LowerSnakeOneof = &Test_Bar{Bar: t}
 				}
 			}
 		}
@@ -872,7 +872,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = string(v.Value)
 				}
 				if !v.Null && !v.Unknown {
-					obj.lower_snake_oneof = &Test_Foo{Foo: t}
+					obj.LowerSnakeOneof = &Test_Foo{Foo: t}
 				}
 			}
 		}
@@ -2300,7 +2300,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.bar"})
 		} else {
-			obj, ok := obj.lower_snake_oneof.(*Test_Bar)
+			obj, ok := obj.LowerSnakeOneof.(*Test_Bar)
 			if !ok {
 				obj = &Test_Bar{}
 			}
@@ -2891,7 +2891,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.foo"})
 		} else {
-			obj, ok := obj.lower_snake_oneof.(*Test_Foo)
+			obj, ok := obj.LowerSnakeOneof.(*Test_Foo)
 			if !ok {
 				obj = &Test_Foo{}
 			}
