@@ -22,6 +22,7 @@ import (
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/stoewer/go-strcase"
 )
 
 const (
@@ -137,7 +138,11 @@ func (c *MessageBuildContext) GetInjectedFields() []InjectedField {
 func (c *MessageBuildContext) GetOneOfNames() []string {
 	s := make([]string, len(c.desc.OneofDecl))
 	for i, d := range c.desc.OneofDecl {
-		s[i] = d.GetName()
+		name := d.GetName()
+		if name[0:1] == strings.ToLower(name[0:1]) {
+			name = strcase.UpperCamelCase(name)
+		}
+		s[i] = name
 	}
 	return s
 }

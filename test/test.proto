@@ -173,6 +173,11 @@ message Test {
     // functions "GenSchemaStringCustom", "CopyFromStringCustom",
     // "CopyToStringCustom" instead of attempting to generate them.
     string StringOverride = 40;
+
+    oneof lower_snake_oneof {
+        string foo = 41;
+        string bar = 42;
+    }
 }
 
 message MaxAgeDuration {
