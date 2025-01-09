@@ -475,7 +475,11 @@ func (c *FieldBuildContext) GetOneOfFieldName() string {
 		return ""
 	}
 
-	return c.desc.OneofDecl[*c.field.OneofIndex].GetName()
+	name := c.desc.OneofDecl[*c.field.OneofIndex].GetName()
+	if name[0:1] == strings.ToLower(name[0:1]) {
+		return strcase.UpperCamelCase(name)
+	}
+	return name
 }
 
 // GetOneOfTypeName returns OneOf container go name

@@ -43,6 +43,11 @@ var _ = time.Kitchen
 // GenSchemaTest returns tfsdk.Schema definition for Test
 func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bar": {
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"bool": {
 			Description: "Bool bool field",
 			Optional:    true,
@@ -143,6 +148,11 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Description: "Float float field",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+		},
+		"foo": {
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"id": {
 			Computed: true,
@@ -474,6 +484,26 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	obj.OneOf = nil
 	obj.OneOfWithEmptyMessage = nil
+	obj.LowerSnakeOneof = nil
+	{
+		a, ok := tf.Attrs["bar"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.bar"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.bar", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.LowerSnakeOneof = &Test_Bar{Bar: t}
+				}
+			}
+		}
+	}
 	{
 		a, ok := tf.Attrs["bool"]
 		if !ok {
@@ -825,6 +855,25 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = float32(v.Value)
 				}
 				obj.Float = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["foo"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.foo"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.foo", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.LowerSnakeOneof = &Test_Foo{Foo: t}
+				}
 			}
 		}
 	}
@@ -2247,6 +2296,32 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
 	}
 	{
+		t, ok := tf.AttrTypes["bar"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.bar"})
+		} else {
+			obj, ok := obj.LowerSnakeOneof.(*Test_Bar)
+			if !ok {
+				obj = &Test_Bar{}
+			}
+			v, ok := tf.Attrs["bar"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.bar", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.bar", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.Bar) == ""
+			}
+			v.Value = string(obj.Bar)
+			v.Unknown = false
+			tf.Attrs["bar"] = v
+		}
+	}
+	{
 		t, ok := tf.AttrTypes["bool"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.Bool"})
@@ -2809,6 +2884,32 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 			v.Value = float64(obj.Float)
 			v.Unknown = false
 			tf.Attrs["float"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["foo"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.foo"})
+		} else {
+			obj, ok := obj.LowerSnakeOneof.(*Test_Foo)
+			if !ok {
+				obj = &Test_Foo{}
+			}
+			v, ok := tf.Attrs["foo"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.foo", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.foo", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.Foo) == ""
+			}
+			v.Value = string(obj.Foo)
+			v.Unknown = false
+			tf.Attrs["foo"] = v
 		}
 	}
 	{

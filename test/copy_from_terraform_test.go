@@ -22,15 +22,31 @@ import (
 	time "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
 )
+
+func requireNoDiagErrors(t *testing.T, diagnostics diag.Diagnostics) {
+	t.Helper()
+
+	errDiags := diagnostics.Errors()
+	if len(errDiags) == 0 {
+		return
+	}
+
+	for _, d := range errDiags {
+		t.Logf("Diagnostic Error: %s", d.Detail())
+	}
+	require.Empty(t, errDiags, "No error diagnostic messages should be emitted.")
+}
 
 func TestCopyFromPrimitives(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "Test", target.Str)
 	require.Equal(t, int32(98), target.Int32)
@@ -46,7 +62,8 @@ func TestCopyFromTime(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{TimestampNullableWithNilValue: &timestamp}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, timestamp, target.Timestamp)
 	require.Equal(t, timestamp, *target.TimestampNullable)
@@ -60,7 +77,8 @@ func TestCopyFromNested(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{NestedNullableWithNilValue: &Nested{}}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "Test", target.Nested.Str)
 	require.Equal(t, "Test", target.NestedNullable.Str)
@@ -72,7 +90,8 @@ func TestCopyFromList(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []string{"el1", "el2"}, target.StringList)
 	require.Empty(t, target.StringListEmpty)
@@ -85,7 +104,8 @@ func TestCopyFromNestedList(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Len(t, target.NestedList, 1)
 	require.Equal(t, "Test", target.NestedList[0].Str)
@@ -102,7 +122,8 @@ func TestCopyFromMap(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, map[string]string{"key1": "Value1", "key2": "Value2"}, target.Map)
 	require.Equal(t, map[string]string{"key1": "Value1", "key2": "Value2"}, target.Nested.Map)
@@ -113,7 +134,8 @@ func TestCopyFromNestedMap(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "Test1", target.MapObject["key1"].Str)
 	require.Equal(t, "Test2", target.MapObject["key2"].Str)
@@ -125,7 +147,8 @@ func TestCopyFromCustom(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []BoolCustom{true, false, true}, target.BoolCustomList)
 }
@@ -135,7 +158,8 @@ func TestCopyFromOneOfScalarBranch(t *testing.T) {
 	obj.Attrs["branch3"] = types.String{Value: "Test"}
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "Test", target.OneOf.(*Test_Branch3).Branch3)
 }
@@ -149,7 +173,8 @@ func TestCopyFromOneOfObjectBranch(t *testing.T) {
 	}
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, int32(5), target.OneOf.(*Test_Branch2).Branch2.Int32)
 }
@@ -158,7 +183,8 @@ func TestCopyFromOneOfObjectNoBranch(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, nil, target.OneOf)
 }
@@ -167,7 +193,8 @@ func TestCopyFromEmbeddedField(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "embdtest1", target.EmbeddedString)
 	require.Equal(t, "embdtest2", target.EmbeddedNestedField.EmbeddedNestedString)
@@ -177,7 +204,8 @@ func TestCopyFromNullableEmbeddedField(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, Duration(5*time.Minute), target.Value)
 }
@@ -190,7 +218,7 @@ func TestCopyFromNullableEmbeddedFieldWithoutValue(t *testing.T) {
 
 	target := Test{}
 	diags := CopyTestFromTerraform(context.Background(), obj, &target)
-	require.False(t, diags.HasError(), diags)
+	requireNoDiagErrors(t, diags)
 
 	// should be nil
 	require.Nil(t, target.MaxAgeDuration)
@@ -200,7 +228,20 @@ func TestCopyFromStringOverride(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	target := Test{}
-	require.False(t, CopyTestFromTerraform(context.Background(), obj, &target).HasError())
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "a/b/c", target.StringOverride)
+}
+
+func TestCopyFromOneOfLowercase(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+
+	target := Test{}
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
+
+	v, ok := target.LowerSnakeOneof.(*Test_Bar)
+	require.True(t, ok)
+	require.Equal(t, "ham", v.Bar)
 }
