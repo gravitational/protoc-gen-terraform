@@ -6,13 +6,13 @@ require (
 	github.com/dave/jennifer v1.4.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/gravitational/trace v1.2.1
-	github.com/hashicorp/terraform-plugin-framework v0.11.0
-	github.com/hashicorp/terraform-plugin-go v0.13.0
+	github.com/hashicorp/terraform-plugin-framework v0.12.0
+	github.com/hashicorp/terraform-plugin-go v0.14.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/testify v1.7.2
 	golang.org/x/tools v0.1.7
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -20,7 +20,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/hashicorp/go-hclog v1.2.1 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.7.0 // indirect
 	github.com/jonboulle/clockwork v0.3.0 // indirect
