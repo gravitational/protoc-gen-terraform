@@ -6,8 +6,8 @@ require (
 	github.com/dave/jennifer v1.4.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/gravitational/trace v1.2.1
-	github.com/hashicorp/terraform-plugin-framework v0.12.0
-	github.com/hashicorp/terraform-plugin-go v0.14.0
+	github.com/hashicorp/terraform-plugin-framework v0.16.0
+	github.com/hashicorp/terraform-plugin-go v0.14.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stoewer/go-strcase v1.2.0
 	github.com/stretchr/testify v1.7.2

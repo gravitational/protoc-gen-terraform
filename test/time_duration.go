@@ -143,6 +143,18 @@ func (t TimeValue) String() string {
 	return t.Value.String()
 }
 
+// ValueTime returns the underlying time value
+func (t TimeValue) ValueTime() time.Time { return t.Value }
+
+func ValueTime(value time.Time) TimeValue {
+	return TimeValue{Value: value, Format: time.RFC3339}
+}
+
+// NullTime returns a null time value
+func NullTime() TimeValue {
+	return TimeValue{Null: true, Format: time.RFC3339}
+}
+
 // DurationType represents time.Time Terraform type which is stored in RFC3339 format, nanoseconds truncated
 type DurationType struct {
 	attr.Type
@@ -208,9 +220,12 @@ type DurationValue struct {
 	Value time.Duration
 }
 
+// ValueDuration returns the underlying duration value.
+func (t DurationValue) ValueDuration() Duration { return Duration(t.Value) }
+
 // Type returns value type
 func (t DurationValue) Type(_ context.Context) attr.Type {
-	return TimeType{}
+	return DurationType{}
 }
 
 // ToTerraformValue returns the data contained in the *String as a string. If
@@ -262,4 +277,14 @@ func (t DurationValue) String() string {
 	}
 
 	return t.Value.String()
+}
+
+// ValueDuration constructs a DurationValue from the given duration
+func ValueDuration(value time.Duration) DurationValue {
+	return DurationValue{Value: value}
+}
+
+// NullDuration returns a null duration
+func NullDuration() DurationValue {
+	return DurationValue{Null: true}
 }

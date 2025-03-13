@@ -50,14 +50,18 @@ type TerraformType struct {
 	Type string
 	// ValueType represents Terraform attr.Value name
 	ValueType string
+	// ValueFromMethod is the method called on an attr.Value to get the underlying value
+	ValueFromMethod string
+	// ValueToMethod is the method called to construct an attr.Value
+	ValueToMethod string
+	// NullValueMethod is the method called to construct a null attr.Value
+	NullValueMethod string
 	// ElemType represents Terraform attr.Type name for list/map Elem, equals Type by default
 	ElemType string
 	// ElemValueType represents Terraform attr.Value name for list/map Elem, equals ValueType by default
 	ElemValueType string
 	// IsTypeScalar is true when Type is not a real struct and is represented with numeric constant on Terraform side
 	IsTypeScalar bool
-	// IsTypeScalar is true when ElemType is not a real struct and is represented with numeric constant on Terraform side
-	IsElemTypeScalar bool
 	// ValueCastToType represents Go type of either ValueType.Value or ElemValueType.Value
 	ValueCastToType string
 	// ValueCastFromType represents Go type of a counterpart object field or field elem to cast from .Value
@@ -322,6 +326,9 @@ func (f *Field) setMapValues(c *FieldBuildContext) error {
 	f.ElemValueType = f.MapValueField.ElemValueType
 	f.ValueCastToType = f.MapValueField.ValueCastToType
 	f.ValueCastFromType = f.MapValueField.ValueCastFromType
+	f.ValueFromMethod = f.MapValueField.ValueFromMethod
+	f.ValueToMethod = f.MapValueField.ValueToMethod
+	f.NullValueMethod = f.MapValueField.NullValueMethod
 
 	f.GoElemType = f.MapValueField.GoElemType
 
@@ -409,6 +416,9 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 	if o != nil {
 		f.Type = o.Type
 		f.ValueType = o.ValueType
+		f.ValueFromMethod = o.ValueFromMethod
+		f.ValueToMethod = o.ValueToMethod
+		f.NullValueMethod = o.NullValueMethod
 		f.ValueCastToType = o.CastToType
 		f.ValueCastFromType = o.CastFromType
 		f.TypeConstructor = o.TypeConstructor

@@ -60,10 +60,10 @@ github.com/gravitational/trace v1.2.1/go.mod h1:n0ijrq6psJY0sOI/NzLp+xdd8xl79jjw
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/hashicorp/go-hclog v1.2.1 h1:YQsLlGDJgwhXFpucSPyVbCBviQtjlHv3jLTlp8YmtEw=
 github.com/hashicorp/go-hclog v1.2.1/go.mod h1:W4Qnvbt70Wk/zYJryRzDRU/4r0kIg0PVHBcfoyhpF5M=
-github.com/hashicorp/terraform-plugin-framework v0.12.0 h1:Bk3l5MQUaZoo5eplr+u1FomYqGS564e8Tp3rutnCfYg=
-github.com/hashicorp/terraform-plugin-framework v0.12.0/go.mod h1:wcZdk4+Uef6Ng+BiBJjGAcIPlIs5bhlEV/TA1k6Xkq8=
-github.com/hashicorp/terraform-plugin-go v0.14.0 h1:ttnSlS8bz3ZPYbMb84DpcPhY4F5DsQtcAS7cHo8uvP4=
-github.com/hashicorp/terraform-plugin-go v0.14.0/go.mod h1:2nNCBeRLaenyQEi78xrGrs9hMbulveqG/zDMQSvVJTE=
+github.com/hashicorp/terraform-plugin-framework v0.16.0 h1:kEHh0d6dp5Ig/ey6PYXkWDZPMLIW8Me41T/Oa7bpO4s=
+github.com/hashicorp/terraform-plugin-framework v0.16.0/go.mod h1:Vk5MuIJoE1qksHZawAZr6psx6YXsQBFIKDrWbROrwus=
+github.com/hashicorp/terraform-plugin-go v0.14.1 h1:cwZzPYla82XwAqpLhSzdVsOMU+6H29tczAwrB0z9Zek=
+github.com/hashicorp/terraform-plugin-go v0.14.1/go.mod h1:Bc/K6K26BQ2FHqIELPbpKtt2CzzbQou+0UQF3/0NsCQ=
 github.com/hashicorp/terraform-plugin-log v0.7.0 h1:SDxJUyT8TwN4l5b5/VkiTIaQgY6R+Y2BQ0sRZftGKQs=
 github.com/hashicorp/terraform-plugin-log v0.7.0/go.mod h1:p4R1jWBXRTvL4odmEkFfDdhUjHf9zcs/BCoNHAc7IK4=
 github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=

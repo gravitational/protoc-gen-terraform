@@ -42,16 +42,16 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 		return
 	}
 
-	arr := make([]BoolCustom, len(v.Elems))
-	for i, raw := range v.Elems {
+	arr := make([]BoolCustom, len(v.Elements()))
+	for i, raw := range v.Elements() {
 		el, ok := raw.(types.Bool)
 		if !ok {
 			diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", raw))
 			return
 		}
 
-		if !el.Null && !el.Unknown {
-			arr[i] = BoolCustom(el.Value)
+		if !el.IsNull() && !el.IsUnknown() {
+			arr[i] = BoolCustom(el.ValueBool())
 		}
 	}
 
@@ -59,27 +59,14 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 }
 
 // CopyToBoolSpecial copies source value to the target
-func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value) attr.Value {
-	value, ok := v.(types.List)
-	if !ok {
-		value = types.List{
-			Null:     true,
-			Unknown:  false,
-			ElemType: types.BoolType,
-		}
+func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom) attr.Value {
+	elems := make([]attr.Value, len(obj))
+	for i, b := range obj {
+		elems[i] = types.BoolValue(bool(b))
 	}
-
-	if len(obj) > 0 {
-		if value.Elems == nil {
-			value.Elems = make([]attr.Value, len(obj))
-		}
-
-		for i, b := range obj {
-			value.Elems[i] = types.Bool{Null: false, Unknown: false, Value: bool(b)}
-		}
-	}
-
-	return value
+	list, listDiags := types.ListValue(types.BoolType, elems)
+	diags.Append(listDiags...)
+	return list
 }
 
 // StringCustom is a custom type that maps a Terraform List of string, onto a
@@ -104,15 +91,15 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 	}
 
 	items := make([]string, 0)
-	for _, raw := range v.Elems {
+	for _, raw := range v.Elements() {
 		el, ok := raw.(types.String)
 		if !ok {
 			diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", raw))
 			return
 		}
 
-		if !el.Null && !el.Unknown {
-			items = append(items, el.Value)
+		if !el.IsNull() && !el.IsUnknown() {
+			items = append(items, el.ValueString())
 		}
 	}
 
@@ -121,25 +108,13 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 
 // CopyToStringCustom copies a source value (single string) into the Terraform
 // value (a list of strings) by splitting the string on every "/".
-func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value) attr.Value {
-	value, ok := v.(types.List)
-	if !ok {
-		value = types.List{
-			Null:     true,
-			Unknown:  false,
-			ElemType: types.StringType,
-		}
+func CopyToStringCustom(diags diag.Diagnostics, obj string) attr.Value {
+	parts := strings.Split(obj, "/")
+	elems := make([]attr.Value, len(parts))
+	for i, b := range parts {
+		elems[i] = types.StringValue(b)
 	}
-
-	if len(obj) > 0 {
-		if value.Elems == nil {
-			value.Elems = make([]attr.Value, len(obj))
-		}
-
-		for i, b := range strings.Split(obj, "/") {
-			value.Elems[i] = types.String{Null: false, Unknown: false, Value: b}
-		}
-	}
-
-	return value
+	list, listDiags := types.ListValue(types.StringType, elems)
+	diags.Append(listDiags...)
+	return list
 }

@@ -22,6 +22,7 @@ import (
 	time "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
 )
@@ -104,6 +105,8 @@ func createTestObj() *Test {
 
 // copyFromTerraformObject returns a base object used in CopyFrom* tests
 func copyFromTerraformObject(t *testing.T) types.Object {
+	t.Helper()
+
 	s, d := GenSchemaTest(context.Background())
 
 	require.False(t, d.HasError())
@@ -112,343 +115,501 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 	obj, ok := typ.(types.ObjectType)
 	require.True(t, ok)
 
-	return types.Object{
-		Null:    false,
-		Unknown: false,
-		Attrs: map[string]attr.Value{
-			"str":    types.String{Value: "Test"},
-			"int32":  types.Int64{Value: 98},
-			"int64":  types.Int64{Value: 99},
-			"float":  types.Float64{Value: 0.75},
-			"double": types.Float64{Value: 0.76},
-			"bool":   types.Bool{Value: true},
-			"bytes":  types.String{Value: "Test"},
-
-			"timestamp":                         TimeValue{Value: timestamp},
-			"timestamp_missing":                 TimeValue{Unknown: true},
-			"timestamp_nullable":                TimeValue{Value: timestamp},
-			"timestamp_nullable_with_nil_value": TimeValue{Null: true},
-			"duration_standard":                 DurationValue{Value: duration},
-			"duration_standard_missing":         DurationValue{Unknown: true},
-			"duration_custom":                   DurationValue{Value: duration},
-			"duration_custom_missing":           DurationValue{Unknown: true},
-
-			"string_list": types.List{
-				Elems: []attr.Value{types.String{Value: "el1"}, types.String{Value: "el2"}},
-			},
-			"string_list_empty": types.List{Null: false},
-			"bytes_list": types.List{
-				Elems: []attr.Value{types.String{Value: "bytes1"}, types.String{Value: "bytes2"}},
-			},
-
-			"timestamp_list": types.List{
-				Elems: []attr.Value{TimeValue{Value: timestamp}, TimeValue{Value: timestamp}},
-			},
-			"duration_custom_list": types.List{
-				Elems: []attr.Value{DurationValue{Value: duration}, DurationValue{Value: duration}},
-			},
-
-			"bool_custom_list": types.List{
-				Elems: []attr.Value{types.Bool{Value: true}, types.Bool{Value: false}, types.Bool{Value: true}},
-			},
-
-			"nested": types.Object{
-				Attrs: map[string]attr.Value{
-					"str": types.String{Value: "Test"},
-					"map": types.Map{
-						Elems: map[string]attr.Value{
-							"key1": types.String{Value: "Value1"},
-							"key2": types.String{Value: "Value2"},
-						},
-					},
-					"nested_list": types.List{Null: true},
-					"map_object_nested": types.Map{
-						Elems: map[string]attr.Value{
-							"key1": types.Object{
-								Attrs: map[string]attr.Value{
-									"str":         types.String{Value: "Test1"},
-									"nested_list": types.List{Null: true},
-									"map":         types.Map{Null: true},
-								},
-							},
-							"key2": types.Object{
-								Attrs: map[string]attr.Value{
-									"str":         types.String{Value: "Test2"},
-									"nested_list": types.List{Null: true},
-									"map":         types.Map{Null: true},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			"nested_nullable": types.Object{
-				Attrs: map[string]attr.Value{
-					"str": types.String{Value: "Test"},
-					"map": types.Map{
-						Elems: map[string]attr.Value{
-							"key1": types.String{Value: "Value1"},
-							"key2": types.String{Value: "Value2"},
-						},
-					},
-					"nested_list": types.List{Null: true},
-					"map_object_nested": types.Map{
-						Elems: map[string]attr.Value{
-							"key1": types.Object{
-								Attrs: map[string]attr.Value{
-									"str":         types.String{Value: "Test1"},
-									"nested_list": types.List{Null: true},
-									"map":         types.Map{Null: true},
-								},
-							},
-							"key2": types.Object{
-								Attrs: map[string]attr.Value{
-									"str":         types.String{Value: "Test2"},
-									"nested_list": types.List{Null: true},
-									"map":         types.Map{Null: true},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			"nested_nullable_with_nil_value": types.Object{Null: true},
-
-			"nested_list": types.List{
-				Elems: []attr.Value{
-					types.Object{
-						Attrs: map[string]attr.Value{
-							"str": types.String{Value: "Test"},
-							"nested_list": types.List{
-								Elems: []attr.Value{
-									types.Object{
-										Attrs: map[string]attr.Value{
-											"str": types.String{Value: "Test1"},
-										},
-									},
-									types.Object{
-										Attrs: map[string]attr.Value{
-											"str": types.String{Value: "Test2"},
-										},
-									},
-								},
-							},
-							"map": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.String{Value: "Value1"},
-									"key2": types.String{Value: "Value2"},
-								},
-							},
-							"map_object_nested": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test1"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-									"key2": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test2"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			"nested_list_nullable": types.List{
-				Elems: []attr.Value{
-					types.Object{
-						Attrs: map[string]attr.Value{
-							"str":         types.String{Value: "Test"},
-							"nested_list": types.List{Null: true},
-							"map":         types.Map{Null: true},
-							"map_object_nested": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test1"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-									"key2": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test2"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			"map": types.Map{
-				Elems: map[string]attr.Value{
-					"key1": types.String{Value: "Value1"},
-					"key2": types.String{Value: "Value2"},
-				},
-			},
-
-			"map_object": types.Map{
-				Elems: map[string]attr.Value{
-					"key1": types.Object{
-						Attrs: map[string]attr.Value{
-							"str":         types.String{Value: "Test1"},
-							"nested_list": types.List{Null: true},
-							"map":         types.Map{Null: true},
-							"map_object_nested": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test1"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-									"key2": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test2"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-								},
-							},
-						},
-					},
-					"key2": types.Object{
-						Attrs: map[string]attr.Value{
-							"str":         types.String{Value: "Test2"},
-							"nested_list": types.List{Null: true},
-							"map":         types.Map{Null: true},
-							"map_object_nested": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test1"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-									"key2": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test2"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-
-			"map_object_nullable": types.Map{
-				Elems: map[string]attr.Value{
-					"key1": types.Object{
-						Attrs: map[string]attr.Value{
-							"str":         types.String{Value: "Test1"},
-							"nested_list": types.List{Null: true},
-							"map":         types.Map{Null: true},
-							"map_object_nested": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test1"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-									"key2": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test2"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-								},
-							},
-						},
-					},
-					"key2": types.Object{
-						Attrs: map[string]attr.Value{
-							"str":         types.String{Value: "Test2"},
-							"nested_list": types.List{Null: true},
-							"map":         types.Map{Null: true},
-							"map_object_nested": types.Map{
-								Elems: map[string]attr.Value{
-									"key1": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test1"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-									"key2": types.Object{
-										Attrs: map[string]attr.Value{
-											"str":         types.String{Value: "Test2"},
-											"nested_list": types.List{Null: true},
-											"map":         types.Map{Null: true},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			"mode":                 types.Int64{Value: 1},
-			"branch1":              types.Object{Null: true},
-			"branch2":              types.Object{Null: true},
-			"branch3":              types.String{Null: true},
-			"empty_message_branch": types.Object{Null: true},
-			"string_branch":        types.String{Null: true},
-			"embedded_string":      types.String{Value: "embdtest1"},
-			"embedded_nested_field": types.Object{
-				Attrs: map[string]attr.Value{
-					"embedded_nested_string": types.String{Value: "embdtest2"},
-				},
-			},
-			"max_age": DurationValue{Value: duration},
-			"string_override": types.List{Elems: []attr.Value{
-				types.String{Value: "a"},
-				types.String{Value: "b"},
-				types.String{Value: "c"},
-			}},
-			"foo": types.String{Null: true},
-			"bar": types.String{Value: "ham"},
-		},
-		AttrTypes: obj.AttrTypes,
+	must := func(v any, d diag.Diagnostics) attr.Value {
+		t.Helper()
+		requireNoDiagErrors(t, d)
+		return v.(attr.Value)
 	}
+
+	attrs := map[string]attr.Value{
+		"id":     types.StringNull(), // TODO
+		"str":    types.StringValue("Test"),
+		"int32":  types.Int64Value(98),
+		"int64":  types.Int64Value(99),
+		"float":  types.Float64Value(0.75),
+		"double": types.Float64Value(0.76),
+		"bool":   types.BoolValue(true),
+		"bytes":  types.StringValue("Test"),
+
+		"timestamp":                         ValueTime(timestamp),
+		"timestamp_missing":                 TimeValue{Unknown: true, Format: time.RFC3339},
+		"timestamp_nullable":                ValueTime(timestamp),
+		"timestamp_nullable_with_nil_value": NullTime(),
+		"duration_standard":                 ValueDuration(duration),
+		"duration_standard_missing":         DurationValue{Unknown: true},
+		"duration_custom":                   ValueDuration(duration),
+		"duration_custom_missing":           DurationValue{Unknown: true},
+
+		"string_list": must(types.ListValue(
+			types.StringType,
+			[]attr.Value{types.StringValue("el1"), types.StringValue("el2")},
+		)),
+		"string_list_empty": must(types.ListValue(types.StringType, []attr.Value{})),
+		"bytes_list": must(types.ListValue(
+			types.StringType,
+			[]attr.Value{types.StringValue("bytes1"), types.StringValue("bytes2")},
+		)),
+
+		"timestamp_list": must(types.ListValue(
+			UseRFC3339Time(),
+			[]attr.Value{ValueTime(timestamp), ValueTime(timestamp)},
+		)),
+		"duration_custom_list": must(types.ListValue(
+			DurationType{},
+			[]attr.Value{DurationValue{Value: duration}, DurationValue{Value: duration}},
+		)),
+
+		"bool_custom_list": must(types.ListValue(
+			types.BoolType,
+			[]attr.Value{types.BoolValue(true), types.BoolValue(false), types.BoolValue(true)},
+		)),
+
+		"nested": must(types.ObjectValue(
+			obj.AttrTypes["nested"].(types.ObjectType).AttrTypes,
+			map[string]attr.Value{
+				"str": types.StringValue("Test"),
+				"map": must(types.MapValue(types.StringType, map[string]attr.Value{
+					"key1": types.StringValue("Value1"),
+					"key2": types.StringValue("Value2"),
+				})),
+				"nested_list": types.ListNull(
+					obj.AttrTypes["nested"].(types.ObjectType).
+						AttrTypes["nested_list"].(types.ListType).
+						ElemType,
+				),
+				"map_object_nested": must(types.MapValue(
+					obj.AttrTypes["nested"].(types.ObjectType).
+						AttrTypes["map_object_nested"].(types.MapType).
+						ElemType,
+					map[string]attr.Value{
+						"key1": must(types.ObjectValue(
+							obj.AttrTypes["nested"].(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes,
+							map[string]attr.Value{
+								"str": types.StringValue("Test1"),
+							},
+						)),
+						"key2": must(types.ObjectValue(
+							obj.AttrTypes["nested"].(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes,
+							map[string]attr.Value{
+								"str": types.StringValue("Test2"),
+							},
+						)),
+					},
+				)),
+			},
+		)),
+
+		"nested_nullable": must(types.ObjectValue(
+			obj.AttrTypes["nested_nullable"].(types.ObjectType).AttrTypes,
+			map[string]attr.Value{
+				"str": types.StringValue("Test"),
+				"map": must(types.MapValue(types.StringType, map[string]attr.Value{
+					"key1": types.StringValue("Value1"),
+					"key2": types.StringValue("Value2"),
+				})),
+				"nested_list": types.ListNull(
+					obj.AttrTypes["nested_nullable"].(types.ObjectType).
+						AttrTypes["nested_list"].(types.ListType).
+						ElemType,
+				),
+				"map_object_nested": must(types.MapValue(
+					obj.AttrTypes["nested_nullable"].(types.ObjectType).
+						AttrTypes["map_object_nested"].(types.MapType).
+						ElemType,
+					map[string]attr.Value{
+						"key1": must(types.ObjectValue(
+							obj.AttrTypes["nested_nullable"].(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes,
+							map[string]attr.Value{
+								"str": types.StringValue("Test1"),
+							},
+						)),
+						"key2": must(types.ObjectValue(
+							obj.AttrTypes["nested_nullable"].(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes,
+							map[string]attr.Value{
+								"str": types.StringValue("Test2"),
+							},
+						)),
+					},
+				)),
+			},
+		)),
+
+		"nested_list": must(types.ListValue(
+			obj.AttrTypes["nested_list"].(types.ListType).ElemType,
+			[]attr.Value{
+				must(types.ObjectValue(
+					obj.AttrTypes["nested_list"].(types.ListType).
+						ElemType.(types.ObjectType).
+						AttrTypes,
+					map[string]attr.Value{
+						"str": types.StringValue("Test"),
+						"nested_list": must(types.ListValue(
+							obj.AttrTypes["nested_list"].(types.ListType).
+								ElemType.(types.ObjectType).
+								AttrTypes["nested_list"].(types.ListType).
+								ElemType,
+							[]attr.Value{
+								must(types.ObjectValue(
+									obj.AttrTypes["nested_list"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes["nested_list"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								must(types.ObjectValue(
+									obj.AttrTypes["nested_list"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes["nested_list"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+						"map": must(types.MapValue(types.StringType, map[string]attr.Value{
+							"key1": types.StringValue("Value1"),
+							"key2": types.StringValue("Value2"),
+						})),
+						"map_object_nested": must(types.MapValue(
+							obj.AttrTypes["nested_list"].(types.ListType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType,
+							map[string]attr.Value{
+								"key1": must(types.ObjectValue(
+									obj.AttrTypes["nested_list"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								"key2": must(types.ObjectValue(
+									obj.AttrTypes["nested_list"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+					},
+				)),
+			},
+		)),
+
+		"nested_list_nullable": must(types.ListValue(
+			obj.AttrTypes["nested_list_nullable"].(types.ListType).ElemType,
+			[]attr.Value{
+				must(types.ObjectValue(
+					obj.AttrTypes["nested_list_nullable"].(types.ListType).
+						ElemType.(types.ObjectType).
+						AttrTypes,
+					map[string]attr.Value{
+						"str": types.StringValue("Test"),
+						"nested_list": types.ListNull(
+							obj.AttrTypes["nested_list_nullable"].(types.ListType).
+								ElemType.(types.ObjectType).
+								AttrTypes["nested_list"].(types.ListType).
+								ElemType,
+						),
+						"map": types.MapNull(
+							obj.AttrTypes["nested_list_nullable"].(types.ListType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map"].(types.MapType).
+								ElemType,
+						),
+						"map_object_nested": must(types.MapValue(
+							obj.AttrTypes["nested_list_nullable"].(types.ListType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType,
+							map[string]attr.Value{
+								"key1": must(types.ObjectValue(
+									obj.AttrTypes["nested_list_nullable"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								"key2": must(types.ObjectValue(
+									obj.AttrTypes["nested_list_nullable"].(types.ListType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+					},
+				)),
+			},
+		)),
+
+		"map_object": must(types.MapValue(
+			obj.AttrTypes["map_object"].(types.MapType).ElemType,
+			map[string]attr.Value{
+				"key1": must(types.ObjectValue(
+					obj.AttrTypes["map_object"].(types.MapType).
+						ElemType.(types.ObjectType).
+						AttrTypes,
+					map[string]attr.Value{
+						"str": types.StringValue("Test1"),
+						"nested_list": types.ListNull(
+							obj.AttrTypes["map_object"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["nested_list"].(types.ListType).
+								ElemType,
+						),
+						"map": types.MapNull(
+							obj.AttrTypes["map_object"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map"].(types.MapType).
+								ElemType,
+						),
+						"map_object_nested": must(types.MapValue(
+							obj.AttrTypes["map_object"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType,
+							map[string]attr.Value{
+								"key1": must(types.ObjectValue(
+									obj.AttrTypes["map_object"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								"key2": must(types.ObjectValue(
+									obj.AttrTypes["map_object"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+					},
+				)),
+				"key2": must(types.ObjectValue(
+					obj.AttrTypes["map_object"].(types.MapType).
+						ElemType.(types.ObjectType).
+						AttrTypes,
+					map[string]attr.Value{
+						"str": types.StringValue("Test2"),
+						"nested_list": types.ListNull(
+							obj.AttrTypes["map_object"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["nested_list"].(types.ListType).
+								ElemType,
+						),
+						"map": types.MapNull(
+							obj.AttrTypes["map_object"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map"].(types.MapType).
+								ElemType,
+						),
+						"map_object_nested": must(types.MapValue(
+							obj.AttrTypes["map_object"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType,
+							map[string]attr.Value{
+								"key1": must(types.ObjectValue(
+									obj.AttrTypes["map_object"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								"key2": must(types.ObjectValue(
+									obj.AttrTypes["map_object"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+					},
+				)),
+			},
+		)),
+
+		"map_object_nullable": must(types.MapValue(
+			obj.AttrTypes["map_object_nullable"].(types.MapType).ElemType,
+			map[string]attr.Value{
+				"key1": must(types.ObjectValue(
+					obj.AttrTypes["map_object_nullable"].(types.MapType).
+						ElemType.(types.ObjectType).
+						AttrTypes,
+					map[string]attr.Value{
+						"str": types.StringValue("Test1"),
+						"nested_list": types.ListNull(
+							obj.AttrTypes["map_object_nullable"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["nested_list"].(types.ListType).
+								ElemType,
+						),
+						"map": types.MapNull(
+							obj.AttrTypes["map_object_nullable"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map"].(types.MapType).
+								ElemType,
+						),
+						"map_object_nested": must(types.MapValue(
+							obj.AttrTypes["map_object_nullable"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType,
+							map[string]attr.Value{
+								"key1": must(types.ObjectValue(
+									obj.AttrTypes["map_object_nullable"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								"key2": must(types.ObjectValue(
+									obj.AttrTypes["map_object_nullable"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+					},
+				)),
+				"key2": must(types.ObjectValue(
+					obj.AttrTypes["map_object_nullable"].(types.MapType).
+						ElemType.(types.ObjectType).
+						AttrTypes,
+					map[string]attr.Value{
+						"str": types.StringValue("Test2"),
+						"nested_list": types.ListNull(
+							obj.AttrTypes["map_object_nullable"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["nested_list"].(types.ListType).
+								ElemType,
+						),
+						"map": types.MapNull(
+							obj.AttrTypes["map_object_nullable"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map"].(types.MapType).
+								ElemType,
+						),
+						"map_object_nested": must(types.MapValue(
+							obj.AttrTypes["map_object_nullable"].(types.MapType).
+								ElemType.(types.ObjectType).
+								AttrTypes["map_object_nested"].(types.MapType).
+								ElemType,
+							map[string]attr.Value{
+								"key1": must(types.ObjectValue(
+									obj.AttrTypes["map_object_nullable"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test1"),
+									},
+								)),
+								"key2": must(types.ObjectValue(
+									obj.AttrTypes["map_object_nullable"].(types.MapType).
+										ElemType.(types.ObjectType).
+										AttrTypes["map_object_nested"].(types.MapType).
+										ElemType.(types.ObjectType).AttrTypes,
+									map[string]attr.Value{
+										"str": types.StringValue("Test2"),
+									},
+								)),
+							},
+						)),
+					},
+				)),
+			},
+		)),
+
+		"nested_nullable_with_nil_value": types.ObjectNull(
+			obj.AttrTypes["nested_nullable_with_nil_value"].(types.ObjectType).AttrTypes,
+		),
+
+		"map": must(types.MapValue(types.StringType, map[string]attr.Value{
+			"key1": types.StringValue("Value1"),
+			"key2": types.StringValue("Value2"),
+		})),
+
+		"mode":                 types.Int64Value(1),
+		"branch1":              types.ObjectNull(obj.AttrTypes["branch1"].(types.ObjectType).AttrTypes),
+		"branch2":              types.ObjectNull(obj.AttrTypes["branch2"].(types.ObjectType).AttrTypes),
+		"branch3":              types.StringNull(),
+		"empty_message_branch": types.ObjectNull(obj.AttrTypes["empty_message_branch"].(types.ObjectType).AttrTypes),
+		"string_branch":        types.StringNull(),
+		"embedded_string":      types.StringValue("embdtest1"),
+		"embedded_nested_field": must(types.ObjectValue(
+			obj.AttrTypes["embedded_nested_field"].(types.ObjectType).AttrTypes,
+			map[string]attr.Value{
+				"embedded_nested_string": types.StringValue("embdtest2"),
+			},
+		)),
+		"max_age": DurationValue{Value: duration},
+		"string_override": must(types.ListValue(types.StringType, []attr.Value{
+			types.StringValue("a"),
+			types.StringValue("b"),
+			types.StringValue("c"),
+		})),
+		"foo": types.StringNull(),
+		"bar": types.StringValue("ham"),
+	}
+	result, diags := types.ObjectValue(obj.AttrTypes, attrs)
+	requireNoDiagErrors(t, diags)
+	return result
 }
 
-// copyToTerraformObject returns the base object used in CopyTo* tests
-func copyToTerraformObject(t *testing.T) types.Object {
-	s, d := GenSchemaTest(context.Background())
-
-	require.False(t, d.HasError())
-	typ := s.Type()
-
-	obj, ok := typ.(types.ObjectType)
-	require.True(t, ok)
-
-	return types.Object{
-		Unknown:   false,
-		Null:      false,
-		Attrs:     make(map[string]attr.Value),
-		AttrTypes: obj.AttrTypes,
-	}
+func emptyObject() *types.Object {
+	o, _ := types.ObjectValue(
+		map[string]attr.Type{"id": types.StringType},
+		map[string]attr.Value{"id": types.StringNull()},
+	)
+	return &o
 }

@@ -30,23 +30,30 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, cfg.TimeType, &SchemaType{
 		Type:            "TimeType",
 		ValueType:       "TimeValue",
+		ValueFromMethod: "ValueTime",
+		ValueToMethod:   "ValueTime",
+		NullValueMethod: "NullTime",
 		CastToType:      "time.Time",
 		CastFromType:    "time.Time",
 		TypeConstructor: "UseRFC3339Time()",
 	})
 
 	require.Equal(t, cfg.DurationType, &SchemaType{
-		Type:         "DurationType",
-		ValueType:    "DurationValue",
-		CastToType:   "time.Duration",
-		CastFromType: "time.Duration",
+		Type:            "DurationType",
+		ValueType:       "DurationValue",
+		ValueFromMethod: "ValueDuration",
+		ValueToMethod:   "ValueDuration",
+		NullValueMethod: "NullDuration",
+		CastToType:      "time.Duration",
+		CastFromType:    "time.Duration",
 	})
 
 	require.Equal(t, cfg.InjectedFields, map[string][]InjectedField{
 		"Test": {{
-			Name:     "id",
-			Type:     "github.com/hashicorp/terraform-plugin-framework/types.StringType",
-			Computed: true,
+			Name:        "id",
+			Type:        "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			Computed:    true,
+			ValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
 		}},
 	})
 

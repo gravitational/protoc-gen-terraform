@@ -57,6 +57,13 @@ type SchemaType struct {
 	Type string `yaml:"type,omitempty"`
 	// ValueType is a Go attr.Value struct name
 	ValueType string `yaml:"value_type,omitempty"`
+	// ValueFromMethod is the method on attr.Value that will be called to get
+	// the underlying value
+	ValueFromMethod string `yaml:"value_from_method,omitempty"`
+	// ValueToMethod is the method that will be called to create the attr.Value
+	ValueToMethod string `yaml:"value_to_method,omitempty"`
+	// NullValueMethod is the method that will be called to create a null attr.Value
+	NullValueMethod string `yaml:"null_value_method,omitempty"`
 	// CastToType is a Go attr.Value .Value member type
 	CastToType string `yaml:"cast_to_type,omitempty"`
 	// CastToType is a go type of the object field
@@ -81,6 +88,9 @@ type InjectedField struct {
 	PlanModifiers []string `yaml:"plan_modifiers,omitempty"`
 	// PlanModifiers is the array of Validators
 	Validators []string `yaml:"validators,omitempty"`
+	// ValueMethod is the method that will be called to construct a placeholder
+	// value for the field in Copy*ToTerraform methods
+	ValueMethod string `yaml:"value_method,omitempty"`
 }
 
 // Config represents the plugin config
