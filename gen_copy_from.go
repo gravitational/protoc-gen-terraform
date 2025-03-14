@@ -101,8 +101,8 @@ func (f *FieldCopyFromGenerator) errAttrConversionFailure(path string, typ strin
 // nextField reads current field value from Terraform object and asserts it's type against expected
 func (f *FieldCopyFromGenerator) nextField(g func(g *j.Group)) *j.Statement {
 	return j.Block(
-		// a, ok := ft.Attrs["key"]
-		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attrs").Index(j.Lit(f.NameSnake)),
+		// a, ok := ft.Attributes()["key"]
+		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)),
 		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag).Else().Block(
 			// v, ok := a.(types.Int64)
 			j.List(j.Id("v"), j.Id("ok")).Op(":=").Id("a").Assert(j.Id(f.i.WithType(f.ValueType))),
@@ -118,13 +118,25 @@ func (f *FieldCopyFromGenerator) genPrimitiveBody(g *j.Group) {
 	// var t float32 || *float32, acts as zero value if needed
 	g.Var().Id("t").Id(f.i.WithType(f.GoElemType))
 	// if !v.Null {
-	g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+	g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
+		val := j.Id("v." + f.ValueFromMethod).Call()
+
 		if !f.IsNullable {
-			// obj.Float = float32(v.Value)
-			g.Id("t").Op("=").Id(f.i.WithType(f.ValueCastFromType)).Parens(j.Id("v.Value"))
+			if f.ValueCastFromType == "" {
+				// obj.Float = v.ValueFloat64()
+				g.Id("t").Op("=").Add(val)
+			} else {
+				// obj.Float = float32(v.ValueFloat64())
+				g.Id("t").Op("=").Id(f.i.WithType(f.ValueCastFromType)).Parens(val)
+			}
 		} else {
-			// c := float32(v.Value)
-			g.Id("c").Op(":=").Id(f.i.WithType(f.ValueCastFromType)).Parens(j.Id("v.Value"))
+			if f.ValueCastFromType == "" {
+				// c := v.ValueFloat64()
+				g.Id("c").Op(":=").Add(val)
+			} else {
+				// c := float32(v.ValueFloat64())
+				g.Id("c").Op(":=").Id(f.i.WithType(f.ValueCastFromType)).Parens(val)
+			}
 			// obj.Float = &c
 			g.Id("t").Op("=&").Id("c")
 		}
@@ -135,13 +147,13 @@ func (f *FieldCopyFromGenerator) genPrimitiveBody(g *j.Group) {
 func (f *FieldCopyFromGenerator) genListOrMapIterator(g *j.Group, typ *j.Statement, els func(g *j.Group)) {
 	objFieldName := "obj." + f.Name
 
-	// obj.List = make([]string, len(v.Elems)) - same for maps
-	g.Id(objFieldName).Op("=").Make(j.Id(f.i.WithType(f.GoType)), j.Len(j.Id("v.Elems")))
+	// obj.List = make([]string, len(v.Elements())) - same for maps
+	g.Id(objFieldName).Op("=").Make(j.Id(f.i.WithType(f.GoType)), j.Len(j.Id("v.Elements").Call()))
 
 	// if !v.Null
-	g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
-		// for k, el := range v.Elems - where k is either index or map key
-		g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id("v.Elems").BlockFunc(func(g *j.Group) {
+	g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
+		// for k, el := range v.Elements() - where k is either index or map key
+		g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id("v.Elements").Call().BlockFunc(func(g *j.Group) {
 			// v, ok := a.(types.String)
 			g.List(j.Id("v"), j.Id("ok")).Op(":=").Id("a").Assert(typ)
 			g.If(j.Id("!ok")).BlockFunc(
@@ -158,7 +170,7 @@ func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 
 		if f.OneOfName != "" {
 			// Do not set empty oneOf value to not override values possibly set by other branches
-			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
 					j.Id(f.Name): j.Id("t"),
 				})
@@ -168,7 +180,7 @@ func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 
 		if f.ParentIsOptionalEmbed {
 			// If the current value is Null or Unknown, we should not set the parent field, otherwise we will get the default values for all the inner fields.
-			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
 					j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("=").Id("&" + f.ParentIsOptionalEmbedFullType + "{}"),
 				)
@@ -196,7 +208,7 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 				g.Id(objFieldName).Op("=").Id(f.i.WithType(f.GoElemType)).Values()
 			}
 			// if !v.Null
-			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				if !m.IsEmpty {
 					// tf := v
 					g.Id("tf").Op(":=").Id("v")
@@ -217,7 +229,7 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 		} else {
 			// We do not need nullable checks because all oneOf branches are nullable by design
 			// We do not need to assign OneOf explicitly to not overrite other OneOf branch values
-			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				g.Id("b").Op(":=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
 
 				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
@@ -271,7 +283,7 @@ func (f *FieldCopyFromGenerator) genObjectListOrMap() *j.Statement {
 			// var t Nested || *Nested
 			g.Var().Id("t").Id(f.i.WithType(f.GoElemType))
 
-			g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				// tf := v
 				g.Id("tf").Op(":=").Id("v")
 
@@ -296,8 +308,8 @@ func (f *FieldCopyFromGenerator) genObjectListOrMap() *j.Statement {
 // genCustom generates statement representing custom type
 func (f *FieldCopyFromGenerator) genCustom() *j.Statement {
 	return j.Block(
-		// a, ok := ft.Attrs["key"]
-		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attrs").Index(j.Lit(f.NameSnake)),
+		// a, ok := ft.Attributes()["key"]
+		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)),
 		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag),
 		j.Id("CopyFrom"+f.Suffix).Params(j.Id("diags"), j.Id("a"), j.Id("&obj."+f.Name)),
 	)

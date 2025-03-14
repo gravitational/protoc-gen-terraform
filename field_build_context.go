@@ -29,47 +29,55 @@ import (
 
 var (
 	float64Type = TerraformType{
-		Type:             Types + ".Float64Type",
-		ValueType:        Types + ".Float64",
-		ElemType:         Types + ".Float64Type",
-		ElemValueType:    Types + ".Float64",
-		ValueCastToType:  "float64",
-		ZeroValue:        "0",
-		IsTypeScalar:     true,
-		IsElemTypeScalar: true,
+		Type:            Types + ".Float64Type",
+		ValueType:       Types + ".Float64",
+		ValueFromMethod: "ValueFloat64",
+		ValueToMethod:   Types + ".Float64Value",
+		NullValueMethod: Types + ".Float64Null",
+		ElemType:        Types + ".Float64Type",
+		ElemValueType:   Types + ".Float64",
+		ValueCastToType: "float64",
+		ZeroValue:       "0",
+		IsTypeScalar:    true,
 	}
 
 	int64Type = TerraformType{
-		Type:             Types + ".Int64Type",
-		ValueType:        Types + ".Int64",
-		ElemType:         Types + ".Int64Type",
-		ElemValueType:    Types + ".Int64",
-		ValueCastToType:  "int64",
-		ZeroValue:        "0",
-		IsTypeScalar:     true,
-		IsElemTypeScalar: true,
+		Type:            Types + ".Int64Type",
+		ValueType:       Types + ".Int64",
+		ValueFromMethod: "ValueInt64",
+		ValueToMethod:   Types + ".Int64Value",
+		NullValueMethod: Types + ".Int64Null",
+		ElemType:        Types + ".Int64Type",
+		ElemValueType:   Types + ".Int64",
+		ValueCastToType: "int64",
+		ZeroValue:       "0",
+		IsTypeScalar:    true,
 	}
 
 	stringType = TerraformType{
-		Type:             Types + ".StringType",
-		ValueType:        Types + ".String",
-		ElemType:         Types + ".StringType",
-		ElemValueType:    Types + ".String",
-		ValueCastToType:  "string",
-		ZeroValue:        `""`,
-		IsTypeScalar:     true,
-		IsElemTypeScalar: true,
+		Type:            Types + ".StringType",
+		ValueType:       Types + ".String",
+		ValueFromMethod: "ValueString",
+		ValueToMethod:   Types + ".StringValue",
+		NullValueMethod: Types + ".StringNull",
+		ElemType:        Types + ".StringType",
+		ElemValueType:   Types + ".String",
+		ValueCastToType: "string",
+		ZeroValue:       `""`,
+		IsTypeScalar:    true,
 	}
 
 	boolType = TerraformType{
-		Type:             Types + ".BoolType",
-		ValueType:        Types + ".Bool",
-		ElemType:         Types + ".BoolType",
-		ElemValueType:    Types + ".Bool",
-		ValueCastToType:  "bool",
-		ZeroValue:        "false",
-		IsTypeScalar:     true,
-		IsElemTypeScalar: true,
+		Type:            Types + ".BoolType",
+		ValueType:       Types + ".Bool",
+		ValueFromMethod: "ValueBool",
+		ValueToMethod:   Types + ".BoolValue",
+		NullValueMethod: Types + ".BoolNull",
+		ElemType:        Types + ".BoolType",
+		ElemValueType:   Types + ".Bool",
+		ValueCastToType: "bool",
+		ZeroValue:       "false",
+		IsTypeScalar:    true,
 	}
 
 	objectType = TerraformType{
@@ -200,6 +208,9 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t = TerraformType{
 			Type:              c.config.TimeType.Type,
 			ValueType:         c.config.TimeType.ValueType,
+			ValueFromMethod:   c.config.TimeType.ValueFromMethod,
+			ValueToMethod:     c.config.TimeType.ValueToMethod,
+			NullValueMethod:   c.config.TimeType.NullValueMethod,
 			ElemType:          c.config.TimeType.Type,
 			ElemValueType:     c.config.TimeType.ValueType,
 			ValueCastToType:   c.config.TimeType.CastToType,
@@ -213,6 +224,9 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t = TerraformType{
 			Type:              c.config.DurationType.Type,
 			ValueType:         c.config.DurationType.ValueType,
+			ValueFromMethod:   c.config.DurationType.ValueFromMethod,
+			ValueToMethod:     c.config.DurationType.ValueToMethod,
+			NullValueMethod:   c.config.DurationType.NullValueMethod,
 			ElemType:          c.config.DurationType.Type,
 			ElemValueType:     c.config.DurationType.ValueType,
 			ValueCastToType:   c.config.DurationType.CastToType,
@@ -221,13 +235,11 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
-		t.ValueCastFromType = "float64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_FLOAT) || gogoproto.IsStdFloat(p):
 		t = float64Type
 		t.ValueCastFromType = "float32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_INT64) || gogoproto.IsStdInt64(p):
 		t = int64Type
-		t.ValueCastFromType = "int64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_UINT64) || gogoproto.IsStdUInt64(p):
 		t = int64Type
 		t.ValueCastFromType = "uint64"
@@ -248,19 +260,15 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueCastFromType = "int32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SFIXED64):
 		t = int64Type
-		t.ValueCastFromType = "int64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT32):
 		t = int64Type
 		t.ValueCastFromType = "int32"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_SINT64):
 		t = int64Type
-		t.ValueCastFromType = "int64"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_BOOL) || gogoproto.IsStdBool(p):
 		t = boolType
-		t.ValueCastFromType = "bool"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_STRING) || gogoproto.IsStdString(p):
 		t = stringType
-		t.ValueCastFromType = "string"
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_BYTES) || gogoproto.IsStdBytes(p):
 		t = stringType
 		t.ValueCastFromType = "[]byte"
@@ -442,7 +450,7 @@ func (c *FieldBuildContext) GetPlanModifiers() []string {
 	}
 
 	if c.config.UseStateForUnknownByDefault && c.IsComputed() {
-		return []string{"github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"}
+		return []string{"github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"}
 	}
 
 	return []string{}

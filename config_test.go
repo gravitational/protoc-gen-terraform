@@ -24,29 +24,36 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, cfg.Suffixes, map[string]string{"BoolCustom": "BoolSpecial"})
 	require.Equal(t, cfg.NameOverrides, map[string]string{"Test.Str": "str"})
 
-	require.Equal(t, cfg.PlanModifiers, map[string][]string{"Test.Str": {"github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"}})
+	require.Equal(t, cfg.PlanModifiers, map[string][]string{"Test.Str": {"github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"}})
 	require.Equal(t, cfg.Validators, map[string][]string{"Test.Str": {"UseMockValidator()"}})
 
 	require.Equal(t, cfg.TimeType, &SchemaType{
 		Type:            "TimeType",
 		ValueType:       "TimeValue",
+		ValueFromMethod: "ValueTime",
+		ValueToMethod:   "ValueTime",
+		NullValueMethod: "NullTime",
 		CastToType:      "time.Time",
 		CastFromType:    "time.Time",
 		TypeConstructor: "UseRFC3339Time()",
 	})
 
 	require.Equal(t, cfg.DurationType, &SchemaType{
-		Type:         "DurationType",
-		ValueType:    "DurationValue",
-		CastToType:   "time.Duration",
-		CastFromType: "time.Duration",
+		Type:            "DurationType",
+		ValueType:       "DurationValue",
+		ValueFromMethod: "ValueDuration",
+		ValueToMethod:   "ValueDuration",
+		NullValueMethod: "NullDuration",
+		CastToType:      "time.Duration",
+		CastFromType:    "time.Duration",
 	})
 
 	require.Equal(t, cfg.InjectedFields, map[string][]InjectedField{
 		"Test": {{
-			Name:     "id",
-			Type:     "github.com/hashicorp/terraform-plugin-framework/types.StringType",
-			Computed: true,
+			Name:        "id",
+			Type:        "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			Computed:    true,
+			ValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
 		}},
 	})
 

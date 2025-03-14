@@ -22,28 +22,34 @@ name_overrides:
   Test.Str: "str"
 
 time_type:
-  type: "TimeType"                # Struct name of attrs.Type
-  value_type: "TimeValue"         # Struct name of attrs.Value
-  cast_to_type: "time.Time"       # Go type of .Value
-  cast_from_type: "time.Time"     # Go type of an object field
+  type: "TimeType" # Struct name of attrs.Type
+  value_type: "TimeValue" # Struct name of attrs.Value
+  value_from_method: "ValueTime" # Method to get value from Terraform attribute
+  value_to_method: "ValueTime" # Method to construct Terraform attribute from value
+  null_value_method: "NullTime" # Method to get null value
+  cast_to_type: "time.Time" # Go type of .Value
+  cast_from_type: "time.Time" # Go type of an object field
   type_constructor: UseRFC3339Time()
 
 duration_type:
-  type: "DurationType"            # Struct name of attrs.Type
-  value_type: "DurationValue"     # Struct name of attrs.Value
-  cast_to_type: "time.Duration"   # Go type of .Value
+  type: "DurationType" # Struct name of attrs.Type
+  value_type: "DurationValue" # Struct name of attrs.Value
+  value_from_method: "ValueDuration" # Method to get value from Terraform attribute
+  value_to_method: "ValueDuration" # Method to construct Terraform attribute from value
+  null_value_method: "NullDuration" # Method to get null value
+  cast_to_type: "time.Duration" # Go type of .Value
   cast_from_type: "time.Duration" # Go type of an object field
 
 injected_fields:
   Test:
-    -
-      name: id
+    - name: id
       type: github.com/hashicorp/terraform-plugin-framework/types.StringType
       computed: true
+      value_method: github.com/hashicorp/terraform-plugin-framework/types.StringUnknown
 
 plan_modifiers:
   "Test.Str":
-    - github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()
+    - github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()
 
 validators:
   "Test.Str":
