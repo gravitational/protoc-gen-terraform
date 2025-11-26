@@ -143,3 +143,5 @@ func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.
 
 	return value
 }
+
+type OverrideCastType string

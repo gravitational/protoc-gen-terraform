@@ -423,6 +423,11 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Description: "NestedNullableWithNilValue nested message field, with no value set",
 			Optional:    true,
 		},
+		"schema_override": {
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"str": {
 			Computed:      true,
 			Description:   "Str string field",
@@ -2064,6 +2069,23 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						}
 					}
 				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["schema_override"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.SchemaOverride"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.SchemaOverride", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t OverrideCastType
+				if !v.Null && !v.Unknown {
+					t = OverrideCastType(v.Value)
+				}
+				obj.SchemaOverride = t
 			}
 		}
 	}
@@ -4931,6 +4953,28 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Unknown = false
 				tf.Attrs["nested_nullable_with_nil_value"] = v
 			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["schema_override"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.SchemaOverride"})
+		} else {
+			v, ok := tf.Attrs["schema_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.SchemaOverride", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.SchemaOverride", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.SchemaOverride) == ""
+			}
+			v.Value = string(obj.SchemaOverride)
+			v.Unknown = false
+			tf.Attrs["schema_override"] = v
 		}
 	}
 	{

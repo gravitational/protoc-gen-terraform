@@ -99,6 +99,8 @@ func createTestObj() *Test {
 				EmbeddedNestedString: "embdtest2",
 			},
 		},
+
+		SchemaOverride: "hello",
 	}
 }
 
@@ -428,8 +430,9 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 				types.String{Value: "b"},
 				types.String{Value: "c"},
 			}},
-			"foo": types.String{Null: true},
-			"bar": types.String{Value: "ham"},
+			"foo":             types.String{Null: true},
+			"bar":             types.String{Value: "ham"},
+			"schema_override": types.String{Value: "hello"},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

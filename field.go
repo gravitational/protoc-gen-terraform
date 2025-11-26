@@ -415,7 +415,8 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 
 		f.ElemType = f.Type
 		f.ElemValueType = f.ValueType
-		f.ValueCastFromType = f.ValueCastToType
+		f.GoType = f.ValueCastFromType
+		f.GoElemType = f.ValueCastFromType
 	}
 }
 
