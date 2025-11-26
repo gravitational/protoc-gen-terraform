@@ -51,3 +51,10 @@ validators:
 
 custom_types:
   "Test.StringOverride": StringCustom
+
+schema_types:
+  "Test.SchemaOverride":
+    type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
+    value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
+    cast_to_type: "string"
+    cast_from_type: "OverrideCastType"
