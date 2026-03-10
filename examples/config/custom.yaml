@@ -9,25 +9,40 @@ types:
 
 injected_fields:
   Custom:
-    -
-      name: injected
+    - name: injected
       type: github.com/hashicorp/terraform-plugin-framework/types.StringType
       computed: true
 
 computed_fields:
   - Custom.id
   - Custom.computed
+  - Custom.plan_modifier
+
 exclude_fields:
   - Custom.excluded
+
 required_fields:
   - Custom.required
+
 sensitive_fields:
   - Custom.sensitive
+
+name_overrides:
+  Custom.name_override: "custom_name_override"
+
 suffixes:
   BoolCustom: BoolSpecial
 
 custom_types:
   "Custom.string_override": StringCustom
+
+validators:
+  "Custom.validated":
+    - UseMockValidator()
+
+plan_modifiers:
+  "Custom.plan_modifier":
+    - UseMockPlanModifier()
 
 schema_types:
   "Custom.schema_override":

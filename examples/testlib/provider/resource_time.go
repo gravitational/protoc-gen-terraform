@@ -35,7 +35,7 @@ type timeResource struct {
 
 func (r timeResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
 	var plan types.Object
-	resp.Diagnostics.Append(req.Config.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -83,7 +83,6 @@ func (r timeResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, r
 		return
 	}
 
-	// Read resource using 3rd party API.
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 

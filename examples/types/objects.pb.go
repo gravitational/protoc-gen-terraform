@@ -31,20 +31,31 @@ type Objects struct {
 	// int_map map of ints.
 	IntMap map[string]int64 `protobuf:"bytes,4,rep,name=int_map,json=intMap,proto3" json:"int_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
 	// bool_map map of bools.
-	BoolMap            map[string]bool    `protobuf:"bytes,5,rep,name=bool_map,json=boolMap,proto3" json:"bool_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
-	NestedValue        Nested             `protobuf:"bytes,6,opt,name=nested_value,json=nestedValue,proto3" json:"nested_value"`
-	NestedNullable     *Nested            `protobuf:"bytes,7,opt,name=nested_nullable,json=nestedNullable,proto3" json:"nested_nullable,omitempty"`
-	NestedList         []Nested           `protobuf:"bytes,8,rep,name=nested_list,json=nestedList,proto3" json:"nested_list"`
-	NestedNullableList []*Nested          `protobuf:"bytes,9,rep,name=nested_nullable_list,json=nestedNullableList,proto3" json:"nested_nullable_list,omitempty"`
-	NestedMap          map[string]Nested  `protobuf:"bytes,10,rep,name=nested_map,json=nestedMap,proto3" json:"nested_map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	NestedNullableMap  map[string]*Nested `protobuf:"bytes,11,rep,name=nested_nullable_map,json=nestedNullableMap,proto3" json:"nested_nullable_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Empty              *Empty             `protobuf:"bytes,12,opt,name=empty,proto3" json:"empty,omitempty"`
+	BoolMap map[string]bool `protobuf:"bytes,5,rep,name=bool_map,json=boolMap,proto3" json:"bool_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	// nested_value is a nested object.
+	NestedValue Nested `protobuf:"bytes,6,opt,name=nested_value,json=nestedValue,proto3" json:"nested_value"`
+	// nested_nullable is a nullable nested object.
+	NestedNullable *Nested `protobuf:"bytes,7,opt,name=nested_nullable,json=nestedNullable,proto3" json:"nested_nullable,omitempty"`
+	// nested_list is a list of nested objects.
+	NestedList []Nested `protobuf:"bytes,8,rep,name=nested_list,json=nestedList,proto3" json:"nested_list"`
+	// nested_nullable_list is a nullable list of nested objects.
+	NestedNullableList []*Nested `protobuf:"bytes,9,rep,name=nested_nullable_list,json=nestedNullableList,proto3" json:"nested_nullable_list,omitempty"`
+	// nested_map is a map of nested objects.
+	NestedMap map[string]Nested `protobuf:"bytes,10,rep,name=nested_map,json=nestedMap,proto3" json:"nested_map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// nested_map is a nullable map of nested objects.
+	NestedNullableMap map[string]*Nested `protobuf:"bytes,11,rep,name=nested_nullable_map,json=nestedNullableMap,proto3" json:"nested_nullable_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// empty is an empty field.
+	Empty *Empty `protobuf:"bytes,12,opt,name=empty,proto3" json:"empty,omitempty"`
+	// one_of is a oneof field.
+	//
 	// Types that are valid to be assigned to OneOf:
 	//
 	//	*Objects_Branch1
 	//	*Objects_Branch2
-	OneOf                isObjects_OneOf `protobuf_oneof:"one_of"`
-	Nested               `protobuf:"bytes,13,opt,name=embedded,proto3,embedded=embedded" json:"embedded"`
+	OneOf isObjects_OneOf `protobuf_oneof:"one_of"`
+	// embeded is an embedded field.
+	Nested `protobuf:"bytes,13,opt,name=embedded,proto3,embedded=embedded" json:"embedded"`
+	// embedded_nullable is a nullabled embedded field.
 	*Leaf                `protobuf:"bytes,14,opt,name=embedded_nullable,json=embeddedNullable,proto3,embedded=embedded_nullable" json:"embedded_nullable,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

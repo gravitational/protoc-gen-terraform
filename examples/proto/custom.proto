@@ -12,27 +12,42 @@ option (gogoproto.goproto_getters_all) = false;
 message Custom {
   string id = 1;
 
+  // excluded is an excluded field.
   string excluded = 2;
+
+  // computed is a computed field.
   string computed = 3;
+
+  // required is a required field.
   string required = 4;
+
+  // sensitive is a sensitive field.
   string sensitive = 5;
 
-  // TODO: bool_custom does not work as expected...
-  //
-  // bool_custom custom bool field
-  // bool bool_custom = 10 [ (gogoproto.customtype) = "BoolCustom" ];
+  // validated is a validated field.
+  string validated = 6;
 
-  // bool_custom_list custom bool list field
-  repeated bool bool_custom_list = 11 [ (gogoproto.customtype) = "BoolCustom" ];
+  // name_override is a field with a name override.
+  string name_override = 7;
+
+  // plan_modifier is a field with a plan modifier.
+  string plan_modifier = 8;
+
+  // TODO: bool_custom does not work as expected.
+  // bool_custom custom bool field.
+  // bool bool_custom = 9 [ (gogoproto.customtype) = "BoolCustom" ];
+
+  // bool_custom_list custom bool list field.
+  repeated bool bool_custom_list = 10 [ (gogoproto.customtype) = "BoolCustom" ];
 
   // string_override is represented by a single string in the go struct, but by
   // a list of strings in the Terraform Schema. The plugin's configuration
   // specifies a custom_type (StringCustom), the generator should use the
   // functions "GenSchemaStringCustom", "CopyFromStringCustom",
   // "CopyToStringCustom" instead of attempting to generate them.
-  string string_override = 12;
+  string string_override = 11;
 
-  string schema_override = 43 [
+  string schema_override = 12 [
     (gogoproto.jsontag) = "schema_override",
     (gogoproto.casttype) = "OverrideCastType"
   ];

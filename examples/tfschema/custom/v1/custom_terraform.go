@@ -42,15 +42,20 @@ var _ = math.Inf
 func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"bool_custom_list": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Description: "bool_custom_list custom bool list field",
+			Description: "bool_custom_list custom bool list field.",
 			Optional:    true,
 		}),
 		"computed": {
 			Computed:      true,
-			Description:   "",
+			Description:   "computed is a computed field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
+		"custom_name_override": {
+			Description: "name_override is a field with a name override.",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"id": {
 			Computed:      true,
@@ -65,8 +70,15 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Required: false,
 			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
+		"plan_modifier": {
+			Computed:      true,
+			Description:   "plan_modifier is a field with a plan modifier.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{UseMockPlanModifier()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"required": {
-			Description: "",
+			Description: "required is a required field.",
 			Required:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
@@ -76,7 +88,7 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"sensitive": {
-			Description: "",
+			Description: "sensitive is a sensitive field.",
 			Optional:    true,
 			Sensitive:   true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -85,6 +97,12 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Description: "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:    true,
 		}),
+		"validated": {
+			Description: "validated is a validated field.",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Validators:  []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
+		},
 	}}, nil
 }
 
@@ -129,6 +147,40 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 					t = string(v.Value)
 				}
 				obj.Id = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["custom_name_override"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Custom.name_override"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.NameOverride = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["plan_modifier"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Custom.plan_modifier"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.PlanModifier = t
 			}
 		}
 	}
@@ -189,6 +241,23 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			diags.Append(attrReadMissingDiag{"Custom.string_override"})
 		}
 		CopyFromStringCustom(diags, a, &obj.StringOverride)
+	}
+	{
+		a, ok := tf.Attrs["validated"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Custom.validated"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.Validated = t
+			}
+		}
 	}
 	return diags
 }
@@ -252,6 +321,50 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v.Value = string(obj.Id)
 			v.Unknown = false
 			tf.Attrs["id"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["custom_name_override"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Custom.name_override"})
+		} else {
+			v, ok := tf.Attrs["custom_name_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Custom.name_override", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.NameOverride) == ""
+			}
+			v.Value = string(obj.NameOverride)
+			v.Unknown = false
+			tf.Attrs["custom_name_override"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["plan_modifier"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Custom.plan_modifier"})
+		} else {
+			v, ok := tf.Attrs["plan_modifier"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Custom.plan_modifier", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.PlanModifier) == ""
+			}
+			v.Value = string(obj.PlanModifier)
+			v.Unknown = false
+			tf.Attrs["plan_modifier"] = v
 		}
 	}
 	{
@@ -327,6 +440,28 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attrs["string_override"])
 			tf.Attrs["string_override"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["validated"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Custom.validated"})
+		} else {
+			v, ok := tf.Attrs["validated"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Custom.validated", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.Validated) == ""
+			}
+			v.Value = string(obj.Validated)
+			v.Unknown = false
+			tf.Attrs["validated"] = v
 		}
 	}
 	return diags

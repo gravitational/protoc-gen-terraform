@@ -13,4 +13,7 @@ var (
 	GenSchemaStringCustom = types.GenSchemaStringCustom
 	CopyToStringCustom    = types.CopyToStringCustom
 	CopyFromStringCustom  = types.CopyFromStringCustom
+
+	UseMockValidator    = types.UseMockValidator
+	UseMockPlanModifier = types.UseMockPlanModifier
 )

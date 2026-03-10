@@ -39,7 +39,7 @@ resource "example_objects" "test" {
   nested_nullable_list = null
 
   nested_map = {
-    first = { leaf = { value = "map-1" } }
+    first  = { leaf = { value = "map-1" } }
     second = { leaf = { value = "map-2" } }
   }
 
@@ -52,11 +52,10 @@ resource "example_objects" "test" {
     }
   }
 
-  # Embedded fields from `embedded` and `embedded_nullable`.
   leaf = {
     value = "embedded-leaf"
   }
   # TODO: Unepxected behavior with embedded fields.
-  # This embedded value is overwriting the embedded leaf.value field...
+  # This embedded value overwrites the embedded leaf.value field.
   # value = "embedded-nullable-value"
 }

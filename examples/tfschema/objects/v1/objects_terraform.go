@@ -79,7 +79,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Optional:    true,
 				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 			}}),
-			Description: "",
+			Description: "empty is an empty field.",
 			Optional:    true,
 		},
 		"id": {
@@ -113,7 +113,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Description: "",
 				Optional:    true,
 			}}),
-			Description: "",
+			Description: "nested_list is a list of nested objects.",
 			Optional:    true,
 		},
 		"nested_map": {
@@ -126,7 +126,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Description: "",
 				Optional:    true,
 			}}),
-			Description: "",
+			Description: "nested_map is a map of nested objects.",
 			Optional:    true,
 		},
 		"nested_nullable": {
@@ -139,7 +139,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Description: "",
 				Optional:    true,
 			}}),
-			Description: "",
+			Description: "nested_nullable is a nullable nested object.",
 			Optional:    true,
 		},
 		"nested_nullable_list": {
@@ -152,7 +152,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Description: "",
 				Optional:    true,
 			}}),
-			Description: "",
+			Description: "nested_nullable_list is a nullable list of nested objects.",
 			Optional:    true,
 		},
 		"nested_nullable_map": {
@@ -165,7 +165,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Description: "",
 				Optional:    true,
 			}}),
-			Description: "",
+			Description: "nested_map is a nullable map of nested objects.",
 			Optional:    true,
 		},
 		"nested_value": {
@@ -178,58 +178,58 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Description: "",
 				Optional:    true,
 			}}),
-			Description: "",
+			Description: "nested_value is a nested object.",
 			Optional:    true,
 		},
 		"primitives": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"bool_list": {
-					Description: "bool_list bool list field",
+					Description: "bool_list bool list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 				},
 				"bool_value": {
-					Description: "bool_value bool field",
+					Description: "bool_value bool field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 				},
 				"bytes_list": {
-					Description: "bytes_list bytes list field",
+					Description: "bytes_list bytes list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"bytes_value": {
-					Description: "bytes_value bytes field",
+					Description: "bytes_value bytes field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"double_list": {
-					Description: "double_list double list field",
+					Description: "double_list double list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 				},
 				"double_value": {
-					Description: "double_value float64 field",
+					Description: "double_value float64 field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 				},
 				"enum_list": {
-					Description: "enum_list enum list field",
+					Description: "enum_list enum list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
 				"enum_value": {
-					Description: "enum_value enum field",
+					Description: "enum_value enum field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
 				"float_list": {
-					Description: "float_list float list field",
+					Description: "float_list float list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 				},
 				"float_value": {
-					Description: "float_value float32 field",
+					Description: "float_value float32 field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 				},
@@ -239,37 +239,37 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"int32_list": {
-					Description: "int32_list int32 list field",
+					Description: "int32_list int32 list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
 				"int32_value": {
-					Description: "int32_value int32 field",
+					Description: "int32_value int32 field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
 				"int64_list": {
-					Description: "int64_list int64 list field",
+					Description: "int64_list int64 list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
 				"int64_value": {
-					Description: "int64_value int64 field",
+					Description: "int64_value int64 field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
 				"nullable_value": {
-					Description: "nullable_value nullable field",
+					Description: "nullable_value nullable field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 				},
 				"string_list": {
-					Description: "string_list string list field",
+					Description: "string_list string list field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"string_value": {
-					Description: "string_value string field",
+					Description: "string_value string field.",
 					Optional:    true,
 					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},

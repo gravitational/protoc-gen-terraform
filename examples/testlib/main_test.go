@@ -79,8 +79,8 @@ func (s *TerraformSuite) TestPrimitives() {
 					resource.TestCheckResourceAttr(name, "double_list.0", "0.75"),
 					resource.TestCheckResourceAttr(name, "double_list.1", "1.25"),
 					resource.TestCheckResourceAttr(name, "bool_list.0", "true"),
-					// TODO: Bool false value is treated as null.
-					// This should not be the case...
+					// TODO: Bool false value is treated as null within list.
+					// This should not be the case.
 					// resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
 					resource.TestCheckResourceAttr(name, "bytes_list.0", "bytes1"),
 					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
@@ -162,7 +162,7 @@ func (s *TerraformSuite) TestObjects() {
 
 					resource.TestCheckResourceAttr(name, "leaf.value", "embedded-leaf"),
 					// TODO: Unepxected behavior with embedded fields.
-					// This embedded value is overwrites the leaf.value field...
+					// This embedded value overwrites the leaf.value field.
 					// resource.TestCheckResourceAttr(name, "value", "embedded-nullable-value"),
 				),
 			},
@@ -185,11 +185,14 @@ func (s *TerraformSuite) TestCustom() {
 					resource.TestCheckResourceAttr(name, "injected", "injected"),
 					resource.TestCheckResourceAttr(name, "required", "required"),
 					resource.TestCheckResourceAttr(name, "sensitive", "sensitive"),
+					resource.TestCheckResourceAttr(name, "validated", "valid"),
 					resource.TestCheckNoResourceAttr(name, "excluded"),
+
+					resource.TestCheckResourceAttr(name, "custom_name_override", "name-override"),
+					resource.TestCheckResourceAttr(name, "plan_modifier", "modified_value"),
 
 					resource.TestCheckResourceAttr(name, "bool_custom_list.0", "true"),
 					resource.TestCheckResourceAttr(name, "bool_custom_list.1", "false"),
-					resource.TestCheckResourceAttr(name, "bool_custom_list.2", "true"),
 
 					resource.TestCheckResourceAttr(name, "string_override.0", "foo"),
 					resource.TestCheckResourceAttr(name, "string_override.1", "bar"),

@@ -2,11 +2,11 @@ package types
 
 import (
 	"context"
-	fmt "fmt"
-	time "time"
+	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 const (
@@ -210,8 +210,7 @@ type DurationValue struct {
 
 // Type returns value type
 func (t DurationValue) Type(_ context.Context) attr.Type {
-	// TODO: Should this be DurationType?
-	return TimeType{}
+	return DurationType{}
 }
 
 // ToTerraformValue returns the data contained in the *String as a string. If

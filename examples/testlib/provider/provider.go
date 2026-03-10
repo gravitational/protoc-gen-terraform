@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 
-	types "github.com/gravitational/protoc-gen-terraform/v3/examples/types"
+	"github.com/gravitational/protoc-gen-terraform/v3/examples/types"
 )
 
 var _ tfsdk.Provider = &exampleProvider{}

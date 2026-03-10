@@ -2,12 +2,12 @@ package types
 
 import (
 	"context"
-	fmt "fmt"
+	"fmt"
 	"strings"
-	time "time"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	diag "github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )

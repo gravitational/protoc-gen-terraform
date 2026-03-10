@@ -1,7 +1,7 @@
 resource "example_primitives" "test" {
   string_value = "string"
-  int32_value   = 123
-  int64_value   = 456
+  int32_value  = 123
+  int64_value  = 456
   // TODO: Float64 type validation error in terraform-plugin-framework v0.10.0
   // 0.75 works, but 0.76 fails.
   // Verify both cases are correctly validated after updating to > v1.2.0
@@ -12,15 +12,15 @@ resource "example_primitives" "test" {
   bytes_value  = "bytes"
   enum_value   = 1
   string_list  = ["el1", "el2"]
-  int32_list    = [123, 456]
-  int64_list    = [234, 567]
+  int32_list   = [123, 456]
+  int64_list   = [234, 567]
   float_list   = [0.75, 1.25]
   double_list  = [0.75, 1.25]
-  // TODO: Bool false value is treated as null.
-  // This should not be the case...
+  // TODO: Bool false value is treated as null within list.
+  // This should not be the case.
   # bool_list        = [true, false]
-  bool_list        = [true]
-  bytes_list       = ["bytes1", "bytes2"]
-  enum_list        = [1, 2]
-  nullable_value   = null
+  bool_list      = [true]
+  bytes_list     = ["bytes1", "bytes2"]
+  enum_list      = [1, 2]
+  nullable_value = null
 }
