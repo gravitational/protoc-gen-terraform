@@ -1,0 +1,37 @@
+---
+target_package_name: v1
+default_package_name: "github.com/gravitational/protoc-gen-terraform/v3/examples/types"
+use_state_for_unknown_by_default: true
+sort: true
+
+types:
+  - Custom
+
+injected_fields:
+  Custom:
+    -
+      name: injected
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+
+computed_fields:
+  - Custom.id
+  - Custom.computed
+exclude_fields:
+  - Custom.excluded
+required_fields:
+  - Custom.required
+sensitive_fields:
+  - Custom.sensitive
+suffixes:
+  BoolCustom: BoolSpecial
+
+custom_types:
+  "Custom.string_override": StringCustom
+
+schema_types:
+  "Custom.schema_override":
+    type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
+    value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
+    cast_to_type: "string"
+    cast_from_type: "OverrideCastType"

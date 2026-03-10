@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package types;
+
+import "gogoproto/gogo.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+// EnumValue is an enum field.
+enum EnumValue {
+  ENUM_UNSPECIFIED = 0;
+  ENUM_VALUE_ONE = 1;
+  ENUM_VALUE_TWO = 2;
+}
+
+// Primitives contains primitive/scalar protobuf field types and list variants.
+message Primitives {
+  string id = 1;
+
+  // string_value string field
+  string string_value = 2;
+
+  // int32_value int32 field
+  int32 int32_value = 3;
+
+  // int64_value int64 field
+  int64 int64_value = 4;
+
+  // float_value float32 field
+  float float_value = 5;
+
+  // double_value float64 field
+  double double_value = 6;
+
+  // bool_value bool field
+  bool bool_value = 7;
+
+  // bytes_value bytes field
+  bytes bytes_value = 9;
+
+  // enum_value enum field
+  EnumValue enum_value = 10;
+
+  // nullable_value nullable field
+  bool nullable_value = 11 [ (gogoproto.nullable) = true ];
+
+  // string_list string list field
+  repeated string string_list = 12;
+
+  // int32_list int32 list field
+  repeated int32 int32_list = 13;
+
+  // int64_list int64 list field
+  repeated int64 int64_list = 14;
+
+  // float_list float list field
+  repeated float float_list = 15;
+
+  // double_list double list field
+  repeated double double_list = 16;
+
+  // bool_list bool list field
+  repeated bool bool_list = 17;
+
+  // bytes_list bytes list field
+  repeated bytes bytes_list = 19;
+
+  // enum_list enum list field
+  repeated EnumValue enum_list = 20;
+}

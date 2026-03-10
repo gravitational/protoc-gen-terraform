@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package types;
+
+import "gogoproto/gogo.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+// Custom contains examples of custom field types.
+message Custom {
+  string id = 1;
+
+  string excluded = 2;
+  string computed = 3;
+  string required = 4;
+  string sensitive = 5;
+
+  // TODO: bool_custom does not work as expected...
+  //
+  // bool_custom custom bool field
+  // bool bool_custom = 10 [ (gogoproto.customtype) = "BoolCustom" ];
+
+  // bool_custom_list custom bool list field
+  repeated bool bool_custom_list = 11 [ (gogoproto.customtype) = "BoolCustom" ];
+
+  // string_override is represented by a single string in the go struct, but by
+  // a list of strings in the Terraform Schema. The plugin's configuration
+  // specifies a custom_type (StringCustom), the generator should use the
+  // functions "GenSchemaStringCustom", "CopyFromStringCustom",
+  // "CopyToStringCustom" instead of attempting to generate them.
+  string string_override = 12;
+
+  string schema_override = 43 [
+    (gogoproto.jsontag) = "schema_override",
+    (gogoproto.casttype) = "OverrideCastType"
+  ];
+}
