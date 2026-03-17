@@ -32,6 +32,7 @@ name_overrides:
 
 suffixes:
   BoolCustom: BoolSpecial
+  BoolCustomList: BoolSpecialList
 
 custom_types:
   "Custom.string_override": StringCustom

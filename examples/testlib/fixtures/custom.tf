@@ -11,6 +11,7 @@ resource "example_custom" "test" {
 
   custom_name_override = "name-override"
 
+  bool_custom      = true
   bool_custom_list = [true, false]
 
   # Stored in Go as a single string joined with "/".

@@ -26,6 +26,35 @@ type BoolCustom bool
 // GenSchemaBoolSpecial generates custom field schema (bool list)
 func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
 	return tfsdk.Attribute{
+		Type:        types.BoolType,
+		Description: attr.Description,
+		Optional:    attr.Optional,
+	}
+}
+
+// CopyFromBoolSpecial copies target value to the source
+func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *BoolCustom) {
+	v, ok := tf.(types.Bool)
+	if !ok {
+		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", tf))
+		return
+	}
+
+	if !v.Null && !v.Unknown {
+		*obj = BoolCustom(v.Value)
+	}
+}
+
+// CopyToBoolSpecial copies source value to the target
+func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v attr.Value) attr.Value {
+	return types.Bool{Value: bool(obj)}
+}
+
+type BoolCustomList bool
+
+// GenSchemaBoolSpecialList generates custom field schema (bool list)
+func GenSchemaBoolSpecialList(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+	return tfsdk.Attribute{
 		Type: types.ListType{
 			ElemType: types.BoolType,
 		},
@@ -34,15 +63,15 @@ func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribu
 	}
 }
 
-// CopyFromBoolSpecial copies target value to the source
-func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom) {
+// CopyFromBoolSpecialList copies target value to the source
+func CopyFromBoolSpecialList(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustomList) {
 	v, ok := tf.(types.List)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
 		return
 	}
 
-	arr := make([]BoolCustom, len(v.Elems))
+	arr := make([]BoolCustomList, len(v.Elems))
 	for i, raw := range v.Elems {
 		el, ok := raw.(types.Bool)
 		if !ok {
@@ -51,15 +80,15 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 		}
 
 		if !el.Null && !el.Unknown {
-			arr[i] = BoolCustom(el.Value)
+			arr[i] = BoolCustomList(el.Value)
 		}
 	}
 
 	*obj = arr
 }
 
-// CopyToBoolSpecial copies source value to the target
-func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value) attr.Value {
+// CopyToBoolSpecialList copies source value to the target
+func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.Type, v attr.Value) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{

@@ -41,7 +41,11 @@ var _ = math.Inf
 // GenSchemaCustom returns tfsdk.Schema definition for Custom
 func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"bool_custom_list": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+			Description: "bool_custom custom bool field.",
+			Optional:    true,
+		}),
+		"bool_custom_list": GenSchemaBoolSpecialList(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Description: "bool_custom_list custom bool list field.",
 			Optional:    true,
 		}),
@@ -110,11 +114,18 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Custom) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
+		a, ok := tf.Attrs["bool_custom"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Custom.bool_custom"})
+		}
+		CopyFromBoolSpecial(diags, a, &obj.BoolCustom)
+	}
+	{
 		a, ok := tf.Attrs["bool_custom_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.bool_custom_list"})
 		}
-		CopyFromBoolSpecial(diags, a, &obj.BoolCustomList)
+		CopyFromBoolSpecialList(diags, a, &obj.BoolCustomList)
 	}
 	{
 		a, ok := tf.Attrs["computed"]
@@ -271,11 +282,20 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
 	}
 	{
+		t, ok := tf.AttrTypes["bool_custom"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Custom.bool_custom"})
+		} else {
+			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, tf.Attrs["bool_custom"])
+			tf.Attrs["bool_custom"] = v
+		}
+	}
+	{
 		t, ok := tf.AttrTypes["bool_custom_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom_list"})
 		} else {
-			v := CopyToBoolSpecial(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"])
+			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"])
 			tf.Attrs["bool_custom_list"] = v
 		}
 	}

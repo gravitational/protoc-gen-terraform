@@ -33,12 +33,14 @@ message Custom {
   // plan_modifier is a field with a plan modifier.
   string plan_modifier = 8;
 
-  // TODO: bool_custom does not work as expected.
   // bool_custom custom bool field.
-  // bool bool_custom = 9 [ (gogoproto.customtype) = "BoolCustom" ];
+  bool bool_custom = 9 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "BoolCustom"
+  ];
 
   // bool_custom_list custom bool list field.
-  repeated bool bool_custom_list = 10 [ (gogoproto.customtype) = "BoolCustom" ];
+  repeated bool bool_custom_list = 10 [ (gogoproto.customtype) = "BoolCustomList" ];
 
   // string_override is represented by a single string in the go struct, but by
   // a list of strings in the Terraform Schema. The plugin's configuration

@@ -191,6 +191,7 @@ func (s *TerraformSuite) TestCustom() {
 					resource.TestCheckResourceAttr(name, "custom_name_override", "name-override"),
 					resource.TestCheckResourceAttr(name, "plan_modifier", "modified_value"),
 
+					resource.TestCheckResourceAttr(name, "bool_custom", "true"),
 					resource.TestCheckResourceAttr(name, "bool_custom_list.0", "true"),
 					resource.TestCheckResourceAttr(name, "bool_custom_list.1", "false"),
 
