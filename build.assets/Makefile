@@ -17,7 +17,7 @@ DOCKERFLAGS := --rm \
 	-w $(SRCDIR) \
 	-h $(HOSTNAME)
 DOCKERPULLFLAGS ?= --pull
-GO_VER = 1.16
+GO_VER = 1.25
 
 PROTOC_VER ?= 3.15.3
 PROTOC_PLATFORM := linux-x86_64 # NOTE: use linux-aarch_64 for Mac M1

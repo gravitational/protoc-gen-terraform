@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package types;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+// Time contains examples of time and duration protobuf field types.
+message Time {
+  string id = 1;
+
+  // timestamp_value time.Time field.
+  google.protobuf.Timestamp timestamp_value = 2 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // timestamp_list []time.Time field.
+  repeated google.protobuf.Timestamp timestamp_list = 3 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // duration_standard time.Duration field using stdduration.
+  google.protobuf.Duration duration_standard = 4 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // duration_list []time.Duration field.
+  repeated google.protobuf.Duration duration_list = 5 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // duration_custom time.Duration field using casttype.
+  int64 duration_custom = 6 [ (gogoproto.casttype) = "Duration" ];
+
+  // duration_custom_list []time.Duration field using casttype.
+  repeated int64 duration_custom_list = 7 [ (gogoproto.casttype) = "Duration" ];
+}

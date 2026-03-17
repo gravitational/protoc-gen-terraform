@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package types;
+
+import "gogoproto/gogo.proto";
+import "primitives.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+// Objects contains examples of nested object and map protobuf field types.
+message Objects {
+  string id = 1;
+
+  // primitives field.
+  Primitives primitives = 2;
+
+  // string_map map of strings.
+  map<string, string> string_map = 3;
+
+  // int_map map of ints.
+  map<string, int64> int_map = 4;
+
+  // bool_map map of bools.
+  map<string, bool> bool_map = 5;
+
+  // nested_value is a nested object.
+  Nested nested_value = 6 [ (gogoproto.nullable) = false ];
+
+  // nested_nullable is a nullable nested object.
+  Nested nested_nullable = 7 [ (gogoproto.nullable) = true ];
+
+  // nested_list is a list of nested objects.
+  repeated Nested nested_list = 8 [ (gogoproto.nullable) = false ];
+
+  // nested_nullable_list is a nullable list of nested objects.
+  repeated Nested nested_nullable_list = 9 [ (gogoproto.nullable) = true ];
+
+  // nested_map is a map of nested objects.
+  map<string, Nested> nested_map = 10 [ (gogoproto.nullable) = false ];
+
+  // nested_map is a nullable map of nested objects.
+  map<string, Nested> nested_nullable_map = 11 [ (gogoproto.nullable) = true ];
+
+  // empty is an empty field.
+  Empty empty = 12;
+
+  // one_of is a oneof field.
+  oneof one_of {
+    Nested branch1 = 15;
+    Nested branch2 = 16;
+  }
+
+  // embeded is an embedded field.
+  Nested embedded = 13 [
+    (gogoproto.nullable) = false,
+    (gogoproto.embed) = true
+  ];
+
+  // embedded_nullable is a nullabled embedded field.
+  Leaf embedded_nullable = 14 [
+    (gogoproto.nullable) = true,
+    (gogoproto.embed) = true
+  ];
+}
+
+message Empty {}
+
+message Nested {
+  Leaf leaf = 1;
+}
+
+message Leaf {
+  string value = 1;
+}
