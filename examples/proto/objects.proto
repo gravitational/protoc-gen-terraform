@@ -67,10 +67,6 @@ message Objects {
 
 message Empty {}
 
-message Embedded {
-  Primitives primitives = 1;
-}
-
 message Nested {
   Leaf leaf = 1;
 }
