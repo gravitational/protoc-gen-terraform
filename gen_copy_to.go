@@ -177,7 +177,20 @@ func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
 			j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
 		)
 	}
-	return j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
+	// Non-nullable fields should never be null, so we explicitly set Null=false
+	// to handle the case where the tf we're copying into has Null=true.
+	// This will happen if the provider marks the field as optional and the user
+	// doesn't provide a value.
+	//
+	// IsNullable indicates the Go values is a pointer, which is generally a
+	// result of the field being optional in the protobuf, and vice versa (i.e.
+	// IsNullable == False for non-optional Protobuf fields). But providers may
+	// still want to mark such fields as optional to allow the user to adopt a
+	// default "empty" value. In such cases, the provider MUST mark the field as
+	// `computed`` in addition to `optional` to avoid Terraform reporting a bug
+	// in the provider.
+	return j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Line().
+		Id("v.Null").Op("=").False()
 }
 
 // genObjectBody generates block which reads message into v

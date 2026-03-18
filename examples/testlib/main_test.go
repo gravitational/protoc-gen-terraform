@@ -86,7 +86,13 @@ func (s *TerraformSuite) TestPrimitives() {
 					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
+					// nullable_value is a message field with (gogoproto.nullable)=true.
+					// We verify that the provider preserves its null status.
 					resource.TestCheckNoResourceAttr(name, "nullable_value"),
+					// optional_string is non-nullable in the proto but not set
+					// in config. We verify it receives its type's zero value
+					// and is not marked null in terraform.
+					resource.TestCheckResourceAttr(name, "optional_string", ""),
 				),
 			},
 		},
@@ -138,6 +144,9 @@ func (s *TerraformSuite) TestObjects() {
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
 					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
+					// optional_string is non-nullable but not set in config. We
+					// verify it's not null and has its type's zero value
+					resource.TestCheckResourceAttr(name, "primitives.optional_string", ""),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
 					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),

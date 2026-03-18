@@ -266,6 +266,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationCustom)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["duration_custom"] = v
 		}
@@ -311,6 +312,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							v.Null = false
 						}
 						v.Value = time.Duration(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -364,6 +366,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							v.Null = false
 						}
 						v.Value = time.Duration(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -394,6 +397,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationStandard)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["duration_standard"] = v
 		}
@@ -416,6 +420,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				v.Null = string(obj.Id) == ""
 			}
 			v.Value = string(obj.Id)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["id"] = v
 		}
@@ -461,6 +466,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							v.Null = false
 						}
 						v.Value = time.Time(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -491,6 +497,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				v.Null = false
 			}
 			v.Value = time.Time(obj.TimestampValue)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["timestamp_value"] = v
 		}

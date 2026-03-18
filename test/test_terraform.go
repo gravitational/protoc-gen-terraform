@@ -437,6 +437,11 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Validators:    []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
 		},
+		"str_nullable": {
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"string_branch": {
 			Description: "StringBranch is the oneof branch triggered by string value",
 			Optional:    true,
@@ -2107,6 +2112,23 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		}
 	}
 	{
+		a, ok := tf.Attrs["str_nullable"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.StrNullable"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Test.StrNullable", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				obj.StrNullable = t
+			}
+		}
+	}
+	{
 		a, ok := tf.Attrs["string_branch"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Test.StringBranch"})
@@ -2339,6 +2361,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.Bar) == ""
 			}
 			v.Value = string(obj.Bar)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["bar"] = v
 		}
@@ -2361,6 +2384,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = bool(obj.Bool) == false
 			}
 			v.Value = bool(obj.Bool)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["bool"] = v
 		}
@@ -2422,6 +2446,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								v.Null = string(obj.Str) == ""
 							}
 							v.Value = string(obj.Str)
+							v.Null = false
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -2480,6 +2505,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								v.Null = int64(obj.Int32) == 0
 							}
 							v.Value = int64(obj.Int32)
+							v.Null = false
 							v.Unknown = false
 							tf.Attrs["int32"] = v
 						}
@@ -2512,6 +2538,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.Branch3) == ""
 			}
 			v.Value = string(obj.Branch3)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["branch3"] = v
 		}
@@ -2534,6 +2561,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.Bytes) == ""
 			}
 			v.Value = string(obj.Bytes)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["bytes"] = v
 		}
@@ -2579,6 +2607,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							v.Null = string(a) == ""
 						}
 						v.Value = string(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -2609,6 +2638,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = float64(obj.Double) == 0
 			}
 			v.Value = float64(obj.Double)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["double"] = v
 		}
@@ -2631,6 +2661,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationCustom)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["duration_custom"] = v
 		}
@@ -2676,6 +2707,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							v.Null = false
 						}
 						v.Value = time.Duration(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -2706,6 +2738,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationCustomMissing)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["duration_custom_missing"] = v
 		}
@@ -2728,6 +2761,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationStandard)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["duration_standard"] = v
 		}
@@ -2750,6 +2784,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			v.Value = time.Duration(obj.DurationStandardMissing)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["duration_standard_missing"] = v
 		}
@@ -2798,6 +2833,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								v.Null = string(obj.EmbeddedNestedString) == ""
 							}
 							v.Value = string(obj.EmbeddedNestedString)
+							v.Null = false
 							v.Unknown = false
 							tf.Attrs["embedded_nested_string"] = v
 						}
@@ -2826,6 +2862,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.EmbeddedString) == ""
 			}
 			v.Value = string(obj.EmbeddedString)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["embedded_string"] = v
 		}
@@ -2904,6 +2941,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = float64(obj.Float) == 0
 			}
 			v.Value = float64(obj.Float)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["float"] = v
 		}
@@ -2930,6 +2968,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.Foo) == ""
 			}
 			v.Value = string(obj.Foo)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["foo"] = v
 		}
@@ -2952,6 +2991,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = int64(obj.Int32) == 0
 			}
 			v.Value = int64(obj.Int32)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["int32"] = v
 		}
@@ -2974,6 +3014,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = int64(obj.Int64) == 0
 			}
 			v.Value = int64(obj.Int64)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["int64"] = v
 		}
@@ -3016,6 +3057,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							v.Null = false
 						}
 						v.Value = string(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -3106,6 +3148,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													v.Null = false
 												}
 												v.Value = string(a)
+												v.Null = false
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -3176,6 +3219,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3256,6 +3300,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3291,6 +3336,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										v.Null = string(obj.Str) == ""
 									}
 									v.Value = string(obj.Str)
+									v.Null = false
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -3388,6 +3434,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													v.Null = false
 												}
 												v.Value = string(a)
+												v.Null = false
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -3458,6 +3505,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3538,6 +3586,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3573,6 +3622,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										v.Null = string(obj.Str) == ""
 									}
 									v.Value = string(obj.Str)
+									v.Null = false
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -3608,6 +3658,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = int64(obj.Mode) == 0
 			}
 			v.Value = int64(obj.Mode)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["mode"] = v
 		}
@@ -3674,6 +3725,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											v.Null = false
 										}
 										v.Value = string(a)
+										v.Null = false
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -3744,6 +3796,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														v.Null = string(obj.Str) == ""
 													}
 													v.Value = string(obj.Str)
+													v.Null = false
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -3824,6 +3877,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														v.Null = string(obj.Str) == ""
 													}
 													v.Value = string(obj.Str)
+													v.Null = false
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -3859,6 +3913,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								v.Null = string(obj.Str) == ""
 							}
 							v.Value = string(obj.Str)
+							v.Null = false
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -3950,6 +4005,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													v.Null = false
 												}
 												v.Value = string(a)
+												v.Null = false
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -4020,6 +4076,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4100,6 +4157,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4135,6 +4193,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										v.Null = string(obj.Str) == ""
 									}
 									v.Value = string(obj.Str)
+									v.Null = false
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -4235,6 +4294,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													v.Null = false
 												}
 												v.Value = string(a)
+												v.Null = false
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -4305,6 +4365,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4385,6 +4446,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																v.Null = string(obj.Str) == ""
 															}
 															v.Value = string(obj.Str)
+															v.Null = false
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4420,6 +4482,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										v.Null = string(obj.Str) == ""
 									}
 									v.Value = string(obj.Str)
+									v.Null = false
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -4501,6 +4564,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											v.Null = false
 										}
 										v.Value = string(a)
+										v.Null = false
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -4571,6 +4635,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														v.Null = string(obj.Str) == ""
 													}
 													v.Value = string(obj.Str)
+													v.Null = false
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -4651,6 +4716,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														v.Null = string(obj.Str) == ""
 													}
 													v.Value = string(obj.Str)
+													v.Null = false
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -4686,6 +4752,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								v.Null = string(obj.Str) == ""
 							}
 							v.Value = string(obj.Str)
+							v.Null = false
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -4760,6 +4827,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											v.Null = false
 										}
 										v.Value = string(a)
+										v.Null = false
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -4830,6 +4898,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														v.Null = string(obj.Str) == ""
 													}
 													v.Value = string(obj.Str)
+													v.Null = false
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -4910,6 +4979,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														v.Null = string(obj.Str) == ""
 													}
 													v.Value = string(obj.Str)
+													v.Null = false
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -4945,6 +5015,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								v.Null = string(obj.Str) == ""
 							}
 							v.Value = string(obj.Str)
+							v.Null = false
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -4973,6 +5044,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.SchemaOverride) == ""
 			}
 			v.Value = string(obj.SchemaOverride)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["schema_override"] = v
 		}
@@ -4995,8 +5067,32 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.Str) == ""
 			}
 			v.Value = string(obj.Str)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["str"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["str_nullable"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.StrNullable"})
+		} else {
+			v, ok := tf.Attrs["str_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Test.StrNullable", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Test.StrNullable", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.StrNullable) == ""
+			}
+			v.Value = string(obj.StrNullable)
+			v.Null = false
+			v.Unknown = false
+			tf.Attrs["str_nullable"] = v
 		}
 	}
 	{
@@ -5021,6 +5117,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = string(obj.StringBranch) == ""
 			}
 			v.Value = string(obj.StringBranch)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["string_branch"] = v
 		}
@@ -5066,6 +5163,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							v.Null = string(a) == ""
 						}
 						v.Value = string(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -5119,6 +5217,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							v.Null = string(a) == ""
 						}
 						v.Value = string(a)
+						v.Null = false
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -5158,6 +5257,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			v.Value = time.Time(obj.Timestamp)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["timestamp"] = v
 		}
@@ -5238,6 +5338,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = false
 			}
 			v.Value = time.Time(obj.TimestampMissing)
+			v.Null = false
 			v.Unknown = false
 			tf.Attrs["timestamp_missing"] = v
 		}
@@ -5317,6 +5418,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				v.Null = true
 			} else {
 				v.Value = time.Duration(obj.Value)
+				v.Null = false
 			}
 			v.Unknown = false
 			tf.Attrs["max_age"] = v

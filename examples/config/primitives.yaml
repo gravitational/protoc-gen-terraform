@@ -9,3 +9,4 @@ types:
 
 computed_fields:
   - Primitives.id
+  - Primitives.optional_string

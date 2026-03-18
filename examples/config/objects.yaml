@@ -9,3 +9,9 @@ types:
 
 computed_fields:
   - Objects.id
+  - Primitives.id
+  - Primitives.bytes_value
+  - Primitives.int64_value
+  - Primitives.double_value
+  - Primitives.optional_string
+  - Leaf.value

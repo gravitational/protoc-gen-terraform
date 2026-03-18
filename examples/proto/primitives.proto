@@ -15,6 +15,11 @@ enum EnumValue {
   ENUM_VALUE_TWO = 2;
 }
 
+// BoolValue wraps a bool so it can be used as a nullable message field.
+message BoolValue {
+  bool value = 1;
+}
+
 // Primitives contains primitive/scalar protobuf field types and list variants.
 message Primitives {
   string id = 1;
@@ -43,8 +48,15 @@ message Primitives {
   // enum_value enum field.
   EnumValue enum_value = 9;
 
-  // nullable_value nullable field.
-  bool nullable_value = 10 [ (gogoproto.nullable) = true ];
+  // nullable_value is a message rather than primitive field so it can be set to
+  // null in the config. Tests verify that null/not-null status is preserved.
+  BoolValue nullable_value = 10 [ (gogoproto.nullable) = true ];
+
+  // optional_string non-nullable because it's a primitive, but it will be set
+  // as optional in the Terraform config, and therefore must also be set as
+  // computed. The provider will return the string zero value ("") and tests
+  // will verify both that value and that it's not marked as null in Terraform.
+  string optional_string = 19;
 
   // string_list string list field.
   repeated string string_list = 11;

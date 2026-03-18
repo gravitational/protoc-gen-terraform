@@ -316,7 +316,7 @@ func TestCopyToOneOfNoBranch(t *testing.T) {
 
 	require.True(t, o.Attrs["branch1"].(types.Object).Null)
 	require.True(t, o.Attrs["branch2"].(types.Object).Null)
-	require.True(t, o.Attrs["branch3"].(types.String).Null)
+	require.False(t, o.Attrs["branch3"].(types.String).Null)
 }
 
 func TestCopyToEmbeddedField(t *testing.T) {
@@ -331,6 +331,59 @@ func TestCopyToEmbeddedField(t *testing.T) {
 	require.False(t, o.Attrs["embedded_string"].(types.String).Null)
 
 	require.Equal(t, "embdtest2", o.Attrs["embedded_nested_field"].(types.Object).Attrs["embedded_nested_string"].(types.String).Value)
+}
+
+// TestCopyToNullToValueNotNullable checks regression of
+// https://github.com/gravitational/teleport/issues/60200: when TF has Null=true
+// and Go has a non-zero value, Null must become false for non-nullable fields.
+func TestCopyToNullToValueNotNullable(t *testing.T) {
+	o := copyToTerraformObject(t)
+	o.Attrs["str"] = types.String{Null: true}
+	testObj := createTestObj()
+	testObj.Str = "TestString"
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+	require.False(t, o.Attrs["str"].(types.String).Null)
+	require.Equal(t, "TestString", o.Attrs["str"].(types.String).Value)
+}
+
+// TestCopyToValueToNullNotNullable verifies that non-nullable fields are never
+// null, even when the Go value is the zero value.
+func TestCopyToValueToNullNotNullable(t *testing.T) {
+	o := copyToTerraformObject(t)
+	o.Attrs["str"] = types.String{Null: false, Value: "existing"}
+	testObj := createTestObj()
+	testObj.Str = ""
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+	require.False(t, o.Attrs["str"].(types.String).Null)
+	require.Equal(t, "", o.Attrs["str"].(types.String).Value)
+}
+
+// TestCopyToNullToValueNullable checks regression of
+// https://github.com/gravitational/teleport/issues/60200: when TF has Null=true
+// and Go has a non-nil value, Null must become false for nullable fields.
+func TestCopyToNullToValueNullable(t *testing.T) {
+	o := copyToTerraformObject(t)
+	o.Attrs["timestamp_nullable"] = TimeValue{Null: true}
+	testObj := createTestObj()
+	testObj.TimestampNullable = &timestamp
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+	require.False(t, o.Attrs["timestamp_nullable"].(TimeValue).Null)
+	require.Equal(t, timestamp, o.Attrs["timestamp_nullable"].(TimeValue).Value)
+}
+
+// TestCopyToValueToNullNullable verifies that nullable fields become null when
+// the Go value is nil, even if TF previously had a non-null value.
+func TestCopyToValueToNullNullable(t *testing.T) {
+	o := copyToTerraformObject(t)
+	o.Attrs["timestamp_nullable"] = TimeValue{Null: false, Value: timestamp}
+	testObj := createTestObj()
+	testObj.TimestampNullable = nil
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+	require.True(t, o.Attrs["timestamp_nullable"].(TimeValue).Null)
 }
 
 func TestCopyToOneOfLowercase(t *testing.T) {

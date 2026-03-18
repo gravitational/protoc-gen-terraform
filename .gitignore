@@ -3,3 +3,4 @@ out
 protoc-gen-terraform
 .vscode
 *.swp
+vendor/**

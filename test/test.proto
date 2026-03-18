@@ -183,6 +183,8 @@ message Test {
     (gogoproto.jsontag) = "schema_override",
     (gogoproto.casttype) = "OverrideCastType"
   ];
+
+  string StrNullable = 44 [ (gogoproto.nullable) = true ];
 }
 
 message MaxAgeDuration {
