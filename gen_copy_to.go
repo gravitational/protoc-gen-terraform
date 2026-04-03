@@ -104,13 +104,15 @@ func (f *FieldCopyToGenerator) nextField(v string, g func(g *j.Group)) *j.Statem
 	)
 }
 
-// getAttr v, ok := tf.Attrs["name"]
-func (f *FieldCopyToGenerator) getAttr(v string, typ string, g *j.Group) {
-	g.List(
-		j.Id(v), j.Id("ok"),
-	).Op(":=").Id("tf.Attrs").Index(
-		j.Lit(f.Field.NameSnake),
-	).Assert(j.Id(f.i.WithType(typ)))
+// getAttr generates a statement to read the value of an attribute at the specified index.
+//
+// Expected format: `<varName>, ok := <selector>[<index>].(valType)`
+func (f *FieldCopyToGenerator) getAttr(g *j.Group, varName, selector, valType string, index *j.Statement) {
+	g.List(j.Id(varName), j.Id("ok")).
+		Op(":=").
+		Id(selector).
+		Index(index).
+		Assert(j.Id(f.i.WithType(valType)))
 }
 
 // genZeroValue generates zero value from an empty AttrType
@@ -150,9 +152,9 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 	}
 }
 
-// genPrimitiveBody generates block which reads object field into v
-func (f *FieldCopyToGenerator) genPrimitiveBody(fieldName string, g *j.Group) {
-	f.getAttr("v", f.i.WithType(f.Field.ElemValueType), g)
+// genPrimitiveBody generates a block statement that reads an object field into
+// variable "v".
+func (f *FieldCopyToGenerator) genPrimitiveBody(g *j.Group, fieldName string) {
 	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue(fieldName))
 
 	if !f.IsPlaceholder {
@@ -180,8 +182,9 @@ func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
 	return j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
 }
 
-// genObjectBody generates block which reads message into v
-func (f *FieldCopyToGenerator) genObjectBody(m *MessageCopyToGenerator, fieldName string, typ string, g *j.Group) {
+// genObjectBody generates block statement that reads a message into
+// variable "v".
+func (f *FieldCopyToGenerator) genObjectBody(g *j.Group, m *MessageCopyToGenerator, fieldName string, typ string) {
 	copyObj := func(g *j.Group) {
 		if len(m.Fields) > 0 {
 			if !m.IsEmpty {
@@ -192,7 +195,6 @@ func (f *FieldCopyToGenerator) genObjectBody(m *MessageCopyToGenerator, fieldNam
 		}
 	}
 
-	f.getAttr("v", f.Field.ElemValueType, g)
 	g.If(j.Id("!ok")).Block(
 		// v := types.Object{Attrs: make(map[string]attr.Value, len(o.AttrTypes)), AttrTypes: o.AttrTypes}
 		j.Id("v").Op("=").Id(f.i.WithType(typ)).Block(j.Dict{
@@ -244,7 +246,8 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 			f.genOneOfStub(g)
 		}
 
-		f.genPrimitiveBody(fieldName, g)
+		f.getAttr(g, "v", "tf.Attrs", f.i.WithType(f.Field.ElemValueType), j.Lit(f.Field.NameSnake))
+		f.genPrimitiveBody(g, fieldName)
 		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})
 }
@@ -260,7 +263,8 @@ func (f *FieldCopyToGenerator) genObject() *j.Statement {
 		}
 
 		f.assertTo(f.Field.ElemType, g, func(g *j.Group) {
-			f.genObjectBody(m, fieldName, f.Field.ValueType, g)
+			f.getAttr(g, "v", "tf.Attrs", f.i.WithType(f.Field.ElemValueType), j.Lit(f.Field.NameSnake))
+			f.genObjectBody(g, m, fieldName, f.Field.ValueType)
 			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 		})
 	})
@@ -293,7 +297,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 
 	return f.nextField("a", func(g *j.Group) {
 		f.assertTo(f.Field.Type, g, func(g *j.Group) {
-			f.getAttr("c", f.Field.ValueType, g)
+			f.getAttr(g, "c", "tf.Attrs", f.Field.ValueType, j.Lit(f.Field.NameSnake))
 
 			g.If(j.Id("!ok")).Block(
 				// c := types.Object{Elems: make([]attr.Value, ElemType: o.ElemType}
@@ -326,11 +330,14 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 
 				// for k, a := range obj.List
 				g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id(fieldName).BlockFunc(func(g *j.Group) {
-					if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
-						f.genPrimitiveBody("a", g)
-					} else {
+					switch f.Kind {
+					case PrimitiveListKind, PrimitiveMapKind:
+						f.getAttr(g, "v", "c.Elems", f.i.WithType(f.Field.ElemValueType), j.Id("k"))
+						f.genPrimitiveBody(g, "a")
+					default:
 						m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
-						f.genObjectBody(m, "a", f.i.WithType(f.Field.ElemValueType), g)
+						f.getAttr(g, "v", "c.Elems", f.i.WithType(f.Field.ElemValueType), j.Id("k"))
+						f.genObjectBody(g, m, "a", f.i.WithType(f.Field.ElemValueType))
 					}
 					g.Id("c.Elems").Index(j.Id("k")).Op("=").Id("v")
 				})
