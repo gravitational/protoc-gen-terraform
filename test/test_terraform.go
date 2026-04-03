@@ -2566,7 +2566,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
 					}
 					for k, a := range obj.BytesList {
-						v, ok := tf.Attrs["bytes_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -2663,7 +2663,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
 					}
 					for k, a := range obj.DurationCustomList {
-						v, ok := tf.Attrs["duration_custom_list"].(DurationValue)
+						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -3003,7 +3003,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.Map != nil {
 					t := o.ElemType
 					for k, a := range obj.Map {
-						v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -3053,7 +3053,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.MapObject != nil {
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.MapObject {
-						v, ok := tf.Attrs["map_object"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
 							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3093,7 +3093,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.Map != nil {
 											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
 													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 													if err != nil {
@@ -3143,7 +3143,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.MapObjectNested != nil {
 											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3221,7 +3221,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3333,7 +3333,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.MapObjectNullable != nil {
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.MapObjectNullable {
-						v, ok := tf.Attrs["map_object_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
 							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3375,7 +3375,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.Map != nil {
 											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
 													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 													if err != nil {
@@ -3425,7 +3425,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.MapObjectNested != nil {
 											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3503,7 +3503,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3661,7 +3661,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if obj.Map != nil {
 									t := o.ElemType
 									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
 											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 											if err != nil {
@@ -3711,7 +3711,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if obj.MapObjectNested != nil {
 									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
 											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3789,7 +3789,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 									}
 									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
 											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3897,7 +3897,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 					}
 					for k, a := range obj.NestedList {
-						v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
 							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -3937,7 +3937,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.Map != nil {
 											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
 													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 													if err != nil {
@@ -3987,7 +3987,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.MapObjectNested != nil {
 											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4065,7 +4065,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4180,7 +4180,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedListNullable))
 					}
 					for k, a := range obj.NestedListNullable {
-						v, ok := tf.Attrs["nested_list_nullable"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
 							v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4222,7 +4222,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.Map != nil {
 											t := o.ElemType
 											for k, a := range obj.Map {
-												v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 												if !ok {
 													i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 													if err != nil {
@@ -4272,7 +4272,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if obj.MapObjectNested != nil {
 											o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 											for k, a := range obj.MapObjectNested {
-												v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4350,7 +4350,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 											}
 											for k, a := range obj.NestedList {
-												v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+												v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 												if !ok {
 													v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4488,7 +4488,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if obj.Map != nil {
 									t := o.ElemType
 									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
 											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 											if err != nil {
@@ -4538,7 +4538,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if obj.MapObjectNested != nil {
 									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
 											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4616,7 +4616,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 									}
 									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
 											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4747,7 +4747,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if obj.Map != nil {
 									t := o.ElemType
 									for k, a := range obj.Map {
-										v, ok := tf.Attrs["map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
 											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 											if err != nil {
@@ -4797,7 +4797,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if obj.MapObjectNested != nil {
 									o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 									for k, a := range obj.MapObjectNested {
-										v, ok := tf.Attrs["map_object_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
 											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -4875,7 +4875,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 									}
 									for k, a := range obj.NestedList {
-										v, ok := tf.Attrs["nested_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 										if !ok {
 											v = github_com_hashicorp_terraform_plugin_framework_types.Object{
 
@@ -5053,7 +5053,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 					for k, a := range obj.StringList {
-						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -5106,7 +5106,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringListEmpty))
 					}
 					for k, a := range obj.StringListEmpty {
-						v, ok := tf.Attrs["string_list_empty"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -5190,7 +5190,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
 					}
 					for k, a := range obj.TimestampList {
-						v, ok := tf.Attrs["timestamp_list"].(TimeValue)
+						v, ok := c.Elems[k].(TimeValue)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {

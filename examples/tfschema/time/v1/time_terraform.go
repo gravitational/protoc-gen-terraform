@@ -298,7 +298,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
 					}
 					for k, a := range obj.DurationCustomList {
-						v, ok := tf.Attrs["duration_custom_list"].(DurationValue)
+						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -351,7 +351,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
 					}
 					for k, a := range obj.DurationList {
-						v, ok := tf.Attrs["duration_list"].(DurationValue)
+						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -448,7 +448,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
 					}
 					for k, a := range obj.TimestampList {
-						v, ok := tf.Attrs["timestamp_list"].(TimeValue)
+						v, ok := c.Elems[k].(TimeValue)
 						if !ok {
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
