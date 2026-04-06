@@ -1,4 +1,4 @@
-resource "example_objects" "test_zero_values" {
+resource "example_objects" "test" {
   primitives = {
     string_value   = ""
     int32_value    = 0

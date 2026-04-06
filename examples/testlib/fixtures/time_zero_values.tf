@@ -1,4 +1,4 @@
-resource "example_time" "test_zero_values" {
+resource "example_time" "test" {
   duration_standard = "0s"
   duration_list     = ["0s", "0s"]
 

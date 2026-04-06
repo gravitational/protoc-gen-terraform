@@ -1,4 +1,4 @@
-resource "example_primitives" "test_zero_values" {
+resource "example_primitives" "test" {
   string_value   = ""
   int32_value    = 0
   int64_value    = 0
