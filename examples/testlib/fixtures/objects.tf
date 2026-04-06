@@ -5,7 +5,6 @@ resource "example_objects" "test" {
     float_value    = 0.75
     bool_value     = true
     enum_value     = 1
-    nullable_value = false
   }
 
   string_map = {

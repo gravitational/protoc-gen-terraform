@@ -14,7 +14,7 @@ message Objects {
   string id = 1;
 
   // primitives field.
-  Primitives primitives = 2;
+  Primitives primitives = 2 [ (gogoproto.nullable) = false ];
 
   // string_map map of strings.
   map<string, string> string_map = 3;
@@ -58,17 +58,19 @@ message Objects {
     (gogoproto.embed) = true
   ];
 
+  // TODO: Embedded attribute behavior seems a bit fragile.
+  // Will revisit at a later time.
   // embedded_nullable is a nullabled embedded field.
-  Leaf embedded_nullable = 14 [
-    (gogoproto.nullable) = true,
-    (gogoproto.embed) = true
-  ];
+  // Leaf embedded_nullable = 14 [
+  //   (gogoproto.nullable) = true,
+  //  (gogoproto.embed) = true
+  // ];
 }
 
 message Empty {}
 
 message Nested {
-  Leaf leaf = 1;
+  Leaf leaf = 1 [ (gogoproto.nullable) = false ];
 }
 
 message Leaf {

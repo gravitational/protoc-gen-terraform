@@ -15,5 +15,4 @@ resource "example_primitives" "test" {
   bool_list      = [false, false]
   bytes_list     = ["", ""]
   enum_list      = [0, 0]
-  nullable_value = null
 }

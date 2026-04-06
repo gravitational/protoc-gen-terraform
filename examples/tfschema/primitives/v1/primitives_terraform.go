@@ -118,11 +118,6 @@ func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_pl
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"nullable_value": {
-			Description: "nullable_value nullable field.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-		},
 		"string_list": {
 			Description: "string_list string list field.",
 			Optional:    true,
@@ -461,23 +456,6 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 					t = int64(v.Value)
 				}
 				obj.Int64Value = t
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["nullable_value"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Primitives.nullable_value"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Primitives.nullable_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
-			} else {
-				var t bool
-				if !v.Null && !v.Unknown {
-					t = bool(v.Value)
-				}
-				obj.NullableValue = t
 			}
 		}
 	}
@@ -1126,31 +1104,6 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 			v.Value = int64(obj.Int64Value)
 			v.Unknown = false
 			tf.Attrs["int64_value"] = v
-		}
-	}
-	{
-		t, ok := tf.AttrTypes["nullable_value"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Primitives.nullable_value"})
-		} else {
-			v, ok := tf.Attrs["nullable_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
-			if !ok {
-				if tf.Attrs["nullable_value"] != nil {
-					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.nullable_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
-				}
-				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-				if err != nil {
-					diags.Append(attrWriteGeneralError{"Primitives.nullable_value", err})
-				}
-				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
-				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"Primitives.nullable_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
-				}
-				v.Null = bool(obj.NullableValue) == false
-			}
-			v.Value = bool(obj.NullableValue)
-			v.Unknown = false
-			tf.Attrs["nullable_value"] = v
 		}
 	}
 	{
