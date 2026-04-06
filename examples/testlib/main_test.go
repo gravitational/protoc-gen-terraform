@@ -84,7 +84,6 @@ func (s *TerraformSuite) TestPrimitives() {
 					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
-					resource.TestCheckNoResourceAttr(name, "nullable_value"),
 				),
 			},
 		},
@@ -126,7 +125,6 @@ func (s *TerraformSuite) TestPrimitivesZeroValues() {
 					resource.TestCheckResourceAttr(name, "bytes_list.1", ""),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "0"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "0"),
-					resource.TestCheckNoResourceAttr(name, "nullable_value"),
 				),
 			},
 		},
@@ -168,7 +166,6 @@ func (s *TerraformSuite) TestPrimitivesUpdate() {
 					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
-					resource.TestCheckNoResourceAttr(name, "nullable_value"),
 				),
 			},
 			{
@@ -202,7 +199,6 @@ func (s *TerraformSuite) TestPrimitivesUpdate() {
 					resource.TestCheckResourceAttr(name, "bytes_list.1", ""),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "0"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "0"),
-					resource.TestCheckNoResourceAttr(name, "nullable_value"),
 				),
 			},
 			{
@@ -236,7 +232,6 @@ func (s *TerraformSuite) TestPrimitivesUpdate() {
 					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
-					resource.TestCheckNoResourceAttr(name, "nullable_value"),
 				),
 			},
 			{
@@ -387,7 +382,6 @@ func (s *TerraformSuite) TestObjects() {
 					resource.TestCheckResourceAttr(name, "primitives.float_value", "0.75"),
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
-					resource.TestCheckResourceAttr(name, "primitives.nullable_value", "false"),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
 					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),
@@ -438,7 +432,6 @@ func (s *TerraformSuite) TestObjectsZeroValues() {
 					resource.TestCheckResourceAttr(name, "primitives.float_value", "0"),
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "false"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "0"),
-					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", ""),
 					resource.TestCheckResourceAttr(name, "string_map.key2", ""),
@@ -484,7 +477,6 @@ func (s *TerraformSuite) TestObjectsUpdate() {
 					resource.TestCheckResourceAttr(name, "primitives.float_value", "0.75"),
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
-					resource.TestCheckResourceAttr(name, "primitives.nullable_value", "false"),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
 					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),
@@ -524,7 +516,6 @@ func (s *TerraformSuite) TestObjectsUpdate() {
 					resource.TestCheckResourceAttr(name, "primitives.float_value", "0"),
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "false"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "0"),
-					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", ""),
 					resource.TestCheckResourceAttr(name, "string_map.key2", ""),
@@ -562,7 +553,6 @@ func (s *TerraformSuite) TestObjectsUpdate() {
 					resource.TestCheckResourceAttr(name, "primitives.float_value", "0.75"),
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
-					resource.TestCheckResourceAttr(name, "primitives.nullable_value", "false"),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
 					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),
