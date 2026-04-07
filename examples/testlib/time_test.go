@@ -125,3 +125,26 @@ func (s *TerraformSuite) TestTimeUpdate() {
 		},
 	})
 }
+
+func (s *TerraformSuite) TestTimeNullValues() {
+	t := s.T()
+	name := "example_time.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("time_null_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr(name, "timestamp_value"),
+					resource.TestCheckNoResourceAttr(name, "timestamp_list.0"),
+					resource.TestCheckNoResourceAttr(name, "duration_standard"),
+					resource.TestCheckNoResourceAttr(name, "duration_list.0"),
+					resource.TestCheckNoResourceAttr(name, "duration_custom"),
+					resource.TestCheckNoResourceAttr(name, "duration_custom_list.0"),
+				),
+			},
+		},
+	})
+}

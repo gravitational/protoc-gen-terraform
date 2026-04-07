@@ -223,3 +223,51 @@ func (s *TerraformSuite) TestObjectsUpdate() {
 		},
 	})
 }
+
+func (s *TerraformSuite) TestObjectsNullValues() {
+	t := s.T()
+	name := "example_objects.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("objects_null_values.tf"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckNoResourceAttr(name, "primitives.string_value"),
+					resource.TestCheckNoResourceAttr(name, "primitives.int32_value"),
+					resource.TestCheckNoResourceAttr(name, "primitives.float_value"),
+					resource.TestCheckNoResourceAttr(name, "primitives.bool_value"),
+					resource.TestCheckNoResourceAttr(name, "primitives.enum_value"),
+					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
+
+					resource.TestCheckNoResourceAttr(name, "string_map.key1"),
+					resource.TestCheckNoResourceAttr(name, "string_map.key2"),
+					resource.TestCheckNoResourceAttr(name, "int_map.key1"),
+					resource.TestCheckNoResourceAttr(name, "int_map.key2"),
+					resource.TestCheckNoResourceAttr(name, "bool_map.key1"),
+					resource.TestCheckNoResourceAttr(name, "bool_map.key2"),
+
+					resource.TestCheckNoResourceAttr(name, "nested_value.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable.leaf.value"),
+
+					resource.TestCheckNoResourceAttr(name, "nested_list.0.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_list.1.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_list.0.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_list.1.leaf.value"),
+
+					resource.TestCheckNoResourceAttr(name, "nested_map.key1.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_map.key2.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_map.key1.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_map.key2.leaf.value"),
+
+					resource.TestCheckNoResourceAttr(name, "branch1.leaf.value"),
+					resource.TestCheckNoResourceAttr(name, "branch2.leaf.value"),
+
+					resource.TestCheckNoResourceAttr(name, "leaf.value"),
+				),
+			},
+		},
+	})
+}
