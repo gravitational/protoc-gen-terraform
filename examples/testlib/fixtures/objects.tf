@@ -1,10 +1,10 @@
 resource "example_objects" "test" {
   primitives = {
-    string_value   = "string"
-    int32_value    = 123
-    float_value    = 0.75
-    bool_value     = true
-    enum_value     = 1
+    string_value = "string"
+    int32_value  = 123
+    float_value  = 0.75
+    bool_value   = true
+    enum_value   = 1
   }
 
   string_map = {
