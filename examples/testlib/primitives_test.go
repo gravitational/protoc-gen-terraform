@@ -194,3 +194,36 @@ func (s *TerraformSuite) TestPrimitivesUpdate() {
 		},
 	})
 }
+
+func (s *TerraformSuite) TestPrimitivesNullValues() {
+	t := s.T()
+	name := "example_primitives.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("primitives_null_values.tf"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckNoResourceAttr(name, "string_value"),
+					resource.TestCheckNoResourceAttr(name, "int32_value"),
+					resource.TestCheckNoResourceAttr(name, "int64_value"),
+					resource.TestCheckNoResourceAttr(name, "float_value"),
+					resource.TestCheckNoResourceAttr(name, "double_value"),
+					resource.TestCheckNoResourceAttr(name, "bool_value"),
+					resource.TestCheckNoResourceAttr(name, "bytes_value"),
+					resource.TestCheckNoResourceAttr(name, "enum_value"),
+					resource.TestCheckNoResourceAttr(name, "string_list.0"),
+					resource.TestCheckNoResourceAttr(name, "int32_list.0"),
+					resource.TestCheckNoResourceAttr(name, "int64_list.0"),
+					resource.TestCheckNoResourceAttr(name, "float_list.0"),
+					resource.TestCheckNoResourceAttr(name, "double_list.0"),
+					resource.TestCheckNoResourceAttr(name, "bool_list.0"),
+					resource.TestCheckNoResourceAttr(name, "bytes_list.0"),
+					resource.TestCheckNoResourceAttr(name, "enum_list.0"),
+				),
+			},
+		},
+	})
+}
