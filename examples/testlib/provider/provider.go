@@ -15,6 +15,7 @@ type exampleProvider struct {
 	primitives map[string]*types.Primitives
 	time       map[string]*types.Time
 	objects    map[string]*types.Objects
+	computed   map[string]*types.Computed
 	custom     map[string]*types.Custom
 }
 
@@ -23,6 +24,7 @@ func New() tfsdk.Provider {
 		primitives: make(map[string]*types.Primitives),
 		time:       make(map[string]*types.Time),
 		objects:    make(map[string]*types.Objects),
+		computed:   make(map[string]*types.Computed),
 		custom:     make(map[string]*types.Custom),
 	}
 }
@@ -50,6 +52,7 @@ func (p *exampleProvider) GetResources(ctx context.Context) (map[string]tfsdk.Re
 		"example_primitives": primitivesResourceType{},
 		"example_time":       timeResourceType{},
 		"example_objects":    objectsResourceType{},
+		"example_computed":   computedResourceType{},
 		"example_custom":     customResourceType{},
 	}, nil
 }
