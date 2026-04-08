@@ -904,7 +904,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.Id)
 			v.Unknown = false

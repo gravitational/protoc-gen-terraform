@@ -1578,7 +1578,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Objects.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.Id)
 			v.Unknown = false

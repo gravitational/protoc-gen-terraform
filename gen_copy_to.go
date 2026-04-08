@@ -143,6 +143,12 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 			return
 		}
 
+		// Computed attributes evalute to non-Null values
+		if f.IsComputed {
+			g.Id("v.Null").Op("=").False()
+			return
+		}
+
 		// v.Null = v.Value == ""
 		if f.ZeroValue != "" {
 			g.Id("v.Null").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Op("==").Id(f.ZeroValue)

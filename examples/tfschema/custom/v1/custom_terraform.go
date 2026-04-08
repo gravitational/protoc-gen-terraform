@@ -314,7 +314,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.computed", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Computed) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.Computed)
 			v.Unknown = false
@@ -336,7 +336,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.Id)
 			v.Unknown = false
@@ -380,7 +380,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.PlanModifier) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.PlanModifier)
 			v.Unknown = false

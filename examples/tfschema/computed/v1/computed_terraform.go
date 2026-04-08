@@ -977,7 +977,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
-				v.Null = bool(obj.BoolValue) == false
+				v.Null = false
 			}
 			v.Value = bool(obj.BoolValue)
 			v.Unknown = false
@@ -999,7 +999,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.BytesValue) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.BytesValue)
 			v.Unknown = false
@@ -1021,7 +1021,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
-				v.Null = float64(obj.DoubleValue) == 0
+				v.Null = false
 			}
 			v.Value = float64(obj.DoubleValue)
 			v.Unknown = false
@@ -1065,7 +1065,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = int64(obj.EnumValue) == 0
+				v.Null = false
 			}
 			v.Value = int64(obj.EnumValue)
 			v.Unknown = false
@@ -1087,7 +1087,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
-				v.Null = float64(obj.FloatValue) == 0
+				v.Null = false
 			}
 			v.Value = float64(obj.FloatValue)
 			v.Unknown = false
@@ -1109,7 +1109,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.Id)
 			v.Unknown = false
@@ -1131,7 +1131,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = int64(obj.Int32Value) == 0
+				v.Null = false
 			}
 			v.Value = int64(obj.Int32Value)
 			v.Unknown = false
@@ -1153,7 +1153,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = int64(obj.Int64Value) == 0
+				v.Null = false
 			}
 			v.Value = int64(obj.Int64Value)
 			v.Unknown = false
@@ -1225,7 +1225,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 												if !ok {
 													diags.Append(attrWriteConversionFailureDiag{"Computed.nested_nullable.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 												}
-												v.Null = string(obj.Value) == ""
+												v.Null = false
 											}
 											v.Value = string(obj.Value)
 											v.Unknown = false
@@ -1307,7 +1307,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 												if !ok {
 													diags.Append(attrWriteConversionFailureDiag{"Computed.nested_value.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 												}
-												v.Null = string(obj.Value) == ""
+												v.Null = false
 											}
 											v.Value = string(obj.Value)
 											v.Unknown = false
@@ -1418,7 +1418,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = bool(obj.BoolValue) == false
+								v.Null = false
 							}
 							v.Value = bool(obj.BoolValue)
 							v.Unknown = false
@@ -1493,7 +1493,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.BytesValue) == ""
+								v.Null = false
 							}
 							v.Value = string(obj.BytesValue)
 							v.Unknown = false
@@ -1568,7 +1568,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 								}
-								v.Null = float64(obj.DoubleValue) == 0
+								v.Null = false
 							}
 							v.Value = float64(obj.DoubleValue)
 							v.Unknown = false
@@ -1643,7 +1643,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.EnumValue) == 0
+								v.Null = false
 							}
 							v.Value = int64(obj.EnumValue)
 							v.Unknown = false
@@ -1718,7 +1718,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 								}
-								v.Null = float64(obj.FloatValue) == 0
+								v.Null = false
 							}
 							v.Value = float64(obj.FloatValue)
 							v.Unknown = false
@@ -1815,7 +1815,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.Int32Value) == 0
+								v.Null = false
 							}
 							v.Value = int64(obj.Int32Value)
 							v.Unknown = false
@@ -1890,7 +1890,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.Int64Value) == 0
+								v.Null = false
 							}
 							v.Value = int64(obj.Int64Value)
 							v.Unknown = false
@@ -1965,7 +1965,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Computed.primitives_value.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.StringValue) == ""
+								v.Null = false
 							}
 							v.Value = string(obj.StringValue)
 							v.Unknown = false
@@ -1993,7 +1993,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Computed.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.StringValue) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.StringValue)
 			v.Unknown = false

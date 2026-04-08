@@ -4992,7 +4992,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Str) == ""
+				v.Null = false
 			}
 			v.Value = string(obj.Str)
 			v.Unknown = false
