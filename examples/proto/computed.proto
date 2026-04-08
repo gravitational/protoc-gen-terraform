@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package types;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "objects.proto";
+import "primitives.proto";
+
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.goproto_getters_all) = false;
+
+// Computed contains example fields that can be marked computed in config.
+message Computed {
+  string id = 1;
+
+  // string_value string field.
+  string string_value = 2;
+
+  // int32_value int32 field.
+  int32 int32_value = 3;
+
+  // int64_value int64 field.
+  int64 int64_value = 4;
+
+  // float_value float32 field.
+  float float_value = 5;
+
+  // double_value float64 field.
+  double double_value = 6;
+
+  // bool_value bool field.
+  bool bool_value = 7;
+
+  // bytes_value bytes field.
+  bytes bytes_value = 8;
+
+  // enum_value enum field.
+  EnumValue enum_value = 9;
+
+  // timestamp_value time.Time field.
+  google.protobuf.Timestamp timestamp_value = 10 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // duration_value time.Duration field.
+  google.protobuf.Duration duration_value = 11 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // primitives_value nested primitives object.
+  Primitives primitives_value = 12 [ (gogoproto.nullable) = false ];
+
+  // nested_value nested object field.
+  Nested nested_value = 13 [ (gogoproto.nullable) = false ];
+
+  // nested_nullable nullable nested object field.
+  Nested nested_nullable = 14 [ (gogoproto.nullable) = true ];
+}

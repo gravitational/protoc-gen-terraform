@@ -1,0 +1,49 @@
+---
+target_package_name: v1
+default_package_name: "github.com/gravitational/protoc-gen-terraform/v3/examples/types"
+use_state_for_unknown_by_default: true
+sort: true
+
+types:
+  - Computed
+
+computed_fields:
+  - Computed.id
+  - Computed.string_value
+  - Computed.int32_value
+  - Computed.int64_value
+  - Computed.float_value
+  - Computed.double_value
+  - Computed.bool_value
+  - Computed.bytes_value
+  - Computed.enum_value
+  - Computed.timestamp_value
+  - Computed.duration_value
+  - Computed.primitives_value
+  - Computed.primitives_value.string_value
+  - Computed.primitives_value.int32_value
+  - Computed.primitives_value.int64_value
+  - Computed.primitives_value.float_value
+  - Computed.primitives_value.double_value
+  - Computed.primitives_value.bool_value
+  - Computed.primitives_value.bytes_value
+  - Computed.primitives_value.enum_value
+  - Computed.nested_value
+  - Computed.nested_value.leaf
+  - Computed.nested_value.leaf.value
+  - Computed.nested_nullable
+  - Computed.nested_nullable.leaf
+  - Computed.nested_nullable.leaf.value
+
+time_type:
+  type: "TimeType" # Struct name of attrs.Type
+  value_type: "TimeValue" # Struct name of attrs.Value
+  cast_to_type: "time.Time" # Go type of .Value
+  cast_from_type: "time.Time" # Go type of an object field
+  type_constructor: UseRFC3339Time()
+
+duration_type:
+  type: "DurationType" # Struct name of attrs.Type
+  value_type: "DurationValue" # Struct name of attrs.Value
+  cast_to_type: "time.Duration" # Go type of .Value
+  cast_from_type: "time.Duration" # Go type of an object field

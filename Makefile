@@ -89,7 +89,16 @@ gen: build
 		--terraform_out=config=examples/config/custom.yaml:./examples/tfschema \
 		custom.proto
 
+	@protoc \
+		-I$(PWD) \
+		-I$(EXAMPLES_PROTO_DIR) \
+		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		--plugin=$(BINFILE) \
+		--terraform_out=config=examples/config/computed.yaml:./examples/tfschema \
+		computed.proto
+
 	mv ./examples/tfschema/primitives_terraform.go ./examples/tfschema/primitives/v1/
 	mv ./examples/tfschema/time_terraform.go ./examples/tfschema/time/v1/
 	mv ./examples/tfschema/objects_terraform.go ./examples/tfschema/objects/v1/
 	mv ./examples/tfschema/custom_terraform.go ./examples/tfschema/custom/v1/
+	mv ./examples/tfschema/computed_terraform.go ./examples/tfschema/computed/v1/
