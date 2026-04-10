@@ -262,7 +262,11 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 	f.Kind = f.getKind()
 
-	if c.IsOneOf() {
+	isOneOf, err := c.IsOneOf()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	if isOneOf {
 		f.OneOfName = c.GetOneOfFieldName()
 		f.OneOfType = c.GetOneOfTypeName()
 	}

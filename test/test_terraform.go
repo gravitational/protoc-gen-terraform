@@ -5200,7 +5200,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "TimeValue"})
 							}
-							v.Null = false
+							v.Null = a == nil
 						}
 						if a == nil {
 							v.Null = true
@@ -5257,7 +5257,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
 				}
-				v.Null = false
+				v.Null = obj.TimestampNullable == nil
 			}
 			if obj.TimestampNullable == nil {
 				v.Null = true
@@ -5284,7 +5284,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
 				}
-				v.Null = false
+				v.Null = obj.TimestampNullableWithNilValue == nil
 			}
 			if obj.TimestampNullableWithNilValue == nil {
 				v.Null = true

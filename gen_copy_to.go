@@ -141,8 +141,12 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 			return
 		}
 
-		// v.Null = v.Value == ""
-		if f.ZeroValue != "" {
+		// For pointer types, null means the pointer is nil,
+		// not the zero value.
+		if f.IsNullable {
+			g.Id("v.Null").Op("=").Id(fieldName).Op("==").Nil()
+		} else if f.ZeroValue != "" {
+			// v.Null = v.Value == ""
 			g.Id("v.Null").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Op("==").Id(f.ZeroValue)
 		} else {
 			g.Id("v.Null").Op("=").False()

@@ -134,6 +134,18 @@ func NewFieldBuildContext(m MessageBuildContext, field *FieldDescriptorProtoExt,
 		goType:              m.imports.PrependPackageNameIfMissing(t, m.config.DefaultPackageName),
 	}
 
+	// Proto3 optional scalar fields are generated as pointer types by
+	// protoc-gen-go (e.g. *string instead of string). This plugin uses
+	// gogo's generator (protoc-gen-gogo/generator) library to resolve Go types, which doesn't
+	// support optional and returns the non-pointer type.
+	isOptional, err := c.field.IsProto3Optional()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	if isOptional {
+		c.goType = "*" + c.goType
+	}
+
 	return c, nil
 }
 
@@ -364,8 +376,20 @@ func (c *FieldBuildContext) IsMap() bool {
 }
 
 // IsOneOf returns true if this field belongs to a OneOf group
-func (c *FieldBuildContext) IsOneOf() bool {
-	return c.field.OneofIndex != nil
+func (c *FieldBuildContext) IsOneOf() (bool, error) {
+	if c.field.OneofIndex == nil {
+		return false, nil
+	}
+	// Proto3 optional fields are represented as oneofs in the
+	// descriptor. Exclude them from being treated as real oneof members.
+	isOptional, err := c.field.IsProto3Optional()
+	if err != nil {
+		return false, trace.Wrap(err)
+	}
+	if isOptional {
+		return false, nil
+	}
+	return true, nil
 }
 
 // GetMapValueFieldDescriptorAndType returns field descriptor for a map field
@@ -471,7 +495,7 @@ func (c *FieldBuildContext) GetTerraformTypeOverride() *SchemaType {
 
 // GetOneOfFieldName returns OneOf container name
 func (c *FieldBuildContext) GetOneOfFieldName() string {
-	if !c.IsOneOf() {
+	if c.field.OneofIndex == nil {
 		return ""
 	}
 
@@ -484,7 +508,7 @@ func (c *FieldBuildContext) GetOneOfFieldName() string {
 
 // GetOneOfTypeName returns OneOf container go name
 func (c *FieldBuildContext) GetOneOfTypeName() string {
-	if !c.IsOneOf() {
+	if c.field.OneofIndex == nil {
 		return ""
 	}
 
