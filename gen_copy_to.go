@@ -301,6 +301,12 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 		mk = j.Make(j.Index().Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id(fieldName)))
 	}
 
+	// Computed attributes evaluate to non-Null values
+	mkNull := j.True()
+	if f.IsComputed {
+		mkNull = j.False()
+	}
+
 	return f.nextField("a", func(g *j.Group) {
 		f.assertTo(f.Field.Type, g, func(g *j.Group) {
 			f.getAttr(g, "c", "tf.Attrs", f.Field.ValueType, j.Lit(f.Field.NameSnake))
@@ -310,7 +316,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				j.Id("c").Op("=").Id(f.i.WithType(f.Field.ValueType)).Block(j.Dict{
 					j.Id("Elems"):    mk,
 					j.Id("ElemType"): j.Id("o.ElemType"),
-					j.Id("Null"):     j.True(),
+					j.Id("Null"):     mkNull,
 				}),
 			).Else().Block(
 				j.If(j.Id("c.Elems").Op("==").Nil()).Block(

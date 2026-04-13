@@ -1367,7 +1367,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1420,7 +1420,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1473,7 +1473,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1526,7 +1526,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1609,7 +1609,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolMap)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1662,7 +1662,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatMap)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1715,7 +1715,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64Map)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
@@ -1768,7 +1768,7 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 
 										ElemType: o.ElemType,
 										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringMap)),
-										Null:     true,
+										Null:     false,
 									}
 								} else {
 									if c.Elems == nil {
