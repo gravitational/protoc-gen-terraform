@@ -34,6 +34,16 @@ computed_fields:
   - Computed.nested_nullable
   - Computed.nested_nullable.leaf
   - Computed.nested_nullable.leaf.value
+  - Computed.computed_list
+  - Computed.computed_list.string_list
+  - Computed.computed_list.int64_list
+  - Computed.computed_list.float_list
+  - Computed.computed_list.bool_list
+  - Computed.computed_map
+  - Computed.computed_map.string_map
+  - Computed.computed_map.int64_map
+  - Computed.computed_map.float_map
+  - Computed.computed_map.bool_map
 
 time_type:
   type: "TimeType" # Struct name of attrs.Type

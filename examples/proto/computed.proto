@@ -60,4 +60,40 @@ message Computed {
 
   // nested_nullable nullable nested object field.
   Nested nested_nullable = 14 [ (gogoproto.nullable) = true ];
+
+  // computed_list contain nested lists.
+  ComputedList computed_list = 15 [ (gogoproto.nullable) = false ];
+
+  // computed_map contain nested maps.
+  ComputedMap computed_map = 16 [ (gogoproto.nullable) = false ];
+}
+
+// ComputedList contains lists.
+message ComputedList {
+  // string_list string list field.
+  repeated string string_list = 1;
+
+  // int64_list int64 list field.
+  repeated int64 int64_list = 2;
+
+  // float_list float list field.
+  repeated float float_list = 3;
+
+  // bool_list bool list field.
+  repeated bool bool_list = 4;
+}
+
+// ComputedMap contains maps.
+message ComputedMap {
+  // string_map string map field.
+  repeated string string_map = 1;
+
+  // int64_map int64 map field.
+  repeated int64 int64_map = 2;
+
+  // float_map float map field.
+  repeated float float_map = 3;
+
+  // bool_map bool map field.
+  repeated bool bool_map = 4;
 }
