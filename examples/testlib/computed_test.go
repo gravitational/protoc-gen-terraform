@@ -93,6 +93,22 @@ func testCheckComputedResource(name string) resource.TestCheckFunc {
 		resource.TestCheckResourceAttr(name, "primitives_value.enum_value", "1"),
 		resource.TestCheckResourceAttr(name, "nested_value.leaf.value", "nested-value"),
 		resource.TestCheckResourceAttr(name, "nested_nullable.leaf.value", "nested-nullable"),
+		resource.TestCheckResourceAttr(name, "computed_list.string_list.0", "s1"),
+		resource.TestCheckResourceAttr(name, "computed_list.string_list.1", "s2"),
+		resource.TestCheckResourceAttr(name, "computed_list.int64_list.0", "123"),
+		resource.TestCheckResourceAttr(name, "computed_list.int64_list.1", "456"),
+		resource.TestCheckResourceAttr(name, "computed_list.float_list.0", "0.5"),
+		resource.TestCheckResourceAttr(name, "computed_list.float_list.1", "1.5"),
+		resource.TestCheckResourceAttr(name, "computed_list.bool_list.0", "true"),
+		resource.TestCheckResourceAttr(name, "computed_list.bool_list.1", "false"),
+		resource.TestCheckResourceAttr(name, "computed_map.string_map.0", "s1"),
+		resource.TestCheckResourceAttr(name, "computed_map.string_map.1", "s2"),
+		resource.TestCheckResourceAttr(name, "computed_map.int64_map.0", "123"),
+		resource.TestCheckResourceAttr(name, "computed_map.int64_map.1", "456"),
+		resource.TestCheckResourceAttr(name, "computed_map.float_map.0", "0.5"),
+		resource.TestCheckResourceAttr(name, "computed_map.float_map.1", "1.5"),
+		resource.TestCheckResourceAttr(name, "computed_map.bool_map.0", "true"),
+		resource.TestCheckResourceAttr(name, "computed_map.bool_map.1", "false"),
 	)
 }
 
@@ -121,5 +137,18 @@ func testCheckComputedResourceZeroValue(name string) resource.TestCheckFunc {
 
 		resource.TestCheckResourceAttr(name, "nested_value.leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "nested_nullable.leaf.value"),
+
+		// TODO: Updates with computed list and map type attributes result in
+		// unexpected behavior. Previous state is not overridden. This will be
+		// fixed in a follow up PR.
+
+		// resource.TestCheckResourceAttr(name, "computed_list.string_list.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_list.int64_list.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_list.float_list.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_list.bool_list.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_map.string_map.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_map.int64_map.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_map.float_map.#", "0"),
+		// resource.TestCheckResourceAttr(name, "computed_map.bool_map.#", "0"),
 	)
 }

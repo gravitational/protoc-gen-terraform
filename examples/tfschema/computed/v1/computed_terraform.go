@@ -59,6 +59,78 @@ func GenSchemaComputed(ctx context.Context) (github_com_hashicorp_terraform_plug
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
+		"computed_list": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+				"bool_list": {
+					Computed:      true,
+					Description:   "bool_list bool list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
+				},
+				"float_list": {
+					Computed:      true,
+					Description:   "float_list float list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
+				},
+				"int64_list": {
+					Computed:      true,
+					Description:   "int64_list int64 list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
+				},
+				"string_list": {
+					Computed:      true,
+					Description:   "string_list string list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+				},
+			}),
+			Computed:      true,
+			Description:   "computed_list contain nested lists.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+		},
+		"computed_map": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+				"bool_map": {
+					Computed:      true,
+					Description:   "bool_map bool map field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
+				},
+				"float_map": {
+					Computed:      true,
+					Description:   "float_map float map field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
+				},
+				"int64_map": {
+					Computed:      true,
+					Description:   "int64_map int64 map field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
+				},
+				"string_map": {
+					Computed:      true,
+					Description:   "string_map string map field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+				},
+			}),
+			Computed:      true,
+			Description:   "computed_map contain nested maps.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+		},
 		"double_value": {
 			Computed:      true,
 			Description:   "double_value float64 field.",
@@ -306,6 +378,256 @@ func CopyComputedFromTerraform(_ context.Context, tf github_com_hashicorp_terraf
 					t = []byte(v.Value)
 				}
 				obj.BytesValue = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["computed_list"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Computed.computed_list"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Computed.computed_list", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.ComputedList = github_com_gravitational_protoc_gen_terraform_v3_examples_types.ComputedList{}
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj := &obj.ComputedList
+					{
+						a, ok := tf.Attrs["bool_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_list.bool_list"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.BoolList = make([]bool, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.bool_list", "github_com_hashicorp_terraform_plugin_framework_types.Bool"})
+										} else {
+											var t bool
+											if !v.Null && !v.Unknown {
+												t = bool(v.Value)
+											}
+											obj.BoolList[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["float_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_list.float_list"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.float_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.FloatList = make([]float32, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.float_list", "github_com_hashicorp_terraform_plugin_framework_types.Float64"})
+										} else {
+											var t float32
+											if !v.Null && !v.Unknown {
+												t = float32(v.Value)
+											}
+											obj.FloatList[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["int64_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_list.int64_list"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.Int64List = make([]int64, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.int64_list", "github_com_hashicorp_terraform_plugin_framework_types.Int64"})
+										} else {
+											var t int64
+											if !v.Null && !v.Unknown {
+												t = int64(v.Value)
+											}
+											obj.Int64List[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["string_list"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_list.string_list"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.string_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.StringList = make([]string, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_list.string_list", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.StringList[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["computed_map"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Computed.computed_map"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Computed.computed_map", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.ComputedMap = github_com_gravitational_protoc_gen_terraform_v3_examples_types.ComputedMap{}
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj := &obj.ComputedMap
+					{
+						a, ok := tf.Attrs["bool_map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_map.bool_map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.bool_map", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.BoolMap = make([]bool, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.bool_map", "github_com_hashicorp_terraform_plugin_framework_types.Bool"})
+										} else {
+											var t bool
+											if !v.Null && !v.Unknown {
+												t = bool(v.Value)
+											}
+											obj.BoolMap[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["float_map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_map.float_map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.float_map", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.FloatMap = make([]float32, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.float_map", "github_com_hashicorp_terraform_plugin_framework_types.Float64"})
+										} else {
+											var t float32
+											if !v.Null && !v.Unknown {
+												t = float32(v.Value)
+											}
+											obj.FloatMap[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["int64_map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_map.int64_map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.int64_map", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.Int64Map = make([]int64, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.int64_map", "github_com_hashicorp_terraform_plugin_framework_types.Int64"})
+										} else {
+											var t int64
+											if !v.Null && !v.Unknown {
+												t = int64(v.Value)
+											}
+											obj.Int64Map[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+					{
+						a, ok := tf.Attrs["string_map"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Computed.computed_map.string_map"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.string_map", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+							} else {
+								obj.StringMap = make([]string, len(v.Elems))
+								if !v.Null && !v.Unknown {
+									for k, a := range v.Elems {
+										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											diags.Append(attrReadConversionFailureDiag{"Computed.computed_map.string_map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+										} else {
+											var t string
+											if !v.Null && !v.Unknown {
+												t = string(v.Value)
+											}
+											obj.StringMap[k] = t
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1004,6 +1326,490 @@ func CopyComputedToTerraform(ctx context.Context, obj *github_com_gravitational_
 			v.Value = string(obj.BytesValue)
 			v.Unknown = false
 			tf.Attrs["bytes_value"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["computed_list"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Computed.computed_list"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["computed_list"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				{
+					obj := obj.ComputedList
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["bool_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_list.bool_list"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["bool_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
+									}
+								}
+								if obj.BoolList != nil {
+									t := o.ElemType
+									if len(obj.BoolList) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
+									}
+									for k, a := range obj.BoolList {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_list.bool_list", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+											}
+											v.Null = false
+										}
+										v.Value = bool(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.BoolList) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["bool_list"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["float_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_list.float_list"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.float_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["float_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
+									}
+								}
+								if obj.FloatList != nil {
+									t := o.ElemType
+									if len(obj.FloatList) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
+									}
+									for k, a := range obj.FloatList {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_list.float_list", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.float_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+											}
+											v.Null = false
+										}
+										v.Value = float64(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.FloatList) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["float_list"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["int64_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_list.int64_list"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["int64_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
+									}
+								}
+								if obj.Int64List != nil {
+									t := o.ElemType
+									if len(obj.Int64List) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
+									}
+									for k, a := range obj.Int64List {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_list.int64_list", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+											}
+											v.Null = false
+										}
+										v.Value = int64(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.Int64List) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["int64_list"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["string_list"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_list.string_list"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.string_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+									}
+								}
+								if obj.StringList != nil {
+									t := o.ElemType
+									if len(obj.StringList) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+									}
+									for k, a := range obj.StringList {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_list.string_list", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_list.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
+										}
+										v.Value = string(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.StringList) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["string_list"] = c
+							}
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["computed_list"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["computed_map"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Computed.computed_map"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["computed_map"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				{
+					obj := obj.ComputedMap
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["bool_map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_map.bool_map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.bool_map", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["bool_map"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolMap)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolMap))
+									}
+								}
+								if obj.BoolMap != nil {
+									t := o.ElemType
+									if len(obj.BoolMap) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolMap))
+									}
+									for k, a := range obj.BoolMap {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_map.bool_map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.bool_map", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+											}
+											v.Null = false
+										}
+										v.Value = bool(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.BoolMap) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["bool_map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["float_map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_map.float_map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.float_map", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["float_map"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatMap)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatMap))
+									}
+								}
+								if obj.FloatMap != nil {
+									t := o.ElemType
+									if len(obj.FloatMap) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatMap))
+									}
+									for k, a := range obj.FloatMap {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_map.float_map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.float_map", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+											}
+											v.Null = false
+										}
+										v.Value = float64(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.FloatMap) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["float_map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["int64_map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_map.int64_map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.int64_map", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["int64_map"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64Map)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64Map))
+									}
+								}
+								if obj.Int64Map != nil {
+									t := o.ElemType
+									if len(obj.Int64Map) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64Map))
+									}
+									for k, a := range obj.Int64Map {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_map.int64_map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.int64_map", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+											}
+											v.Null = false
+										}
+										v.Value = int64(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.Int64Map) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["int64_map"] = c
+							}
+						}
+					}
+					{
+						a, ok := tf.AttrTypes["string_map"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Computed.computed_map.string_map"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.string_map", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+							} else {
+								c, ok := tf.Attrs["string_map"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+								if !ok {
+									c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+										ElemType: o.ElemType,
+										Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringMap)),
+										Null:     false,
+									}
+								} else {
+									if c.Elems == nil {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringMap))
+									}
+								}
+								if obj.StringMap != nil {
+									t := o.ElemType
+									if len(obj.StringMap) != len(c.Elems) {
+										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringMap))
+									}
+									for k, a := range obj.StringMap {
+										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
+										if !ok {
+											i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+											if err != nil {
+												diags.Append(attrWriteGeneralError{"Computed.computed_map.string_map", err})
+											}
+											v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrWriteConversionFailureDiag{"Computed.computed_map.string_map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											}
+											v.Null = false
+										}
+										v.Value = string(a)
+										v.Unknown = false
+										c.Elems[k] = v
+									}
+									if len(obj.StringMap) > 0 {
+										c.Null = false
+									}
+								}
+								c.Unknown = false
+								tf.Attrs["string_map"] = c
+							}
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["computed_map"] = v
+			}
 		}
 	}
 	{
