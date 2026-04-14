@@ -67,7 +67,7 @@ var (
 		ElemType:         Types + ".BoolType",
 		ElemValueType:    Types + ".Bool",
 		ValueCastToType:  "bool",
-		ZeroValue:        "false",
+		ZeroValue:        "",
 		IsTypeScalar:     true,
 		IsElemTypeScalar: true,
 	}

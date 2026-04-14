@@ -2358,7 +2358,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
-				v.Null = bool(obj.Bool) == false
+				v.Null = false
 			}
 			v.Value = bool(obj.Bool)
 			v.Unknown = false

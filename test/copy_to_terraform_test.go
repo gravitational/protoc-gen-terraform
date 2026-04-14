@@ -61,6 +61,18 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 	require.False(t, o.Attrs["bytes"].(types.String).Null)
 }
 
+func TestCopyToBoolZeroValue(t *testing.T) {
+	o := copyToTerraformObject(t)
+	obj := createTestObj()
+	obj.Bool = false
+	diags := CopyTestToTerraform(t.Context(), obj, &o)
+	requireNoDiagErrors(t, diags)
+
+	require.Equal(t, false, o.Attrs["bool"].(types.Bool).Value)
+	require.False(t, o.Attrs["bool"].(types.Bool).Unknown)
+	require.False(t, o.Attrs["bool"].(types.Bool).Null)
+}
+
 func TestCopyToTime(t *testing.T) {
 	o := copyToTerraformObject(t)
 

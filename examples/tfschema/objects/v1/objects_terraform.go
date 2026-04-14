@@ -2424,7 +2424,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 											}
-											v.Null = bool(a) == false
+											v.Null = false
 										}
 										v.Value = bool(a)
 										v.Unknown = false
@@ -2454,7 +2454,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = bool(obj.BoolValue) == false
+								v.Null = false
 							}
 							v.Value = bool(obj.BoolValue)
 							v.Unknown = false
@@ -2948,7 +2948,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.nullable_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = bool(obj.NullableValue) == false
+								v.Null = false
 							}
 							v.Value = bool(obj.NullableValue)
 							v.Unknown = false
