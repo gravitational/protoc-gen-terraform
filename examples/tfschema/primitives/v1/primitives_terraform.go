@@ -536,7 +536,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
 					}
 				}
-				if obj.BoolList != nil {
+				{
 					t := o.ElemType
 					if len(obj.BoolList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
@@ -611,7 +611,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
 					}
 				}
-				if obj.BytesList != nil {
+				{
 					t := o.ElemType
 					if len(obj.BytesList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
@@ -686,7 +686,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
 					}
 				}
-				if obj.DoubleList != nil {
+				{
 					t := o.ElemType
 					if len(obj.DoubleList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
@@ -761,7 +761,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
 					}
 				}
-				if obj.EnumList != nil {
+				{
 					t := o.ElemType
 					if len(obj.EnumList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
@@ -836,7 +836,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
 					}
 				}
-				if obj.FloatList != nil {
+				{
 					t := o.ElemType
 					if len(obj.FloatList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
@@ -933,7 +933,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
 					}
 				}
-				if obj.Int32List != nil {
+				{
 					t := o.ElemType
 					if len(obj.Int32List) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
@@ -1008,7 +1008,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
 					}
 				}
-				if obj.Int64List != nil {
+				{
 					t := o.ElemType
 					if len(obj.Int64List) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
@@ -1083,7 +1083,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 				}
-				if obj.StringList != nil {
+				{
 					t := o.ElemType
 					if len(obj.StringList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))

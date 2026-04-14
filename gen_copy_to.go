@@ -324,7 +324,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				),
 			)
 
-			g.If(j.Id(fieldName)).Op("!=").Nil().BlockFunc(func(g *j.Group) {
+			g.BlockFunc(func(g *j.Group) {
 				if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
 					g.Id("t").Op(":=").Id("o.ElemType")
 				} else {
