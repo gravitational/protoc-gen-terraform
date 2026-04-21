@@ -566,6 +566,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.BoolList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.bool_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.bool_list", err})
@@ -596,6 +599,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["bool_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
+				if tf.Attrs["bool_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.bool_value", "obj.BoolValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.bool_value", err})
@@ -641,6 +647,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.BytesList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.bytes_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.bytes_list", err})
@@ -671,6 +680,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["bytes_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["bytes_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.bytes_value", "obj.BytesValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.bytes_value", err})
@@ -716,6 +728,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.DoubleList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.double_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.double_list", err})
@@ -746,6 +761,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["double_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
+				if tf.Attrs["double_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.double_value", "obj.DoubleValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.double_value", err})
@@ -791,6 +809,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.EnumList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.enum_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.enum_list", err})
@@ -821,6 +842,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["enum_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["enum_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.enum_value", "obj.EnumValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.enum_value", err})
@@ -866,6 +890,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.FloatList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.float_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.float_list", err})
@@ -896,6 +923,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["float_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
+				if tf.Attrs["float_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.float_value", "obj.FloatValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.float_value", err})
@@ -918,6 +948,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["id"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.id", "obj.Id"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.id", err})
@@ -963,6 +996,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.Int32List {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.int32_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.int32_list", err})
@@ -993,6 +1029,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["int32_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["int32_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.int32_value", "obj.Int32Value"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.int32_value", err})
@@ -1038,6 +1077,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.Int64List {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.int64_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.int64_list", err})
@@ -1068,6 +1110,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["int64_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["int64_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.int64_value", "obj.Int64Value"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.int64_value", err})
@@ -1090,6 +1135,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["nullable_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
+				if tf.Attrs["nullable_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.nullable_value", "obj.NullableValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.nullable_value", err})
@@ -1135,6 +1183,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					for k, a := range obj.StringList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Primitives.string_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.string_list", err})
@@ -1165,6 +1216,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["string_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["string_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Primitives.string_value", "obj.StringValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.string_value", err})

@@ -306,6 +306,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["computed"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["computed"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.computed", "obj.Computed"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.computed", err})
@@ -328,6 +331,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["id"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.id", "obj.Id"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.id", err})
@@ -350,6 +356,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["custom_name_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["custom_name_override"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.name_override", "obj.NameOverride"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.name_override", err})
@@ -372,6 +381,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["plan_modifier"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["plan_modifier"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.plan_modifier", "obj.PlanModifier"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.plan_modifier", err})
@@ -394,6 +406,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["required"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["required"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.required", "obj.Required"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.required", err})
@@ -416,6 +431,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["schema_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["schema_override"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.schema_override", "obj.SchemaOverride"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.schema_override", err})
@@ -438,6 +456,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["sensitive"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["sensitive"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.sensitive", "obj.Sensitive"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.sensitive", err})
@@ -469,6 +490,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 		} else {
 			v, ok := tf.Attrs["validated"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["validated"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Custom.validated", "obj.Validated"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Custom.validated", err})

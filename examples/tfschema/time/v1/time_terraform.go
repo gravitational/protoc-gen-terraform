@@ -255,6 +255,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 		} else {
 			v, ok := tf.Attrs["duration_custom"].(DurationValue)
 			if !ok {
+				if tf.Attrs["duration_custom"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom", "obj.DurationCustom"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Time.duration_custom", err})
@@ -300,6 +303,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 					for k, a := range obj.DurationCustomList {
 						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Time.duration_custom_list", err})
@@ -353,6 +359,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 					for k, a := range obj.DurationList {
 						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Time.duration_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Time.duration_list", err})
@@ -383,6 +392,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 		} else {
 			v, ok := tf.Attrs["duration_standard"].(DurationValue)
 			if !ok {
+				if tf.Attrs["duration_standard"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Time.duration_standard", "obj.DurationStandard"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Time.duration_standard", err})
@@ -405,6 +417,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 		} else {
 			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["id"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Time.id", "obj.Id"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Time.id", err})
@@ -450,6 +465,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 					for k, a := range obj.TimestampList {
 						v, ok := c.Elems[k].(TimeValue)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_list", "a"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Time.timestamp_list", err})
@@ -480,6 +498,9 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 		} else {
 			v, ok := tf.Attrs["timestamp_value"].(TimeValue)
 			if !ok {
+				if tf.Attrs["timestamp_value"] != nil {
+					diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_value", "obj.TimestampValue"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Time.timestamp_value", err})
