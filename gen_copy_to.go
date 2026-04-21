@@ -154,8 +154,21 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 
 // genPrimitiveBody generates a block statement that reads an object field into
 // variable "v".
-func (f *FieldCopyToGenerator) genPrimitiveBody(g *j.Group, fieldName string) {
-	g.If(j.Id("!ok")).BlockFunc(f.genZeroValue(fieldName))
+func (f *FieldCopyToGenerator) genPrimitiveBody(g *j.Group, fieldName string, existing *j.Statement, expectedType string) {
+	g.If(j.Id("!ok")).BlockFunc(
+		// If the existing field is not of the expected primitive type.
+		// This is either because the field is uninitialized, but this could be a bug.
+		func(g *j.Group) {
+			// First we check if the field was really uninitialized.
+			// If it's not, we don't know what's going on and need to fail.
+			g.If(existing.Op("!=").Nil()).Block(
+				j.Id("diags.Append").Call(
+					j.Id("attrWriteUnexpectedExistingTypeDiag").Values(j.Lit(f.Path), j.Lit(expectedType)),
+				),
+			)
+			// The existing field is nil, we generate the zero value.
+			f.genZeroValue(fieldName)(g)
+		})
 
 	if !f.IsPlaceholder {
 		if f.ParentIsOptionalEmbed {
@@ -246,8 +259,10 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 			f.genOneOfStub(g)
 		}
 
-		f.getAttr(g, "v", "tf.Attrs", f.i.WithType(f.Field.ElemValueType), j.Lit(f.Field.NameSnake))
-		f.genPrimitiveBody(g, fieldName)
+		selector := "tf.Attrs"
+		index := j.Lit(f.Field.NameSnake)
+		f.getAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
+		f.genPrimitiveBody(g, fieldName, j.Id(selector).Index(index), f.Field.ElemValueType)
 		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})
 }
@@ -332,8 +347,10 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id(fieldName).BlockFunc(func(g *j.Group) {
 					switch f.Kind {
 					case PrimitiveListKind, PrimitiveMapKind:
-						f.getAttr(g, "v", "c.Elems", f.i.WithType(f.Field.ElemValueType), j.Id("k"))
-						f.genPrimitiveBody(g, "a")
+						selector := "c.Elems"
+						index := j.Id("k")
+						f.getAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
+						f.genPrimitiveBody(g, "a", j.Id(selector).Index(index), f.Field.ElemValueType)
 					default:
 						m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
 						f.getAttr(g, "v", "c.Elems", f.i.WithType(f.Field.ElemValueType), j.Id("k"))
