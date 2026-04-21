@@ -307,7 +307,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["computed"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["computed"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.computed", "obj.Computed"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.computed", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -332,7 +332,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["id"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.id", "obj.Id"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -357,7 +357,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["custom_name_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["custom_name_override"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.name_override", "obj.NameOverride"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -382,7 +382,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["plan_modifier"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["plan_modifier"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.plan_modifier", "obj.PlanModifier"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -407,7 +407,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["required"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["required"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.required", "obj.Required"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.required", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -432,7 +432,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["schema_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["schema_override"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.schema_override", "obj.SchemaOverride"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.schema_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -457,7 +457,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["sensitive"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["sensitive"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.sensitive", "obj.Sensitive"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.sensitive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -491,7 +491,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 			v, ok := tf.Attrs["validated"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["validated"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Custom.validated", "obj.Validated"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -616,5 +616,28 @@ func (d attrWriteGeneralError) Detail() string {
 }
 
 func (d attrWriteGeneralError) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteUnexpectedExistingTypeDiag represents diagnostic message when a field is initialized with a value whose go
+// type does not match what we'd expect.
+type attrWriteUnexpectedExistingTypeDiag struct {
+	Path string
+	Type string
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Detail() string {
+	return fmt.Sprintf("A value for %v is already initialized and its type is not %v", d.Path, d.Type)
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }

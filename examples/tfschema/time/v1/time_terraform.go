@@ -256,7 +256,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 			v, ok := tf.Attrs["duration_custom"].(DurationValue)
 			if !ok {
 				if tf.Attrs["duration_custom"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom", "obj.DurationCustom"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_custom", "DurationValue"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -304,7 +304,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
 							if c.Elems[k] != nil {
-								diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom_list", "a"})
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_custom_list", "DurationValue"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -360,7 +360,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v, ok := c.Elems[k].(DurationValue)
 						if !ok {
 							if c.Elems[k] != nil {
-								diags.Append(attrWriteConversionFailureDiag{"Time.duration_list", "a"})
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_list", "DurationValue"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -393,7 +393,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 			v, ok := tf.Attrs["duration_standard"].(DurationValue)
 			if !ok {
 				if tf.Attrs["duration_standard"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Time.duration_standard", "obj.DurationStandard"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_standard", "DurationValue"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -418,7 +418,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["id"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Time.id", "obj.Id"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -466,7 +466,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v, ok := c.Elems[k].(TimeValue)
 						if !ok {
 							if c.Elems[k] != nil {
-								diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_list", "a"})
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.timestamp_list", "TimeValue"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
@@ -499,7 +499,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 			v, ok := tf.Attrs["timestamp_value"].(TimeValue)
 			if !ok {
 				if tf.Attrs["timestamp_value"] != nil {
-					diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_value", "obj.TimestampValue"})
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.timestamp_value", "TimeValue"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
@@ -624,5 +624,28 @@ func (d attrWriteGeneralError) Detail() string {
 }
 
 func (d attrWriteGeneralError) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteUnexpectedExistingTypeDiag represents diagnostic message when a field is initialized with a value whose go
+// type does not match what we'd expect.
+type attrWriteUnexpectedExistingTypeDiag struct {
+	Path string
+	Type string
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Detail() string {
+	return fmt.Sprintf("A value for %v is already initialized and its type is not %v", d.Path, d.Type)
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
