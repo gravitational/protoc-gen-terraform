@@ -64,7 +64,6 @@ resource "example_objects" "test" {
   leaf = {
     value = "embedded-leaf"
   }
-  # TODO: Unepxected behavior with embedded fields.
-  # This embedded value overwrites the embedded leaf.value field.
-  # value = "embedded-nullable-value"
+
+  embedded_value = "embedded-nullable-value"
 }

@@ -72,6 +72,11 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			Description: "",
 			Optional:    true,
 		},
+		"embedded_value": {
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"empty": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
 				Computed:    true,
@@ -411,6 +416,28 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["embedded_value"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.embedded_value"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.embedded_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					if obj.LeafEmbedded == nil {
+						obj.LeafEmbedded = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.LeafEmbedded{}
+					}
+					obj.EmbeddedValue = t
 				}
 			}
 		}
@@ -1518,6 +1545,35 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				v.Unknown = false
 				tf.Attrs["branch2"] = v
 			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["embedded_value"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.embedded_value"})
+		} else {
+			v, ok := tf.Attrs["embedded_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				if tf.Attrs["embedded_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.embedded_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.embedded_value", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.embedded_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				v.Null = string(obj.EmbeddedValue) == ""
+			}
+			if obj.LeafEmbedded == nil {
+				v.Null = true
+			} else {
+				v.Value = string(obj.EmbeddedValue)
+			}
+			v.Unknown = false
+			tf.Attrs["embedded_value"] = v
 		}
 	}
 	{

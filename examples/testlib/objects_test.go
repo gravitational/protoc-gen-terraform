@@ -118,9 +118,7 @@ func (s *TerraformSuite) testCheckObjectResource(name string) resource.TestCheck
 		resource.TestCheckNoResourceAttr(name, "branch2"),
 
 		resource.TestCheckResourceAttr(name, "leaf.value", "embedded-leaf"),
-		// TODO: Unepxected behavior with embedded fields.
-		// This embedded value overwrites the leaf.value field.
-		// resource.TestCheckResourceAttr(name, "value", "embedded-nullable-value"),
+		resource.TestCheckResourceAttr(name, "embedded_value", "embedded-nullable-value"),
 	)
 }
 
@@ -154,6 +152,7 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "branch2"),
 
 		resource.TestCheckResourceAttr(name, "leaf.value", ""),
+		resource.TestCheckResourceAttr(name, "embedded_value", ""),
 	)
 }
 
@@ -190,5 +189,6 @@ func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "branch2.leaf.value"),
 
 		resource.TestCheckNoResourceAttr(name, "leaf.value"),
+		resource.TestCheckNoResourceAttr(name, "embedded_value"),
 	)
 }
