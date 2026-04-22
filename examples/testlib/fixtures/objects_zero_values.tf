@@ -53,4 +53,6 @@ resource "example_objects" "test" {
   leaf = {
     value = ""
   }
+
+  embedded_value = ""
 }

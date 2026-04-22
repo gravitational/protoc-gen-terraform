@@ -58,13 +58,11 @@ message Objects {
     (gogoproto.embed) = true
   ];
 
-  // TODO: Embedded attribute behavior seems a bit fragile.
-  // Will revisit at a later time.
-  // embedded_nullable is a nullabled embedded field.
-  // Leaf embedded_nullable = 14 [
-  //   (gogoproto.nullable) = true,
-  //  (gogoproto.embed) = true
-  // ];
+  // embedded_nullable is an embedded nullable field.
+  LeafEmbedded embedded_nullable = 14 [
+    (gogoproto.nullable) = true,
+    (gogoproto.embed) = true
+  ];
 }
 
 message Empty {}
@@ -75,4 +73,8 @@ message Nested {
 
 message Leaf {
   string value = 1;
+}
+
+message LeafEmbedded {
+  string embedded_value = 1;
 }
