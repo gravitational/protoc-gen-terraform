@@ -9,3 +9,19 @@ types:
 
 computed_fields:
   - Primitives.id
+  - Primitives.string_value
+  - Primitives.int32_value
+  - Primitives.int64_value
+  - Primitives.float_value
+  - Primitives.double_value
+  - Primitives.bool_value
+  - Primitives.bytes_value
+  - Primitives.enum_value
+  - Primitives.string_list
+  - Primitives.int32_list
+  - Primitives.int64_list
+  - Primitives.float_list
+  - Primitives.double_list
+  - Primitives.bool_list
+  - Primitives.bytes_list
+  - Primitives.enum_list
