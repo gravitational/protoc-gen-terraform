@@ -9,3 +9,65 @@ types:
 
 computed_fields:
   - Objects.id
+
+  - Objects.primitives
+  - Objects.primitives.id
+  - Objects.primitives.string_value
+  - Objects.primitives.int32_value
+  - Objects.primitives.int64_value
+  - Objects.primitives.float_value
+  - Objects.primitives.double_value
+  - Objects.primitives.bool_value
+  - Objects.primitives.bytes_value
+  - Objects.primitives.enum_value
+  - Objects.primitives.string_list
+  - Objects.primitives.int32_list
+  - Objects.primitives.int64_list
+  - Objects.primitives.float_list
+  - Objects.primitives.double_list
+  - Objects.primitives.bool_list
+  - Objects.primitives.bytes_list
+  - Objects.primitives.enum_list
+
+  - Objects.string_map
+  - Objects.int_map
+  - Objects.bool_map
+
+  - Objects.nested_value
+  - Objects.nested_value.leaf
+  - Objects.nested_value.leaf.value
+
+  - Objects.nested_nullable
+  - Objects.nested_nullable.leaf
+  - Objects.nested_nullable.leaf.value
+
+  - Objects.nested_list
+  - Objects.nested_list.leaf
+  - Objects.nested_list.leaf.value
+
+  - Objects.nested_nullable_list
+  - Objects.nested_nullable_list.leaf
+  - Objects.nested_nullable_list.leaf.value
+
+  - Objects.nested_map
+  - Objects.nested_map.leaf
+  - Objects.nested_map.leaf.value
+
+  - Objects.nested_nullable_map
+  - Objects.nested_nullable_map.leaf
+  - Objects.nested_nullable_map.leaf.value
+
+  - Objects.empty
+
+  - Objects.branch1
+  - Objects.branch1.leaf
+  - Objects.branch1.leaf.value
+
+  - Objects.branch2
+  - Objects.branch2.leaf
+  - Objects.branch2.leaf.value
+
+  - Objects.leaf
+  - Objects.leaf.value
+
+  - Objects.embedded_value
