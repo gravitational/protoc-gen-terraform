@@ -115,9 +115,36 @@ func (f *FieldCopyToGenerator) getAttr(g *j.Group, varName, selector, valType st
 		Assert(j.Id(f.i.WithType(valType)))
 }
 
-// genZeroValue generates zero value from an empty AttrType
-func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
+// getAttr generates a statement to read the value of an attribute at the specified index.
+// The value will be initialized if it does not exist or the type assertion fails.
+//
+// Expected format:
+//
+//	<varName>, ok := <selector>[<index>].(valType)
+//	if !ok {
+//		genPrimitiveZeroValue()
+//	}
+func (f *FieldCopyToGenerator) getPrimitiveAttr(g *j.Group, varName, selector, valType string, index *j.Statement) {
+	g.List(j.Id(varName), j.Id("ok")).
+		Op(":=").
+		Id(selector).
+		Index(index).
+		Assert(j.Id(f.i.WithType(valType)))
+
+	g.If(j.Id("!ok")).BlockFunc(f.genPrimitiveZeroValue(j.Id(selector).Index(index), f.Field.ElemValueType))
+}
+
+// genPrimitiveZeroValue generates zero value from an empty AttrType
+func (f *FieldCopyToGenerator) genPrimitiveZeroValue(existing *j.Statement, expectedType string) func(*j.Group) {
 	return func(g *j.Group) {
+		// First we check if the field was really uninitialized.
+		// If it's not, we don't know what's going on and need to fail.
+		g.If(existing.Op("!=").Nil()).Block(
+			j.Id("diags.Append").Call(
+				j.Id("attrWriteUnexpectedExistingTypeDiag").Values(j.Lit(f.Path), j.Lit(expectedType)),
+			),
+		)
+
 		// This generates an empty attr.Value from a Terraform type
 		// v, err = t.ValueFromTerraform(ctx, tftypes.NewValue(t.TerraformType(ctx, nil)))
 		g.List(j.Id("i"), j.Id("err")).Op(":=").Id("t.ValueFromTerraform").Call(
@@ -137,66 +164,92 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 
 		// if !ok { diags.AddError }
 		g.If(j.Id("!ok")).BlockFunc(f.errAttrConversionFailure(f.Path, f.ElemValueType))
-
-		if f.IsPlaceholder {
-			g.Id("v.Null").Op("=").True()
-			return
-		}
-
-		if f.IsProto3Optional {
-			// Nullable types will be overwritten in genAssignValue
-			// so we return early here since this value won't be used.
-			return
-		} else if f.ZeroValue != "" {
-			// v.Null = v.Value == ""
-			g.Id("v.Null").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Op("==").Id(f.ZeroValue)
-		} else {
-			g.Id("v.Null").Op("=").False()
-		}
 	}
 }
 
 // genPrimitiveBody generates a block statement that reads an object field into
 // variable "v".
-func (f *FieldCopyToGenerator) genPrimitiveBody(g *j.Group, fieldName string, existing *j.Statement, expectedType string) {
-	g.If(j.Id("!ok")).BlockFunc(
-		// If the existing field is not of the expected primitive type.
-		// This is either because the field is uninitialized, but this could be a bug.
-		func(g *j.Group) {
-			// First we check if the field was really uninitialized.
-			// If it's not, we don't know what's going on and need to fail.
-			g.If(existing.Op("!=").Nil()).Block(
-				j.Id("diags.Append").Call(
-					j.Id("attrWriteUnexpectedExistingTypeDiag").Values(j.Lit(f.Path), j.Lit(expectedType)),
-				),
-			)
-			// The existing field is nil, we generate the zero value.
-			f.genZeroValue(fieldName)(g)
-		})
+func (f *FieldCopyToGenerator) genPrimitiveBody(g *j.Group, fieldName string) {
+	// Assign value including `Null` field
+	g.Add(f.genAssignValue(fieldName))
 
-	if !f.IsPlaceholder {
-		if f.ParentIsOptionalEmbed {
-			g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
-				j.Id("v.Null").Op("=").True(),
-			).Else().Block(f.genAssignValue(fieldName))
-		} else {
-			g.Add(f.genAssignValue(fieldName))
-		}
-	}
-
+	// Set `Unknown = false` for all values
 	g.Id("v.Unknown").Op("=").False()
 }
 
 func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
-	if f.IsNullable {
-		return j.If(j.Id(fieldName).Op("==").Nil()).Block(
-			j.Id("v.Null").Op("=").True(),
-		).Else().Block(
-			j.Id("v.Null").Op("=").False(),
-			j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
-		)
+	switch {
+	case f.IsPlaceholder:
+		return f.genAssignPlaceholderValue()
+	case f.ParentIsOptionalEmbed:
+		return f.genAssignOptionalEmbeddedValue(fieldName)
+	case f.IsNullable, f.IsProto3Optional:
+		return f.genAssignNullableValue(fieldName)
+	default:
+		return f.genAssignNonNullableValue(fieldName)
 	}
-	return j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))
+}
+
+// genAssignPlaceholderValue generates a statement to assign a placeholder value.
+//
+// Expected format:
+//
+//	v.Null = true
+func (f *FieldCopyToGenerator) genAssignPlaceholderValue() *j.Statement {
+	return j.Id("v.Null").Op("=").True()
+}
+
+// genAssignOptionalEmbeddedValue generates a statement to assign an optional embedded value.
+//
+// Expected format:
+//
+//	if obj.<f.ParentIsOptionalEmbedFieldName> == nil {
+//		v.Null = true
+//	} else {
+//		v.Null = false
+//		v.Value = <f.ValueCastToType>(<fieldName>)
+//	}
+func (f *FieldCopyToGenerator) genAssignOptionalEmbeddedValue(fieldName string) *j.Statement {
+	return j.If(j.Id("obj."+f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
+		j.Id("v.Null").Op("=").True(),
+	).Else().Block(
+		j.Id("v.Null").Op("=").False(),
+		j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
+	)
+}
+
+// genAssignNullableValue generates a statement to assign a nullable value.
+//
+// Expected format:
+//
+//	if <fieldName> == nil {
+//		v.Null = true
+//	} else {
+//		v.Null = false
+//		v.Value = <f.GoElemTypeIndirect>(*<fieldName>)
+//	}
+func (f *FieldCopyToGenerator) genAssignNullableValue(fieldName string) *j.Statement {
+	return j.If(j.Id(fieldName).Op("==").Nil()).Block(
+		j.Id("v.Null").Op("=").True(),
+	).Else().Block(
+		j.Id("v.Null").Op("=").False(),
+		j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
+	)
+}
+
+// genAssignNonNullableValue generates a statement to assign a non-nullable value.
+//
+// Expected format:
+//
+//	{
+//		v.Null = false
+//		v.Value = <f.ValueCastToType>(<fieldName>)
+//	}
+func (f *FieldCopyToGenerator) genAssignNonNullableValue(fieldName string) *j.Statement {
+	return j.Block(
+		j.Id("v.Null").Op("=").False(),
+		j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
+	)
 }
 
 // genObjectBody generates block statement that reads a message into
@@ -265,8 +318,8 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 
 		selector := "tf.Attrs"
 		index := j.Lit(f.Field.NameSnake)
-		f.getAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
-		f.genPrimitiveBody(g, fieldName, j.Id(selector).Index(index), f.Field.ElemValueType)
+		f.getPrimitiveAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
+		f.genPrimitiveBody(g, fieldName)
 		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})
 }
@@ -353,8 +406,8 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 					case PrimitiveListKind, PrimitiveMapKind:
 						selector := "c.Elems"
 						index := j.Id("k")
-						f.getAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
-						f.genPrimitiveBody(g, "a", j.Id(selector).Index(index), f.Field.ElemValueType)
+						f.getPrimitiveAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
+						f.genPrimitiveBody(g, "a")
 					default:
 						m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
 						f.getAttr(g, "v", "c.Elems", f.i.WithType(f.Field.ElemValueType), j.Id("k"))
