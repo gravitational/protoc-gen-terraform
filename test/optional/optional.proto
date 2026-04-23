@@ -21,17 +21,31 @@ option go_package = "github.com/gravitational/protoc-gen-terraform/v3/test/optio
 message OptionalTest {
 
     // OptionalStr is a proto3 optional string field
-    optional string OptionalStr = 2;
+    optional string optional_str = 2;
 
     // OptionalInt64 is a proto3 optional int64 field
-    optional int64 OptionalInt64 = 3;
+    optional int64 optional_int64 = 3;
 
     // OptionalBool is a proto3 optional bool field
-    optional bool OptionalBool = 4;
+    optional bool optional_bool = 4;
 
     // RealOneOf is a real oneof group
-    oneof RealOneOf {
-        string ChoiceA = 5;
-        string ChoiceB = 6;
+    oneof real_one_of {
+        string choice_a = 5;
+        string choice_b = 6;
     }
+
+    // maps don't support optional keyword, but we add it here to check the generation
+    map<string, string> optional_map = 7;
+
+    // OptionalInnerMessage is a proto3 optional message field
+    optional InnerMessage optional_inner_message = 8;
+
+    // lists don't support the optional keyword, but we add it here to check the generation
+    repeated string string_list = 9;
+}
+
+// InnerMessage is a message embedded in OptionalTest to check generation
+message InnerMessage {
+    optional bool inner_bool = 1;
 }

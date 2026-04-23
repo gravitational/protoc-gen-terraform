@@ -39,18 +39,24 @@ const (
 type OptionalTest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// OptionalStr is a proto3 optional string field
-	OptionalStr *string `protobuf:"bytes,2,opt,name=OptionalStr,proto3,oneof" json:"OptionalStr,omitempty"`
+	OptionalStr *string `protobuf:"bytes,2,opt,name=optional_str,json=optionalStr,proto3,oneof" json:"optional_str,omitempty"`
 	// OptionalInt64 is a proto3 optional int64 field
-	OptionalInt64 *int64 `protobuf:"varint,3,opt,name=OptionalInt64,proto3,oneof" json:"OptionalInt64,omitempty"`
+	OptionalInt64 *int64 `protobuf:"varint,3,opt,name=optional_int64,json=optionalInt64,proto3,oneof" json:"optional_int64,omitempty"`
 	// OptionalBool is a proto3 optional bool field
-	OptionalBool *bool `protobuf:"varint,4,opt,name=OptionalBool,proto3,oneof" json:"OptionalBool,omitempty"`
+	OptionalBool *bool `protobuf:"varint,4,opt,name=optional_bool,json=optionalBool,proto3,oneof" json:"optional_bool,omitempty"`
 	// RealOneOf is a real oneof group
 	//
 	// Types that are valid to be assigned to RealOneOf:
 	//
 	//	*OptionalTest_ChoiceA
 	//	*OptionalTest_ChoiceB
-	RealOneOf     isOptionalTest_RealOneOf `protobuf_oneof:"RealOneOf"`
+	RealOneOf isOptionalTest_RealOneOf `protobuf_oneof:"real_one_of"`
+	// maps don't support optional keyword, but we add it here to check the generation
+	OptionalMap map[string]string `protobuf:"bytes,7,rep,name=optional_map,json=optionalMap,proto3" json:"optional_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// OptionalInnerMessage is a proto3 optional message field
+	OptionalInnerMessage *InnerMessage `protobuf:"bytes,8,opt,name=optional_inner_message,json=optionalInnerMessage,proto3,oneof" json:"optional_inner_message,omitempty"`
+	// lists don't support the optional keyword, but we add it here to check the generation
+	StringList    []string `protobuf:"bytes,9,rep,name=string_list,json=stringList,proto3" json:"string_list,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -131,37 +137,115 @@ func (x *OptionalTest) GetChoiceB() string {
 	return ""
 }
 
+func (x *OptionalTest) GetOptionalMap() map[string]string {
+	if x != nil {
+		return x.OptionalMap
+	}
+	return nil
+}
+
+func (x *OptionalTest) GetOptionalInnerMessage() *InnerMessage {
+	if x != nil {
+		return x.OptionalInnerMessage
+	}
+	return nil
+}
+
+func (x *OptionalTest) GetStringList() []string {
+	if x != nil {
+		return x.StringList
+	}
+	return nil
+}
+
 type isOptionalTest_RealOneOf interface {
 	isOptionalTest_RealOneOf()
 }
 
 type OptionalTest_ChoiceA struct {
-	ChoiceA string `protobuf:"bytes,5,opt,name=ChoiceA,proto3,oneof"`
+	ChoiceA string `protobuf:"bytes,5,opt,name=choice_a,json=choiceA,proto3,oneof"`
 }
 
 type OptionalTest_ChoiceB struct {
-	ChoiceB string `protobuf:"bytes,6,opt,name=ChoiceB,proto3,oneof"`
+	ChoiceB string `protobuf:"bytes,6,opt,name=choice_b,json=choiceB,proto3,oneof"`
 }
 
 func (*OptionalTest_ChoiceA) isOptionalTest_RealOneOf() {}
 
 func (*OptionalTest_ChoiceB) isOptionalTest_RealOneOf() {}
 
+// InnerMessage is a message embedded in OptionalTest to check generation
+type InnerMessage struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	InnerBool     *bool                  `protobuf:"varint,1,opt,name=inner_bool,json=innerBool,proto3,oneof" json:"inner_bool,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InnerMessage) Reset() {
+	*x = InnerMessage{}
+	mi := &file_optional_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InnerMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InnerMessage) ProtoMessage() {}
+
+func (x *InnerMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_optional_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InnerMessage.ProtoReflect.Descriptor instead.
+func (*InnerMessage) Descriptor() ([]byte, []int) {
+	return file_optional_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *InnerMessage) GetInnerBool() bool {
+	if x != nil && x.InnerBool != nil {
+		return *x.InnerBool
+	}
+	return false
+}
+
 var File_optional_proto protoreflect.FileDescriptor
 
 const file_optional_proto_rawDesc = "" +
 	"\n" +
-	"\x0eoptional.proto\x12\boptional\"\x81\x02\n" +
-	"\fOptionalTest\x12%\n" +
-	"\vOptionalStr\x18\x02 \x01(\tH\x01R\vOptionalStr\x88\x01\x01\x12)\n" +
-	"\rOptionalInt64\x18\x03 \x01(\x03H\x02R\rOptionalInt64\x88\x01\x01\x12'\n" +
-	"\fOptionalBool\x18\x04 \x01(\bH\x03R\fOptionalBool\x88\x01\x01\x12\x1a\n" +
-	"\aChoiceA\x18\x05 \x01(\tH\x00R\aChoiceA\x12\x1a\n" +
-	"\aChoiceB\x18\x06 \x01(\tH\x00R\aChoiceBB\v\n" +
-	"\tRealOneOfB\x0e\n" +
-	"\f_OptionalStrB\x10\n" +
-	"\x0e_OptionalInt64B\x0f\n" +
-	"\r_OptionalBoolB@Z>github.com/gravitational/protoc-gen-terraform/v3/test/optionalb\x06proto3"
+	"\x0eoptional.proto\x12\boptional\"\xa6\x04\n" +
+	"\fOptionalTest\x12&\n" +
+	"\foptional_str\x18\x02 \x01(\tH\x01R\voptionalStr\x88\x01\x01\x12*\n" +
+	"\x0eoptional_int64\x18\x03 \x01(\x03H\x02R\roptionalInt64\x88\x01\x01\x12(\n" +
+	"\roptional_bool\x18\x04 \x01(\bH\x03R\foptionalBool\x88\x01\x01\x12\x1b\n" +
+	"\bchoice_a\x18\x05 \x01(\tH\x00R\achoiceA\x12\x1b\n" +
+	"\bchoice_b\x18\x06 \x01(\tH\x00R\achoiceB\x12J\n" +
+	"\foptional_map\x18\a \x03(\v2'.optional.OptionalTest.OptionalMapEntryR\voptionalMap\x12Q\n" +
+	"\x16optional_inner_message\x18\b \x01(\v2\x16.optional.InnerMessageH\x04R\x14optionalInnerMessage\x88\x01\x01\x12\x1f\n" +
+	"\vstring_list\x18\t \x03(\tR\n" +
+	"stringList\x1a>\n" +
+	"\x10OptionalMapEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\r\n" +
+	"\vreal_one_ofB\x0f\n" +
+	"\r_optional_strB\x11\n" +
+	"\x0f_optional_int64B\x10\n" +
+	"\x0e_optional_boolB\x19\n" +
+	"\x17_optional_inner_message\"A\n" +
+	"\fInnerMessage\x12\"\n" +
+	"\n" +
+	"inner_bool\x18\x01 \x01(\bH\x00R\tinnerBool\x88\x01\x01B\r\n" +
+	"\v_inner_boolB@Z>github.com/gravitational/protoc-gen-terraform/v3/test/optionalb\x06proto3"
 
 var (
 	file_optional_proto_rawDescOnce sync.Once
@@ -175,16 +259,20 @@ func file_optional_proto_rawDescGZIP() []byte {
 	return file_optional_proto_rawDescData
 }
 
-var file_optional_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_optional_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_optional_proto_goTypes = []any{
 	(*OptionalTest)(nil), // 0: optional.OptionalTest
+	(*InnerMessage)(nil), // 1: optional.InnerMessage
+	nil,                  // 2: optional.OptionalTest.OptionalMapEntry
 }
 var file_optional_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: optional.OptionalTest.optional_map:type_name -> optional.OptionalTest.OptionalMapEntry
+	1, // 1: optional.OptionalTest.optional_inner_message:type_name -> optional.InnerMessage
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_optional_proto_init() }
@@ -196,13 +284,14 @@ func file_optional_proto_init() {
 		(*OptionalTest_ChoiceA)(nil),
 		(*OptionalTest_ChoiceB)(nil),
 	}
+	file_optional_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_optional_proto_rawDesc), len(file_optional_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

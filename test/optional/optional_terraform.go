@@ -54,15 +54,34 @@ func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
+		"optional_inner_message": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"inner_bool": {
+				Description: "",
+				Optional:    true,
+				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+			}}),
+			Description: "OptionalInnerMessage is a proto3 optional message field",
+			Optional:    true,
+		},
 		"optional_int64": {
 			Description: "OptionalInt64 is a proto3 optional int64 field",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
+		"optional_map": {
+			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+		},
 		"optional_str": {
 			Description: "OptionalStr is a proto3 optional string field",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
+		"string_list": {
+			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }
@@ -74,11 +93,11 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 	{
 		a, ok := tf.Attrs["choice_a"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"OptionalTest.ChoiceA"})
+			diags.Append(attrReadMissingDiag{"OptionalTest.choice_a"})
 		} else {
 			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"OptionalTest.ChoiceA", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.choice_a", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
 				if !v.Null && !v.Unknown {
@@ -93,11 +112,11 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 	{
 		a, ok := tf.Attrs["choice_b"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"OptionalTest.ChoiceB"})
+			diags.Append(attrReadMissingDiag{"OptionalTest.choice_b"})
 		} else {
 			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"OptionalTest.ChoiceB", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.choice_b", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
 				if !v.Null && !v.Unknown {
@@ -112,11 +131,11 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 	{
 		a, ok := tf.Attrs["optional_bool"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"OptionalTest.OptionalBool"})
+			diags.Append(attrReadMissingDiag{"OptionalTest.optional_bool"})
 		} else {
 			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"OptionalTest.OptionalBool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 			} else {
 				var t *bool
 				if !v.Null && !v.Unknown {
@@ -128,13 +147,49 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 		}
 	}
 	{
+		a, ok := tf.Attrs["optional_inner_message"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"OptionalTest.optional_inner_message"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_inner_message", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				obj.OptionalInnerMessage = nil
+				if !v.Null && !v.Unknown {
+					tf := v
+					obj.OptionalInnerMessage = &InnerMessage{}
+					obj := obj.OptionalInnerMessage
+					{
+						a, ok := tf.Attrs["inner_bool"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"OptionalTest.optional_inner_message.inner_bool"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_inner_message.inner_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+							} else {
+								var t *bool
+								if !v.Null && !v.Unknown {
+									c := bool(v.Value)
+									t = &c
+								}
+								obj.InnerBool = t
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
 		a, ok := tf.Attrs["optional_int64"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"OptionalTest.OptionalInt64"})
+			diags.Append(attrReadMissingDiag{"OptionalTest.optional_int64"})
 		} else {
 			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"OptionalTest.OptionalInt64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
 				var t *int64
 				if !v.Null && !v.Unknown {
@@ -146,13 +201,40 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 		}
 	}
 	{
+		a, ok := tf.Attrs["optional_map"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"OptionalTest.optional_map"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Map)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
+			} else {
+				obj.OptionalMap = make(map[string]string, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_map", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+						} else {
+							var t string
+							if !v.Null && !v.Unknown {
+								t = string(v.Value)
+							}
+							obj.OptionalMap[k] = t
+						}
+					}
+				}
+			}
+		}
+	}
+	{
 		a, ok := tf.Attrs["optional_str"]
 		if !ok {
-			diags.Append(attrReadMissingDiag{"OptionalTest.OptionalStr"})
+			diags.Append(attrReadMissingDiag{"OptionalTest.optional_str"})
 		} else {
 			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"OptionalTest.OptionalStr", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t *string
 				if !v.Null && !v.Unknown {
@@ -160,6 +242,33 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 					t = &c
 				}
 				obj.OptionalStr = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["string_list"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"OptionalTest.string_list"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.List)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"OptionalTest.string_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
+			} else {
+				obj.StringList = make([]string, len(v.Elems))
+				if !v.Null && !v.Unknown {
+					for k, a := range v.Elems {
+						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							diags.Append(attrReadConversionFailureDiag{"OptionalTest.string_list", "github_com_hashicorp_terraform_plugin_framework_types.String"})
+						} else {
+							var t string
+							if !v.Null && !v.Unknown {
+								t = string(v.Value)
+							}
+							obj.StringList[k] = t
+						}
+					}
+				}
 			}
 		}
 	}
@@ -177,7 +286,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 	{
 		t, ok := tf.AttrTypes["choice_a"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"OptionalTest.ChoiceA"})
+			diags.Append(attrWriteMissingDiag{"OptionalTest.choice_a"})
 		} else {
 			obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceA)
 			if !ok {
@@ -187,11 +296,11 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 			if !ok {
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
-					diags.Append(attrWriteGeneralError{"OptionalTest.ChoiceA", err})
+					diags.Append(attrWriteGeneralError{"OptionalTest.choice_a", err})
 				}
 				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
 				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.ChoiceA", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.choice_a", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				v.Null = string(obj.ChoiceA) == ""
 			}
@@ -203,7 +312,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 	{
 		t, ok := tf.AttrTypes["choice_b"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"OptionalTest.ChoiceB"})
+			diags.Append(attrWriteMissingDiag{"OptionalTest.choice_b"})
 		} else {
 			obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceB)
 			if !ok {
@@ -213,11 +322,11 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 			if !ok {
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
-					diags.Append(attrWriteGeneralError{"OptionalTest.ChoiceB", err})
+					diags.Append(attrWriteGeneralError{"OptionalTest.choice_b", err})
 				}
 				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
 				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.ChoiceB", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.choice_b", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				v.Null = string(obj.ChoiceB) == ""
 			}
@@ -229,17 +338,17 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 	{
 		t, ok := tf.AttrTypes["optional_bool"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"OptionalTest.OptionalBool"})
+			diags.Append(attrWriteMissingDiag{"OptionalTest.optional_bool"})
 		} else {
 			v, ok := tf.Attrs["optional_bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
-					diags.Append(attrWriteGeneralError{"OptionalTest.OptionalBool", err})
+					diags.Append(attrWriteGeneralError{"OptionalTest.optional_bool", err})
 				}
 				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.OptionalBool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
 				v.Null = obj.OptionalBool == nil
 			}
@@ -254,19 +363,78 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		}
 	}
 	{
+		a, ok := tf.AttrTypes["optional_inner_message"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"OptionalTest.optional_inner_message"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_inner_message", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["optional_inner_message"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.OptionalInnerMessage == nil {
+					v.Null = true
+				} else {
+					obj := obj.OptionalInnerMessage
+					tf := &v
+					{
+						t, ok := tf.AttrTypes["inner_bool"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"OptionalTest.optional_inner_message.inner_bool"})
+						} else {
+							v, ok := tf.Attrs["inner_bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+							if !ok {
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"OptionalTest.optional_inner_message.inner_bool", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_inner_message.inner_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+								}
+								v.Null = obj.InnerBool == nil
+							}
+							if obj.InnerBool == nil {
+								v.Null = true
+							} else {
+								v.Null = false
+								v.Value = bool(*obj.InnerBool)
+							}
+							v.Unknown = false
+							tf.Attrs["inner_bool"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["optional_inner_message"] = v
+			}
+		}
+	}
+	{
 		t, ok := tf.AttrTypes["optional_int64"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"OptionalTest.OptionalInt64"})
+			diags.Append(attrWriteMissingDiag{"OptionalTest.optional_int64"})
 		} else {
 			v, ok := tf.Attrs["optional_int64"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
-					diags.Append(attrWriteGeneralError{"OptionalTest.OptionalInt64", err})
+					diags.Append(attrWriteGeneralError{"OptionalTest.optional_int64", err})
 				}
 				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.OptionalInt64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 				v.Null = obj.OptionalInt64 == nil
 			}
@@ -281,19 +449,69 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		}
 	}
 	{
+		a, ok := tf.AttrTypes["optional_map"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"OptionalTest.optional_map"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.MapType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_map", "github.com/hashicorp/terraform-plugin-framework/types.MapType"})
+			} else {
+				c, ok := tf.Attrs["optional_map"].(github_com_hashicorp_terraform_plugin_framework_types.Map)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.Map{
+
+						ElemType: o.ElemType,
+						Elems:    make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.OptionalMap)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.OptionalMap))
+					}
+				}
+				if obj.OptionalMap != nil {
+					t := o.ElemType
+					for k, a := range obj.OptionalMap {
+						v, ok := tf.Attrs["optional_map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"OptionalTest.optional_map", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = false
+						}
+						v.Value = string(a)
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.OptionalMap) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["optional_map"] = c
+			}
+		}
+	}
+	{
 		t, ok := tf.AttrTypes["optional_str"]
 		if !ok {
-			diags.Append(attrWriteMissingDiag{"OptionalTest.OptionalStr"})
+			diags.Append(attrWriteMissingDiag{"OptionalTest.optional_str"})
 		} else {
 			v, ok := tf.Attrs["optional_str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
-					diags.Append(attrWriteGeneralError{"OptionalTest.OptionalStr", err})
+					diags.Append(attrWriteGeneralError{"OptionalTest.optional_str", err})
 				}
 				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
 				if !ok {
-					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.OptionalStr", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				v.Null = obj.OptionalStr == nil
 			}
@@ -305,6 +523,59 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 			}
 			v.Unknown = false
 			tf.Attrs["optional_str"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["string_list"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"OptionalTest.string_list"})
+		} else {
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ListType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"OptionalTest.string_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
+			} else {
+				c, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				if !ok {
+					c = github_com_hashicorp_terraform_plugin_framework_types.List{
+
+						ElemType: o.ElemType,
+						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
+						Null:     true,
+					}
+				} else {
+					if c.Elems == nil {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+					}
+				}
+				if obj.StringList != nil {
+					t := o.ElemType
+					if len(obj.StringList) != len(c.Elems) {
+						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+					}
+					for k, a := range obj.StringList {
+						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						if !ok {
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"OptionalTest.string_list", err})
+							}
+							v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"OptionalTest.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
+							v.Null = string(a) == ""
+						}
+						v.Value = string(a)
+						v.Unknown = false
+						c.Elems[k] = v
+					}
+					if len(obj.StringList) > 0 {
+						c.Null = false
+					}
+				}
+				c.Unknown = false
+				tf.Attrs["string_list"] = c
+			}
 		}
 	}
 	return diags

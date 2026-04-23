@@ -58,15 +58,27 @@ func TestSchemaHasOptionalFields(t *testing.T) {
 
 	_, ok = s.Attributes["choice_b"]
 	require.True(t, ok)
+
+	_, ok = s.Attributes["optional_map"]
+	require.True(t, ok)
+
+	_, ok = s.Attributes["optional_inner_message"]
+	require.True(t, ok)
+
+	_, ok = s.Attributes["string_list"]
+	require.True(t, ok)
 }
 
 func TestCopyToOptionalFieldsSet(t *testing.T) {
 	o := schemaObject(t)
 	obj := &OptionalTest{
-		OptionalStr:   proto.String("world"),
-		OptionalInt64: proto.Int64(42),
-		OptionalBool:  proto.Bool(true),
-		RealOneOf:     &OptionalTest_ChoiceB{ChoiceB: "picked_b"},
+		OptionalStr:          proto.String("world"),
+		OptionalInt64:        proto.Int64(42),
+		OptionalBool:         proto.Bool(true),
+		RealOneOf:            &OptionalTest_ChoiceB{ChoiceB: "picked_b"},
+		OptionalMap:          map[string]string{"key1": "val1", "key2": "val2"},
+		OptionalInnerMessage: &InnerMessage{InnerBool: proto.Bool(true)},
+		StringList:           []string{"test1", "test2"},
 	}
 
 	diags := CopyOptionalTestToTerraform(context.Background(), obj, &o)
@@ -84,14 +96,36 @@ func TestCopyToOptionalFieldsSet(t *testing.T) {
 
 	// Real oneof
 	require.Equal(t, "picked_b", o.Attrs["choice_b"].(types.String).Value)
+
+	// Populated map
+	m := o.Attrs["optional_map"].(types.Map)
+	require.False(t, m.Null)
+	require.Len(t, m.Elems, 2)
+	require.Equal(t, "val1", m.Elems["key1"].(types.String).Value)
+	require.Equal(t, "val2", m.Elems["key2"].(types.String).Value)
+
+	// Populated inner message
+	inner := o.Attrs["optional_inner_message"].(types.Object)
+	require.False(t, inner.Null)
+	require.True(t, inner.Attrs["inner_bool"].(types.Bool).Value)
+
+	// Populated list
+	l := o.Attrs["string_list"].(types.List)
+	require.False(t, l.Null)
+	require.Len(t, l.Elems, 2)
+	require.Equal(t, "test1", l.Elems[0].(types.String).Value)
+	require.Equal(t, "test2", l.Elems[1].(types.String).Value)
 }
 
 func TestCopyToOptionalFieldsNil(t *testing.T) {
 	o := schemaObject(t)
 	obj := &OptionalTest{
-		OptionalStr:   nil,
-		OptionalInt64: nil,
-		OptionalBool:  nil,
+		OptionalStr:          nil,
+		OptionalInt64:        nil,
+		OptionalBool:         nil,
+		OptionalMap:          nil,
+		OptionalInnerMessage: nil,
+		StringList:           nil,
 	}
 
 	diags := CopyOptionalTestToTerraform(context.Background(), obj, &o)
@@ -101,6 +135,11 @@ func TestCopyToOptionalFieldsNil(t *testing.T) {
 	require.True(t, o.Attrs["optional_str"].(types.String).Null)
 	require.True(t, o.Attrs["optional_int64"].(types.Int64).Null)
 	require.True(t, o.Attrs["optional_bool"].(types.Bool).Null)
+	require.True(t, o.Attrs["optional_inner_message"].(types.Object).Null)
+
+	// Nil map and slice set with Null true on the Terraform side.
+	require.True(t, o.Attrs["optional_map"].(types.Map).Null)
+	require.True(t, o.Attrs["string_list"].(types.List).Null)
 }
 
 func TestCopyFromOptionalFields(t *testing.T) {
@@ -111,6 +150,10 @@ func TestCopyFromOptionalFields(t *testing.T) {
 	obj, ok := typ.(types.ObjectType)
 	require.True(t, ok)
 
+	innerType := obj.AttrTypes["optional_inner_message"].(types.ObjectType)
+	mapType := obj.AttrTypes["optional_map"].(types.MapType)
+	listType := obj.AttrTypes["string_list"].(types.ListType)
+
 	tf := types.Object{
 		Null:    false,
 		Unknown: false,
@@ -120,6 +163,26 @@ func TestCopyFromOptionalFields(t *testing.T) {
 			"optional_bool":  types.Bool{Value: true},
 			"choice_a":       types.String{Null: true},
 			"choice_b":       types.String{Value: "picked_b"},
+			"optional_map": types.Map{
+				ElemType: mapType.ElemType,
+				Elems: map[string]attr.Value{
+					"key1": types.String{Value: "val1"},
+					"key2": types.String{Value: "val2"},
+				},
+			},
+			"optional_inner_message": types.Object{
+				AttrTypes: innerType.AttrTypes,
+				Attrs: map[string]attr.Value{
+					"inner_bool": types.Bool{Value: true},
+				},
+			},
+			"string_list": types.List{
+				ElemType: listType.ElemType,
+				Elems: []attr.Value{
+					types.String{Value: "test1"},
+					types.String{Value: "test2"},
+				},
+			},
 		},
 		AttrTypes: obj.AttrTypes,
 	}
@@ -146,6 +209,16 @@ func TestCopyFromOptionalFields(t *testing.T) {
 
 	_, ok = optionalTest.RealOneOf.(*OptionalTest_ChoiceA)
 	require.False(t, ok)
+
+	// Populated map
+	require.Equal(t, map[string]string{"key1": "val1", "key2": "val2"}, optionalTest.OptionalMap)
+
+	// Populated inner message
+	require.NotNil(t, optionalTest.OptionalInnerMessage)
+	require.True(t, *optionalTest.OptionalInnerMessage.InnerBool)
+
+	// Populated list
+	require.Equal(t, []string{"test1", "test2"}, optionalTest.StringList)
 }
 
 func TestCopyFromOptionalFieldsNull(t *testing.T) {
@@ -160,11 +233,14 @@ func TestCopyFromOptionalFieldsNull(t *testing.T) {
 		Null:    false,
 		Unknown: false,
 		Attrs: map[string]attr.Value{
-			"optional_str":   types.String{Null: true},
-			"optional_int64": types.Int64{Null: true},
-			"optional_bool":  types.Bool{Null: true},
-			"choice_a":       types.String{Null: true},
-			"choice_b":       types.String{Null: true},
+			"optional_str":           types.String{Null: true},
+			"optional_int64":         types.Int64{Null: true},
+			"optional_bool":          types.Bool{Null: true},
+			"choice_a":               types.String{Null: true},
+			"choice_b":               types.String{Null: true},
+			"optional_map":           types.Map{Null: true},
+			"optional_inner_message": types.Object{Null: true},
+			"string_list":            types.List{Null: true},
 		},
 		AttrTypes: objType.AttrTypes,
 	}
@@ -179,4 +255,9 @@ func TestCopyFromOptionalFieldsNull(t *testing.T) {
 	require.Nil(t, obj.OptionalBool)
 
 	require.Nil(t, obj.RealOneOf)
+	require.Nil(t, obj.OptionalInnerMessage)
+
+	// Null map and list decode to empty containers
+	require.Empty(t, obj.OptionalMap)
+	require.Empty(t, obj.StringList)
 }
