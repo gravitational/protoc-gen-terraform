@@ -82,6 +82,11 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 		return nil, trace.Wrap(err)
 	}
 
+	oneOfNames, err := c.GetOneOfNames()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
 	message := &Message{
 		NamePath:       c.GetNamePath(),
 		Name:           c.GetName(),
@@ -90,7 +95,7 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 		Fields:         fields,
 		IsRoot:         isRoot,
 		InjectedFields: c.GetInjectedFields(),
-		OneOfNames:     c.GetOneOfNames(),
+		OneOfNames:     oneOfNames,
 		IsEmpty:        c.IsEmpty(),
 	}
 

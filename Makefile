@@ -39,6 +39,22 @@ test: build gen
 		--terraform_out=config=test/config.yaml:test \
 		test.proto
 
+# Generate Go types for optional test using standard protoc-gen-go (not gogo)
+	@protoc \
+		-I$(PWD)/test/optional \
+		--go_out=test/optional \
+		--go_opt=paths=source_relative \
+		optional.proto
+
+# Generate Terraform code for optional test
+	@protoc \
+		-I$(PWD)/test/optional \
+		--plugin=$(BINFILE) \
+		--terraform_out=config=test/optional/config.yaml:. \
+		optional.proto
+	mv ./github.com/gravitational/protoc-gen-terraform/v3/test/optional/optional_terraform.go ./test/optional/
+	rm -rf ./github.com
+
 	@go test ./...
 
 # EXAMPLES_PROTO_DIR and EXAMPLES_PROTO_FILES specifies the directory and files

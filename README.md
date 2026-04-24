@@ -7,8 +7,12 @@ protoc plugin to generate Terraform Framework schema definitions and getter/sett
 Install the generator binary.
 
 ```
-go install github.com/gravitational/protoc-gen-terraform/v3@v3.0.3
+go install github.com/gravitational/protoc-gen-terraform/v3@v3.1.0
 ```
+
+# Dependencies
+
+- `protoc-gen-go`: `protoc-gen-gogo` does not support all proto3 fields/keywords such as `optional`; if your `.proto` files uses features that are not supported in gogo, you must use `protoc-gen-go` to generate the `.pb.go` files.
 
 # Usage
 

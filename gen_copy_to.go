@@ -143,8 +143,12 @@ func (f *FieldCopyToGenerator) genZeroValue(fieldName string) func(*j.Group) {
 			return
 		}
 
-		// v.Null = v.Value == ""
-		if f.ZeroValue != "" {
+		if f.IsProto3Optional {
+			// Nullable types will be overwritten in genAssignValue
+			// so we return early here since this value won't be used.
+			return
+		} else if f.ZeroValue != "" {
+			// v.Null = v.Value == ""
 			g.Id("v.Null").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)).Op("==").Id(f.ZeroValue)
 		} else {
 			g.Id("v.Null").Op("=").False()

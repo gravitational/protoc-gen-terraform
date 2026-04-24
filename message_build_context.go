@@ -22,6 +22,7 @@ import (
 
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
+	"github.com/gravitational/trace"
 	"github.com/stoewer/go-strcase"
 )
 
@@ -134,17 +135,40 @@ func (c *MessageBuildContext) GetInjectedFields() []InjectedField {
 	return []InjectedField{}
 }
 
-// GetOneOfNames returns the names of OneOf groups in this message
-func (c *MessageBuildContext) GetOneOfNames() []string {
-	s := make([]string, len(c.desc.OneofDecl))
+// GetOneOfNames returns the names of OneOf groups in this message,
+// skipping fake oneofs created by proto3 optional fields.
+func (c *MessageBuildContext) GetOneOfNames() ([]string, error) {
+	// Iterate all fields and check if they're a proto3 optional field.
+	// Use the OneofIndex to keep track of the indices that specify the fake oneof.
+	fakeOneofs := make(map[int32]struct{})
+	for _, f := range c.desc.GetField() {
+		if f.OneofIndex == nil {
+			continue
+		}
+		ext := &FieldDescriptorProtoExt{f}
+		isOptional, err := ext.IsProto3Optional()
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		if isOptional {
+			fakeOneofs[*f.OneofIndex] = struct{}{}
+		}
+	}
+
+	var s []string
+	// OneofDecl lists all oneofs for the proto message. We filter out the fake ones based on the
+	// map fakeOneofs.
 	for i, d := range c.desc.OneofDecl {
+		if _, ok := fakeOneofs[int32(i)]; ok {
+			continue
+		}
 		name := d.GetName()
 		if name[0:1] == strings.ToLower(name[0:1]) {
 			name = strcase.UpperCamelCase(name)
 		}
-		s[i] = name
+		s = append(s, name)
 	}
-	return s
+	return s, nil
 }
 
 // IsEmpty returns true if the message has no fields defined
