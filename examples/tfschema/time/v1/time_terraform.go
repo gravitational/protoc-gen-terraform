@@ -46,24 +46,32 @@ var _ = time.Kitchen
 func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"duration_custom": {
-			Description: "duration_custom time.Duration field using casttype.",
-			Optional:    true,
-			Type:        DurationType{},
+			Computed:      true,
+			Description:   "duration_custom time.Duration field using casttype.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          DurationType{},
 		},
 		"duration_custom_list": {
-			Description: "duration_custom_list []time.Duration field using casttype.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
+			Computed:      true,
+			Description:   "duration_custom_list []time.Duration field using casttype.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
 		},
 		"duration_list": {
-			Description: "duration_list []time.Duration field.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
+			Computed:      true,
+			Description:   "duration_list []time.Duration field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
 		},
 		"duration_standard": {
-			Description: "duration_standard time.Duration field using stdduration.",
-			Optional:    true,
-			Type:        DurationType{},
+			Computed:      true,
+			Description:   "duration_standard time.Duration field using stdduration.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          DurationType{},
 		},
 		"id": {
 			Computed:      true,
@@ -72,15 +80,33 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
+		"nullable_duration": {
+			Computed:      true,
+			Description:   "nullable_duration nullable time.Duration field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          DurationType{},
+		},
+		"nullable_timestamp": {
+			Computed:      true,
+			Description:   "nullable_timestamp nullable time.Time field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          UseRFC3339Time(),
+		},
 		"timestamp_list": {
-			Description: "timestamp_list []time.Time field.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: UseRFC3339Time()},
+			Computed:      true,
+			Description:   "timestamp_list []time.Time field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: UseRFC3339Time()},
 		},
 		"timestamp_value": {
-			Description: "timestamp_value time.Time field.",
-			Optional:    true,
-			Type:        UseRFC3339Time(),
+			Computed:      true,
+			Description:   "timestamp_value time.Time field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          UseRFC3339Time(),
 		},
 	}}, nil
 }
@@ -194,6 +220,42 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		}
 	}
 	{
+		a, ok := tf.Attrs["nullable_duration"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Time.nullable_duration"})
+		} else {
+			v, ok := a.(DurationValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Time.nullable_duration", "DurationValue"})
+			} else {
+				var t *time.Duration
+				if !v.Null && !v.Unknown {
+					c := time.Duration(v.Value)
+					t = &c
+				}
+				obj.NullableDuration = t
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["nullable_timestamp"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Time.nullable_timestamp"})
+		} else {
+			v, ok := a.(TimeValue)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Time.nullable_timestamp", "TimeValue"})
+			} else {
+				var t *time.Time
+				if !v.Null && !v.Unknown {
+					c := time.Time(v.Value)
+					t = &c
+				}
+				obj.NullableTimestamp = t
+			}
+		}
+	}
+	{
 		a, ok := tf.Attrs["timestamp_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Time.timestamp_list"})
@@ -266,9 +328,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationCustom)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationCustom)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_custom"] = v
 		}
@@ -314,9 +378,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom_list", "DurationValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Duration(a)
+						{
+							v.Null = false
+							v.Value = time.Duration(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -370,9 +436,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Time.duration_list", "DurationValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Duration(a)
+						{
+							v.Null = false
+							v.Value = time.Duration(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -403,9 +471,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.duration_standard", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationStandard)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationStandard)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_standard"] = v
 		}
@@ -428,11 +498,71 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
 			}
-			v.Value = string(obj.Id)
+			{
+				v.Null = false
+				v.Value = string(obj.Id)
+			}
 			v.Unknown = false
 			tf.Attrs["id"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["nullable_duration"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Time.nullable_duration"})
+		} else {
+			v, ok := tf.Attrs["nullable_duration"].(DurationValue)
+			if !ok {
+				if tf.Attrs["nullable_duration"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.nullable_duration", "DurationValue"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Time.nullable_duration", err})
+				}
+				v, ok = i.(DurationValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Time.nullable_duration", "DurationValue"})
+				}
+			}
+			if obj.NullableDuration == nil {
+				v.Null = true
+			} else {
+				v.Null = false
+				v.Value = time.Duration(*obj.NullableDuration)
+			}
+			v.Unknown = false
+			tf.Attrs["nullable_duration"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["nullable_timestamp"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Time.nullable_timestamp"})
+		} else {
+			v, ok := tf.Attrs["nullable_timestamp"].(TimeValue)
+			if !ok {
+				if tf.Attrs["nullable_timestamp"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.nullable_timestamp", "TimeValue"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Time.nullable_timestamp", err})
+				}
+				v, ok = i.(TimeValue)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Time.nullable_timestamp", "TimeValue"})
+				}
+			}
+			if obj.NullableTimestamp == nil {
+				v.Null = true
+			} else {
+				v.Null = false
+				v.Value = time.Time(*obj.NullableTimestamp)
+			}
+			v.Unknown = false
+			tf.Attrs["nullable_timestamp"] = v
 		}
 	}
 	{
@@ -476,9 +606,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_list", "TimeValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Time(a)
+						{
+							v.Null = false
+							v.Value = time.Time(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -509,9 +641,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_value", "TimeValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Time(obj.TimestampValue)
+			{
+				v.Null = false
+				v.Value = time.Time(obj.TimestampValue)
+			}
 			v.Unknown = false
 			tf.Attrs["timestamp_value"] = v
 		}

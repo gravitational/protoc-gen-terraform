@@ -2322,10 +2322,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.bar"})
 		} else {
-			obj, ok := obj.LowerSnakeOneof.(*Test_Bar)
-			if !ok {
-				obj = &Test_Bar{}
-			}
 			v, ok := tf.Attrs["bar"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["bar"] != nil {
@@ -2339,9 +2335,16 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.bar", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Bar) == ""
 			}
-			v.Value = string(obj.Bar)
+			{
+				obj, ok := obj.LowerSnakeOneof.(*Test_Bar)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.Bar)
+				}
+			}
 			v.Unknown = false
 			tf.Attrs["bar"] = v
 		}
@@ -2364,9 +2367,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
-				v.Null = bool(obj.Bool) == false
 			}
-			v.Value = bool(obj.Bool)
+			{
+				v.Null = false
+				v.Value = bool(obj.Bool)
+			}
 			v.Unknown = false
 			tf.Attrs["bool"] = v
 		}
@@ -2428,9 +2433,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.Branch1.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.Str) == ""
 							}
-							v.Value = string(obj.Str)
+							{
+								v.Null = false
+								v.Value = string(obj.Str)
+							}
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -2489,9 +2496,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.Branch2.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.Int32) == 0
 							}
-							v.Value = int64(obj.Int32)
+							{
+								v.Null = false
+								v.Value = int64(obj.Int32)
+							}
 							v.Unknown = false
 							tf.Attrs["int32"] = v
 						}
@@ -2507,10 +2516,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.Branch3"})
 		} else {
-			obj, ok := obj.OneOf.(*Test_Branch3)
-			if !ok {
-				obj = &Test_Branch3{}
-			}
 			v, ok := tf.Attrs["branch3"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["branch3"] != nil {
@@ -2524,9 +2529,16 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Branch3", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Branch3) == ""
 			}
-			v.Value = string(obj.Branch3)
+			{
+				obj, ok := obj.OneOf.(*Test_Branch3)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.Branch3)
+				}
+			}
 			v.Unknown = false
 			tf.Attrs["branch3"] = v
 		}
@@ -2549,9 +2561,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.bytes", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Bytes) == ""
 			}
-			v.Value = string(obj.Bytes)
+			{
+				v.Null = false
+				v.Value = string(obj.Bytes)
+			}
 			v.Unknown = false
 			tf.Attrs["bytes"] = v
 		}
@@ -2597,9 +2611,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.BytesList", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = string(a) == ""
 						}
-						v.Value = string(a)
+						{
+							v.Null = false
+							v.Value = string(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -2630,9 +2646,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Double", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
-				v.Null = float64(obj.Double) == 0
 			}
-			v.Value = float64(obj.Double)
+			{
+				v.Null = false
+				v.Value = float64(obj.Double)
+			}
 			v.Unknown = false
 			tf.Attrs["double"] = v
 		}
@@ -2655,9 +2673,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustom", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationCustom)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationCustom)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_custom"] = v
 		}
@@ -2703,9 +2723,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomList", "DurationValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Duration(a)
+						{
+							v.Null = false
+							v.Value = time.Duration(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -2736,9 +2758,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.DurationCustomMissing", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationCustomMissing)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationCustomMissing)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_custom_missing"] = v
 		}
@@ -2761,9 +2785,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandard", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationStandard)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationStandard)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_standard"] = v
 		}
@@ -2786,9 +2812,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.DurationStandardMissing", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationStandardMissing)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationStandardMissing)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_standard_missing"] = v
 		}
@@ -2837,9 +2865,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedNestedField.EmbeddedNestedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.EmbeddedNestedString) == ""
 							}
-							v.Value = string(obj.EmbeddedNestedString)
+							{
+								v.Null = false
+								v.Value = string(obj.EmbeddedNestedString)
+							}
 							v.Unknown = false
 							tf.Attrs["embedded_nested_string"] = v
 						}
@@ -2868,9 +2898,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.EmbeddedString", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.EmbeddedString) == ""
 			}
-			v.Value = string(obj.EmbeddedString)
+			{
+				v.Null = false
+				v.Value = string(obj.EmbeddedString)
+			}
 			v.Unknown = false
 			tf.Attrs["embedded_string"] = v
 		}
@@ -2922,8 +2954,8 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.EmptyMessageBranch.active", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = true
 							}
+							v.Null = true
 							v.Unknown = false
 							tf.Attrs["active"] = v
 						}
@@ -2952,9 +2984,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Float", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
-				v.Null = float64(obj.Float) == 0
 			}
-			v.Value = float64(obj.Float)
+			{
+				v.Null = false
+				v.Value = float64(obj.Float)
+			}
 			v.Unknown = false
 			tf.Attrs["float"] = v
 		}
@@ -2964,10 +2998,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.foo"})
 		} else {
-			obj, ok := obj.LowerSnakeOneof.(*Test_Foo)
-			if !ok {
-				obj = &Test_Foo{}
-			}
 			v, ok := tf.Attrs["foo"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["foo"] != nil {
@@ -2981,9 +3011,16 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.foo", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Foo) == ""
 			}
-			v.Value = string(obj.Foo)
+			{
+				obj, ok := obj.LowerSnakeOneof.(*Test_Foo)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.Foo)
+				}
+			}
 			v.Unknown = false
 			tf.Attrs["foo"] = v
 		}
@@ -3006,9 +3043,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = int64(obj.Int32) == 0
 			}
-			v.Value = int64(obj.Int32)
+			{
+				v.Null = false
+				v.Value = int64(obj.Int32)
+			}
 			v.Unknown = false
 			tf.Attrs["int32"] = v
 		}
@@ -3031,9 +3070,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = int64(obj.Int64) == 0
 			}
-			v.Value = int64(obj.Int64)
+			{
+				v.Null = false
+				v.Value = int64(obj.Int64)
+			}
 			v.Unknown = false
 			tf.Attrs["int64"] = v
 		}
@@ -3076,9 +3117,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = false
 						}
-						v.Value = string(a)
+						{
+							v.Null = false
+							v.Value = string(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -3169,9 +3212,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													if !ok {
 														diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 													}
-													v.Null = false
 												}
-												v.Value = string(a)
+												{
+													v.Null = false
+													v.Value = string(a)
+												}
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -3242,9 +3287,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3325,9 +3372,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3363,9 +3412,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if !ok {
 											diags.Append(attrWriteConversionFailureDiag{"Test.MapObject.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										}
-										v.Null = string(obj.Str) == ""
 									}
-									v.Value = string(obj.Str)
+									{
+										v.Null = false
+										v.Value = string(obj.Str)
+									}
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -3463,9 +3514,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													if !ok {
 														diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 													}
-													v.Null = false
 												}
-												v.Value = string(a)
+												{
+													v.Null = false
+													v.Value = string(a)
+												}
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -3536,9 +3589,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3619,9 +3674,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -3657,9 +3714,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if !ok {
 											diags.Append(attrWriteConversionFailureDiag{"Test.MapObjectNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										}
-										v.Null = string(obj.Str) == ""
 									}
-									v.Value = string(obj.Str)
+									{
+										v.Null = false
+										v.Value = string(obj.Str)
+									}
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -3695,9 +3754,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Mode", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = int64(obj.Mode) == 0
 			}
-			v.Value = int64(obj.Mode)
+			{
+				v.Null = false
+				v.Value = int64(obj.Mode)
+			}
 			v.Unknown = false
 			tf.Attrs["mode"] = v
 		}
@@ -3764,9 +3825,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 											}
-											v.Null = false
 										}
-										v.Value = string(a)
+										{
+											v.Null = false
+											v.Value = string(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -3837,9 +3900,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Str) == ""
 													}
-													v.Value = string(obj.Str)
+													{
+														v.Null = false
+														v.Value = string(obj.Str)
+													}
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -3920,9 +3985,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Test.Nested.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Str) == ""
 													}
-													v.Value = string(obj.Str)
+													{
+														v.Null = false
+														v.Value = string(obj.Str)
+													}
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -3958,9 +4025,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.Nested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.Str) == ""
 							}
-							v.Value = string(obj.Str)
+							{
+								v.Null = false
+								v.Value = string(obj.Str)
+							}
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -4052,9 +4121,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													if !ok {
 														diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 													}
-													v.Null = false
 												}
-												v.Value = string(a)
+												{
+													v.Null = false
+													v.Value = string(a)
+												}
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -4125,9 +4196,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4208,9 +4281,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4246,9 +4321,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if !ok {
 											diags.Append(attrWriteConversionFailureDiag{"Test.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										}
-										v.Null = string(obj.Str) == ""
 									}
-									v.Value = string(obj.Str)
+									{
+										v.Null = false
+										v.Value = string(obj.Str)
+									}
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -4349,9 +4426,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													if !ok {
 														diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 													}
-													v.Null = false
 												}
-												v.Value = string(a)
+												{
+													v.Null = false
+													v.Value = string(a)
+												}
 												v.Unknown = false
 												c.Elems[k] = v
 											}
@@ -4422,9 +4501,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4505,9 +4586,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 																if !ok {
 																	diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 																}
-																v.Null = string(obj.Str) == ""
 															}
-															v.Value = string(obj.Str)
+															{
+																v.Null = false
+																v.Value = string(obj.Str)
+															}
 															v.Unknown = false
 															tf.Attrs["str"] = v
 														}
@@ -4543,9 +4626,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if !ok {
 											diags.Append(attrWriteConversionFailureDiag{"Test.NestedListNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 										}
-										v.Null = string(obj.Str) == ""
 									}
-									v.Value = string(obj.Str)
+									{
+										v.Null = false
+										v.Value = string(obj.Str)
+									}
 									v.Unknown = false
 									tf.Attrs["str"] = v
 								}
@@ -4627,9 +4712,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 											}
-											v.Null = false
 										}
-										v.Value = string(a)
+										{
+											v.Null = false
+											v.Value = string(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -4700,9 +4787,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Str) == ""
 													}
-													v.Value = string(obj.Str)
+													{
+														v.Null = false
+														v.Value = string(obj.Str)
+													}
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -4783,9 +4872,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Str) == ""
 													}
-													v.Value = string(obj.Str)
+													{
+														v.Null = false
+														v.Value = string(obj.Str)
+													}
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -4821,9 +4912,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullable.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.Str) == ""
 							}
-							v.Value = string(obj.Str)
+							{
+								v.Null = false
+								v.Value = string(obj.Str)
+							}
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -4898,9 +4991,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 											}
-											v.Null = false
 										}
-										v.Value = string(a)
+										{
+											v.Null = false
+											v.Value = string(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -4971,9 +5066,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.MapObjectNested.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Str) == ""
 													}
-													v.Value = string(obj.Str)
+													{
+														v.Null = false
+														v.Value = string(obj.Str)
+													}
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -5054,9 +5151,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.NestedList.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Str) == ""
 													}
-													v.Value = string(obj.Str)
+													{
+														v.Null = false
+														v.Value = string(obj.Str)
+													}
 													v.Unknown = false
 													tf.Attrs["str"] = v
 												}
@@ -5092,9 +5191,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Test.NestedNullableWithNilValue.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.Str) == ""
 							}
-							v.Value = string(obj.Str)
+							{
+								v.Null = false
+								v.Value = string(obj.Str)
+							}
 							v.Unknown = false
 							tf.Attrs["str"] = v
 						}
@@ -5123,9 +5224,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.SchemaOverride", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.SchemaOverride) == ""
 			}
-			v.Value = string(obj.SchemaOverride)
+			{
+				v.Null = false
+				v.Value = string(obj.SchemaOverride)
+			}
 			v.Unknown = false
 			tf.Attrs["schema_override"] = v
 		}
@@ -5148,9 +5251,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Str) == ""
 			}
-			v.Value = string(obj.Str)
+			{
+				v.Null = false
+				v.Value = string(obj.Str)
+			}
 			v.Unknown = false
 			tf.Attrs["str"] = v
 		}
@@ -5160,10 +5265,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.StringBranch"})
 		} else {
-			obj, ok := obj.OneOfWithEmptyMessage.(*Test_StringBranch)
-			if !ok {
-				obj = &Test_StringBranch{}
-			}
 			v, ok := tf.Attrs["string_branch"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["string_branch"] != nil {
@@ -5177,9 +5278,16 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.StringBranch", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.StringBranch) == ""
 			}
-			v.Value = string(obj.StringBranch)
+			{
+				obj, ok := obj.OneOfWithEmptyMessage.(*Test_StringBranch)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.StringBranch)
+				}
+			}
 			v.Unknown = false
 			tf.Attrs["string_branch"] = v
 		}
@@ -5225,9 +5333,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.StringList", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = string(a) == ""
 						}
-						v.Value = string(a)
+						{
+							v.Null = false
+							v.Value = string(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -5281,9 +5391,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.StringListEmpty", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = string(a) == ""
 						}
-						v.Value = string(a)
+						{
+							v.Null = false
+							v.Value = string(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -5323,9 +5435,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Timestamp", "TimeValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Time(obj.Timestamp)
+			{
+				v.Null = false
+				v.Value = time.Time(obj.Timestamp)
+			}
 			v.Unknown = false
 			tf.Attrs["timestamp"] = v
 		}
@@ -5371,7 +5485,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Test.TimestampList", "TimeValue"})
 							}
-							v.Null = false
 						}
 						if a == nil {
 							v.Null = true
@@ -5409,9 +5522,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampMissing", "TimeValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Time(obj.TimestampMissing)
+			{
+				v.Null = false
+				v.Value = time.Time(obj.TimestampMissing)
+			}
 			v.Unknown = false
 			tf.Attrs["timestamp_missing"] = v
 		}
@@ -5434,7 +5549,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullable", "TimeValue"})
 				}
-				v.Null = false
 			}
 			if obj.TimestampNullable == nil {
 				v.Null = true
@@ -5464,7 +5578,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.TimestampNullableWithNilValue", "TimeValue"})
 				}
-				v.Null = false
 			}
 			if obj.TimestampNullableWithNilValue == nil {
 				v.Null = true
@@ -5494,11 +5607,11 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Test.Value", "DurationValue"})
 				}
-				v.Null = false
 			}
 			if obj.MaxAgeDuration == nil {
 				v.Null = true
 			} else {
+				v.Null = false
 				v.Value = time.Duration(obj.Value)
 			}
 			v.Unknown = false

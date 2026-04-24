@@ -42,40 +42,77 @@ var _ = math.Inf
 func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"bool_map": {
-			Description: "bool_map map of bools.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
+			Computed:      true,
+			Description:   "bool_map map of bools.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 		},
 		"branch1": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "",
-			Optional:    true,
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"branch2": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "",
-			Optional:    true,
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+		},
+		"branch_bool": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+		},
+		"branch_int": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+		},
+		"branch_string": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"embedded_value": {
-			Description: "",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"empty": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
@@ -84,8 +121,10 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				Optional:    true,
 				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 			}}),
-			Description: "empty is an empty field.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "empty is an empty field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"id": {
 			Computed:      true,
@@ -95,192 +134,272 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"int_map": {
-			Description: "int_map map of ints.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
+			Computed:      true,
+			Description:   "int_map map of ints.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
 		"leaf": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-				Description: "",
-				Optional:    true,
-				Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+				Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			}}),
-			Description: "",
-			Optional:    true,
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"nested_list": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "nested_list is a list of nested objects.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "nested_list is a list of nested objects.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"nested_map": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "nested_map is a map of nested objects.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "nested_map is a map of nested objects.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"nested_nullable": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "nested_nullable is a nullable nested object.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "nested_nullable is a nullable nested object.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"nested_nullable_list": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "nested_nullable_list is a nullable list of nested objects.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "nested_nullable_list is a nullable list of nested objects.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"nested_nullable_map": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "nested_map is a nullable map of nested objects.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "nested_map is a nullable map of nested objects.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"nested_value": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
 				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				}}),
-				Description: "",
-				Optional:    true,
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			}}),
-			Description: "nested_value is a nested object.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "nested_value is a nested object.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"primitives": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				"bool_list": {
-					Description: "bool_list bool list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
+					Computed:      true,
+					Description:   "bool_list bool list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 				},
 				"bool_value": {
-					Description: "bool_value bool field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+					Computed:      true,
+					Description:   "bool_value bool field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 				},
 				"bytes_list": {
-					Description: "bytes_list bytes list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+					Computed:      true,
+					Description:   "bytes_list bytes list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"bytes_value": {
-					Description: "bytes_value bytes field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "bytes_value bytes field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"double_list": {
-					Description: "double_list double list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
+					Computed:      true,
+					Description:   "double_list double list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 				},
 				"double_value": {
-					Description: "double_value float64 field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+					Computed:      true,
+					Description:   "double_value float64 field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 				},
 				"enum_list": {
-					Description: "enum_list enum list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
+					Computed:      true,
+					Description:   "enum_list enum list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
 				"enum_value": {
-					Description: "enum_value enum field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+					Computed:      true,
+					Description:   "enum_value enum field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
 				"float_list": {
-					Description: "float_list float list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
+					Computed:      true,
+					Description:   "float_list float list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 				},
 				"float_value": {
-					Description: "float_value float32 field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+					Computed:      true,
+					Description:   "float_value float32 field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 				},
 				"id": {
-					Description: "",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 				"int32_list": {
-					Description: "int32_list int32 list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
+					Computed:      true,
+					Description:   "int32_list int32 list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
 				"int32_value": {
-					Description: "int32_value int32 field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+					Computed:      true,
+					Description:   "int32_value int32 field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
 				"int64_list": {
-					Description: "int64_list int64 list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
+					Computed:      true,
+					Description:   "int64_list int64 list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
 				"int64_value": {
-					Description: "int64_value int64 field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+					Computed:      true,
+					Description:   "int64_value int64 field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
 				"string_list": {
-					Description: "string_list string list field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+					Computed:      true,
+					Description:   "string_list string list field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
 				"string_value": {
-					Description: "string_value string field.",
-					Optional:    true,
-					Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Computed:      true,
+					Description:   "string_value string field.",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
-			Description: "primitives field.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "primitives field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
 		"string_map": {
-			Description: "string_map map of strings.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+			Computed:      true,
+			Description:   "string_map map of strings.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }
@@ -288,7 +407,8 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 // CopyObjectsFromTerraform copies contents of the source Terraform object into a target struct
 func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
-	obj.OneOf = nil
+	obj.OneOfObjects = nil
+	obj.OneOfPrimitives = nil
 	{
 		a, ok := tf.Attrs["bool_map"]
 		if !ok {
@@ -327,7 +447,7 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			} else {
 				if !v.Null && !v.Unknown {
 					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
-					obj.OneOf = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{Branch1: b}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{Branch1: b}
 					obj := b
 					tf := v
 					{
@@ -379,7 +499,7 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			} else {
 				if !v.Null && !v.Unknown {
 					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
-					obj.OneOf = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{Branch2: b}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{Branch2: b}
 					obj := b
 					tf := v
 					{
@@ -416,6 +536,63 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_bool"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_bool"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+			} else {
+				var t bool
+				if !v.Null && !v.Unknown {
+					t = bool(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchBool{BranchBool: t}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_int"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_int"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_int", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+			} else {
+				var t int64
+				if !v.Null && !v.Unknown {
+					t = int64(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchInt{BranchInt: t}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_string"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_string"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_string", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchString{BranchString: t}
 				}
 			}
 		}
@@ -1350,9 +1527,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Objects.bool_map", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 							}
-							v.Null = false
 						}
-						v.Value = bool(a)
+						{
+							v.Null = false
+							v.Value = bool(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -1370,7 +1549,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.branch1"})
 		} else {
-			obj, ok := obj.OneOf.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1)
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1)
 			if !ok {
 				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{}
 			}
@@ -1437,9 +1616,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 												if !ok {
 													diags.Append(attrWriteConversionFailureDiag{"Objects.branch1.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 												}
-												v.Null = string(obj.Value) == ""
 											}
-											v.Value = string(obj.Value)
+											{
+												v.Null = false
+												v.Value = string(obj.Value)
+											}
 											v.Unknown = false
 											tf.Attrs["value"] = v
 										}
@@ -1461,7 +1642,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.branch2"})
 		} else {
-			obj, ok := obj.OneOf.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2)
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2)
 			if !ok {
 				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{}
 			}
@@ -1528,9 +1709,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 												if !ok {
 													diags.Append(attrWriteConversionFailureDiag{"Objects.branch2.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 												}
-												v.Null = string(obj.Value) == ""
 											}
-											v.Value = string(obj.Value)
+											{
+												v.Null = false
+												v.Value = string(obj.Value)
+											}
 											v.Unknown = false
 											tf.Attrs["value"] = v
 										}
@@ -1545,6 +1728,102 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				v.Unknown = false
 				tf.Attrs["branch2"] = v
 			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["branch_bool"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_bool"})
+		} else {
+			v, ok := tf.Attrs["branch_bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			if !ok {
+				if tf.Attrs["branch_bool"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.branch_bool", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.branch_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
+			}
+			{
+				obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchBool)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = bool(obj.BranchBool)
+				}
+			}
+			v.Unknown = false
+			tf.Attrs["branch_bool"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["branch_int"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_int"})
+		} else {
+			v, ok := tf.Attrs["branch_int"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			if !ok {
+				if tf.Attrs["branch_int"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_int", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.branch_int", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.branch_int", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+			}
+			{
+				obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchInt)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = int64(obj.BranchInt)
+				}
+			}
+			v.Unknown = false
+			tf.Attrs["branch_int"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["branch_string"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_string"})
+		} else {
+			v, ok := tf.Attrs["branch_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				if tf.Attrs["branch_string"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_string", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.branch_string", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.branch_string", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+			}
+			{
+				obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchString)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.BranchString)
+				}
+			}
+			v.Unknown = false
+			tf.Attrs["branch_string"] = v
 		}
 	}
 	{
@@ -1565,11 +1844,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Objects.embedded_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.EmbeddedValue) == ""
 			}
 			if obj.LeafEmbedded == nil {
 				v.Null = true
 			} else {
+				v.Null = false
 				v.Value = string(obj.EmbeddedValue)
 			}
 			v.Unknown = false
@@ -1619,8 +1898,8 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.empty.active", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = true
 							}
+							v.Null = true
 							v.Unknown = false
 							tf.Attrs["active"] = v
 						}
@@ -1649,9 +1928,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Objects.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
 			}
-			v.Value = string(obj.Id)
+			{
+				v.Null = false
+				v.Value = string(obj.Id)
+			}
 			v.Unknown = false
 			tf.Attrs["id"] = v
 		}
@@ -1694,9 +1975,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Objects.int_map", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
-							v.Null = false
 						}
-						v.Value = int64(a)
+						{
+							v.Null = false
+							v.Value = int64(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -1751,9 +2034,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.Value) == ""
 							}
-							v.Value = string(obj.Value)
+							{
+								v.Null = false
+								v.Value = string(obj.Value)
+							}
 							v.Unknown = false
 							tf.Attrs["value"] = v
 						}
@@ -1849,9 +2134,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Objects.nested_list.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Value) == ""
 													}
-													v.Value = string(obj.Value)
+													{
+														v.Null = false
+														v.Value = string(obj.Value)
+													}
 													v.Unknown = false
 													tf.Attrs["value"] = v
 												}
@@ -1957,9 +2244,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Objects.nested_map.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Value) == ""
 													}
-													v.Value = string(obj.Value)
+													{
+														v.Null = false
+														v.Value = string(obj.Value)
+													}
 													v.Unknown = false
 													tf.Attrs["value"] = v
 												}
@@ -2051,9 +2340,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 												if !ok {
 													diags.Append(attrWriteConversionFailureDiag{"Objects.nested_nullable.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 												}
-												v.Null = string(obj.Value) == ""
 											}
-											v.Value = string(obj.Value)
+											{
+												v.Null = false
+												v.Value = string(obj.Value)
+											}
 											v.Unknown = false
 											tf.Attrs["value"] = v
 										}
@@ -2157,9 +2448,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Objects.nested_nullable_list.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Value) == ""
 													}
-													v.Value = string(obj.Value)
+													{
+														v.Null = false
+														v.Value = string(obj.Value)
+													}
 													v.Unknown = false
 													tf.Attrs["value"] = v
 												}
@@ -2267,9 +2560,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 														if !ok {
 															diags.Append(attrWriteConversionFailureDiag{"Objects.nested_nullable_map.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 														}
-														v.Null = string(obj.Value) == ""
 													}
-													v.Value = string(obj.Value)
+													{
+														v.Null = false
+														v.Value = string(obj.Value)
+													}
 													v.Unknown = false
 													tf.Attrs["value"] = v
 												}
@@ -2359,9 +2654,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 												if !ok {
 													diags.Append(attrWriteConversionFailureDiag{"Objects.nested_value.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 												}
-												v.Null = string(obj.Value) == ""
 											}
-											v.Value = string(obj.Value)
+											{
+												v.Null = false
+												v.Value = string(obj.Value)
+											}
 											v.Unknown = false
 											tf.Attrs["value"] = v
 										}
@@ -2443,9 +2740,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 											}
-											v.Null = bool(a) == false
 										}
-										v.Value = bool(a)
+										{
+											v.Null = false
+											v.Value = bool(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2476,9 +2775,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = bool(obj.BoolValue) == false
 							}
-							v.Value = bool(obj.BoolValue)
+							{
+								v.Null = false
+								v.Value = bool(obj.BoolValue)
+							}
 							v.Unknown = false
 							tf.Attrs["bool_value"] = v
 						}
@@ -2524,9 +2825,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 											}
-											v.Null = string(a) == ""
 										}
-										v.Value = string(a)
+										{
+											v.Null = false
+											v.Value = string(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2557,9 +2860,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.BytesValue) == ""
 							}
-							v.Value = string(obj.BytesValue)
+							{
+								v.Null = false
+								v.Value = string(obj.BytesValue)
+							}
 							v.Unknown = false
 							tf.Attrs["bytes_value"] = v
 						}
@@ -2605,9 +2910,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 											}
-											v.Null = float64(a) == 0
 										}
-										v.Value = float64(a)
+										{
+											v.Null = false
+											v.Value = float64(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2638,9 +2945,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 								}
-								v.Null = float64(obj.DoubleValue) == 0
 							}
-							v.Value = float64(obj.DoubleValue)
+							{
+								v.Null = false
+								v.Value = float64(obj.DoubleValue)
+							}
 							v.Unknown = false
 							tf.Attrs["double_value"] = v
 						}
@@ -2686,9 +2995,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 											}
-											v.Null = int64(a) == 0
 										}
-										v.Value = int64(a)
+										{
+											v.Null = false
+											v.Value = int64(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2719,9 +3030,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.EnumValue) == 0
 							}
-							v.Value = int64(obj.EnumValue)
+							{
+								v.Null = false
+								v.Value = int64(obj.EnumValue)
+							}
 							v.Unknown = false
 							tf.Attrs["enum_value"] = v
 						}
@@ -2767,9 +3080,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 											}
-											v.Null = float64(a) == 0
 										}
-										v.Value = float64(a)
+										{
+											v.Null = false
+											v.Value = float64(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2800,9 +3115,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 								}
-								v.Null = float64(obj.FloatValue) == 0
 							}
-							v.Value = float64(obj.FloatValue)
+							{
+								v.Null = false
+								v.Value = float64(obj.FloatValue)
+							}
 							v.Unknown = false
 							tf.Attrs["float_value"] = v
 						}
@@ -2825,9 +3142,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.Id) == ""
 							}
-							v.Value = string(obj.Id)
+							{
+								v.Null = false
+								v.Value = string(obj.Id)
+							}
 							v.Unknown = false
 							tf.Attrs["id"] = v
 						}
@@ -2873,9 +3192,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 											}
-											v.Null = int64(a) == 0
 										}
-										v.Value = int64(a)
+										{
+											v.Null = false
+											v.Value = int64(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2906,9 +3227,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.Int32Value) == 0
 							}
-							v.Value = int64(obj.Int32Value)
+							{
+								v.Null = false
+								v.Value = int64(obj.Int32Value)
+							}
 							v.Unknown = false
 							tf.Attrs["int32_value"] = v
 						}
@@ -2954,9 +3277,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 											}
-											v.Null = int64(a) == 0
 										}
-										v.Value = int64(a)
+										{
+											v.Null = false
+											v.Value = int64(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -2987,9 +3312,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 								}
-								v.Null = int64(obj.Int64Value) == 0
 							}
-							v.Value = int64(obj.Int64Value)
+							{
+								v.Null = false
+								v.Value = int64(obj.Int64Value)
+							}
 							v.Unknown = false
 							tf.Attrs["int64_value"] = v
 						}
@@ -3035,9 +3362,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											if !ok {
 												diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 											}
-											v.Null = string(a) == ""
 										}
-										v.Value = string(a)
+										{
+											v.Null = false
+											v.Value = string(a)
+										}
 										v.Unknown = false
 										c.Elems[k] = v
 									}
@@ -3068,9 +3397,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"Objects.primitives.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 								}
-								v.Null = string(obj.StringValue) == ""
 							}
-							v.Value = string(obj.StringValue)
+							{
+								v.Null = false
+								v.Value = string(obj.StringValue)
+							}
 							v.Unknown = false
 							tf.Attrs["string_value"] = v
 						}
@@ -3119,9 +3450,11 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Objects.string_map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = false
 						}
-						v.Value = string(a)
+						{
+							v.Null = false
+							v.Value = string(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}

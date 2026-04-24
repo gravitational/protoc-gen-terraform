@@ -16,7 +16,14 @@ injected_fields:
 computed_fields:
   - Custom.id
   - Custom.computed
+  - Custom.sensitive
+  - Custom.validated
+  - Custom.name_override
   - Custom.plan_modifier
+  - Custom.bool_custom
+  - Custom.bool_custom_list
+  - Custom.string_override
+  - Custom.schema_override
 
 exclude_fields:
   - Custom.excluded
