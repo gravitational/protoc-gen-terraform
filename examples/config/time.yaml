@@ -10,6 +10,12 @@ types:
 
 computed_fields:
   - Time.id
+  - Time.timestamp_value
+  - Time.timestamp_list
+  - Time.duration_standard
+  - Time.duration_list
+  - Time.duration_custom
+  - Time.duration_custom_list
 
 time_type:
   type: "TimeType" # Struct name of attrs.Type
