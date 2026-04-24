@@ -61,6 +61,8 @@ resource "example_objects" "test" {
     }
   }
 
+  branch_string = "branch-string"
+
   leaf = {
     value = "embedded-leaf"
   }

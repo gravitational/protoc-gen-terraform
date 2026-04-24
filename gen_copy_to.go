@@ -183,6 +183,8 @@ func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
 		return f.genAssignPlaceholderValue()
 	case f.ParentIsOptionalEmbed:
 		return f.genAssignOptionalEmbeddedValue(fieldName)
+	case f.OneOfName != "":
+		return f.genAssignOneOf(fieldName)
 	case f.IsNullable, f.IsProto3Optional:
 		return f.genAssignNullableValue(fieldName)
 	default:
@@ -234,6 +236,29 @@ func (f *FieldCopyToGenerator) genAssignNullableValue(fieldName string) *j.State
 	).Else().Block(
 		j.Id("v.Null").Op("=").False(),
 		j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
+	)
+}
+
+// genAssignOneOf generates a statement to assign a oneof value.
+//
+// Expected format:
+//
+//	obj, ok := obj.<f.OneOfName>.(*f.OneOfType)
+//	if !ok {
+//		v.Null = true
+//	} else {
+//		v.Null = false
+//		v.Value = <f.ValueCastToType>(<fieldName>)
+//	}
+func (f *FieldCopyToGenerator) genAssignOneOf(fieldName string) *j.Statement {
+	return j.Block(
+		j.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj."+f.OneOfName).Assert(j.Id("*"+f.i.WithType(f.OneOfType))),
+		j.If(j.Id("!ok")).Block(
+			j.Id("v.Null").Op("=").True(),
+		).Else().Block(
+			j.Id("v.Null").Op("=").False(),
+			j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
+		),
 	)
 }
 
@@ -312,10 +337,6 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 	fieldName := "obj." + f.Name
 
 	return f.nextField("t", func(g *j.Group) {
-		if f.OneOfName != "" {
-			f.genOneOfStub(g)
-		}
-
 		selector := "tf.Attrs"
 		index := j.Lit(f.Field.NameSnake)
 		f.getPrimitiveAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)

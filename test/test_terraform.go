@@ -2464,10 +2464,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.bar"})
 		} else {
-			obj, ok := obj.LowerSnakeOneof.(*Test_Bar)
-			if !ok {
-				obj = &Test_Bar{}
-			}
 			v, ok := tf.Attrs["bar"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["bar"] != nil {
@@ -2483,8 +2479,13 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				}
 			}
 			{
-				v.Null = false
-				v.Value = string(obj.Bar)
+				obj, ok := obj.LowerSnakeOneof.(*Test_Bar)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.Bar)
+				}
 			}
 			v.Unknown = false
 			tf.Attrs["bar"] = v
@@ -2657,10 +2658,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.Branch3"})
 		} else {
-			obj, ok := obj.OneOf.(*Test_Branch3)
-			if !ok {
-				obj = &Test_Branch3{}
-			}
 			v, ok := tf.Attrs["branch3"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["branch3"] != nil {
@@ -2676,8 +2673,13 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				}
 			}
 			{
-				v.Null = false
-				v.Value = string(obj.Branch3)
+				obj, ok := obj.OneOf.(*Test_Branch3)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.Branch3)
+				}
 			}
 			v.Unknown = false
 			tf.Attrs["branch3"] = v
@@ -3138,10 +3140,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.foo"})
 		} else {
-			obj, ok := obj.LowerSnakeOneof.(*Test_Foo)
-			if !ok {
-				obj = &Test_Foo{}
-			}
 			v, ok := tf.Attrs["foo"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["foo"] != nil {
@@ -3157,8 +3155,13 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				}
 			}
 			{
-				v.Null = false
-				v.Value = string(obj.Foo)
+				obj, ok := obj.LowerSnakeOneof.(*Test_Foo)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.Foo)
+				}
 			}
 			v.Unknown = false
 			tf.Attrs["foo"] = v
@@ -5431,10 +5434,6 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.StringBranch"})
 		} else {
-			obj, ok := obj.OneOfWithEmptyMessage.(*Test_StringBranch)
-			if !ok {
-				obj = &Test_StringBranch{}
-			}
 			v, ok := tf.Attrs["string_branch"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["string_branch"] != nil {
@@ -5450,8 +5449,13 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				}
 			}
 			{
-				v.Null = false
-				v.Value = string(obj.StringBranch)
+				obj, ok := obj.OneOfWithEmptyMessage.(*Test_StringBranch)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.StringBranch)
+				}
 			}
 			v.Unknown = false
 			tf.Attrs["string_branch"] = v
