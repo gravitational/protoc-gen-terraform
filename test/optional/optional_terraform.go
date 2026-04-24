@@ -350,7 +350,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
-				v.Null = obj.OptionalBool == nil
 			}
 			if obj.OptionalBool == nil {
 				v.Null = true
@@ -403,7 +402,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 								if !ok {
 									diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_inner_message.inner_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 								}
-								v.Null = obj.InnerBool == nil
 							}
 							if obj.InnerBool == nil {
 								v.Null = true
@@ -436,7 +434,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
-				v.Null = obj.OptionalInt64 == nil
 			}
 			if obj.OptionalInt64 == nil {
 				v.Null = true
@@ -513,7 +510,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = obj.OptionalStr == nil
 			}
 			if obj.OptionalStr == nil {
 				v.Null = true
