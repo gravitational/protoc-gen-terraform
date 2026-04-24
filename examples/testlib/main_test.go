@@ -79,15 +79,169 @@ func (s *TerraformSuite) TestPrimitives() {
 					resource.TestCheckResourceAttr(name, "double_list.0", "0.75"),
 					resource.TestCheckResourceAttr(name, "double_list.1", "1.25"),
 					resource.TestCheckResourceAttr(name, "bool_list.0", "true"),
-					// TODO: Bool false value is treated as null within list.
-					// This should not be the case.
-					// resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
+					resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
 					resource.TestCheckResourceAttr(name, "bytes_list.0", "bytes1"),
 					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
 					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
 					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
 					resource.TestCheckNoResourceAttr(name, "nullable_value"),
 				),
+			},
+		},
+	})
+}
+
+func (s *TerraformSuite) TestPrimitivesZeroValues() {
+	t := s.T()
+	name := "example_primitives.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("primitives_zero_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "string_value", ""),
+					resource.TestCheckResourceAttr(name, "int32_value", "0"),
+					resource.TestCheckResourceAttr(name, "int64_value", "0"),
+					resource.TestCheckResourceAttr(name, "float_value", "0"),
+					resource.TestCheckResourceAttr(name, "double_value", "0"),
+					resource.TestCheckResourceAttr(name, "bool_value", "false"),
+					resource.TestCheckResourceAttr(name, "bytes_value", ""),
+					resource.TestCheckResourceAttr(name, "enum_value", "0"),
+					resource.TestCheckResourceAttr(name, "string_list.0", ""),
+					resource.TestCheckResourceAttr(name, "string_list.1", ""),
+					resource.TestCheckResourceAttr(name, "int32_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "int32_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "int64_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "int64_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "float_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "float_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "double_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "double_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "bool_list.0", "false"),
+					resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
+					resource.TestCheckResourceAttr(name, "bytes_list.0", ""),
+					resource.TestCheckResourceAttr(name, "bytes_list.1", ""),
+					resource.TestCheckResourceAttr(name, "enum_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "enum_list.1", "0"),
+					resource.TestCheckNoResourceAttr(name, "nullable_value"),
+				),
+			},
+		},
+	})
+}
+
+func (s *TerraformSuite) TestPrimitivesUpdate() {
+	t := s.T()
+	name := "example_primitives.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("primitives.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "string_value", "string"),
+					resource.TestCheckResourceAttr(name, "int32_value", "123"),
+					resource.TestCheckResourceAttr(name, "int64_value", "456"),
+					resource.TestCheckResourceAttr(name, "float_value", "0.75"),
+					resource.TestCheckResourceAttr(name, "double_value", "0.75"),
+					resource.TestCheckResourceAttr(name, "bool_value", "true"),
+					resource.TestCheckResourceAttr(name, "bytes_value", "bytes"),
+					resource.TestCheckResourceAttr(name, "enum_value", "1"),
+					resource.TestCheckResourceAttr(name, "string_list.0", "el1"),
+					resource.TestCheckResourceAttr(name, "string_list.1", "el2"),
+					resource.TestCheckResourceAttr(name, "int32_list.0", "123"),
+					resource.TestCheckResourceAttr(name, "int32_list.1", "456"),
+					resource.TestCheckResourceAttr(name, "int64_list.0", "234"),
+					resource.TestCheckResourceAttr(name, "int64_list.1", "567"),
+					resource.TestCheckResourceAttr(name, "float_list.0", "0.75"),
+					resource.TestCheckResourceAttr(name, "float_list.1", "1.25"),
+					resource.TestCheckResourceAttr(name, "double_list.0", "0.75"),
+					resource.TestCheckResourceAttr(name, "double_list.1", "1.25"),
+					resource.TestCheckResourceAttr(name, "bool_list.0", "true"),
+					resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
+					resource.TestCheckResourceAttr(name, "bytes_list.0", "bytes1"),
+					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
+					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
+					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
+					resource.TestCheckNoResourceAttr(name, "nullable_value"),
+				),
+			},
+			{
+				Config:   s.getFixture("primitives.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("primitives_zero_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "string_value", ""),
+					resource.TestCheckResourceAttr(name, "int32_value", "0"),
+					resource.TestCheckResourceAttr(name, "int64_value", "0"),
+					resource.TestCheckResourceAttr(name, "float_value", "0"),
+					resource.TestCheckResourceAttr(name, "double_value", "0"),
+					resource.TestCheckResourceAttr(name, "bool_value", "false"),
+					resource.TestCheckResourceAttr(name, "bytes_value", ""),
+					resource.TestCheckResourceAttr(name, "enum_value", "0"),
+					resource.TestCheckResourceAttr(name, "string_list.0", ""),
+					resource.TestCheckResourceAttr(name, "string_list.1", ""),
+					resource.TestCheckResourceAttr(name, "int32_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "int32_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "int64_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "int64_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "float_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "float_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "double_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "double_list.1", "0"),
+					resource.TestCheckResourceAttr(name, "bool_list.0", "false"),
+					resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
+					resource.TestCheckResourceAttr(name, "bytes_list.0", ""),
+					resource.TestCheckResourceAttr(name, "bytes_list.1", ""),
+					resource.TestCheckResourceAttr(name, "enum_list.0", "0"),
+					resource.TestCheckResourceAttr(name, "enum_list.1", "0"),
+					resource.TestCheckNoResourceAttr(name, "nullable_value"),
+				),
+			},
+			{
+				Config:   s.getFixture("primitives_zero_values.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("primitives.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "string_value", "string"),
+					resource.TestCheckResourceAttr(name, "int32_value", "123"),
+					resource.TestCheckResourceAttr(name, "int64_value", "456"),
+					resource.TestCheckResourceAttr(name, "float_value", "0.75"),
+					resource.TestCheckResourceAttr(name, "double_value", "0.75"),
+					resource.TestCheckResourceAttr(name, "bool_value", "true"),
+					resource.TestCheckResourceAttr(name, "bytes_value", "bytes"),
+					resource.TestCheckResourceAttr(name, "enum_value", "1"),
+					resource.TestCheckResourceAttr(name, "string_list.0", "el1"),
+					resource.TestCheckResourceAttr(name, "string_list.1", "el2"),
+					resource.TestCheckResourceAttr(name, "int32_list.0", "123"),
+					resource.TestCheckResourceAttr(name, "int32_list.1", "456"),
+					resource.TestCheckResourceAttr(name, "int64_list.0", "234"),
+					resource.TestCheckResourceAttr(name, "int64_list.1", "567"),
+					resource.TestCheckResourceAttr(name, "float_list.0", "0.75"),
+					resource.TestCheckResourceAttr(name, "float_list.1", "1.25"),
+					resource.TestCheckResourceAttr(name, "double_list.0", "0.75"),
+					resource.TestCheckResourceAttr(name, "double_list.1", "1.25"),
+					resource.TestCheckResourceAttr(name, "bool_list.0", "true"),
+					resource.TestCheckResourceAttr(name, "bool_list.1", "false"),
+					resource.TestCheckResourceAttr(name, "bytes_list.0", "bytes1"),
+					resource.TestCheckResourceAttr(name, "bytes_list.1", "bytes2"),
+					resource.TestCheckResourceAttr(name, "enum_list.0", "1"),
+					resource.TestCheckResourceAttr(name, "enum_list.1", "2"),
+					resource.TestCheckNoResourceAttr(name, "nullable_value"),
+				),
+			},
+			{
+				Config:   s.getFixture("primitives.tf"),
+				PlanOnly: true,
 			},
 		},
 	})
@@ -121,6 +275,102 @@ func (s *TerraformSuite) TestTime() {
 	})
 }
 
+func (s *TerraformSuite) TestTimeZeroValues() {
+	t := s.T()
+	name := "example_time.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("time_zero_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "duration_standard", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.0", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.1", "0s"),
+
+					resource.TestCheckResourceAttr(name, "duration_custom", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.0", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.1", "0s"),
+				),
+			},
+		},
+	})
+}
+
+func (s *TerraformSuite) TestTimeUpdate() {
+	t := s.T()
+	name := "example_time.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("time.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "timestamp_value", "2026-01-02T03:04:05Z"),
+					resource.TestCheckResourceAttr(name, "timestamp_list.0", "2026-01-02T03:04:05Z"),
+					resource.TestCheckResourceAttr(name, "timestamp_list.1", "2026-01-02T03:04:06Z"),
+
+					resource.TestCheckResourceAttr(name, "duration_standard", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.0", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.1", "10m0s"),
+
+					resource.TestCheckResourceAttr(name, "duration_custom", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.0", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.1", "10m0s"),
+				),
+			},
+			{
+				Config:   s.getFixture("time.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("time_zero_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr(name, "timestamp_value"),
+					resource.TestCheckNoResourceAttr(name, "timestamp_list.0"),
+					resource.TestCheckNoResourceAttr(name, "timestamp_list.1"),
+
+					resource.TestCheckResourceAttr(name, "duration_standard", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.0", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.1", "0s"),
+
+					resource.TestCheckResourceAttr(name, "duration_custom", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.0", "0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.1", "0s"),
+				),
+			},
+			{
+				Config:   s.getFixture("time_zero_values.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("time.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "timestamp_value", "2026-01-02T03:04:05Z"),
+					resource.TestCheckResourceAttr(name, "timestamp_list.0", "2026-01-02T03:04:05Z"),
+					resource.TestCheckResourceAttr(name, "timestamp_list.1", "2026-01-02T03:04:06Z"),
+
+					resource.TestCheckResourceAttr(name, "duration_standard", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.0", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_list.1", "10m0s"),
+
+					resource.TestCheckResourceAttr(name, "duration_custom", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.0", "5m0s"),
+					resource.TestCheckResourceAttr(name, "duration_custom_list.1", "10m0s"),
+				),
+			},
+			{
+				Config:   s.getFixture("time.tf"),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func (s *TerraformSuite) TestObjects() {
 	t := s.T()
 	name := "example_objects.test"
@@ -137,25 +387,27 @@ func (s *TerraformSuite) TestObjects() {
 					resource.TestCheckResourceAttr(name, "primitives.float_value", "0.75"),
 					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
 					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
-					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
+					resource.TestCheckResourceAttr(name, "primitives.nullable_value", "false"),
 
 					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
 					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),
-					resource.TestCheckResourceAttr(name, "int_map.one", "1"),
-					resource.TestCheckResourceAttr(name, "int_map.two", "2"),
-					resource.TestCheckResourceAttr(name, "bool_map.enabled", "true"),
-					resource.TestCheckResourceAttr(name, "bool_map.disabled", "false"),
+					resource.TestCheckResourceAttr(name, "int_map.key1", "1"),
+					resource.TestCheckResourceAttr(name, "int_map.key2", "2"),
+					resource.TestCheckResourceAttr(name, "bool_map.key1", "true"),
+					resource.TestCheckResourceAttr(name, "bool_map.key2", "false"),
 
 					resource.TestCheckResourceAttr(name, "nested_value.leaf.value", "nested-value"),
-					resource.TestCheckNoResourceAttr(name, "nested_nullable"),
+					resource.TestCheckResourceAttr(name, "nested_nullable.leaf.value", "nested-value"),
 
 					resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", "list-1"),
 					resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", "list-2"),
-					resource.TestCheckNoResourceAttr(name, "nested_nullable_list"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_list.0.leaf.value", "list-1"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_list.1.leaf.value", "list-2"),
 
-					resource.TestCheckResourceAttr(name, "nested_map.first.leaf.value", "map-1"),
-					resource.TestCheckResourceAttr(name, "nested_map.second.leaf.value", "map-2"),
-					resource.TestCheckNoResourceAttr(name, "nested_nullable_map"),
+					resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", "map-1"),
+					resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", "map-2"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_map.key1.leaf.value", "map-1"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_map.key2.leaf.value", "map-2"),
 
 					resource.TestCheckResourceAttr(name, "branch1.leaf.value", "branch-1"),
 					resource.TestCheckNoResourceAttr(name, "branch2"),
@@ -165,6 +417,182 @@ func (s *TerraformSuite) TestObjects() {
 					// This embedded value overwrites the leaf.value field.
 					// resource.TestCheckResourceAttr(name, "value", "embedded-nullable-value"),
 				),
+			},
+		},
+	})
+}
+
+func (s *TerraformSuite) TestObjectsZeroValues() {
+	t := s.T()
+	name := "example_objects.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("objects_zero_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "primitives.string_value", ""),
+					resource.TestCheckResourceAttr(name, "primitives.int32_value", "0"),
+					resource.TestCheckResourceAttr(name, "primitives.float_value", "0"),
+					resource.TestCheckResourceAttr(name, "primitives.bool_value", "false"),
+					resource.TestCheckResourceAttr(name, "primitives.enum_value", "0"),
+					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
+
+					resource.TestCheckResourceAttr(name, "string_map.key1", ""),
+					resource.TestCheckResourceAttr(name, "string_map.key2", ""),
+					resource.TestCheckResourceAttr(name, "int_map.key1", "0"),
+					resource.TestCheckResourceAttr(name, "int_map.key2", "0"),
+					resource.TestCheckResourceAttr(name, "bool_map.key1", "false"),
+					resource.TestCheckResourceAttr(name, "bool_map.key2", "false"),
+
+					resource.TestCheckResourceAttr(name, "nested_value.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable"),
+
+					resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", ""),
+					resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_list"),
+
+					resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", ""),
+					resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_map"),
+
+					resource.TestCheckResourceAttr(name, "branch1.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "branch2"),
+
+					resource.TestCheckResourceAttr(name, "leaf.value", ""),
+				),
+			},
+		},
+	})
+}
+
+func (s *TerraformSuite) TestObjectsUpdate() {
+	t := s.T()
+	name := "example_objects.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("objects.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "primitives.string_value", "string"),
+					resource.TestCheckResourceAttr(name, "primitives.int32_value", "123"),
+					resource.TestCheckResourceAttr(name, "primitives.float_value", "0.75"),
+					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
+					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
+					resource.TestCheckResourceAttr(name, "primitives.nullable_value", "false"),
+
+					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
+					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),
+					resource.TestCheckResourceAttr(name, "int_map.key1", "1"),
+					resource.TestCheckResourceAttr(name, "int_map.key2", "2"),
+					resource.TestCheckResourceAttr(name, "bool_map.key1", "true"),
+					resource.TestCheckResourceAttr(name, "bool_map.key2", "false"),
+
+					resource.TestCheckResourceAttr(name, "nested_value.leaf.value", "nested-value"),
+					resource.TestCheckResourceAttr(name, "nested_nullable.leaf.value", "nested-value"),
+
+					resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", "list-1"),
+					resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", "list-2"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_list.0.leaf.value", "list-1"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_list.1.leaf.value", "list-2"),
+
+					resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", "map-1"),
+					resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", "map-2"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_map.key1.leaf.value", "map-1"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_map.key2.leaf.value", "map-2"),
+
+					resource.TestCheckResourceAttr(name, "branch1.leaf.value", "branch-1"),
+					resource.TestCheckNoResourceAttr(name, "branch2"),
+
+					resource.TestCheckResourceAttr(name, "leaf.value", "embedded-leaf"),
+				),
+			},
+			{
+				Config:   s.getFixture("objects.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("objects_zero_values.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "primitives.string_value", ""),
+					resource.TestCheckResourceAttr(name, "primitives.int32_value", "0"),
+					resource.TestCheckResourceAttr(name, "primitives.float_value", "0"),
+					resource.TestCheckResourceAttr(name, "primitives.bool_value", "false"),
+					resource.TestCheckResourceAttr(name, "primitives.enum_value", "0"),
+					resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
+
+					resource.TestCheckResourceAttr(name, "string_map.key1", ""),
+					resource.TestCheckResourceAttr(name, "string_map.key2", ""),
+					resource.TestCheckResourceAttr(name, "int_map.key1", "0"),
+					resource.TestCheckResourceAttr(name, "int_map.key2", "0"),
+					resource.TestCheckResourceAttr(name, "bool_map.key1", "false"),
+					resource.TestCheckResourceAttr(name, "bool_map.key2", "false"),
+
+					resource.TestCheckResourceAttr(name, "nested_value.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable"),
+
+					resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", ""),
+					resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_list"),
+
+					resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", ""),
+					resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "nested_nullable_map"),
+
+					resource.TestCheckResourceAttr(name, "branch1.leaf.value", ""),
+					resource.TestCheckNoResourceAttr(name, "branch2"),
+
+					resource.TestCheckResourceAttr(name, "leaf.value", ""),
+				),
+			},
+			{
+				Config:   s.getFixture("objects_zero_values.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("objects.tf"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "primitives.string_value", "string"),
+					resource.TestCheckResourceAttr(name, "primitives.int32_value", "123"),
+					resource.TestCheckResourceAttr(name, "primitives.float_value", "0.75"),
+					resource.TestCheckResourceAttr(name, "primitives.bool_value", "true"),
+					resource.TestCheckResourceAttr(name, "primitives.enum_value", "1"),
+					resource.TestCheckResourceAttr(name, "primitives.nullable_value", "false"),
+
+					resource.TestCheckResourceAttr(name, "string_map.key1", "value1"),
+					resource.TestCheckResourceAttr(name, "string_map.key2", "value2"),
+					resource.TestCheckResourceAttr(name, "int_map.key1", "1"),
+					resource.TestCheckResourceAttr(name, "int_map.key2", "2"),
+					resource.TestCheckResourceAttr(name, "bool_map.key1", "true"),
+					resource.TestCheckResourceAttr(name, "bool_map.key2", "false"),
+
+					resource.TestCheckResourceAttr(name, "nested_value.leaf.value", "nested-value"),
+					resource.TestCheckResourceAttr(name, "nested_nullable.leaf.value", "nested-value"),
+
+					resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", "list-1"),
+					resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", "list-2"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_list.0.leaf.value", "list-1"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_list.1.leaf.value", "list-2"),
+
+					resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", "map-1"),
+					resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", "map-2"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_map.key1.leaf.value", "map-1"),
+					resource.TestCheckResourceAttr(name, "nested_nullable_map.key2.leaf.value", "map-2"),
+
+					resource.TestCheckResourceAttr(name, "branch1.leaf.value", "branch-1"),
+					resource.TestCheckNoResourceAttr(name, "branch2"),
+
+					resource.TestCheckResourceAttr(name, "leaf.value", "embedded-leaf"),
+				),
+			},
+			{
+				Config:   s.getFixture("objects.tf"),
+				PlanOnly: true,
 			},
 		},
 	})

@@ -5,7 +5,7 @@ resource "example_objects" "test" {
     float_value    = 0.75
     bool_value     = true
     enum_value     = 1
-    nullable_value = null
+    nullable_value = false
   }
 
   string_map = {
@@ -14,13 +14,13 @@ resource "example_objects" "test" {
   }
 
   int_map = {
-    one = 1
-    two = 2
+    key1 = 1
+    key2 = 2
   }
 
   bool_map = {
-    enabled  = true
-    disabled = false
+    key1 = true
+    key2 = false
   }
 
   nested_value = {
@@ -29,21 +29,31 @@ resource "example_objects" "test" {
     }
   }
 
-  nested_nullable = null
+  nested_nullable = {
+    leaf = {
+      value = "nested-value"
+    }
+  }
 
   nested_list = [
     { leaf = { value = "list-1" } },
     { leaf = { value = "list-2" } },
   ]
 
-  nested_nullable_list = null
+  nested_nullable_list = [
+    { leaf = { value = "list-1" } },
+    { leaf = { value = "list-2" } },
+  ]
 
   nested_map = {
-    first  = { leaf = { value = "map-1" } }
-    second = { leaf = { value = "map-2" } }
+    key1 = { leaf = { value = "map-1" } }
+    key2 = { leaf = { value = "map-2" } }
   }
 
-  nested_nullable_map = null
+  nested_nullable_map = {
+    key1 = { leaf = { value = "map-1" } }
+    key2 = { leaf = { value = "map-2" } }
+  }
 
   # oneof: set only one branch.
   branch1 = {

@@ -564,8 +564,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
 					}
 					for k, a := range obj.BoolList {
-						v, ok := tf.Attrs["bool_list"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.bool_list", err})
@@ -596,6 +599,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["bool_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
+				if tf.Attrs["bool_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.bool_value", err})
@@ -639,8 +645,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
 					}
 					for k, a := range obj.BytesList {
-						v, ok := tf.Attrs["bytes_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.bytes_list", err})
@@ -671,6 +680,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["bytes_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["bytes_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.bytes_value", err})
@@ -714,8 +726,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
 					}
 					for k, a := range obj.DoubleList {
-						v, ok := tf.Attrs["double_list"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.double_list", err})
@@ -746,6 +761,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["double_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
+				if tf.Attrs["double_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.double_value", err})
@@ -789,8 +807,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
 					}
 					for k, a := range obj.EnumList {
-						v, ok := tf.Attrs["enum_list"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.enum_list", err})
@@ -821,6 +842,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["enum_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["enum_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.enum_value", err})
@@ -864,8 +888,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
 					}
 					for k, a := range obj.FloatList {
-						v, ok := tf.Attrs["float_list"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.float_list", err})
@@ -896,6 +923,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["float_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
+				if tf.Attrs["float_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.float_value", err})
@@ -918,6 +948,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["id"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.id", err})
@@ -961,8 +994,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
 					}
 					for k, a := range obj.Int32List {
-						v, ok := tf.Attrs["int32_list"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.int32_list", err})
@@ -993,6 +1029,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["int32_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["int32_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.int32_value", err})
@@ -1036,8 +1075,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
 					}
 					for k, a := range obj.Int64List {
-						v, ok := tf.Attrs["int64_list"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.int64_list", err})
@@ -1068,6 +1110,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["int64_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["int64_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.int64_value", err})
@@ -1090,6 +1135,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["nullable_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
+				if tf.Attrs["nullable_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.nullable_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.nullable_value", err})
@@ -1133,8 +1181,11 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 					for k, a := range obj.StringList {
-						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"Primitives.string_list", err})
@@ -1165,6 +1216,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 		} else {
 			v, ok := tf.Attrs["string_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["string_value"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"Primitives.string_value", err})
@@ -1288,5 +1342,28 @@ func (d attrWriteGeneralError) Detail() string {
 }
 
 func (d attrWriteGeneralError) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteUnexpectedExistingTypeDiag represents diagnostic message when a field is initialized with a value whose go
+// type does not match what we'd expect.
+type attrWriteUnexpectedExistingTypeDiag struct {
+	Path string
+	Type string
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Detail() string {
+	return fmt.Sprintf("A value for %v is already initialized and its type is not %v", d.Path, d.Type)
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
