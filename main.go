@@ -17,10 +17,13 @@ limitations under the License.
 package main
 
 import (
+	"io"
 	"os"
 	"regexp"
 	"strings"
 
+	gogoproto "github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	plugin_go "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/gogo/protobuf/vanity/command"
 	"github.com/gravitational/trace"
@@ -49,7 +52,7 @@ func main() {
 
 	p := NewPlugin()
 
-	req := command.Read()
+	req := Read()
 	resp := command.GeneratePlugin(req, p, "_terraform.go")
 
 	err := runGoImports(p, resp)
@@ -134,4 +137,32 @@ func replacePackageName(s string, target string) string {
 	}
 
 	return strings.Replace(s, pkg, "package "+target+"\n", 1)
+}
+
+// Read is command.Read but it supports dumping the protoc request in a file for debugging purposes.
+func Read() *plugin_go.CodeGeneratorRequest {
+	g := generator.New()
+	data, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		g.Error(err, "reading input")
+	}
+
+	// Dump the request in a file if configured.
+	// This file can then be used to replay the request with a debugger attached.
+	// Once the request is dumped, run `protoc-gen-tfschema < "$PROTOC_GEN_TERRAFORM_DUMP"` to
+	// replay it.
+	if dumpPath := os.Getenv("PROTOC_GEN_TERRAFORM_DUMP"); dumpPath != "" {
+		if err := os.WriteFile(dumpPath, data, 0644); err != nil {
+			g.Error(err, "writing dump file: ", dumpPath)
+		}
+	}
+
+	if err := gogoproto.Unmarshal(data, g.Request); err != nil {
+		g.Error(err, "parsing input proto")
+	}
+
+	if len(g.Request.FileToGenerate) == 0 {
+		g.Fail("no files to generate")
+	}
+	return g.Request
 }
