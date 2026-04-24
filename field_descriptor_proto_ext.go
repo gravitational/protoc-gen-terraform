@@ -20,7 +20,10 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/gogoproto"
-	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
+	gogodescriptor "github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
+	"github.com/gravitational/trace"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 const (
@@ -33,11 +36,11 @@ const (
 
 // FieldDescriptorProtoExt adds some useful extension methods to gogo protobuf field descriptor
 type FieldDescriptorProtoExt struct {
-	*descriptor.FieldDescriptorProto
+	*gogodescriptor.FieldDescriptorProto
 }
 
 // IsTypeEq returns true if type equals current field descriptor type
-func (f *FieldDescriptorProtoExt) IsTypeEq(t descriptor.FieldDescriptorProto_Type) bool {
+func (f *FieldDescriptorProtoExt) IsTypeEq(t gogodescriptor.FieldDescriptorProto_Type) bool {
 	return *f.Type == t
 }
 
@@ -67,7 +70,7 @@ func (f *FieldDescriptorProtoExt) IsDuration(durationCustomType string) bool {
 
 // IsMessage returns true if field is a message
 func (f *FieldDescriptorProtoExt) IsMessage() bool {
-	return f.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_MESSAGE)
+	return f.IsTypeEq(gogodescriptor.FieldDescriptorProto_TYPE_MESSAGE)
 }
 
 // IsCastType returns true if field has gogoproto.casttype flag
@@ -101,4 +104,17 @@ func (f *FieldDescriptorProtoExt) GetJSONName() string {
 	}
 
 	return ""
+}
+
+// IsProto3Optional returns true if the field was declared with the proto3
+// "optional" keyword. Gogo protobuf v1.3.2 predates proto3 optional support
+// and does not expose the proto3_optional descriptor field, but
+// preserves it in XXX_unrecognized. We unmarshal XXX_unrecognzed to extract
+// the descriptor.
+func (f *FieldDescriptorProtoExt) IsProto3Optional() (bool, error) {
+	var gpb descriptorpb.FieldDescriptorProto
+	if err := proto.Unmarshal(f.XXX_unrecognized, &gpb); err != nil {
+		return false, trace.Wrap(err, "failed to unmarshal field descriptor for %s", f.GetName())
+	}
+	return gpb.GetProto3Optional(), nil
 }

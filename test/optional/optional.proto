@@ -1,0 +1,51 @@
+// Copyright 2026 Gravitational, Inc.
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package optional;
+
+option go_package = "github.com/gravitational/protoc-gen-terraform/v3/test/optional";
+
+// OptionalTest message contains proto3 optional fields and a real oneof to verify they are handled correctly.
+message OptionalTest {
+
+    // OptionalStr is a proto3 optional string field
+    optional string optional_str = 2;
+
+    // OptionalInt64 is a proto3 optional int64 field
+    optional int64 optional_int64 = 3;
+
+    // OptionalBool is a proto3 optional bool field
+    optional bool optional_bool = 4;
+
+    // RealOneOf is a real oneof group
+    oneof real_one_of {
+        string choice_a = 5;
+        string choice_b = 6;
+    }
+
+    // maps don't support optional keyword, but we add it here to check the generation
+    map<string, string> optional_map = 7;
+
+    // OptionalInnerMessage is a proto3 optional message field
+    optional InnerMessage optional_inner_message = 8;
+
+    // lists don't support the optional keyword, but we add it here to check the generation
+    repeated string string_list = 9;
+}
+
+// InnerMessage is a message embedded in OptionalTest to check generation
+message InnerMessage {
+    optional bool inner_bool = 1;
+}

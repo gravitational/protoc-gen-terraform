@@ -122,6 +122,9 @@ type Field struct {
 	ParentIsOptionalEmbedFieldName string
 	// IsNullable represents field nullable state
 	IsNullable bool
+	// IsProto3Optional is true if the field was declared with the proto3
+	// optional keyword.
+	IsProto3Optional bool
 	// IsSensitive is field sensitive? (password, token)
 	IsSensitive bool
 	// Validators represents the array of field validators for a field
@@ -189,19 +192,25 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		return nil, nil
 	}
 
+	isProto3Optional, err := c.field.IsProto3Optional()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
 	f := &Field{
-		Name:          c.GetName(),
-		NameSnake:     c.GetNameSnake(),
-		IsRequired:    c.GetFlagValue(c.config.RequiredFields),
-		IsComputed:    c.IsComputed(),
-		IsSensitive:   c.GetFlagValue(c.config.SensitiveFields),
-		IsRepeated:    c.IsRepeated(),
-		IsMap:         c.IsMap(),
-		IsNullable:    c.GetNullable(),
-		Validators:    c.GetValidators(),
-		PlanModifiers: c.GetPlanModifiers(),
-		Path:          c.GetPath(),
-		Comment:       c.GetComment(),
+		Name:             c.GetName(),
+		NameSnake:        c.GetNameSnake(),
+		IsRequired:       c.GetFlagValue(c.config.RequiredFields),
+		IsComputed:       c.IsComputed(),
+		IsSensitive:      c.GetFlagValue(c.config.SensitiveFields),
+		IsRepeated:       c.IsRepeated(),
+		IsMap:            c.IsMap(),
+		IsNullable:       c.GetNullable(),
+		IsProto3Optional: isProto3Optional,
+		Validators:       c.GetValidators(),
+		PlanModifiers:    c.GetPlanModifiers(),
+		Path:             c.GetPath(),
+		Comment:          c.GetComment(),
 	}
 
 	f.GoType = c.GetGoType()
@@ -262,7 +271,11 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 	f.Kind = f.getKind()
 
-	if c.IsOneOf() {
+	isOneOf, err := c.IsOneOf()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	if isOneOf {
 		f.OneOfName = c.GetOneOfFieldName()
 		f.OneOfType = c.GetOneOfTypeName()
 	}
