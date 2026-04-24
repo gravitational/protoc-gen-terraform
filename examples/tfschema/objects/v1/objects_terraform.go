@@ -86,6 +86,27 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		},
+		"branch_bool": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+		},
+		"branch_int": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+		},
+		"branch_string": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
 		"embedded_value": {
 			Computed:      true,
 			Description:   "",
@@ -386,7 +407,8 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 // CopyObjectsFromTerraform copies contents of the source Terraform object into a target struct
 func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
-	obj.OneOf = nil
+	obj.OneOfObjects = nil
+	obj.OneOfPrimitives = nil
 	{
 		a, ok := tf.Attrs["bool_map"]
 		if !ok {
@@ -425,7 +447,7 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			} else {
 				if !v.Null && !v.Unknown {
 					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
-					obj.OneOf = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{Branch1: b}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{Branch1: b}
 					obj := b
 					tf := v
 					{
@@ -477,7 +499,7 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			} else {
 				if !v.Null && !v.Unknown {
 					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
-					obj.OneOf = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{Branch2: b}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{Branch2: b}
 					obj := b
 					tf := v
 					{
@@ -514,6 +536,63 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_bool"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_bool"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+			} else {
+				var t bool
+				if !v.Null && !v.Unknown {
+					t = bool(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchBool{BranchBool: t}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_int"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_int"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_int", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+			} else {
+				var t int64
+				if !v.Null && !v.Unknown {
+					t = int64(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchInt{BranchInt: t}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_string"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_string"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_string", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.Null && !v.Unknown {
+					t = string(v.Value)
+				}
+				if !v.Null && !v.Unknown {
+					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchString{BranchString: t}
 				}
 			}
 		}
@@ -1470,7 +1549,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.branch1"})
 		} else {
-			obj, ok := obj.OneOf.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1)
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1)
 			if !ok {
 				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{}
 			}
@@ -1563,7 +1642,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.branch2"})
 		} else {
-			obj, ok := obj.OneOf.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2)
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2)
 			if !ok {
 				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{}
 			}
@@ -1649,6 +1728,102 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				v.Unknown = false
 				tf.Attrs["branch2"] = v
 			}
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["branch_bool"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_bool"})
+		} else {
+			v, ok := tf.Attrs["branch_bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			if !ok {
+				if tf.Attrs["branch_bool"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.branch_bool", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.branch_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
+			}
+			{
+				obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchBool)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = bool(obj.BranchBool)
+				}
+			}
+			v.Unknown = false
+			tf.Attrs["branch_bool"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["branch_int"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_int"})
+		} else {
+			v, ok := tf.Attrs["branch_int"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			if !ok {
+				if tf.Attrs["branch_int"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_int", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.branch_int", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.branch_int", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
+			}
+			{
+				obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchInt)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = int64(obj.BranchInt)
+				}
+			}
+			v.Unknown = false
+			tf.Attrs["branch_int"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["branch_string"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_string"})
+		} else {
+			v, ok := tf.Attrs["branch_string"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				if tf.Attrs["branch_string"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_string", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+				if err != nil {
+					diags.Append(attrWriteGeneralError{"Objects.branch_string", err})
+				}
+				v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+				if !ok {
+					diags.Append(attrWriteConversionFailureDiag{"Objects.branch_string", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
+			}
+			{
+				obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchString)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.BranchString)
+				}
+			}
+			v.Unknown = false
+			tf.Attrs["branch_string"] = v
 		}
 	}
 	{

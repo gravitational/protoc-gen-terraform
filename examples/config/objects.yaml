@@ -67,6 +67,10 @@ computed_fields:
   - Objects.branch2.leaf
   - Objects.branch2.leaf.value
 
+  - Objects.branch_bool
+  - Objects.branch_string
+  - Objects.branch_int
+
   - Objects.leaf
   - Objects.leaf.value
 
