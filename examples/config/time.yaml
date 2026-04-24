@@ -16,6 +16,8 @@ computed_fields:
   - Time.duration_list
   - Time.duration_custom
   - Time.duration_custom_list
+  - Time.nullable_timestamp
+  - Time.nullable_duration
 
 time_type:
   type: "TimeType" # Struct name of attrs.Type

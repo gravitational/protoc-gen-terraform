@@ -7,4 +7,7 @@ resource "example_time" "test" {
 
   duration_custom      = "0s"
   duration_custom_list = ["0s", "0s"]
+
+  nullable_timestamp = "0001-01-01T00:00:00Z"
+  nullable_duration  = "0s"
 }
