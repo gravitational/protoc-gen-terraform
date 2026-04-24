@@ -288,3 +288,25 @@ Current version number resides in the VERSION file. To update the file contents 
 git tag v1.1.1
 go generate
 ```
+
+# Debugging
+
+The plugin can be configured to dump the `protoc` generation request by setting the `PROTOC_GEN_TERRAFORM_DUMP` env var.
+The dumped request can then be replayed by sending it to the plugin's stdin.
+For example:
+
+```
+export PROTOC_GEN_TERRAFORM_DUMP="$(mktemp)"
+echo "$PROTOC_GEN_TERRAFORM_DUMP"
+
+# note that make gen calls the plugin several times, only the last request is logged, which is usually the one that fails.
+make gen
+
+# invoke the plugin again, but replay the saved request
+./build/protoc-gen-terraform < "$PROTOC_GEN_TERRAFORM_DUMP"
+```
+
+Debuggers can be configured to read stdin from the file:
+* in GoLand: on a `Go Build` target, set `Redirect input from` to the dump file path
+* in VSCode: in the `Launch.json` file, set `stdinFrom` to the dump file path
+* with `dlv`: `dlv exec ./build/protoc-gen-terraform --listen=:2345 --headless=true --api-version=2 --accept-multiclient --redirect stdin:"$PROTOC_GEN_TERRAFORM_DUMP"
