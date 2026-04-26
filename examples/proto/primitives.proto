@@ -43,9 +43,6 @@ message Primitives {
   // enum_value enum field.
   EnumValue enum_value = 9;
 
-  // nullable_value nullable field.
-  bool nullable_value = 10 [ (gogoproto.nullable) = true ];
-
   // string_list string list field.
   repeated string string_list = 11;
 

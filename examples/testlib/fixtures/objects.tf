@@ -1,11 +1,10 @@
 resource "example_objects" "test" {
   primitives = {
-    string_value   = "string"
-    int32_value    = 123
-    float_value    = 0.75
-    bool_value     = true
-    enum_value     = 1
-    nullable_value = false
+    string_value = "string"
+    int32_value  = 123
+    float_value  = 0.75
+    bool_value   = true
+    enum_value   = 1
   }
 
   string_map = {
@@ -65,7 +64,6 @@ resource "example_objects" "test" {
   leaf = {
     value = "embedded-leaf"
   }
-  # TODO: Unepxected behavior with embedded fields.
-  # This embedded value overwrites the embedded leaf.value field.
-  # value = "embedded-nullable-value"
+
+  embedded_value = "embedded-nullable-value"
 }
