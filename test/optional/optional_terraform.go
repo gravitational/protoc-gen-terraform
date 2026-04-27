@@ -40,11 +40,13 @@ var _ = math.Inf
 func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"choice_a": {
+			Computed:    true,
 			Description: "",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"choice_b": {
+			Computed:    true,
 			Description: "",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -79,6 +81,7 @@ func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"string_list": {
+			Computed:    true,
 			Description: "lists don't support the optional keyword, but we add it here to check the generation",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
