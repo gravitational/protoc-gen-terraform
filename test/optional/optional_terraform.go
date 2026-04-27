@@ -294,6 +294,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 			}
 			v, ok := tf.Attrs["choice_a"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["choice_a"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.choice_a", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"OptionalTest.choice_a", err})
@@ -320,6 +323,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 			}
 			v, ok := tf.Attrs["choice_b"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["choice_b"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.choice_b", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"OptionalTest.choice_b", err})
@@ -342,6 +348,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		} else {
 			v, ok := tf.Attrs["optional_bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
+				if tf.Attrs["optional_bool"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.optional_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"OptionalTest.optional_bool", err})
@@ -394,6 +403,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						} else {
 							v, ok := tf.Attrs["inner_bool"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 							if !ok {
+								if tf.Attrs["inner_bool"] != nil {
+									diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.optional_inner_message.inner_bool", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+								}
 								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 								if err != nil {
 									diags.Append(attrWriteGeneralError{"OptionalTest.optional_inner_message.inner_bool", err})
@@ -426,6 +438,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		} else {
 			v, ok := tf.Attrs["optional_int64"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
+				if tf.Attrs["optional_int64"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.optional_int64", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"OptionalTest.optional_int64", err})
@@ -470,8 +485,11 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if obj.OptionalMap != nil {
 					t := o.ElemType
 					for k, a := range obj.OptionalMap {
-						v, ok := tf.Attrs["optional_map"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.optional_map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"OptionalTest.optional_map", err})
@@ -502,6 +520,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		} else {
 			v, ok := tf.Attrs["optional_str"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
+				if tf.Attrs["optional_str"] != nil {
+					diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.optional_str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 				if err != nil {
 					diags.Append(attrWriteGeneralError{"OptionalTest.optional_str", err})
@@ -549,8 +570,11 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 					for k, a := range obj.StringList {
-						v, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
+							if c.Elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"OptionalTest.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
 							if err != nil {
 								diags.Append(attrWriteGeneralError{"OptionalTest.string_list", err})
@@ -682,5 +706,28 @@ func (d attrWriteGeneralError) Detail() string {
 }
 
 func (d attrWriteGeneralError) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrWriteUnexpectedExistingTypeDiag represents diagnostic message when a field is initialized with a value whose go
+// type does not match what we'd expect.
+type attrWriteUnexpectedExistingTypeDiag struct {
+	Path string
+	Type string
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Summary() string {
+	return "Error writing to Terraform object"
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Detail() string {
+	return fmt.Sprintf("A value for %v is already initialized and its type is not %v", d.Path, d.Type)
+}
+
+func (d attrWriteUnexpectedExistingTypeDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
