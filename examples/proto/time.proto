@@ -43,4 +43,16 @@ message Time {
 
   // duration_custom_list []time.Duration field using casttype.
   repeated int64 duration_custom_list = 7 [ (gogoproto.casttype) = "Duration" ];
+
+  // nullable_timestamp nullable time.Time field.
+  google.protobuf.Timestamp nullable_timestamp = 8 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = true
+  ];
+
+  // nullable_duration nullable time.Duration field.
+  google.protobuf.Duration nullable_duration = 9 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = true
+  ];
 }
