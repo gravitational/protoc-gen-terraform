@@ -42,12 +42,16 @@ var _ = math.Inf
 func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"bool_custom": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Description: "bool_custom custom bool field.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "bool_custom custom bool field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		}),
 		"bool_custom_list": GenSchemaBoolSpecialList(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Description: "bool_custom_list custom bool list field.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "bool_custom_list custom bool list field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		}),
 		"computed": {
 			Computed:      true,
@@ -57,9 +61,11 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"custom_name_override": {
-			Description: "name_override is a field with a name override.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Computed:      true,
+			Description:   "name_override is a field with a name override.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"id": {
 			Computed:      true,
@@ -87,25 +93,33 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"schema_override": {
-			Description: "",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"sensitive": {
-			Description: "sensitive is a sensitive field.",
-			Optional:    true,
-			Sensitive:   true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Computed:      true,
+			Description:   "sensitive is a sensitive field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Sensitive:     true,
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"string_override": GenSchemaStringCustom(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Description: "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
-			Optional:    true,
+			Computed:      true,
+			Description:   "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		}),
 		"validated": {
-			Description: "validated is a validated field.",
-			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-			Validators:  []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
+			Computed:      true,
+			Description:   "validated is a validated field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Validators:    []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
 		},
 	}}, nil
 }
