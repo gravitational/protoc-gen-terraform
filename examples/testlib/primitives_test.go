@@ -146,14 +146,15 @@ func (s *TerraformSuite) testCheckPrimitivesZeroValuesResource(name string) reso
 
 func (s *TerraformSuite) testCheckPrimitivesNullValuesResource(name string) resource.TestCheckFunc {
 	return resource.ComposeAggregateTestCheckFunc(
-		resource.TestCheckNoResourceAttr(name, "string_value"),
-		resource.TestCheckNoResourceAttr(name, "int32_value"),
-		resource.TestCheckNoResourceAttr(name, "int64_value"),
-		resource.TestCheckNoResourceAttr(name, "float_value"),
-		resource.TestCheckNoResourceAttr(name, "double_value"),
-		resource.TestCheckNoResourceAttr(name, "bool_value"),
-		resource.TestCheckNoResourceAttr(name, "bytes_value"),
-		resource.TestCheckNoResourceAttr(name, "enum_value"),
+		resource.TestCheckResourceAttr(name, "string_value", ""),
+		resource.TestCheckResourceAttr(name, "int32_value", "0"),
+		resource.TestCheckResourceAttr(name, "int64_value", "0"),
+		resource.TestCheckResourceAttr(name, "float_value", "0"),
+		resource.TestCheckResourceAttr(name, "double_value", "0"),
+		resource.TestCheckResourceAttr(name, "bool_value", "false"),
+		resource.TestCheckResourceAttr(name, "bytes_value", ""),
+		resource.TestCheckResourceAttr(name, "enum_value", "0"),
+
 		resource.TestCheckNoResourceAttr(name, "string_list.0"),
 		resource.TestCheckNoResourceAttr(name, "int32_list.0"),
 		resource.TestCheckNoResourceAttr(name, "int64_list.0"),
