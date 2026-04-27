@@ -436,8 +436,31 @@ func (c *FieldBuildContext) GetFlagValue(f map[string]struct{}) bool {
 }
 
 // IsComputed returns true if a field is computed
-func (c *FieldBuildContext) IsComputed() bool {
-	return c.GetFlagValue(c.config.ComputedFields)
+func (c *FieldBuildContext) IsComputed(isProto3optional bool) bool {
+	// Required fields cannot be computed
+	if c.GetFlagValue(c.config.RequiredFields) {
+		return false
+	}
+	// Config says this field must be computed.
+	if c.GetFlagValue(c.config.ComputedFields) {
+		return true
+	}
+	// If the field is nullable or optional, the Terraform `Null` value can be represented
+	// in the go struct as a `nil` pointer. This allows us to successfully round-trip through
+	// the go type: `ToTerraform(FromTerraform(field)) == field`.
+	// We don't need to mark this field as computed.
+	if c.GetNullable() || isProto3optional {
+		return false
+	}
+
+	// The field is non-nullable in the go-struct side.
+	// This means we cannot differentiate in go between `nil` and the zero-value.
+	// We cannot have stability when round-trippping through go:
+	// `ToTerraform(FromTerraform(field)) != field`.
+	// The only fix that we have is to set the field as non-null when reading back from go.
+	// Terraform gets angry about the non-stability of a round trip and will throw "Inconsistent Result"
+	// errors if the field is not marked computed.
+	return true
 }
 
 // GetValidators returns field validators
@@ -455,7 +478,7 @@ func (c *FieldBuildContext) GetValidators() []string {
 }
 
 // GetPlanModifiers returns field validators
-func (c *FieldBuildContext) GetPlanModifiers() []string {
+func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) []string {
 	v, ok := c.config.PlanModifiers[c.GetPath()]
 	if !ok {
 		v, ok = c.config.PlanModifiers[c.GetNameWithTypeName()]
@@ -465,7 +488,7 @@ func (c *FieldBuildContext) GetPlanModifiers() []string {
 		return v
 	}
 
-	if c.config.UseStateForUnknownByDefault && c.IsComputed() {
+	if c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
 		return []string{"github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()"}
 	}
 
