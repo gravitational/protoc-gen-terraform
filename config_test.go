@@ -18,7 +18,7 @@ func TestConfig(t *testing.T) {
 
 	require.Equal(t, cfg.ExcludeFields, flagMap{"Test.Excluded": struct{}{}})
 	require.Equal(t, cfg.ComputedFields, flagMap{"Test.Str": struct{}{}})
-	require.Equal(t, cfg.RequiredFields, flagMap{"Test.Str": struct{}{}})
+	require.Equal(t, cfg.RequiredFields, flagMap{"Test.RequiredStr": struct{}{}})
 	require.Equal(t, cfg.SensitiveFields, flagMap{"Test.Str": struct{}{}})
 
 	require.Equal(t, cfg.Suffixes, map[string]string{"BoolCustom": "BoolSpecial"})

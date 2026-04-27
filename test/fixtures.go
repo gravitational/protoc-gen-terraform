@@ -433,6 +433,7 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 			"foo":             types.String{Null: true},
 			"bar":             types.String{Value: "ham"},
 			"schema_override": types.String{Value: "hello"},
+			"required_str":    types.String{Value: "Test"},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

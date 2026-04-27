@@ -12,7 +12,7 @@ exclude_fields:
 computed_fields:
   - Test.Str
 required_fields:
-  - Test.Str
+  - Test.RequiredStr
 sensitive_fields:
   - Test.Str
 suffixes:
