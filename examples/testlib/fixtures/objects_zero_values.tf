@@ -1,11 +1,10 @@
 resource "example_objects" "test" {
   primitives = {
-    string_value   = ""
-    int32_value    = 0
-    float_value    = 0
-    bool_value     = false
-    enum_value     = 0
-    nullable_value = null
+    string_value = ""
+    int32_value  = 0
+    float_value  = 0
+    bool_value   = false
+    enum_value   = 0
   }
 
   string_map = {
@@ -54,4 +53,6 @@ resource "example_objects" "test" {
   leaf = {
     value = ""
   }
+
+  embedded_value = ""
 }
