@@ -331,9 +331,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.computed", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Computed) == ""
 			}
-			v.Value = string(obj.Computed)
+			{
+				v.Null = false
+				v.Value = string(obj.Computed)
+			}
 			v.Unknown = false
 			tf.Attrs["computed"] = v
 		}
@@ -356,9 +358,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
 			}
-			v.Value = string(obj.Id)
+			{
+				v.Null = false
+				v.Value = string(obj.Id)
+			}
 			v.Unknown = false
 			tf.Attrs["id"] = v
 		}
@@ -381,9 +385,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.NameOverride) == ""
 			}
-			v.Value = string(obj.NameOverride)
+			{
+				v.Null = false
+				v.Value = string(obj.NameOverride)
+			}
 			v.Unknown = false
 			tf.Attrs["custom_name_override"] = v
 		}
@@ -406,9 +412,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.PlanModifier) == ""
 			}
-			v.Value = string(obj.PlanModifier)
+			{
+				v.Null = false
+				v.Value = string(obj.PlanModifier)
+			}
 			v.Unknown = false
 			tf.Attrs["plan_modifier"] = v
 		}
@@ -431,9 +439,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.required", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Required) == ""
 			}
-			v.Value = string(obj.Required)
+			{
+				v.Null = false
+				v.Value = string(obj.Required)
+			}
 			v.Unknown = false
 			tf.Attrs["required"] = v
 		}
@@ -456,9 +466,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.schema_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.SchemaOverride) == ""
 			}
-			v.Value = string(obj.SchemaOverride)
+			{
+				v.Null = false
+				v.Value = string(obj.SchemaOverride)
+			}
 			v.Unknown = false
 			tf.Attrs["schema_override"] = v
 		}
@@ -481,9 +493,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.sensitive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Sensitive) == ""
 			}
-			v.Value = string(obj.Sensitive)
+			{
+				v.Null = false
+				v.Value = string(obj.Sensitive)
+			}
 			v.Unknown = false
 			tf.Attrs["sensitive"] = v
 		}
@@ -515,9 +529,11 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Validated) == ""
 			}
-			v.Value = string(obj.Validated)
+			{
+				v.Null = false
+				v.Value = string(obj.Validated)
+			}
 			v.Unknown = false
 			tf.Attrs["validated"] = v
 		}

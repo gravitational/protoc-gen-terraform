@@ -115,7 +115,7 @@ func (f *FieldCopyToGenerator) getAttr(g *j.Group, varName, selector, valType st
 		Assert(j.Id(f.i.WithType(valType)))
 }
 
-// getAttr generates a statement to read the value of an attribute at the specified index.
+// getPrimitiveAttr generates a statement to read the value of an attribute at the specified index.
 // The value will be initialized if it does not exist or the type assertion fails.
 //
 // Expected format:

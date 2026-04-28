@@ -324,9 +324,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationCustom)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationCustom)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_custom"] = v
 		}
@@ -372,9 +374,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom_list", "DurationValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Duration(a)
+						{
+							v.Null = false
+							v.Value = time.Duration(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -428,9 +432,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Time.duration_list", "DurationValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Duration(a)
+						{
+							v.Null = false
+							v.Value = time.Duration(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -461,9 +467,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.duration_standard", "DurationValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Duration(obj.DurationStandard)
+			{
+				v.Null = false
+				v.Value = time.Duration(obj.DurationStandard)
+			}
 			v.Unknown = false
 			tf.Attrs["duration_standard"] = v
 		}
@@ -486,9 +494,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.Id) == ""
 			}
-			v.Value = string(obj.Id)
+			{
+				v.Null = false
+				v.Value = string(obj.Id)
+			}
 			v.Unknown = false
 			tf.Attrs["id"] = v
 		}
@@ -511,7 +521,6 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.nullable_duration", "DurationValue"})
 				}
-				v.Null = false
 			}
 			if obj.NullableDuration == nil {
 				v.Null = true
@@ -541,7 +550,6 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.nullable_timestamp", "TimeValue"})
 				}
-				v.Null = false
 			}
 			if obj.NullableTimestamp == nil {
 				v.Null = true
@@ -594,9 +602,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_list", "TimeValue"})
 							}
-							v.Null = false
 						}
-						v.Value = time.Time(a)
+						{
+							v.Null = false
+							v.Value = time.Time(a)
+						}
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -627,9 +637,11 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_value", "TimeValue"})
 				}
-				v.Null = false
 			}
-			v.Value = time.Time(obj.TimestampValue)
+			{
+				v.Null = false
+				v.Value = time.Time(obj.TimestampValue)
+			}
 			v.Unknown = false
 			tf.Attrs["timestamp_value"] = v
 		}
