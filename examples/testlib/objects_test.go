@@ -117,6 +117,10 @@ func (s *TerraformSuite) testCheckObjectResource(name string) resource.TestCheck
 		resource.TestCheckResourceAttr(name, "branch1.leaf.value", "branch-1"),
 		resource.TestCheckNoResourceAttr(name, "branch2"),
 
+		resource.TestCheckResourceAttr(name, "branch_string", "branch-string"),
+		resource.TestCheckNoResourceAttr(name, "branch_bool"),
+		resource.TestCheckNoResourceAttr(name, "branch_int"),
+
 		resource.TestCheckResourceAttr(name, "leaf.value", "embedded-leaf"),
 		resource.TestCheckResourceAttr(name, "embedded_value", "embedded-nullable-value"),
 	)
@@ -151,6 +155,10 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 		resource.TestCheckResourceAttr(name, "branch1.leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "branch2"),
 
+		resource.TestCheckResourceAttr(name, "branch_string", ""),
+		resource.TestCheckNoResourceAttr(name, "branch_bool"),
+		resource.TestCheckNoResourceAttr(name, "branch_int"),
+
 		resource.TestCheckResourceAttr(name, "leaf.value", ""),
 		resource.TestCheckResourceAttr(name, "embedded_value", ""),
 	)
@@ -158,12 +166,14 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 
 func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource.TestCheckFunc {
 	return resource.ComposeAggregateTestCheckFunc(
-		resource.TestCheckNoResourceAttr(name, "primitives.string_value"),
-		resource.TestCheckNoResourceAttr(name, "primitives.int32_value"),
-		resource.TestCheckNoResourceAttr(name, "primitives.float_value"),
-		resource.TestCheckNoResourceAttr(name, "primitives.bool_value"),
-		resource.TestCheckNoResourceAttr(name, "primitives.enum_value"),
-		resource.TestCheckNoResourceAttr(name, "primitives.nullable_value"),
+		resource.TestCheckResourceAttr(name, "primitives.string_value", ""),
+		resource.TestCheckResourceAttr(name, "primitives.int32_value", "0"),
+		resource.TestCheckResourceAttr(name, "primitives.int64_value", "0"),
+		resource.TestCheckResourceAttr(name, "primitives.float_value", "0"),
+		resource.TestCheckResourceAttr(name, "primitives.double_value", "0"),
+		resource.TestCheckResourceAttr(name, "primitives.bool_value", "false"),
+		resource.TestCheckResourceAttr(name, "primitives.bytes_value", ""),
+		resource.TestCheckResourceAttr(name, "primitives.enum_value", "0"),
 
 		resource.TestCheckNoResourceAttr(name, "string_map.key1"),
 		resource.TestCheckNoResourceAttr(name, "string_map.key2"),
@@ -172,7 +182,7 @@ func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "bool_map.key1"),
 		resource.TestCheckNoResourceAttr(name, "bool_map.key2"),
 
-		resource.TestCheckNoResourceAttr(name, "nested_value.leaf.value"),
+		resource.TestCheckResourceAttr(name, "nested_value.leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "nested_nullable.leaf.value"),
 
 		resource.TestCheckNoResourceAttr(name, "nested_list.0.leaf.value"),
@@ -188,7 +198,11 @@ func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "branch1.leaf.value"),
 		resource.TestCheckNoResourceAttr(name, "branch2.leaf.value"),
 
-		resource.TestCheckNoResourceAttr(name, "leaf.value"),
+		resource.TestCheckNoResourceAttr(name, "branch_bool"),
+		resource.TestCheckNoResourceAttr(name, "branch_int"),
+		resource.TestCheckNoResourceAttr(name, "branch_string"),
+
+		resource.TestCheckResourceAttr(name, "leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "embedded_value"),
 	)
 }

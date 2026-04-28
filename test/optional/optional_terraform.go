@@ -291,10 +291,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"OptionalTest.choice_a"})
 		} else {
-			obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceA)
-			if !ok {
-				obj = &OptionalTest_ChoiceA{}
-			}
 			v, ok := tf.Attrs["choice_a"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["choice_a"] != nil {
@@ -308,9 +304,16 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.choice_a", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.ChoiceA) == ""
 			}
-			v.Value = string(obj.ChoiceA)
+			{
+				obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceA)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.ChoiceA)
+				}
+			}
 			v.Unknown = false
 			tf.Attrs["choice_a"] = v
 		}
@@ -320,10 +323,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"OptionalTest.choice_b"})
 		} else {
-			obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceB)
-			if !ok {
-				obj = &OptionalTest_ChoiceB{}
-			}
 			v, ok := tf.Attrs["choice_b"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
 				if tf.Attrs["choice_b"] != nil {
@@ -337,9 +336,16 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if !ok {
 					diags.Append(attrWriteConversionFailureDiag{"OptionalTest.choice_b", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
-				v.Null = string(obj.ChoiceB) == ""
 			}
-			v.Value = string(obj.ChoiceB)
+			{
+				obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceB)
+				if !ok {
+					v.Null = true
+				} else {
+					v.Null = false
+					v.Value = string(obj.ChoiceB)
+				}
+			}
 			v.Unknown = false
 			tf.Attrs["choice_b"] = v
 		}
@@ -501,8 +507,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"OptionalTest.optional_map", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = false
 						}
+
+						v.Null = false
 						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v
@@ -586,8 +593,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 							if !ok {
 								diags.Append(attrWriteConversionFailureDiag{"OptionalTest.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
-							v.Null = string(a) == ""
 						}
+
+						v.Null = false
 						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v

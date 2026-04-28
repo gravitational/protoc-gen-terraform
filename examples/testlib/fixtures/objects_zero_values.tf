@@ -50,6 +50,8 @@ resource "example_objects" "test" {
     }
   }
 
+  branch_string = ""
+
   leaf = {
     value = ""
   }

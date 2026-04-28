@@ -46,12 +46,6 @@ message Objects {
   // empty is an empty field.
   Empty empty = 12;
 
-  // one_of is a oneof field.
-  oneof one_of {
-    Nested branch1 = 15;
-    Nested branch2 = 16;
-  }
-
   // embeded is an embedded field.
   Nested embedded = 13 [
     (gogoproto.nullable) = false,
@@ -63,6 +57,19 @@ message Objects {
     (gogoproto.nullable) = true,
     (gogoproto.embed) = true
   ];
+
+  // one_of_objects is a oneof objects field.
+  oneof one_of_objects {
+    Nested branch1 = 15;
+    Nested branch2 = 16;
+  }
+
+  // one_of_primitives is a oneof primitives field.
+  oneof one_of_primitives {
+    bool branch_bool = 17;
+    string branch_string = 18;
+    int64 branch_int = 19;
+  }
 }
 
 message Empty {}
