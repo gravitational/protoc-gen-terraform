@@ -25,11 +25,8 @@ type BoolCustom bool
 
 // GenSchemaBoolSpecial generates custom field schema (bool list)
 func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type:        types.BoolType,
-		Description: attr.Description,
-		Optional:    attr.Optional,
-	}
+	attr.Type = types.BoolType
+	return attr
 }
 
 // CopyFromBoolSpecial copies target value to the source
@@ -54,13 +51,10 @@ type BoolCustomList bool
 
 // GenSchemaBoolSpecialList generates custom field schema (bool list)
 func GenSchemaBoolSpecialList(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type: types.ListType{
-			ElemType: types.BoolType,
-		},
-		Description: attr.Description,
-		Optional:    attr.Optional,
+	attr.Type = types.ListType{
+		ElemType: types.BoolType,
 	}
+	return attr
 }
 
 // CopyFromBoolSpecialList copies target value to the source
@@ -93,10 +87,10 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 	if !ok {
 		value = types.List{
 			Null:     true,
-			Unknown:  false,
 			ElemType: types.BoolType,
 		}
 	}
+	value.Unknown = false
 
 	if len(obj) > 0 {
 		if value.Elems == nil {
@@ -116,13 +110,10 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 
 // GenSchemaStringCustom returns the StringCustom schema.
 func GenSchemaStringCustom(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type: types.ListType{
-			ElemType: types.StringType,
-		},
-		Description: attr.Description,
-		Optional:    attr.Optional,
+	attr.Type = types.ListType{
+		ElemType: types.StringType,
 	}
+	return attr
 }
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into
@@ -157,10 +148,10 @@ func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.
 	if !ok {
 		value = types.List{
 			Null:     true,
-			Unknown:  false,
 			ElemType: types.StringType,
 		}
 	}
+	value.Unknown = false
 
 	if len(obj) > 0 {
 		if value.Elems == nil {

@@ -35,3 +35,35 @@ func (s *TerraformSuite) TestCustom() {
 		},
 	})
 }
+
+func (s *TerraformSuite) TestCustomNullValues() {
+	t := s.T()
+	name := "example_custom.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("custom_null_values.tf"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "computed", "computed"),
+					resource.TestCheckResourceAttr(name, "injected", "injected"),
+					resource.TestCheckResourceAttr(name, "required", "required"),
+					resource.TestCheckResourceAttr(name, "sensitive", ""),
+					resource.TestCheckResourceAttr(name, "validated", ""),
+					resource.TestCheckNoResourceAttr(name, "excluded"),
+
+					resource.TestCheckResourceAttr(name, "custom_name_override", ""),
+					resource.TestCheckResourceAttr(name, "plan_modifier", "modified_value"),
+
+					resource.TestCheckResourceAttr(name, "bool_custom", "false"),
+					resource.TestCheckNoResourceAttr(name, "bool_custom_list.0"),
+
+					resource.TestCheckNoResourceAttr(name, "string_override.0"),
+					resource.TestCheckResourceAttr(name, "schema_override", ""),
+				),
+			},
+		},
+	})
+}
