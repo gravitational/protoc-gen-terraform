@@ -588,10 +588,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = bool(a)
-						}
+
+						v.Null = false
+						v.Value = bool(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -623,10 +622,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = bool(obj.BoolValue)
-			}
+
+			v.Null = false
+			v.Value = bool(obj.BoolValue)
 			v.Unknown = false
 			tf.Attrs["bool_value"] = v
 		}
@@ -673,10 +671,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = string(a)
-						}
+
+						v.Null = false
+						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -708,10 +705,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = string(obj.BytesValue)
-			}
+
+			v.Null = false
+			v.Value = string(obj.BytesValue)
 			v.Unknown = false
 			tf.Attrs["bytes_value"] = v
 		}
@@ -758,10 +754,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = float64(a)
-						}
+
+						v.Null = false
+						v.Value = float64(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -793,10 +788,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = float64(obj.DoubleValue)
-			}
+
+			v.Null = false
+			v.Value = float64(obj.DoubleValue)
 			v.Unknown = false
 			tf.Attrs["double_value"] = v
 		}
@@ -843,10 +837,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = int64(a)
-						}
+
+						v.Null = false
+						v.Value = int64(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -878,10 +871,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = int64(obj.EnumValue)
-			}
+
+			v.Null = false
+			v.Value = int64(obj.EnumValue)
 			v.Unknown = false
 			tf.Attrs["enum_value"] = v
 		}
@@ -928,10 +920,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = float64(a)
-						}
+
+						v.Null = false
+						v.Value = float64(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -963,10 +954,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = float64(obj.FloatValue)
-			}
+
+			v.Null = false
+			v.Value = float64(obj.FloatValue)
 			v.Unknown = false
 			tf.Attrs["float_value"] = v
 		}
@@ -990,10 +980,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = string(obj.Id)
-			}
+
+			v.Null = false
+			v.Value = string(obj.Id)
 			v.Unknown = false
 			tf.Attrs["id"] = v
 		}
@@ -1040,10 +1029,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = int64(a)
-						}
+
+						v.Null = false
+						v.Value = int64(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -1075,10 +1063,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = int64(obj.Int32Value)
-			}
+
+			v.Null = false
+			v.Value = int64(obj.Int32Value)
 			v.Unknown = false
 			tf.Attrs["int32_value"] = v
 		}
@@ -1125,10 +1112,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = int64(a)
-						}
+
+						v.Null = false
+						v.Value = int64(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -1160,10 +1146,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = int64(obj.Int64Value)
-			}
+
+			v.Null = false
+			v.Value = int64(obj.Int64Value)
 			v.Unknown = false
 			tf.Attrs["int64_value"] = v
 		}
@@ -1210,10 +1195,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 								diags.Append(attrWriteConversionFailureDiag{"Primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
 						}
-						{
-							v.Null = false
-							v.Value = string(a)
-						}
+
+						v.Null = false
+						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v
 					}
@@ -1245,10 +1229,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 					diags.Append(attrWriteConversionFailureDiag{"Primitives.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-			{
-				v.Null = false
-				v.Value = string(obj.StringValue)
-			}
+
+			v.Null = false
+			v.Value = string(obj.StringValue)
 			v.Unknown = false
 			tf.Attrs["string_value"] = v
 		}

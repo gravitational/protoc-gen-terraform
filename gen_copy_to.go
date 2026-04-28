@@ -266,12 +266,11 @@ func (f *FieldCopyToGenerator) genAssignOneOf(fieldName string) *j.Statement {
 //
 // Expected format:
 //
-//	{
-//		v.Null = false
-//		v.Value = <f.ValueCastToType>(<fieldName>)
-//	}
+//	v.Null = false
+//	v.Value = <f.ValueCastToType>(<fieldName>)
 func (f *FieldCopyToGenerator) genAssignNonNullableValue(fieldName string) *j.Statement {
-	return j.Block(
+	return j.Custom(
+		j.Options{Multi: true},
 		j.Id("v.Null").Op("=").False(),
 		j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
 	)
