@@ -44,7 +44,7 @@ resource "example_objects" "test" {
 
   nested_nullable_map = null
 
-  branch1 = {
+  branch_nested = {
     leaf = {
       value = ""
     }

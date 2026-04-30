@@ -347,3 +347,32 @@ func TestCopyToOneOfLowercase(t *testing.T) {
 		o.Attrs["foo"].(types.String),
 	)
 }
+
+func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
+	o := copyToTerraformObject(t)
+
+	nestedNullableType, ok := o.AttrTypes["nested_nullable"].(types.ObjectType)
+	require.True(t, ok)
+
+	o.Attrs["nested_nullable"] = types.Object{
+		Null:      true,
+		AttrTypes: nestedNullableType.AttrTypes,
+	}
+
+	testObj := createTestObj()
+	testObj.NestedNullable = &Nested{
+		Str: "TestString",
+	}
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+
+	nestedNullable := o.Attrs["nested_nullable"].(types.Object)
+	require.False(t, nestedNullable.Null)
+	require.False(t, nestedNullable.Unknown)
+	require.Equal(
+		t,
+		types.String{Null: false, Unknown: false, Value: "TestString"},
+		nestedNullable.Attrs["str"].(types.String),
+	)
+}

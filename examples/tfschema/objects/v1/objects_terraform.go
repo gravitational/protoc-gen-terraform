@@ -46,40 +46,6 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 		},
-		"branch1": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Computed:      true,
-					Description:   "",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
-				Computed:      true,
-				Description:   "",
-				Optional:      true,
-				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-			}}),
-			Description: "",
-			Optional:    true,
-		},
-		"branch2": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
-					Computed:      true,
-					Description:   "",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
-				Computed:      true,
-				Description:   "",
-				Optional:      true,
-				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-			}}),
-			Description: "",
-			Optional:    true,
-		},
 		"branch_bool": {
 			Computed:      true,
 			Description:   "",
@@ -87,12 +53,56 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
+		"branch_empty": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
+				Computed:    true,
+				Description: "Automatically generated field preventing empty message errors",
+				Optional:    true,
+				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+			}}),
+			Description: "",
+			Optional:    true,
+		},
 		"branch_int": {
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+		},
+		"branch_leaf": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
+				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				}}),
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			}}),
+			Description: "",
+			Optional:    true,
+		},
+		"branch_nested": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
+				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+					Computed:      true,
+					Description:   "",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+				}}),
+				Computed:      true,
+				Description:   "",
+				Optional:      true,
+				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			}}),
+			Description: "",
+			Optional:    true,
 		},
 		"branch_string": {
 			Computed:      true,
@@ -419,110 +429,6 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 		}
 	}
 	{
-		a, ok := tf.Attrs["branch1"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Objects.branch1"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Objects.branch1", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				if !v.Null && !v.Unknown {
-					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
-					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{Branch1: b}
-					obj := b
-					tf := v
-					{
-						a, ok := tf.Attrs["leaf"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Objects.branch1.leaf"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Objects.branch1.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-							} else {
-								obj.Leaf = github_com_gravitational_protoc_gen_terraform_v3_examples_types.Leaf{}
-								if !v.Null && !v.Unknown {
-									tf := v
-									obj := &obj.Leaf
-									{
-										a, ok := tf.Attrs["value"]
-										if !ok {
-											diags.Append(attrReadMissingDiag{"Objects.branch1.leaf.value"})
-										} else {
-											v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												diags.Append(attrReadConversionFailureDiag{"Objects.branch1.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-											} else {
-												var t string
-												if !v.Null && !v.Unknown {
-													t = string(v.Value)
-												}
-												obj.Value = t
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
-		a, ok := tf.Attrs["branch2"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Objects.branch2"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Objects.branch2", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-			} else {
-				if !v.Null && !v.Unknown {
-					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
-					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{Branch2: b}
-					obj := b
-					tf := v
-					{
-						a, ok := tf.Attrs["leaf"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Objects.branch2.leaf"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
-							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Objects.branch2.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
-							} else {
-								obj.Leaf = github_com_gravitational_protoc_gen_terraform_v3_examples_types.Leaf{}
-								if !v.Null && !v.Unknown {
-									tf := v
-									obj := &obj.Leaf
-									{
-										a, ok := tf.Attrs["value"]
-										if !ok {
-											diags.Append(attrReadMissingDiag{"Objects.branch2.leaf.value"})
-										} else {
-											v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												diags.Append(attrReadConversionFailureDiag{"Objects.branch2.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-											} else {
-												var t string
-												if !v.Null && !v.Unknown {
-													t = string(v.Value)
-												}
-												obj.Value = t
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	{
 		a, ok := tf.Attrs["branch_bool"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Objects.branch_bool"})
@@ -542,6 +448,22 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 		}
 	}
 	{
+		a, ok := tf.Attrs["branch_empty"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_empty"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_empty", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				if !v.Null && !v.Unknown {
+					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Empty{}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchEmpty{BranchEmpty: b}
+				}
+			}
+		}
+	}
+	{
 		a, ok := tf.Attrs["branch_int"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Objects.branch_int"})
@@ -556,6 +478,110 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 				}
 				if !v.Null && !v.Unknown {
 					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchInt{BranchInt: t}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_leaf"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_leaf"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				if !v.Null && !v.Unknown {
+					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchLeaf{BranchLeaf: b}
+					obj := b
+					tf := v
+					{
+						a, ok := tf.Attrs["leaf"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Objects.branch_leaf.leaf"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Objects.branch_leaf.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+							} else {
+								obj.Leaf = github_com_gravitational_protoc_gen_terraform_v3_examples_types.Leaf{}
+								if !v.Null && !v.Unknown {
+									tf := v
+									obj := &obj.Leaf
+									{
+										a, ok := tf.Attrs["value"]
+										if !ok {
+											diags.Append(attrReadMissingDiag{"Objects.branch_leaf.leaf.value"})
+										} else {
+											v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrReadConversionFailureDiag{"Objects.branch_leaf.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											} else {
+												var t string
+												if !v.Null && !v.Unknown {
+													t = string(v.Value)
+												}
+												obj.Value = t
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	{
+		a, ok := tf.Attrs["branch_nested"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.branch_nested"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+			} else {
+				if !v.Null && !v.Unknown {
+					b := &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested{}
+					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchNested{BranchNested: b}
+					obj := b
+					tf := v
+					{
+						a, ok := tf.Attrs["leaf"]
+						if !ok {
+							diags.Append(attrReadMissingDiag{"Objects.branch_nested.leaf"})
+						} else {
+							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+							if !ok {
+								diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+							} else {
+								obj.Leaf = github_com_gravitational_protoc_gen_terraform_v3_examples_types.Leaf{}
+								if !v.Null && !v.Unknown {
+									tf := v
+									obj := &obj.Leaf
+									{
+										a, ok := tf.Attrs["value"]
+										if !ok {
+											diags.Append(attrReadMissingDiag{"Objects.branch_nested.leaf.value"})
+										} else {
+											v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+											} else {
+												var t string
+												if !v.Null && !v.Unknown {
+													t = string(v.Value)
+												}
+												obj.Value = t
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1526,190 +1552,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["branch1"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Objects.branch1"})
-		} else {
-			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1)
-			if !ok {
-				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch1{}
-			}
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Objects.branch1", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["branch1"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.Branch1 == nil {
-					v.Null = true
-				} else {
-					obj := obj.Branch1
-					tf := &v
-					{
-						a, ok := tf.AttrTypes["leaf"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Objects.branch1.leaf"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Objects.branch1.leaf", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-							} else {
-								v, ok := tf.Attrs["leaf"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-								if !ok {
-									v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-										AttrTypes: o.AttrTypes,
-										Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-									}
-								} else {
-									if v.Attrs == nil {
-										v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-									}
-								}
-								{
-									obj := obj.Leaf
-									tf := &v
-									{
-										t, ok := tf.AttrTypes["value"]
-										if !ok {
-											diags.Append(attrWriteMissingDiag{"Objects.branch1.leaf.value"})
-										} else {
-											v, ok := tf.Attrs["value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												if tf.Attrs["value"] != nil {
-													diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch1.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-												}
-												i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-												if err != nil {
-													diags.Append(attrWriteGeneralError{"Objects.branch1.leaf.value", err})
-												}
-												v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-												if !ok {
-													diags.Append(attrWriteConversionFailureDiag{"Objects.branch1.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-												}
-											}
-
-											v.Null = false
-											v.Value = string(obj.Value)
-											v.Unknown = false
-											tf.Attrs["value"] = v
-										}
-									}
-								}
-								v.Unknown = false
-								tf.Attrs["leaf"] = v
-							}
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["branch1"] = v
-			}
-		}
-	}
-	{
-		a, ok := tf.AttrTypes["branch2"]
-		if !ok {
-			diags.Append(attrWriteMissingDiag{"Objects.branch2"})
-		} else {
-			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2)
-			if !ok {
-				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_Branch2{}
-			}
-			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-			if !ok {
-				diags.Append(attrWriteConversionFailureDiag{"Objects.branch2", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-			} else {
-				v, ok := tf.Attrs["branch2"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-				if !ok {
-					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-						AttrTypes: o.AttrTypes,
-						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-					}
-				} else {
-					if v.Attrs == nil {
-						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-					}
-				}
-				if obj.Branch2 == nil {
-					v.Null = true
-				} else {
-					obj := obj.Branch2
-					tf := &v
-					{
-						a, ok := tf.AttrTypes["leaf"]
-						if !ok {
-							diags.Append(attrWriteMissingDiag{"Objects.branch2.leaf"})
-						} else {
-							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
-							if !ok {
-								diags.Append(attrWriteConversionFailureDiag{"Objects.branch2.leaf", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
-							} else {
-								v, ok := tf.Attrs["leaf"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
-								if !ok {
-									v = github_com_hashicorp_terraform_plugin_framework_types.Object{
-
-										AttrTypes: o.AttrTypes,
-										Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
-									}
-								} else {
-									if v.Attrs == nil {
-										v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
-									}
-								}
-								{
-									obj := obj.Leaf
-									tf := &v
-									{
-										t, ok := tf.AttrTypes["value"]
-										if !ok {
-											diags.Append(attrWriteMissingDiag{"Objects.branch2.leaf.value"})
-										} else {
-											v, ok := tf.Attrs["value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
-											if !ok {
-												if tf.Attrs["value"] != nil {
-													diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch2.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-												}
-												i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-												if err != nil {
-													diags.Append(attrWriteGeneralError{"Objects.branch2.leaf.value", err})
-												}
-												v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
-												if !ok {
-													diags.Append(attrWriteConversionFailureDiag{"Objects.branch2.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-												}
-											}
-
-											v.Null = false
-											v.Value = string(obj.Value)
-											v.Unknown = false
-											tf.Attrs["value"] = v
-										}
-									}
-								}
-								v.Unknown = false
-								tf.Attrs["leaf"] = v
-							}
-						}
-					}
-				}
-				v.Unknown = false
-				tf.Attrs["branch2"] = v
-			}
-		}
-	}
-	{
 		t, ok := tf.AttrTypes["branch_bool"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.branch_bool"})
@@ -1742,6 +1584,65 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 		}
 	}
 	{
+		a, ok := tf.AttrTypes["branch_empty"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_empty"})
+		} else {
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchEmpty)
+			if !ok {
+				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchEmpty{}
+			}
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Objects.branch_empty", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["branch_empty"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.BranchEmpty == nil {
+					v.Null = true
+				} else {
+					tf := &v
+					{
+						t, ok := tf.AttrTypes["active"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Objects.branch_empty.active"})
+						} else {
+							v, ok := tf.Attrs["active"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+							if !ok {
+								if tf.Attrs["active"] != nil {
+									diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_empty.active", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+								}
+								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+								if err != nil {
+									diags.Append(attrWriteGeneralError{"Objects.branch_empty.active", err})
+								}
+								v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+								if !ok {
+									diags.Append(attrWriteConversionFailureDiag{"Objects.branch_empty.active", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
+								}
+							}
+							v.Null = true
+							v.Unknown = false
+							tf.Attrs["active"] = v
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["branch_empty"] = v
+			}
+		}
+	}
+	{
 		t, ok := tf.AttrTypes["branch_int"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.branch_int"})
@@ -1771,6 +1672,190 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 			}
 			v.Unknown = false
 			tf.Attrs["branch_int"] = v
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["branch_leaf"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_leaf"})
+		} else {
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchLeaf)
+			if !ok {
+				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchLeaf{}
+			}
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Objects.branch_leaf", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["branch_leaf"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.BranchLeaf == nil {
+					v.Null = true
+				} else {
+					obj := obj.BranchLeaf
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["leaf"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Objects.branch_leaf.leaf"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Objects.branch_leaf.leaf", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+							} else {
+								v, ok := tf.Attrs["leaf"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+								if !ok {
+									v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+										AttrTypes: o.AttrTypes,
+										Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+									}
+								} else {
+									if v.Attrs == nil {
+										v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+									}
+								}
+								{
+									obj := obj.Leaf
+									tf := &v
+									{
+										t, ok := tf.AttrTypes["value"]
+										if !ok {
+											diags.Append(attrWriteMissingDiag{"Objects.branch_leaf.leaf.value"})
+										} else {
+											v, ok := tf.Attrs["value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												if tf.Attrs["value"] != nil {
+													diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_leaf.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+												}
+												i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+												if err != nil {
+													diags.Append(attrWriteGeneralError{"Objects.branch_leaf.leaf.value", err})
+												}
+												v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+												if !ok {
+													diags.Append(attrWriteConversionFailureDiag{"Objects.branch_leaf.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+												}
+											}
+
+											v.Null = false
+											v.Value = string(obj.Value)
+											v.Unknown = false
+											tf.Attrs["value"] = v
+										}
+									}
+								}
+								v.Unknown = false
+								tf.Attrs["leaf"] = v
+							}
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["branch_leaf"] = v
+			}
+		}
+	}
+	{
+		a, ok := tf.AttrTypes["branch_nested"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Objects.branch_nested"})
+		} else {
+			obj, ok := obj.OneOfObjects.(*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchNested)
+			if !ok {
+				obj = &github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects_BranchNested{}
+			}
+			o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+			if !ok {
+				diags.Append(attrWriteConversionFailureDiag{"Objects.branch_nested", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+			} else {
+				v, ok := tf.Attrs["branch_nested"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+				if !ok {
+					v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+						AttrTypes: o.AttrTypes,
+						Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+					}
+				} else {
+					if v.Attrs == nil {
+						v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+					}
+				}
+				if obj.BranchNested == nil {
+					v.Null = true
+				} else {
+					obj := obj.BranchNested
+					tf := &v
+					{
+						a, ok := tf.AttrTypes["leaf"]
+						if !ok {
+							diags.Append(attrWriteMissingDiag{"Objects.branch_nested.leaf"})
+						} else {
+							o, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+							if !ok {
+								diags.Append(attrWriteConversionFailureDiag{"Objects.branch_nested.leaf", "github.com/hashicorp/terraform-plugin-framework/types.ObjectType"})
+							} else {
+								v, ok := tf.Attrs["leaf"].(github_com_hashicorp_terraform_plugin_framework_types.Object)
+								if !ok {
+									v = github_com_hashicorp_terraform_plugin_framework_types.Object{
+
+										AttrTypes: o.AttrTypes,
+										Attrs:     make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(o.AttrTypes)),
+									}
+								} else {
+									if v.Attrs == nil {
+										v.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(tf.AttrTypes))
+									}
+								}
+								{
+									obj := obj.Leaf
+									tf := &v
+									{
+										t, ok := tf.AttrTypes["value"]
+										if !ok {
+											diags.Append(attrWriteMissingDiag{"Objects.branch_nested.leaf.value"})
+										} else {
+											v, ok := tf.Attrs["value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+											if !ok {
+												if tf.Attrs["value"] != nil {
+													diags.Append(attrWriteUnexpectedExistingTypeDiag{"Objects.branch_nested.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+												}
+												i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+												if err != nil {
+													diags.Append(attrWriteGeneralError{"Objects.branch_nested.leaf.value", err})
+												}
+												v, ok = i.(github_com_hashicorp_terraform_plugin_framework_types.String)
+												if !ok {
+													diags.Append(attrWriteConversionFailureDiag{"Objects.branch_nested.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+												}
+											}
+
+											v.Null = false
+											v.Value = string(obj.Value)
+											v.Unknown = false
+											tf.Attrs["value"] = v
+										}
+									}
+								}
+								v.Unknown = false
+								tf.Attrs["leaf"] = v
+							}
+						}
+					}
+				}
+				v.Unknown = false
+				tf.Attrs["branch_nested"] = v
+			}
 		}
 	}
 	{

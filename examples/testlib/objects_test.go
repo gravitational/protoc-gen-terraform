@@ -114,8 +114,9 @@ func (s *TerraformSuite) testCheckObjectResource(name string) resource.TestCheck
 		resource.TestCheckResourceAttr(name, "nested_nullable_map.key1.leaf.value", "map-1"),
 		resource.TestCheckResourceAttr(name, "nested_nullable_map.key2.leaf.value", "map-2"),
 
-		resource.TestCheckResourceAttr(name, "branch1.leaf.value", "branch-1"),
-		resource.TestCheckNoResourceAttr(name, "branch2"),
+		resource.TestCheckResourceAttr(name, "branch_nested.leaf.value", "branch-1"),
+		resource.TestCheckNoResourceAttr(name, "branch_leaf"),
+		resource.TestCheckNoResourceAttr(name, "branch_empty"),
 
 		resource.TestCheckResourceAttr(name, "branch_string", "branch-string"),
 		resource.TestCheckNoResourceAttr(name, "branch_bool"),
@@ -152,8 +153,9 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 		resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "nested_nullable_map"),
 
-		resource.TestCheckResourceAttr(name, "branch1.leaf.value", ""),
-		resource.TestCheckNoResourceAttr(name, "branch2"),
+		resource.TestCheckResourceAttr(name, "branch_nested.leaf.value", ""),
+		resource.TestCheckNoResourceAttr(name, "branch_leaf"),
+		resource.TestCheckNoResourceAttr(name, "branch_empty"),
 
 		resource.TestCheckResourceAttr(name, "branch_string", ""),
 		resource.TestCheckNoResourceAttr(name, "branch_bool"),
@@ -195,8 +197,9 @@ func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "nested_nullable_map.key1.leaf.value"),
 		resource.TestCheckNoResourceAttr(name, "nested_nullable_map.key2.leaf.value"),
 
-		resource.TestCheckNoResourceAttr(name, "branch1.leaf.value"),
-		resource.TestCheckNoResourceAttr(name, "branch2.leaf.value"),
+		resource.TestCheckNoResourceAttr(name, "branch_nested.leaf.value"),
+		resource.TestCheckNoResourceAttr(name, "branch_leaf.leaf.value"),
+		resource.TestCheckNoResourceAttr(name, "branch_empty.leaf.value"),
 
 		resource.TestCheckNoResourceAttr(name, "branch_bool"),
 		resource.TestCheckNoResourceAttr(name, "branch_int"),
