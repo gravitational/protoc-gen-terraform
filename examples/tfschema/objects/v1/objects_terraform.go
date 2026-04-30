@@ -1611,6 +1611,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if obj.BranchEmpty == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					tf := &v
 					{
 						t, ok := tf.AttrTypes["active"]
@@ -1702,6 +1703,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if obj.BranchLeaf == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.BranchLeaf
 					tf := &v
 					{
@@ -1726,6 +1728,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 									}
 								}
 								{
+									v.Null = false
 									obj := obj.Leaf
 									tf := &v
 									{
@@ -1794,6 +1797,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if obj.BranchNested == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.BranchNested
 					tf := &v
 					{
@@ -1818,6 +1822,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 									}
 								}
 								{
+									v.Null = false
 									obj := obj.Leaf
 									tf := &v
 									{
@@ -1943,6 +1948,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if obj.Empty == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					tf := &v
 					{
 						t, ok := tf.AttrTypes["active"]
@@ -2076,6 +2082,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 					}
 				}
 				{
+					v.Null = false
 					obj := obj.Leaf
 					tf := &v
 					{
@@ -2151,6 +2158,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 							}
 						}
 						{
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -2175,6 +2183,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											}
 										}
 										{
+											v.Null = false
 											obj := obj.Leaf
 											tf := &v
 											{
@@ -2260,6 +2269,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 							}
 						}
 						{
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -2284,6 +2294,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											}
 										}
 										{
+											v.Null = false
 											obj := obj.Leaf
 											tf := &v
 											{
@@ -2355,6 +2366,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				if obj.NestedNullable == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.NestedNullable
 					tf := &v
 					{
@@ -2379,6 +2391,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 									}
 								}
 								{
+									v.Null = false
 									obj := obj.Leaf
 									tf := &v
 									{
@@ -2462,6 +2475,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						if a == nil {
 							v.Null = true
 						} else {
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -2486,6 +2500,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											}
 										}
 										{
+											v.Null = false
 											obj := obj.Leaf
 											tf := &v
 											{
@@ -2573,6 +2588,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						if a == nil {
 							v.Null = true
 						} else {
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -2597,6 +2613,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 											}
 										}
 										{
+											v.Null = false
 											obj := obj.Leaf
 											tf := &v
 											{
@@ -2666,6 +2683,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 					}
 				}
 				{
+					v.Null = false
 					obj := obj.NestedValue
 					tf := &v
 					{
@@ -2690,6 +2708,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 									}
 								}
 								{
+									v.Null = false
 									obj := obj.Leaf
 									tf := &v
 									{
@@ -2752,6 +2771,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 					}
 				}
 				{
+					v.Null = false
 					obj := obj.Primitives
 					tf := &v
 					{

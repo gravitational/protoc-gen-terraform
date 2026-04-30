@@ -280,6 +280,7 @@ func (f *FieldCopyToGenerator) genAssignNonNullableValue(fieldName string) *j.St
 // variable "v".
 func (f *FieldCopyToGenerator) genObjectBody(g *j.Group, m *MessageCopyToGenerator, fieldName string, typ string) {
 	copyObj := func(g *j.Group) {
+		g.Id("v.Null").Op("=").False()
 		if len(m.Fields) > 0 {
 			if !m.IsEmpty {
 				g.Id("obj").Op(":=").Id(fieldName)

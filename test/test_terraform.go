@@ -2554,6 +2554,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.Branch1 == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.Branch1
 					tf := &v
 					{
@@ -2616,6 +2617,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.Branch2 == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.Branch2
 					tf := &v
 					{
@@ -2976,6 +2978,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.EmbeddedNestedField == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.EmbeddedNestedField
 					tf := &v
 					{
@@ -3064,6 +3067,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.EmptyMessageBranch == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					tf := &v
 					{
 						t, ok := tf.AttrTypes["active"]
@@ -3297,6 +3301,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							}
 						}
 						{
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -3391,6 +3396,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													}
 												}
 												{
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -3475,6 +3481,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												if a == nil {
 													v.Null = true
 												} else {
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -3595,6 +3602,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						if a == nil {
 							v.Null = true
 						} else {
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -3689,6 +3697,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													}
 												}
 												{
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -3773,6 +3782,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												if a == nil {
 													v.Null = true
 												} else {
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -3901,6 +3911,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 					}
 				}
 				{
+					v.Null = false
 					obj := obj.Nested
 					tf := &v
 					{
@@ -3995,6 +4006,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											}
 										}
 										{
+											v.Null = false
 											obj := a
 											tf := &v
 											{
@@ -4079,6 +4091,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if a == nil {
 											v.Null = true
 										} else {
+											v.Null = false
 											obj := a
 											tf := &v
 											{
@@ -4193,6 +4206,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 							}
 						}
 						{
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -4287,6 +4301,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													}
 												}
 												{
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -4371,6 +4386,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												if a == nil {
 													v.Null = true
 												} else {
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -4494,6 +4510,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 						if a == nil {
 							v.Null = true
 						} else {
+							v.Null = false
 							obj := a
 							tf := &v
 							{
@@ -4588,6 +4605,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 													}
 												}
 												{
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -4672,6 +4690,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 												if a == nil {
 													v.Null = true
 												} else {
+													v.Null = false
 													obj := a
 													tf := &v
 													{
@@ -4776,6 +4795,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.NestedNullable == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.NestedNullable
 					tf := &v
 					{
@@ -4870,6 +4890,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											}
 										}
 										{
+											v.Null = false
 											obj := a
 											tf := &v
 											{
@@ -4954,6 +4975,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if a == nil {
 											v.Null = true
 										} else {
+											v.Null = false
 											obj := a
 											tf := &v
 											{
@@ -5051,6 +5073,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 				if obj.NestedNullableWithNilValue == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.NestedNullableWithNilValue
 					tf := &v
 					{
@@ -5145,6 +5168,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 											}
 										}
 										{
+											v.Null = false
 											obj := a
 											tf := &v
 											{
@@ -5229,6 +5253,7 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicor
 										if a == nil {
 											v.Null = true
 										} else {
+											v.Null = false
 											obj := a
 											tf := &v
 											{
