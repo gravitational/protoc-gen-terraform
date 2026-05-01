@@ -135,11 +135,13 @@ func (f *FieldCopyFromGenerator) genPrimitiveBody(g *j.Group) {
 func (f *FieldCopyFromGenerator) genListOrMapIterator(g *j.Group, typ *j.Statement, els func(g *j.Group)) {
 	objFieldName := "obj." + f.Name
 
-	// obj.List = make([]string, len(v.Elems)) - same for maps
-	g.Id(objFieldName).Op("=").Make(j.Id(f.i.WithType(f.GoType)), j.Len(j.Id("v.Elems")))
+	g.Id(objFieldName).Op("=").Nil()
 
 	// if !v.Null
 	g.If(j.Id("!v.Null && !v.Unknown")).BlockFunc(func(g *j.Group) {
+		// obj.List = make([]string, len(v.Elems)) - same for maps
+		g.Id(objFieldName).Op("=").Make(j.Id(f.i.WithType(f.GoType)), j.Len(j.Id("v.Elems")))
+
 		// for k, el := range v.Elems - where k is either index or map key
 		g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id("v.Elems").BlockFunc(func(g *j.Group) {
 			// v, ok := a.(types.String)
