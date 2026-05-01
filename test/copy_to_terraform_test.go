@@ -147,6 +147,23 @@ func TestCopyToList(t *testing.T) {
 	}, o.Attrs["duration_custom_list"].(types.List).Elems)
 }
 
+func TestCopyToEmptyList(t *testing.T) {
+	o := copyToTerraformObject(t)
+
+	testObj := createTestObj()
+	testObj.StringListEmpty = []string{}
+
+	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	requireNoDiagErrors(t, diags)
+
+	require.Equal(t, types.List{
+		Null:     false,
+		Unknown:  false,
+		Elems:    make([]attr.Value, 0),
+		ElemType: types.StringType,
+	}, o.Attrs["string_list_empty"].(types.List))
+}
+
 func TestCopyTo_ChangeListSize(t *testing.T) {
 	o := copyToTerraformObject(t)
 
