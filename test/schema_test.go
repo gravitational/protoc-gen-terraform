@@ -21,4 +21,9 @@ func TestSchema(t *testing.T) {
 	require.Len(t, schema.Attributes["str"].Validators, 1)
 	require.Equal(t, "BoolCustomList []bool field", schema.Attributes["bool_custom_list"].Description)
 	require.True(t, schema.Attributes["bool_custom_list"].Optional)
+
+	require.False(t, schema.Attributes["string_list"].Computed)
+	require.False(t, schema.Attributes["nested_list"].Computed)
+	require.False(t, schema.Attributes["map"].Computed)
+	require.False(t, schema.Attributes["map_object"].Computed)
 }

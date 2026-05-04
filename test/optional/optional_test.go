@@ -67,6 +67,7 @@ func TestSchemaHasOptionalFields(t *testing.T) {
 
 	_, ok = s.Attributes["string_list"]
 	require.True(t, ok)
+	require.False(t, s.Attributes["string_list"].Computed)
 }
 
 func TestCopyToOptionalFieldsSet(t *testing.T) {
