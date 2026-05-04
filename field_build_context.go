@@ -449,7 +449,7 @@ func (c *FieldBuildContext) IsComputed(isProto3optional bool) bool {
 	// in the go struct as a `nil` pointer. This allows us to successfully round-trip through
 	// the go type: `ToTerraform(FromTerraform(field)) == field`.
 	// We don't need to mark this field as computed.
-	if c.GetNullable() || isProto3optional {
+	if c.GetNullable() || isProto3optional || c.IsRepeated() || c.IsMap() {
 		return false
 	}
 
