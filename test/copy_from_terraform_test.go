@@ -100,6 +100,19 @@ func TestCopyFromList(t *testing.T) {
 	require.Equal(t, []Duration{Duration(duration), Duration(duration)}, target.DurationCustomList)
 }
 
+func TestCopyFromNullList(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+	obj.Attrs["string_list_empty"] = types.List{
+		Null: true,
+	}
+
+	target := Test{}
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	requireNoDiagErrors(t, diags)
+
+	require.Nil(t, target.StringListEmpty)
+}
+
 func TestCopyFromNestedList(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
