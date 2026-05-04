@@ -404,8 +404,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.bool_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
-				obj.BoolMap = make(map[string]bool, len(v.Elems))
+				obj.BoolMap = nil
 				if !v.Null && !v.Unknown {
+					obj.BoolMap = make(map[string]bool, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 						if !ok {
@@ -645,8 +646,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.int_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
-				obj.IntMap = make(map[string]int64, len(v.Elems))
+				obj.IntMap = nil
 				if !v.Null && !v.Unknown {
+					obj.IntMap = make(map[string]int64, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
@@ -706,8 +708,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.nested_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.NestedList = make([]github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
+				obj.NestedList = nil
 				if !v.Null && !v.Unknown {
+					obj.NestedList = make([]github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
@@ -768,8 +771,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.nested_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
-				obj.NestedMap = make(map[string]github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
+				obj.NestedMap = nil
 				if !v.Null && !v.Unknown {
+					obj.NestedMap = make(map[string]github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
@@ -882,8 +886,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.nested_nullable_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.NestedNullableList = make([]*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
+				obj.NestedNullableList = nil
 				if !v.Null && !v.Unknown {
+					obj.NestedNullableList = make([]*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
@@ -945,8 +950,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.nested_nullable_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
-				obj.NestedNullableMap = make(map[string]*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
+				obj.NestedNullableMap = nil
 				if !v.Null && !v.Unknown {
+					obj.NestedNullableMap = make(map[string]*github_com_gravitational_protoc_gen_terraform_v3_examples_types.Nested, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
@@ -1072,8 +1078,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.BoolList = make([]bool, len(v.Elems))
+								obj.BoolList = nil
 								if !v.Null && !v.Unknown {
+									obj.BoolList = make([]bool, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 										if !ok {
@@ -1116,8 +1123,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.BytesList = make([][]byte, len(v.Elems))
+								obj.BytesList = nil
 								if !v.Null && !v.Unknown {
+									obj.BytesList = make([][]byte, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
@@ -1160,8 +1168,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.DoubleList = make([]float64, len(v.Elems))
+								obj.DoubleList = nil
 								if !v.Null && !v.Unknown {
+									obj.DoubleList = make([]float64, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 										if !ok {
@@ -1204,8 +1213,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.EnumList = make([]github_com_gravitational_protoc_gen_terraform_v3_examples_types.EnumValue, len(v.Elems))
+								obj.EnumList = nil
 								if !v.Null && !v.Unknown {
+									obj.EnumList = make([]github_com_gravitational_protoc_gen_terraform_v3_examples_types.EnumValue, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 										if !ok {
@@ -1248,8 +1258,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.FloatList = make([]float32, len(v.Elems))
+								obj.FloatList = nil
 								if !v.Null && !v.Unknown {
+									obj.FloatList = make([]float32, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 										if !ok {
@@ -1309,8 +1320,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.Int32List = make([]int32, len(v.Elems))
+								obj.Int32List = nil
 								if !v.Null && !v.Unknown {
+									obj.Int32List = make([]int32, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 										if !ok {
@@ -1353,8 +1365,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.Int64List = make([]int64, len(v.Elems))
+								obj.Int64List = nil
 								if !v.Null && !v.Unknown {
+									obj.Int64List = make([]int64, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 										if !ok {
@@ -1397,8 +1410,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 							if !ok {
 								diags.Append(attrReadConversionFailureDiag{"Objects.primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 							} else {
-								obj.StringList = make([]string, len(v.Elems))
+								obj.StringList = nil
 								if !v.Null && !v.Unknown {
+									obj.StringList = make([]string, len(v.Elems))
 									for k, a := range v.Elems {
 										v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 										if !ok {
@@ -1445,8 +1459,9 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.string_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
-				obj.StringMap = make(map[string]string, len(v.Elems))
+				obj.StringMap = nil
 				if !v.Null && !v.Unknown {
+					obj.StringMap = make(map[string]string, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
@@ -1496,7 +1511,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolMap))
 					}
 				}
-				if obj.BoolMap != nil {
+				if obj.BoolMap == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					for k, a := range obj.BoolMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
@@ -1518,9 +1536,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						v.Value = bool(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.BoolMap) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -1974,7 +1989,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.IntMap))
 					}
 				}
-				if obj.IntMap != nil {
+				if obj.IntMap == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					for k, a := range obj.IntMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
@@ -1996,9 +2014,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						v.Value = int64(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.IntMap) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -2085,7 +2100,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
 					}
 				}
-				if obj.NestedList != nil {
+				if obj.NestedList == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					if len(obj.NestedList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
@@ -2168,9 +2186,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.NestedList) > 0 {
-						c.Null = false
-					}
 				}
 				c.Unknown = false
 				tf.Attrs["nested_list"] = c
@@ -2199,7 +2214,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedMap))
 					}
 				}
-				if obj.NestedMap != nil {
+				if obj.NestedMap == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.NestedMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
@@ -2278,9 +2296,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						}
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.NestedMap) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -2400,7 +2415,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedNullableList))
 					}
 				}
-				if obj.NestedNullableList != nil {
+				if obj.NestedNullableList == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					if len(obj.NestedNullableList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedNullableList))
@@ -2485,9 +2503,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.NestedNullableList) > 0 {
-						c.Null = false
-					}
 				}
 				c.Unknown = false
 				tf.Attrs["nested_nullable_list"] = c
@@ -2516,7 +2531,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedNullableMap))
 					}
 				}
-				if obj.NestedNullableMap != nil {
+				if obj.NestedNullableMap == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					for k, a := range obj.NestedNullableMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
@@ -2597,9 +2615,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						}
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.NestedNullableMap) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -2742,7 +2757,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
 									}
 								}
-								if obj.BoolList != nil {
+								if obj.BoolList == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.BoolList) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
@@ -2767,9 +2785,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = bool(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.BoolList) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -2825,7 +2840,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
 									}
 								}
-								if obj.BytesList != nil {
+								if obj.BytesList == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.BytesList) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
@@ -2850,9 +2868,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = string(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.BytesList) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -2908,7 +2923,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
 									}
 								}
-								if obj.DoubleList != nil {
+								if obj.DoubleList == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.DoubleList) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
@@ -2933,9 +2951,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = float64(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.DoubleList) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -2991,7 +3006,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
 									}
 								}
-								if obj.EnumList != nil {
+								if obj.EnumList == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.EnumList) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
@@ -3016,9 +3034,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = int64(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.EnumList) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -3074,7 +3089,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
 									}
 								}
-								if obj.FloatList != nil {
+								if obj.FloatList == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.FloatList) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
@@ -3099,9 +3117,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = float64(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.FloatList) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -3183,7 +3198,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
 									}
 								}
-								if obj.Int32List != nil {
+								if obj.Int32List == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.Int32List) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
@@ -3208,9 +3226,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = int64(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.Int32List) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -3266,7 +3281,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
 									}
 								}
-								if obj.Int64List != nil {
+								if obj.Int64List == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.Int64List) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
@@ -3291,9 +3309,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = int64(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.Int64List) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -3349,7 +3364,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 									}
 								}
-								if obj.StringList != nil {
+								if obj.StringList == nil {
+									c.Null = true
+								} else {
+									c.Null = false
 									t := o.ElemType
 									if len(obj.StringList) != len(c.Elems) {
 										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
@@ -3374,9 +3392,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 										v.Value = string(a)
 										v.Unknown = false
 										c.Elems[k] = v
-									}
-									if len(obj.StringList) > 0 {
-										c.Null = false
 									}
 								}
 								c.Unknown = false
@@ -3438,7 +3453,10 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringMap))
 					}
 				}
-				if obj.StringMap != nil {
+				if obj.StringMap == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					for k, a := range obj.StringMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
@@ -3460,9 +3478,6 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.StringMap) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false

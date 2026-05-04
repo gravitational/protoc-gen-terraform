@@ -136,8 +136,9 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Time.duration_custom_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.DurationCustomList = make([]github_com_gravitational_protoc_gen_terraform_v3_examples_types.Duration, len(v.Elems))
+				obj.DurationCustomList = nil
 				if !v.Null && !v.Unknown {
+					obj.DurationCustomList = make([]github_com_gravitational_protoc_gen_terraform_v3_examples_types.Duration, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(DurationValue)
 						if !ok {
@@ -163,8 +164,9 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Time.duration_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.DurationList = make([]time.Duration, len(v.Elems))
+				obj.DurationList = nil
 				if !v.Null && !v.Unknown {
+					obj.DurationList = make([]time.Duration, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(DurationValue)
 						if !ok {
@@ -260,8 +262,9 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Time.timestamp_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.TimestampList = make([]time.Time, len(v.Elems))
+				obj.TimestampList = nil
 				if !v.Null && !v.Unknown {
+					obj.TimestampList = make([]time.Time, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(TimeValue)
 						if !ok {
@@ -354,7 +357,10 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
 					}
 				}
-				if obj.DurationCustomList != nil {
+				if obj.DurationCustomList == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					if len(obj.DurationCustomList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
@@ -379,9 +385,6 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v.Value = time.Duration(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.DurationCustomList) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -411,7 +414,10 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
 					}
 				}
-				if obj.DurationList != nil {
+				if obj.DurationList == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					if len(obj.DurationList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
@@ -436,9 +442,6 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v.Value = time.Duration(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.DurationList) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -578,7 +581,10 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
 					}
 				}
-				if obj.TimestampList != nil {
+				if obj.TimestampList == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					if len(obj.TimestampList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
@@ -603,9 +609,6 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v.Value = time.Time(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.TimestampList) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false

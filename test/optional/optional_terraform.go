@@ -212,8 +212,9 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"OptionalTest.optional_map", "github.com/hashicorp/terraform-plugin-framework/types.Map"})
 			} else {
-				obj.OptionalMap = make(map[string]string, len(v.Elems))
+				obj.OptionalMap = nil
 				if !v.Null && !v.Unknown {
+					obj.OptionalMap = make(map[string]string, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
@@ -257,8 +258,9 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"OptionalTest.string_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.StringList = make([]string, len(v.Elems))
+				obj.StringList = nil
 				if !v.Null && !v.Unknown {
+					obj.StringList = make([]string, len(v.Elems))
 					for k, a := range v.Elems {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
@@ -492,7 +494,10 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.OptionalMap))
 					}
 				}
-				if obj.OptionalMap != nil {
+				if obj.OptionalMap == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					for k, a := range obj.OptionalMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
@@ -514,9 +519,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.OptionalMap) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
@@ -575,7 +577,10 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 				}
-				if obj.StringList != nil {
+				if obj.StringList == nil {
+					c.Null = true
+				} else {
+					c.Null = false
 					t := o.ElemType
 					if len(obj.StringList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
@@ -600,9 +605,6 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						v.Value = string(a)
 						v.Unknown = false
 						c.Elems[k] = v
-					}
-					if len(obj.StringList) > 0 {
-						c.Null = false
 					}
 				}
 				c.Unknown = false
