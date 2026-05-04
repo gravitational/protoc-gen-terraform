@@ -48,10 +48,8 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 		}),
 		"bool_custom_list": GenSchemaBoolSpecialList(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Computed:      true,
-			Description:   "bool_custom_list custom bool list field.",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Description: "bool_custom_list custom bool list field.",
+			Optional:    true,
 		}),
 		"computed": {
 			Computed:      true,

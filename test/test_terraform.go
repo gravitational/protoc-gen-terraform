@@ -58,10 +58,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
 		"bool_custom_list": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Computed:      true,
-			Description:   "BoolCustomList []bool field",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Description: "BoolCustomList []bool field",
+			Optional:    true,
 		}),
 		"branch1": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -100,11 +98,9 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"bytes_list": {
-			Computed:      true,
-			Description:   "BytesList [][]byte field",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+			Description: "BytesList [][]byte field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"double": {
 			Computed:      true,
@@ -121,11 +117,9 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Type:          DurationType{},
 		},
 		"duration_custom_list": {
-			Computed:      true,
-			Description:   "DurationCustomList []time.Duration field",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
+			Description: "DurationCustomList []time.Duration field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
 		},
 		"duration_custom_missing": {
 			Computed:      true,
@@ -230,10 +224,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -254,10 +246,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
-			Computed:      true,
-			Description:   "MapObject is the object map",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Description: "MapObject is the object map",
+			Optional:    true,
 		},
 		"map_object_nullable": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
@@ -274,10 +264,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -330,10 +318,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -374,10 +360,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -398,10 +382,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
 			}),
-			Computed:      true,
-			Description:   "NestedList nested message array",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Description: "NestedList nested message array",
+			Optional:    true,
 		},
 		"nested_list_nullable": {
 			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
@@ -418,10 +400,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -460,10 +440,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -502,10 +480,8 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 						PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
 						Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					}}),
-					Computed:      true,
-					Description:   "MapObjectNested nested object map",
-					Optional:      true,
-					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+					Description: "MapObjectNested nested object map",
+					Optional:    true,
 				},
 				"nested_list": {
 					Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"str": {
@@ -558,18 +534,14 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"string_list": {
-			Computed:      true,
-			Description:   "StringList []string field",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+			Description: "StringList []string field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"string_list_empty": {
-			Computed:      true,
-			Description:   "StringListEmpty []string field",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+			Description: "StringListEmpty []string field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"string_override": GenSchemaStringCustom(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
