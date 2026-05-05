@@ -71,6 +71,7 @@ func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
 		"optional_map": {
+			Computed:    true,
 			Description: "maps don't support optional keyword, but we add it here to check the generation",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
