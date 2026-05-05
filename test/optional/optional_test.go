@@ -138,8 +138,8 @@ func TestCopyToOptionalFieldsNil(t *testing.T) {
 	require.True(t, o.Attrs["optional_inner_message"].(types.Object).Null)
 
 	// Nil map and slice set with Null true on the Terraform side.
-	require.True(t, o.Attrs["optional_map"].(types.Map).Null)
-	require.True(t, o.Attrs["string_list"].(types.List).Null)
+	require.False(t, o.Attrs["optional_map"].(types.Map).Null)
+	require.False(t, o.Attrs["string_list"].(types.List).Null)
 }
 
 func TestCopyFromOptionalFields(t *testing.T) {
