@@ -354,7 +354,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
 					}
 				}
-				if obj.DurationCustomList != nil {
+				{
 					t := o.ElemType
 					if len(obj.DurationCustomList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
@@ -380,10 +380,8 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.DurationCustomList) > 0 {
-						c.Null = false
-					}
 				}
+				c.Null = false
 				c.Unknown = false
 				tf.Attrs["duration_custom_list"] = c
 			}
@@ -411,7 +409,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
 					}
 				}
-				if obj.DurationList != nil {
+				{
 					t := o.ElemType
 					if len(obj.DurationList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
@@ -437,10 +435,8 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.DurationList) > 0 {
-						c.Null = false
-					}
 				}
+				c.Null = false
 				c.Unknown = false
 				tf.Attrs["duration_list"] = c
 			}
@@ -578,7 +574,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
 					}
 				}
-				if obj.TimestampList != nil {
+				{
 					t := o.ElemType
 					if len(obj.TimestampList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
@@ -604,10 +600,8 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.TimestampList) > 0 {
-						c.Null = false
-					}
 				}
+				c.Null = false
 				c.Unknown = false
 				tf.Attrs["timestamp_list"] = c
 			}
