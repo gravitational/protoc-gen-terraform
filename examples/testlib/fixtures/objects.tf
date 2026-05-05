@@ -55,7 +55,7 @@ resource "example_objects" "test" {
   }
 
   # oneof: set only one branch.
-  branch1 = {
+  branch_nested = {
     leaf = {
       value = "branch-1"
     }

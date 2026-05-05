@@ -403,6 +403,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				if obj.OptionalInnerMessage == nil {
 					v.Null = true
 				} else {
+					v.Null = false
 					obj := obj.OptionalInnerMessage
 					tf := &v
 					{

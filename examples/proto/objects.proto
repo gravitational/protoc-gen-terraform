@@ -60,8 +60,9 @@ message Objects {
 
   // one_of_objects is a oneof objects field.
   oneof one_of_objects {
-    Nested branch1 = 15;
-    Nested branch2 = 16;
+    Nested branch_nested = 15;
+    Leaf branch_leaf = 16;
+    Empty branch_empty = 20;
   }
 
   // one_of_primitives is a oneof primitives field.
