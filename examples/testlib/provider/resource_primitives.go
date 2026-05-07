@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -53,9 +54,24 @@ func (r primitivesResource) Create(ctx context.Context, req tfsdk.CreateResource
 		return
 	}
 
-	r.p.primitives[id] = primitives
+	// We proto marshall and unmarshall the resource to test stability through proto round-trip.
+	// This is required because protouf does not preserve the distinction between nil and empty
+	// for some types (lists for examples).
+	wireMsg, err := proto.Marshal(primitives)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to proto marshal", err.Error())
+		return
+	}
 
-	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, primitives, &plan)...)
+	var newPrimitives extypes.Primitives
+	if err := proto.Unmarshal(wireMsg, &newPrimitives); err != nil {
+		resp.Diagnostics.AddError("failed to proto unmarshal", err.Error())
+		return
+	}
+
+	r.p.primitives[id] = &newPrimitives
+
+	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -99,9 +115,24 @@ func (r primitivesResource) Update(ctx context.Context, req tfsdk.UpdateResource
 		return
 	}
 
-	r.p.primitives[primitives.Id] = primitives
+	// We proto marshall and unmarshall the resource to test stability through proto round-trip.
+	// This is required because protouf does not preserve the distinction between nil and empty
+	// for some types (lists for examples).
+	wireMsg, err := proto.Marshal(primitives)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to proto marshal", err.Error())
+		return
+	}
 
-	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, primitives, &plan)...)
+	var newPrimitives extypes.Primitives
+	if err := proto.Unmarshal(wireMsg, &newPrimitives); err != nil {
+		resp.Diagnostics.AddError("failed to proto unmarshal", err.Error())
+		return
+	}
+
+	r.p.primitives[newPrimitives.Id] = &newPrimitives
+
+	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

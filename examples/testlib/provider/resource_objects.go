@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/gogo/protobuf/proto"
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -53,9 +54,24 @@ func (r objectsResource) Create(ctx context.Context, req tfsdk.CreateResourceReq
 		return
 	}
 
-	r.p.objects[id] = objects
+	// We proto marshall and unmarshall the resource to test stability through proto round-trip.
+	// This is required because protouf does not preserve the distinction between nil and empty
+	// for some types (lists for examples).
+	wireMsg, err := proto.Marshal(objects)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to proto marshal", err.Error())
+		return
+	}
 
-	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, objects, &plan)...)
+	var newObjects extypes.Objects
+	if err := proto.Unmarshal(wireMsg, &newObjects); err != nil {
+		resp.Diagnostics.AddError("failed to proto unmarshal", err.Error())
+		return
+	}
+
+	r.p.objects[id] = &newObjects
+
+	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -101,7 +117,24 @@ func (r objectsResource) Update(ctx context.Context, req tfsdk.UpdateResourceReq
 
 	r.p.objects[objects.Id] = objects
 
-	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, objects, &plan)...)
+	// We proto marshall and unmarshall the resource to test stability through proto round-trip.
+	// This is required because protouf does not preserve the distinction between nil and empty
+	// for some types (lists for examples).
+	wireMsg, err := proto.Marshal(objects)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to proto marshal", err.Error())
+		return
+	}
+
+	var newObjects extypes.Objects
+	if err := proto.Unmarshal(wireMsg, &newObjects); err != nil {
+		resp.Diagnostics.AddError("failed to proto unmarshal", err.Error())
+		return
+	}
+
+	r.p.objects[newObjects.Id] = &newObjects
+
+	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
