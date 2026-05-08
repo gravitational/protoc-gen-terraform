@@ -71,6 +71,7 @@ func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
 		"optional_map": {
+			Computed:    true,
 			Description: "maps don't support optional keyword, but we add it here to check the generation",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
@@ -492,7 +493,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.OptionalMap))
 					}
 				}
-				if obj.OptionalMap != nil {
+				{
 					t := o.ElemType
 					for k, a := range obj.OptionalMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
@@ -515,10 +516,8 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.OptionalMap) > 0 {
-						c.Null = false
-					}
 				}
+				c.Null = false
 				c.Unknown = false
 				tf.Attrs["optional_map"] = c
 			}
@@ -575,7 +574,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 				}
-				if obj.StringList != nil {
+				{
 					t := o.ElemType
 					if len(obj.StringList) != len(c.Elems) {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
@@ -601,10 +600,8 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 						v.Unknown = false
 						c.Elems[k] = v
 					}
-					if len(obj.StringList) > 0 {
-						c.Null = false
-					}
 				}
+				c.Null = false
 				c.Unknown = false
 				tf.Attrs["string_list"] = c
 			}

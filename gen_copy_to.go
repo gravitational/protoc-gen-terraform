@@ -405,7 +405,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				),
 			)
 
-			g.If(j.Id(fieldName)).Op("!=").Nil().BlockFunc(func(g *j.Group) {
+			g.BlockFunc(func(g *j.Group) {
 				if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
 					g.Id("t").Op(":=").Id("o.ElemType")
 				} else {
@@ -436,13 +436,10 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 					}
 					g.Id("c.Elems").Index(j.Id("k")).Op("=").Id("v")
 				})
-
-				// if len(obj.Test) > 0
-				g.If(j.Len(j.Id(fieldName))).Op(">").Lit(0).Block(
-					j.Id("c.Null").Op("=").False(),
-				)
 			})
 
+			// List and Map attributes are normalized to an empty value
+			g.Id("c.Null").Op("=").False()
 			g.Id("c.Unknown").Op("=").False()
 			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("c")
 		})

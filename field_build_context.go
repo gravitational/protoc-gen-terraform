@@ -445,6 +445,17 @@ func (c *FieldBuildContext) IsComputed(isProto3optional bool) bool {
 	if c.GetFlagValue(c.config.ComputedFields) {
 		return true
 	}
+
+	// Go allows list and map attributes to be `nil`, but protobuf does not preserve
+	// this distinction. As a result, they may appear as either `null` or empty,
+	// though the backend treats them identically.
+	//
+	// To ensure consistency, `nil` values are normalized to empty values, making
+	// list and map attributes effectively non-nullable and computed as empty by default.
+	if c.IsRepeated() || c.IsMap() {
+		return true
+	}
+
 	// If the field is nullable or optional, the Terraform `Null` value can be represented
 	// in the go struct as a `nil` pointer. This allows us to successfully round-trip through
 	// the go type: `ToTerraform(FromTerraform(field)) == field`.
