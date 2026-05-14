@@ -66,6 +66,14 @@ func (s *TerraformSuite) TestObjectsUpdate() {
 				Config:   s.getFixture("objects.tf"),
 				PlanOnly: true,
 			},
+			{
+				Config: s.getFixture("objects_null_values.tf"),
+				Check:  s.testCheckObjectNullValuesResource(name),
+			},
+			{
+				Config:   s.getFixture("objects_null_values.tf"),
+				PlanOnly: true,
+			},
 		},
 	})
 }

@@ -66,6 +66,18 @@ func (s *TerraformSuite) TestPrimitivesUpdate() {
 				Config:   s.getFixture("primitives.tf"),
 				PlanOnly: true,
 			},
+
+			// Although `UseStateForUnknown` is not applied, prior state is still
+			// used in some scenarios... I think specifically only when the
+			// plan is null.
+			// {
+			// 	Config: s.getFixture("primitives_null_values.tf"),
+			// 	Check:  s.testCheckPrimitivesNullValuesResource(name),
+			// },
+			// {
+			// 	Config:   s.getFixture("primitives_null_values.tf"),
+			// 	PlanOnly: true,
+			// },
 		},
 	})
 }
