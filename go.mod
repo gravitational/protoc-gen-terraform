@@ -1,4 +1,4 @@
-module github.com/gravitational/protoc-gen-terraform/v3
+module github.com/gravitational/protoc-gen-terraform/v4
 
 go 1.25.0
 
