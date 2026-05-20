@@ -25,7 +25,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gravitational_protoc_gen_terraform_v3_examples_types "github.com/gravitational/protoc-gen-terraform/v3/examples/types"
+	github_com_gravitational_protoc_gen_terraform_v3_examples_types "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
