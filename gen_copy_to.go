@@ -17,12 +17,13 @@ func NewMessageCopyToGenerator(m *Message, i *Imports) *MessageCopyToGenerator {
 	return &MessageCopyToGenerator{Message: m, i: i}
 }
 
-// Generate generates CopyToTF<Name> method
+// Generate generates Copy<Name>ToTerraform method.
+// Unknown values are overridden.
 func (m *MessageCopyToGenerator) Generate(writer io.Writer) (int, error) {
 	methodName := "Copy" + m.Name + "ToTerraform"
+	helperName := "Copy" + m.Name + "ToTerraformPreserveUnknown"
 	tf := j.Id("tf").Op("*").Id(m.i.WithPackage(Types, "Object"))
 	obj := j.Id("obj").Op("*").Id(m.i.WithType(m.GoType))
-	diags := j.Var().Id("diags").Id(m.i.WithPackage(Diag, "Diagnostics"))
 	ctx := j.Id("ctx").Id(m.i.WithPackage("context", "Context"))
 
 	// func Copy<name>ToTerraform(ctx context.Context, tf types.Object, obj *apitypes.<name>)
@@ -31,6 +32,33 @@ func (m *MessageCopyToGenerator) Generate(writer io.Writer) (int, error) {
 		j.Commentf("// %v copies contents of the source Terraform object into a target struct\n", methodName).
 			Func().Id(methodName).
 			Params(ctx, obj, tf).
+			Id(m.i.WithPackage(Diag, "Diagnostics")).
+			BlockFunc(func(g *j.Group) {
+				g.Return(j.Id(helperName).Call(j.Id("ctx"), j.Id("obj"), j.Id("tf"), j.False()))
+			})
+
+	return writer.Write([]byte(method.GoString() + "\n"))
+}
+
+// GeneratePreserveUnknown generates Copy<Name>ToTerraformPreserveUnknown method.
+// If the `preserveUnknown` flag is enabled, Unknown values are preserved.
+func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int, error) {
+	methodName := "Copy" + m.Name + "ToTerraformPreserveUnknown"
+	tf := j.Id("tf").Op("*").Id(m.i.WithPackage(Types, "Object"))
+	obj := j.Id("obj").Op("*").Id(m.i.WithType(m.GoType))
+	diags := j.Var().Id("diags").Id(m.i.WithPackage(Diag, "Diagnostics"))
+	ctx := j.Id("ctx").Id(m.i.WithPackage("context", "Context"))
+	preserveUnknown := j.Id("preserveUnknown").Id("bool")
+	comment := "// %v copies contents of the source Terraform object into a target struct.\n" +
+		"// Set preserveUnknown to true to preserve unknown values.\n"
+
+	// func Copy<name>ToTerraformPreserveUnknown(ctx context.Context, tf types.Object, obj *apitypes.<name>, preserveUnknown bool)
+	// ... statements for a fields
+
+	method :=
+		j.Commentf(comment, methodName).
+			Func().Id(methodName).
+			Params(ctx, obj, tf, preserveUnknown).
 			Id(m.i.WithPackage(Diag, "Diagnostics")).
 			BlockFunc(func(g *j.Group) {
 				g.Add(diags)
@@ -174,7 +202,9 @@ func (f *FieldCopyToGenerator) genPrimitiveBody(g *j.Group, fieldName string) {
 	g.Add(f.genAssignValue(fieldName))
 
 	// Set `Unknown = false` for all values
-	g.Id("v.Unknown").Op("=").False()
+	g.If(j.Id("!preserveUnknown")).Block(
+		j.Id("v.Unknown").Op("=").False(),
+	)
 }
 
 func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
@@ -311,7 +341,10 @@ func (f *FieldCopyToGenerator) genObjectBody(g *j.Group, m *MessageCopyToGenerat
 	} else {
 		g.BlockFunc(copyObj)
 	}
-	g.Id("v.Unknown").Op("=").False()
+
+	g.If(j.Id("!preserveUnknown")).Block(
+		j.Id("v.Unknown").Op("=").False(),
+	)
 }
 
 // assertTo asserts a to typ
@@ -440,7 +473,11 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 
 			// List and Map attributes are normalized to an empty value
 			g.Id("c.Null").Op("=").False()
-			g.Id("c.Unknown").Op("=").False()
+
+			g.If(j.Id("!preserveUnknown")).Block(
+				j.Id("c.Unknown").Op("=").False(),
+			)
+
 			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("c")
 		})
 	})

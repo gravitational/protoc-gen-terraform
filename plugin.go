@@ -156,6 +156,10 @@ func (p *Plugin) write(m []*Message, out io.Writer) error {
 		if err != nil {
 			return trace.Wrap(err)
 		}
+		_, err = t.GeneratePreserveUnknown(out)
+		if err != nil {
+			return trace.Wrap(err)
+		}
 	}
 
 	_, err := NewSharedCodeGenerator(&p.Imports).Write(out)
