@@ -540,6 +540,12 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 
 // CopyPrimitivesToTerraform copies contents of the source Terraform object into a target struct
 func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+	return CopyPrimitivesToTerraformPreserveUnknown(ctx, obj, tf, false)
+}
+
+// CopyPrimitivesToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// Set preserveUnknown to true to preserve unknown values.
+func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
@@ -591,12 +597,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = bool(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["bool_list"] = c
 			}
 		}
@@ -623,7 +633,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = bool(obj.BoolValue)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["bool_value"] = v
 		}
 	}
@@ -672,12 +684,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = string(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["bytes_list"] = c
 			}
 		}
@@ -704,7 +720,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = string(obj.BytesValue)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["bytes_value"] = v
 		}
 	}
@@ -753,12 +771,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = float64(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["double_list"] = c
 			}
 		}
@@ -785,7 +807,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = float64(obj.DoubleValue)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["double_value"] = v
 		}
 	}
@@ -834,12 +858,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = int64(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["enum_list"] = c
 			}
 		}
@@ -866,7 +894,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = int64(obj.EnumValue)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["enum_value"] = v
 		}
 	}
@@ -915,12 +945,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = float64(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["float_list"] = c
 			}
 		}
@@ -947,7 +981,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = float64(obj.FloatValue)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["float_value"] = v
 		}
 	}
@@ -973,7 +1009,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = string(obj.Id)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["id"] = v
 		}
 	}
@@ -1022,12 +1060,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = int64(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["int32_list"] = c
 			}
 		}
@@ -1054,7 +1096,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = int64(obj.Int32Value)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["int32_value"] = v
 		}
 	}
@@ -1103,12 +1147,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = int64(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["int64_list"] = c
 			}
 		}
@@ -1135,7 +1183,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = int64(obj.Int64Value)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["int64_value"] = v
 		}
 	}
@@ -1184,12 +1234,16 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 						v.Null = false
 						v.Value = string(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["string_list"] = c
 			}
 		}
@@ -1216,7 +1270,9 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 
 			v.Null = false
 			v.Value = string(obj.StringValue)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["string_value"] = v
 		}
 	}

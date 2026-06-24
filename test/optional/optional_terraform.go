@@ -281,6 +281,12 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 
 // CopyOptionalTestToTerraform copies contents of the source Terraform object into a target struct
 func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+	return CopyOptionalTestToTerraformPreserveUnknown(ctx, obj, tf, false)
+}
+
+// CopyOptionalTestToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// Set preserveUnknown to true to preserve unknown values.
+func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *OptionalTest, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
@@ -315,7 +321,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 					v.Value = string(obj.ChoiceA)
 				}
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["choice_a"] = v
 		}
 	}
@@ -347,7 +355,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 					v.Value = string(obj.ChoiceB)
 				}
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["choice_b"] = v
 		}
 	}
@@ -376,7 +386,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				v.Null = false
 				v.Value = bool(*obj.OptionalBool)
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["optional_bool"] = v
 		}
 	}
@@ -432,12 +444,16 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 								v.Null = false
 								v.Value = bool(*obj.InnerBool)
 							}
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["inner_bool"] = v
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["optional_inner_message"] = v
 			}
 		}
@@ -467,7 +483,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				v.Null = false
 				v.Value = int64(*obj.OptionalInt64)
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["optional_int64"] = v
 		}
 	}
@@ -513,12 +531,16 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 
 						v.Null = false
 						v.Value = string(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["optional_map"] = c
 			}
 		}
@@ -548,7 +570,9 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 				v.Null = false
 				v.Value = string(*obj.OptionalStr)
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["optional_str"] = v
 		}
 	}
@@ -597,12 +621,16 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 
 						v.Null = false
 						v.Value = string(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["string_list"] = c
 			}
 		}

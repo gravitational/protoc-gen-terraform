@@ -1478,6 +1478,12 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 
 // CopyObjectsToTerraform copies contents of the source Terraform object into a target struct
 func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+	return CopyObjectsToTerraformPreserveUnknown(ctx, obj, tf, false)
+}
+
+// CopyObjectsToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// Set preserveUnknown to true to preserve unknown values.
+func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
@@ -1526,12 +1532,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 						v.Null = false
 						v.Value = bool(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["bool_map"] = c
 			}
 		}
@@ -1564,7 +1574,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 					v.Value = bool(obj.BranchBool)
 				}
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["branch_bool"] = v
 		}
 	}
@@ -1618,12 +1630,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								}
 							}
 							v.Null = true
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["active"] = v
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["branch_empty"] = v
 			}
 		}
@@ -1656,7 +1672,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 					v.Value = int64(obj.BranchInt)
 				}
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["branch_int"] = v
 		}
 	}
@@ -1713,12 +1731,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = string(obj.Value)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["value"] = v
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["branch_leaf"] = v
 			}
 		}
@@ -1801,18 +1823,24 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 											v.Null = false
 											v.Value = string(obj.Value)
-											v.Unknown = false
+											if !preserveUnknown {
+												v.Unknown = false
+											}
 											tf.Attrs["value"] = v
 										}
 									}
 								}
-								v.Unknown = false
+								if !preserveUnknown {
+									v.Unknown = false
+								}
 								tf.Attrs["leaf"] = v
 							}
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["branch_nested"] = v
 			}
 		}
@@ -1845,7 +1873,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 					v.Value = string(obj.BranchString)
 				}
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["branch_string"] = v
 		}
 	}
@@ -1874,7 +1904,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 				v.Null = false
 				v.Value = string(obj.EmbeddedValue)
 			}
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["embedded_value"] = v
 		}
 	}
@@ -1924,12 +1956,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 								}
 							}
 							v.Null = true
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["active"] = v
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["empty"] = v
 			}
 		}
@@ -1956,7 +1992,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 			v.Null = false
 			v.Value = string(obj.Id)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["id"] = v
 		}
 	}
@@ -2002,12 +2040,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 						v.Null = false
 						v.Value = int64(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["int_map"] = c
 			}
 		}
@@ -2059,12 +2101,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = string(obj.Value)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["value"] = v
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["leaf"] = v
 			}
 		}
@@ -2160,23 +2206,31 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 													v.Null = false
 													v.Value = string(obj.Value)
-													v.Unknown = false
+													if !preserveUnknown {
+														v.Unknown = false
+													}
 													tf.Attrs["value"] = v
 												}
 											}
 										}
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										tf.Attrs["leaf"] = v
 									}
 								}
 							}
 						}
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["nested_list"] = c
 			}
 		}
@@ -2269,23 +2323,31 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 													v.Null = false
 													v.Value = string(obj.Value)
-													v.Unknown = false
+													if !preserveUnknown {
+														v.Unknown = false
+													}
 													tf.Attrs["value"] = v
 												}
 											}
 										}
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										tf.Attrs["leaf"] = v
 									}
 								}
 							}
 						}
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["nested_map"] = c
 			}
 		}
@@ -2364,18 +2426,24 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 											v.Null = false
 											v.Value = string(obj.Value)
-											v.Unknown = false
+											if !preserveUnknown {
+												v.Unknown = false
+											}
 											tf.Attrs["value"] = v
 										}
 									}
 								}
-								v.Unknown = false
+								if !preserveUnknown {
+									v.Unknown = false
+								}
 								tf.Attrs["leaf"] = v
 							}
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["nested_nullable"] = v
 			}
 		}
@@ -2473,23 +2541,31 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 													v.Null = false
 													v.Value = string(obj.Value)
-													v.Unknown = false
+													if !preserveUnknown {
+														v.Unknown = false
+													}
 													tf.Attrs["value"] = v
 												}
 											}
 										}
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										tf.Attrs["leaf"] = v
 									}
 								}
 							}
 						}
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["nested_nullable_list"] = c
 			}
 		}
@@ -2584,23 +2660,31 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 													v.Null = false
 													v.Value = string(obj.Value)
-													v.Unknown = false
+													if !preserveUnknown {
+														v.Unknown = false
+													}
 													tf.Attrs["value"] = v
 												}
 											}
 										}
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										tf.Attrs["leaf"] = v
 									}
 								}
 							}
 						}
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["nested_nullable_map"] = c
 			}
 		}
@@ -2677,18 +2761,24 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 											v.Null = false
 											v.Value = string(obj.Value)
-											v.Unknown = false
+											if !preserveUnknown {
+												v.Unknown = false
+											}
 											tf.Attrs["value"] = v
 										}
 									}
 								}
-								v.Unknown = false
+								if !preserveUnknown {
+									v.Unknown = false
+								}
 								tf.Attrs["leaf"] = v
 							}
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["nested_value"] = v
 			}
 		}
@@ -2763,12 +2853,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = bool(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["bool_list"] = c
 							}
 						}
@@ -2795,7 +2889,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = bool(obj.BoolValue)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["bool_value"] = v
 						}
 					}
@@ -2844,12 +2940,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = string(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["bytes_list"] = c
 							}
 						}
@@ -2876,7 +2976,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = string(obj.BytesValue)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["bytes_value"] = v
 						}
 					}
@@ -2925,12 +3027,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = float64(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["double_list"] = c
 							}
 						}
@@ -2957,7 +3063,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = float64(obj.DoubleValue)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["double_value"] = v
 						}
 					}
@@ -3006,12 +3114,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = int64(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["enum_list"] = c
 							}
 						}
@@ -3038,7 +3150,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = int64(obj.EnumValue)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["enum_value"] = v
 						}
 					}
@@ -3087,12 +3201,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = float64(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["float_list"] = c
 							}
 						}
@@ -3119,7 +3237,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = float64(obj.FloatValue)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["float_value"] = v
 						}
 					}
@@ -3145,7 +3265,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = string(obj.Id)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["id"] = v
 						}
 					}
@@ -3194,12 +3316,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = int64(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["int32_list"] = c
 							}
 						}
@@ -3226,7 +3352,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = int64(obj.Int32Value)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["int32_value"] = v
 						}
 					}
@@ -3275,12 +3403,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = int64(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["int64_list"] = c
 							}
 						}
@@ -3307,7 +3439,9 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = int64(obj.Int64Value)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["int64_value"] = v
 						}
 					}
@@ -3356,12 +3490,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 										v.Null = false
 										v.Value = string(a)
-										v.Unknown = false
+										if !preserveUnknown {
+											v.Unknown = false
+										}
 										c.Elems[k] = v
 									}
 								}
 								c.Null = false
-								c.Unknown = false
+								if !preserveUnknown {
+									c.Unknown = false
+								}
 								tf.Attrs["string_list"] = c
 							}
 						}
@@ -3388,12 +3526,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 							v.Null = false
 							v.Value = string(obj.StringValue)
-							v.Unknown = false
+							if !preserveUnknown {
+								v.Unknown = false
+							}
 							tf.Attrs["string_value"] = v
 						}
 					}
 				}
-				v.Unknown = false
+				if !preserveUnknown {
+					v.Unknown = false
+				}
 				tf.Attrs["primitives"] = v
 			}
 		}
@@ -3440,12 +3582,16 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 
 						v.Null = false
 						v.Value = string(a)
-						v.Unknown = false
+						if !preserveUnknown {
+							v.Unknown = false
+						}
 						c.Elems[k] = v
 					}
 				}
 				c.Null = false
-				c.Unknown = false
+				if !preserveUnknown {
+					c.Unknown = false
+				}
 				tf.Attrs["string_map"] = c
 			}
 		}

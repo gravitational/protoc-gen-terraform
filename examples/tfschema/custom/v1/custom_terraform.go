@@ -290,6 +290,12 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 
 // CopyCustomToTerraform copies contents of the source Terraform object into a target struct
 func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+	return CopyCustomToTerraformPreserveUnknown(ctx, obj, tf, false)
+}
+
+// CopyCustomToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// Set preserveUnknown to true to preserve unknown values.
+func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v3_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
@@ -336,7 +342,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.Computed)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["computed"] = v
 		}
 	}
@@ -362,7 +370,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.Id)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["id"] = v
 		}
 	}
@@ -388,7 +398,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.NameOverride)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["custom_name_override"] = v
 		}
 	}
@@ -414,7 +426,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.PlanModifier)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["plan_modifier"] = v
 		}
 	}
@@ -440,7 +454,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.Required)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["required"] = v
 		}
 	}
@@ -466,7 +482,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.SchemaOverride)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["schema_override"] = v
 		}
 	}
@@ -492,7 +510,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.Sensitive)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["sensitive"] = v
 		}
 	}
@@ -527,7 +547,9 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 
 			v.Null = false
 			v.Value = string(obj.Validated)
-			v.Unknown = false
+			if !preserveUnknown {
+				v.Unknown = false
+			}
 			tf.Attrs["validated"] = v
 		}
 	}
