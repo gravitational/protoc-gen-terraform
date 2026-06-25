@@ -153,8 +153,7 @@ func (r customResource) ModifyPlan(ctx context.Context, req tfsdk.ModifyResource
 		return
 	}
 
-	// resp.Diagnostics.Append(schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)...)
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &plan)...)
+	resp.Diagnostics.Append(schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

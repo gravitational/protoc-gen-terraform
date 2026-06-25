@@ -69,14 +69,6 @@ func (s *TerraformSuite) TestCustomNullValues() {
 }
 
 func (s *TerraformSuite) TestCustomPreserveUnknown() {
-	// TODO: This test currently fails with an `invalid plan` error
-	//
-	// Error: Provider produced invalid plan
-	// Provider "registry.terraform.io/hashicorp/example" planned an invalid value
-	// for example_custom.preserve_unknown.required: planned value cty.StringVal("")
-	// does not match config value cty.UnknownVal(cty.String) nor prior value
-	// cty.StringVal("required").
-
 	t := s.T()
 	name := "example_custom.preserve_unknown"
 
