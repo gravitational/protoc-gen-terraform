@@ -450,7 +450,9 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 					// This check creates a new array if that's the case.
 					// Otherwise, we would have a panic at the last line in the For loop or extra elements.
 					g.If(j.Len(j.Id(fieldName)).Op("!=").Len(j.Id("c.Elems"))).Block(
-						j.Id("c.Elems").Op("=").Add(mk),
+						j.Id("newElems").Op(":=").Add(mk),
+						j.Id("copy").Call(j.Id("newElems"), j.Id("c.Elems")),
+						j.Id("c.Elems").Op("=").Add(j.Id("newElems")),
 					)
 				}
 
