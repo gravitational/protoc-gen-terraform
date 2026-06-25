@@ -601,7 +601,9 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 				{
 					t := o.ElemType
 					if len(obj.StringList) != len(c.Elems) {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+						copy(newElems, c.Elems)
+						c.Elems = newElems
 					}
 					for k, a := range obj.StringList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)

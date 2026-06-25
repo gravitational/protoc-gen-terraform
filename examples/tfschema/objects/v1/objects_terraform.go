@@ -2140,7 +2140,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				{
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					if len(obj.NestedList) != len(c.Elems) {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedList))
+						copy(newElems, c.Elems)
+						c.Elems = newElems
 					}
 					for k, a := range obj.NestedList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
@@ -2473,7 +2475,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				{
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 					if len(obj.NestedNullableList) != len(c.Elems) {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedNullableList))
+						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedNullableList))
+						copy(newElems, c.Elems)
+						c.Elems = newElems
 					}
 					for k, a := range obj.NestedNullableList {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
@@ -2833,7 +2837,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.BoolList) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.BoolList {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
@@ -2920,7 +2926,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.BytesList) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.BytesList {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
@@ -3007,7 +3015,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.DoubleList) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.DoubleList {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
@@ -3094,7 +3104,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.EnumList) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.EnumList {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
@@ -3181,7 +3193,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.FloatList) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.FloatList {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
@@ -3296,7 +3310,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.Int32List) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.Int32List {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
@@ -3383,7 +3399,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.Int64List) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.Int64List {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
@@ -3470,7 +3488,9 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 								{
 									t := o.ElemType
 									if len(obj.StringList) != len(c.Elems) {
-										c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+										newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
+										copy(newElems, c.Elems)
+										c.Elems = newElems
 									}
 									for k, a := range obj.StringList {
 										v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)

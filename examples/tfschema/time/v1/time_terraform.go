@@ -365,7 +365,9 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				{
 					t := o.ElemType
 					if len(obj.DurationCustomList) != len(c.Elems) {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
+						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
+						copy(newElems, c.Elems)
+						c.Elems = newElems
 					}
 					for k, a := range obj.DurationCustomList {
 						v, ok := c.Elems[k].(DurationValue)
@@ -424,7 +426,9 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				{
 					t := o.ElemType
 					if len(obj.DurationList) != len(c.Elems) {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
+						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
+						copy(newElems, c.Elems)
+						c.Elems = newElems
 					}
 					for k, a := range obj.DurationList {
 						v, ok := c.Elems[k].(DurationValue)
@@ -601,7 +605,9 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				{
 					t := o.ElemType
 					if len(obj.TimestampList) != len(c.Elems) {
-						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
+						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
+						copy(newElems, c.Elems)
+						c.Elems = newElems
 					}
 					for k, a := range obj.TimestampList {
 						v, ok := c.Elems[k].(TimeValue)
