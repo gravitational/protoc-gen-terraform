@@ -75,10 +75,11 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"injected": {
-			Computed: true,
-			Optional: false,
-			Required: false,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Computed:      true,
+			Optional:      false,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_tfsdk.UseStateForUnknown()},
+			Required:      false,
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
 		"plan_modifier": {
 			Computed:      true,

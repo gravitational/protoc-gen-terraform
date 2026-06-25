@@ -126,3 +126,42 @@ func (r customResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequ
 
 	delete(r.p.custom, id.Value)
 }
+
+func (r customResource) ModifyPlan(ctx context.Context, req tfsdk.ModifyResourcePlanRequest, resp *tfsdk.ModifyResourcePlanResponse) {
+	// If the entire plan is null, the resource is planned for destruction.
+	if req.Plan.Raw.IsNull() {
+		return
+	}
+
+	if req.State.Raw.IsNull() {
+		return
+	}
+
+	var plan types.Object
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Preserve the provider-managed ID, but rewrite all other fields from
+	// config so omitted or null values become explicit zero values in the plan.
+	id, hasID := plan.Attrs["id"]
+
+	custom := &extypes.Custom{}
+	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// resp.Diagnostics.Append(schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)...)
+	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if hasID {
+		plan.Attrs["id"] = id
+	}
+
+	resp.Diagnostics.Append(resp.Plan.Set(ctx, &plan)...)
+}
