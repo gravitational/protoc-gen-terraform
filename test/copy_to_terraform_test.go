@@ -376,3 +376,71 @@ func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 		nestedNullable.Attrs["str"].(types.String),
 	)
 }
+
+func TestCopyToTerraformPreserveUnknown(t *testing.T) {
+	o := copyToTerraformObject(t)
+	o.Attrs["str"] = types.String{Unknown: true, Value: "stale"}
+
+	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	requireNoDiagErrors(t, diags)
+
+	v := o.Attrs["str"].(types.String)
+	require.True(t, v.Unknown)
+	require.False(t, v.Null)
+	require.Equal(t, "TestString", v.Value)
+}
+
+func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
+	o := copyToTerraformObject(t)
+
+	nestedType, ok := o.AttrTypes["nested"].(types.ObjectType)
+	require.True(t, ok)
+
+	nestedListType, ok := nestedType.AttrTypes["nested_list"].(types.ListType)
+	require.True(t, ok)
+
+	o.Attrs["nested"] = types.Object{
+		Unknown:   true,
+		AttrTypes: nestedType.AttrTypes,
+		Attrs: map[string]attr.Value{
+			"str": types.String{Unknown: true, Value: "stale"},
+			"nested_list": types.List{
+				Unknown:  true,
+				ElemType: nestedListType.ElemType,
+				Elems: []attr.Value{
+					types.Object{
+						Unknown:   true,
+						AttrTypes: nestedListType.ElemType.(types.ObjectType).AttrTypes,
+						Attrs: map[string]attr.Value{
+							"str": types.String{Unknown: true, Value: "stale"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	requireNoDiagErrors(t, diags)
+
+	nested := o.Attrs["nested"].(types.Object)
+	require.True(t, nested.Unknown)
+
+	str := nested.Attrs["str"].(types.String)
+	require.True(t, str.Unknown)
+	require.Equal(t, "TestString", str.Value)
+
+	nestedList := nested.Attrs["nested_list"].(types.List)
+	require.True(t, nestedList.Unknown)
+	require.Len(t, nestedList.Elems, 2)
+
+	firstElem := nestedList.Elems[0].(types.Object)
+	require.True(t, firstElem.Unknown)
+	require.Equal(t, "Test1", firstElem.Attrs["str"].(types.String).Value)
+	require.True(t, firstElem.Attrs["str"].(types.String).Unknown)
+
+	secondElem := nestedList.Elems[1].(types.Object)
+	require.False(t, secondElem.Unknown)
+	require.Equal(t, "Test2", secondElem.Attrs["str"].(types.String).Value)
+	require.False(t, secondElem.Attrs["str"].(types.String).Unknown)
+}

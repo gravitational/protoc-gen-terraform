@@ -67,3 +67,35 @@ func (s *TerraformSuite) TestCustomNullValues() {
 		},
 	})
 }
+
+func (s *TerraformSuite) TestCustomPreserveUnknown() {
+	t := s.T()
+	name := "example_custom.preserve_unknown"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("custom_preserve_unknown_1.tf"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "required", "required"),
+				),
+			},
+			{
+				Config:   s.getFixture("custom_preserve_unknown_1.tf"),
+				PlanOnly: true,
+			},
+			{
+				Config: s.getFixture("custom_preserve_unknown_2.tf"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(name, "required", "computed"),
+				),
+			},
+			{
+				Config:   s.getFixture("custom_preserve_unknown_2.tf"),
+				PlanOnly: true,
+			},
+		},
+	})
+}

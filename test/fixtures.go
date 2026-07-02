@@ -60,6 +60,10 @@ func createTestObj() *Test {
 
 		Nested: Nested{
 			Str: "TestString",
+			NestedList: []*OtherNested{
+				{Str: "Test1"},
+				{Str: "Test2"},
+			},
 		},
 		NestedNullable: &Nested{
 			Str: "TestString",
@@ -70,10 +74,10 @@ func createTestObj() *Test {
 			{
 				Str: "Test",
 				NestedList: []*OtherNested{
-					&OtherNested{
+					{
 						Str: "Test1",
 					},
-					&OtherNested{
+					{
 						Str: "Test2",
 					},
 				},
