@@ -43,8 +43,18 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *BoolCustom)
 }
 
 // CopyToBoolSpecial copies source value to the target
-func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v attr.Value) attr.Value {
-	return types.Bool{Value: bool(obj)}
+func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+	unknown := false
+	if v != nil {
+		unknown = preserveUnknown && v.IsUnknown()
+	}
+
+	value := types.Bool{
+		Value:   bool(obj),
+		Unknown: unknown,
+	}
+
+	return value
 }
 
 type BoolCustomList bool
@@ -82,7 +92,7 @@ func CopyFromBoolSpecialList(diags diag.Diagnostics, tf attr.Value, obj *[]BoolC
 }
 
 // CopyToBoolSpecialList copies source value to the target
-func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.Type, v attr.Value) attr.Value {
+func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{
@@ -90,15 +100,23 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 			ElemType: types.BoolType,
 		}
 	}
-	value.Unknown = false
+	value.Unknown = preserveUnknown && value.IsUnknown()
 
-	if len(obj) > 0 {
-		if value.Elems == nil {
-			value.Elems = make([]attr.Value, len(obj))
+	if len(value.Elems) != len(obj) {
+		newElems := make([]attr.Value, len(obj))
+		copy(newElems, value.Elems)
+		value.Elems = newElems
+	}
+
+	for i, b := range obj {
+		elemUnknown := false
+		if value.Elems[i] != nil {
+			elemUnknown = preserveUnknown && value.Elems[i].IsUnknown()
 		}
 
-		for i, b := range obj {
-			value.Elems[i] = types.Bool{Null: false, Unknown: false, Value: bool(b)}
+		value.Elems[i] = types.Bool{
+			Value:   bool(b),
+			Unknown: elemUnknown,
 		}
 	}
 
@@ -143,7 +161,7 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 
 // CopyToStringCustom copies a source value (single string) into the Terraform
 // value (a list of strings) by splitting the string on every "/".
-func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value) attr.Value {
+func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{
@@ -151,15 +169,24 @@ func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.
 			ElemType: types.StringType,
 		}
 	}
-	value.Unknown = false
+	value.Unknown = preserveUnknown && value.IsUnknown()
 
-	if len(obj) > 0 {
-		if value.Elems == nil {
-			value.Elems = make([]attr.Value, len(obj))
+	parts := strings.Split(obj, "/")
+	if len(value.Elems) != len(parts) {
+		newElems := make([]attr.Value, len(parts))
+		copy(newElems, value.Elems)
+		value.Elems = newElems
+	}
+
+	for i, b := range parts {
+		elemUnknown := false
+		if value.Elems[i] != nil {
+			elemUnknown = preserveUnknown && value.Elems[i].IsUnknown()
 		}
 
-		for i, b := range strings.Split(obj, "/") {
-			value.Elems[i] = types.String{Null: false, Unknown: false, Value: b}
+		value.Elems[i] = types.String{
+			Value:   b,
+			Unknown: elemUnknown,
 		}
 	}
 
