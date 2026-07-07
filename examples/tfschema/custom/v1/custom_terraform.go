@@ -307,7 +307,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom"})
 		} else {
-			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, tf.Attrs["bool_custom"])
+			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, tf.Attrs["bool_custom"], preserveUnknown)
 			tf.Attrs["bool_custom"] = v
 		}
 	}
@@ -316,7 +316,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom_list"})
 		} else {
-			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"])
+			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"], preserveUnknown)
 			tf.Attrs["bool_custom_list"] = v
 		}
 	}
@@ -521,7 +521,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.string_override"})
 		} else {
-			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attrs["string_override"])
+			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attrs["string_override"], preserveUnknown)
 			tf.Attrs["string_override"] = v
 		}
 	}
