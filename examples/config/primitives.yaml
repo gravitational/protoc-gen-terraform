@@ -1,7 +1,6 @@
 ---
 target_package_name: v1
 default_package_name: "github.com/gravitational/protoc-gen-terraform/v3/examples/types"
-use_state_for_unknown_by_default: true
 sort: true
 
 types:
@@ -9,3 +8,9 @@ types:
 
 computed_fields:
   - Primitives.id
+
+# Apply `UseStateForUnknown` for attribute values that should remain the same
+# after a resource update.
+plan_modifiers:
+  "Primitives.id":
+    - github.com/hashicorp/terraform-plugin-framework/tfsdk.UseStateForUnknown()
