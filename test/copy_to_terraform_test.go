@@ -444,3 +444,31 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 	require.Equal(t, "Test2", secondElem.Attrs["str"].(types.String).Value)
 	require.False(t, secondElem.Attrs["str"].(types.String).Unknown)
 }
+
+func TestCopyToCustomPreserveUnknown(t *testing.T) {
+	o := copyToTerraformObject(t)
+	o.Attrs["bool_custom_list"] = types.List{
+		Unknown: true,
+		Elems: []attr.Value{
+			types.Bool{Unknown: false, Value: false},
+			types.Bool{Unknown: true, Value: false},
+			types.Bool{Unknown: true, Value: true},
+		},
+		ElemType: types.BoolType,
+	}
+
+	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	requireNoDiagErrors(t, diags)
+
+	v := o.Attrs["bool_custom_list"].(types.List)
+
+	require.True(t, v.IsUnknown())
+	require.Equal(t,
+		[]attr.Value{
+			types.Bool{Null: false, Unknown: false, Value: false},
+			types.Bool{Null: false, Unknown: true, Value: false},
+			types.Bool{Null: false, Unknown: true, Value: true},
+		},
+		v.Elems,
+	)
+}

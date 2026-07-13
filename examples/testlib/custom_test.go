@@ -60,7 +60,7 @@ func (s *TerraformSuite) TestCustomNullValues() {
 					resource.TestCheckResourceAttr(name, "bool_custom", "false"),
 					resource.TestCheckNoResourceAttr(name, "bool_custom_list.0"),
 
-					resource.TestCheckNoResourceAttr(name, "string_override.0"),
+					resource.TestCheckResourceAttr(name, "string_override.0", ""),
 					resource.TestCheckResourceAttr(name, "schema_override", ""),
 				),
 			},
