@@ -1,6 +1,6 @@
 package v1
 
-import "github.com/gravitational/protoc-gen-terraform/v3/examples/types"
+import "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
 
 type DurationType = types.DurationType
 type DurationValue = types.DurationValue
