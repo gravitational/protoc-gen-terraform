@@ -15,7 +15,7 @@
 syntax = "proto3";
 package optional;
 
-option go_package = "github.com/gravitational/protoc-gen-terraform/v3/test/optional";
+option go_package = "github.com/gravitational/protoc-gen-terraform/v4/test/optional";
 
 // OptionalTest message contains proto3 optional fields and a real oneof to verify they are handled correctly.
 message OptionalTest {
