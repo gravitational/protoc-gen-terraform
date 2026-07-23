@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 
 	"github.com/gravitational/protoc-gen-terraform/v4/examples/types"
 )
 
-var _ tfsdk.Provider = &exampleProvider{}
+var _ provider.Provider = &exampleProvider{}
 
 type exampleProvider struct {
 	primitives map[string]*types.Primitives
@@ -18,7 +19,7 @@ type exampleProvider struct {
 	custom     map[string]*types.Custom
 }
 
-func New() tfsdk.Provider {
+func New() provider.Provider {
 	return &exampleProvider{
 		primitives: make(map[string]*types.Primitives),
 		time:       make(map[string]*types.Time),
@@ -33,20 +34,20 @@ func (p *exampleProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Dia
 }
 
 // Configure satisfies the provider.Provider interface for exampleProvider.
-func (p *exampleProvider) Configure(ctx context.Context, req tfsdk.ConfigureProviderRequest, resp *tfsdk.ConfigureProviderResponse) {
+func (p *exampleProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	// Nothing to configure
 }
 
 // GetDataSources satisfies the provider.Provider interface for exampleProvider.
-func (p *exampleProvider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSourceType, diag.Diagnostics) {
-	return map[string]tfsdk.DataSourceType{
+func (p *exampleProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
+	return map[string]provider.DataSourceType{
 		// TODO: Add example data source types
 	}, nil
 }
 
 // GetResources satisfies the provider.Provider interface for exampleProvider.
-func (p *exampleProvider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceType, diag.Diagnostics) {
-	return map[string]tfsdk.ResourceType{
+func (p *exampleProvider) GetResources(ctx context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
+	return map[string]provider.ResourceType{
 		"example_primitives": primitivesResourceType{},
 		"example_time":       timeResourceType{},
 		"example_objects":    objectsResourceType{},

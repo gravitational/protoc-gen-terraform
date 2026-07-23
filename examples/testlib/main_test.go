@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/gravitational/protoc-gen-terraform/v4/examples/testlib/provider"
+	providerlib "github.com/gravitational/protoc-gen-terraform/v4/examples/testlib/provider"
 )
 
 func TestTerraform(t *testing.T) {
@@ -22,14 +22,14 @@ func TestTerraform(t *testing.T) {
 type TerraformSuite struct {
 	suite.Suite
 
-	terraformProvider tfsdk.Provider
+	terraformProvider provider.Provider
 
 	terraformProviders map[string]func() (tfprotov6.ProviderServer, error)
 }
 
 func (s *TerraformSuite) SetupSuite() {
 	os.Setenv("TF_ACC", "true")
-	s.terraformProvider = provider.New()
+	s.terraformProvider = providerlib.New()
 	s.terraformProviders = make(map[string]func() (tfprotov6.ProviderServer, error))
 	s.terraformProviders["example"] = func() (tfprotov6.ProviderServer, error) {
 		return providerserver.NewProtocol6(s.terraformProvider)(), nil
