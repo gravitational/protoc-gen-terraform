@@ -40,9 +40,9 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attrs["id"] = types.String{Value: id}
-	plan.Attrs["computed"] = types.String{Value: "computed"}
-	plan.Attrs["injected"] = types.String{Value: "injected"}
+	plan.Attributes()["id"] = types.String{Value: id}
+	plan.Attributes()["computed"] = types.String{Value: "computed"}
+	plan.Attributes()["injected"] = types.String{Value: "injected"}
 
 	custom := &extypes.Custom{}
 	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)
@@ -140,7 +140,7 @@ func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanR
 
 	// Preserve the provider-managed ID, but rewrite all other fields from
 	// config so omitted or null values become explicit zero values in the plan.
-	id, hasID := plan.Attrs["id"]
+	id, hasID := plan.Attributes()["id"]
 
 	custom := &extypes.Custom{}
 	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)
@@ -154,7 +154,7 @@ func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanR
 	}
 
 	if hasID {
-		plan.Attrs["id"] = id
+		plan.Attributes()["id"] = id
 	}
 
 	resp.Diagnostics.Append(resp.Plan.Set(ctx, &plan)...)

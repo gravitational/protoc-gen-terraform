@@ -32,33 +32,33 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, "TestString", o.Attrs["str"].(types.String).Value)
-	require.False(t, o.Attrs["str"].(types.String).Unknown)
-	require.False(t, o.Attrs["str"].(types.String).Null)
+	require.Equal(t, "TestString", o.Attributes()["str"].(types.String).Value)
+	require.False(t, o.Attributes()["str"].(types.String).IsUnknown())
+	require.False(t, o.Attributes()["str"].(types.String).IsNull())
 
-	require.Equal(t, int64(888), o.Attrs["int32"].(types.Int64).Value)
-	require.False(t, o.Attrs["int32"].(types.Int64).Unknown)
-	require.False(t, o.Attrs["int32"].(types.Int64).Null)
+	require.Equal(t, int64(888), o.Attributes()["int32"].(types.Int64).Value)
+	require.False(t, o.Attributes()["int32"].(types.Int64).IsUnknown())
+	require.False(t, o.Attributes()["int32"].(types.Int64).IsNull())
 
-	require.Equal(t, int64(999), o.Attrs["int64"].(types.Int64).Value)
-	require.False(t, o.Attrs["int64"].(types.Int64).Unknown)
-	require.False(t, o.Attrs["int64"].(types.Int64).Null)
+	require.Equal(t, int64(999), o.Attributes()["int64"].(types.Int64).Value)
+	require.False(t, o.Attributes()["int64"].(types.Int64).IsUnknown())
+	require.False(t, o.Attributes()["int64"].(types.Int64).IsNull())
 
-	require.Equal(t, float64(88.5), o.Attrs["float"].(types.Float64).Value)
-	require.False(t, o.Attrs["float"].(types.Float64).Unknown)
-	require.False(t, o.Attrs["float"].(types.Float64).Null)
+	require.Equal(t, float64(88.5), o.Attributes()["float"].(types.Float64).Value)
+	require.False(t, o.Attributes()["float"].(types.Float64).IsUnknown())
+	require.False(t, o.Attributes()["float"].(types.Float64).IsNull())
 
-	require.Equal(t, float64(99.5), o.Attrs["double"].(types.Float64).Value)
-	require.False(t, o.Attrs["double"].(types.Float64).Unknown)
-	require.False(t, o.Attrs["double"].(types.Float64).Null)
+	require.Equal(t, float64(99.5), o.Attributes()["double"].(types.Float64).Value)
+	require.False(t, o.Attributes()["double"].(types.Float64).IsUnknown())
+	require.False(t, o.Attributes()["double"].(types.Float64).IsNull())
 
-	require.True(t, o.Attrs["bool"].(types.Bool).Value)
-	require.False(t, o.Attrs["bool"].(types.Bool).Unknown)
-	require.False(t, o.Attrs["bool"].(types.Bool).Null)
+	require.True(t, o.Attributes()["bool"].(types.Bool).Value)
+	require.False(t, o.Attributes()["bool"].(types.Bool).IsUnknown())
+	require.False(t, o.Attributes()["bool"].(types.Bool).IsNull())
 
-	require.Equal(t, "TestBytes", o.Attrs["bytes"].(types.String).Value)
-	require.False(t, o.Attrs["bytes"].(types.String).Unknown)
-	require.False(t, o.Attrs["bytes"].(types.String).Null)
+	require.Equal(t, "TestBytes", o.Attributes()["bytes"].(types.String).Value)
+	require.False(t, o.Attributes()["bytes"].(types.String).IsUnknown())
+	require.False(t, o.Attributes()["bytes"].(types.String).IsNull())
 }
 
 func TestCopyToTime(t *testing.T) {
@@ -67,14 +67,14 @@ func TestCopyToTime(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, timestamp, o.Attrs["timestamp"].(TimeValue).Value)
-	require.False(t, o.Attrs["timestamp"].(TimeValue).Unknown)
-	require.False(t, o.Attrs["timestamp"].(TimeValue).Null)
+	require.Equal(t, timestamp, o.Attributes()["timestamp"].(TimeValue).Value)
+	require.False(t, o.Attributes()["timestamp"].(TimeValue).IsUnknown())
+	require.False(t, o.Attributes()["timestamp"].(TimeValue).IsNull())
 
-	require.Equal(t, time.Time{}, o.Attrs["timestamp_missing"].(TimeValue).Value)
-	require.False(t, o.Attrs["timestamp_missing"].(TimeValue).Unknown)
+	require.Equal(t, time.Time{}, o.Attributes()["timestamp_missing"].(TimeValue).Value)
+	require.False(t, o.Attributes()["timestamp_missing"].(TimeValue).IsUnknown())
 	// Handle empty time value
-	// require.True(t, o.Attrs["timestamp_missing"].(TimeValue).Null)
+	// require.True(t, o.Attributes()["timestamp_missing"].(TimeValue).IsNull())
 }
 
 func TestCopyToDuration(t *testing.T) {
@@ -83,13 +83,13 @@ func TestCopyToDuration(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, duration, o.Attrs["duration_standard"].(DurationValue).Value)
-	require.False(t, o.Attrs["duration_standard"].(DurationValue).Unknown)
-	require.False(t, o.Attrs["duration_standard"].(DurationValue).Null)
+	require.Equal(t, duration, o.Attributes()["duration_standard"].(DurationValue).Value)
+	require.False(t, o.Attributes()["duration_standard"].(DurationValue).IsUnknown())
+	require.False(t, o.Attributes()["duration_standard"].(DurationValue).IsNull())
 
-	require.Equal(t, duration, o.Attrs["duration_custom"].(DurationValue).Value)
-	require.False(t, o.Attrs["duration_custom"].(DurationValue).Unknown)
-	require.False(t, o.Attrs["duration_custom"].(DurationValue).Null)
+	require.Equal(t, duration, o.Attributes()["duration_custom"].(DurationValue).Value)
+	require.False(t, o.Attributes()["duration_custom"].(DurationValue).IsUnknown())
+	require.False(t, o.Attributes()["duration_custom"].(DurationValue).IsNull())
 }
 
 func TestCopyToNested(t *testing.T) {
@@ -101,16 +101,16 @@ func TestCopyToNested(t *testing.T) {
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "TestString"},
-		o.Attrs["nested"].(types.Object).Attrs["str"].(types.String),
+		o.Attributes()["nested"].(types.Object).Attributes()["str"].(types.String),
 	)
 
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "TestString"},
-		o.Attrs["nested_nullable"].(types.Object).Attrs["str"].(types.String),
+		o.Attributes()["nested_nullable"].(types.Object).Attributes()["str"].(types.String),
 	)
 
-	require.True(t, o.Attrs["nested_nullable_with_nil_value"].(types.Object).Null)
+	require.True(t, o.Attributes()["nested_nullable_with_nil_value"].(types.Object).IsNull())
 }
 
 func TestCopyToList(t *testing.T) {
@@ -122,29 +122,29 @@ func TestCopyToList(t *testing.T) {
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "el1"},
 		types.String{Null: false, Unknown: false, Value: "el2"},
-	}, o.Attrs["string_list"].(types.List).Elems)
+	}, o.Attributes()["string_list"].(types.List).Elements())
 
 	require.Equal(t, types.List{
 		Null:     false,
 		Unknown:  false,
 		Elems:    make([]attr.Value, 0),
 		ElemType: types.StringType,
-	}, o.Attrs["string_list_empty"].(types.List))
+	}, o.Attributes()["string_list_empty"].(types.List))
 
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "bytes1"},
 		types.String{Null: false, Unknown: false, Value: "bytes2"},
-	}, o.Attrs["bytes_list"].(types.List).Elems)
+	}, o.Attributes()["bytes_list"].(types.List).Elements())
 
 	require.Equal(t, []attr.Value{
 		TimeValue{Null: false, Unknown: false, Value: timestamp, Format: time.RFC3339},
 		TimeValue{Null: false, Unknown: false, Value: timestamp, Format: time.RFC3339},
-	}, o.Attrs["timestamp_list"].(types.List).Elems)
+	}, o.Attributes()["timestamp_list"].(types.List).Elements())
 
 	require.Equal(t, []attr.Value{
 		DurationValue{Null: false, Unknown: false, Value: duration},
 		DurationValue{Null: false, Unknown: false, Value: duration},
-	}, o.Attrs["duration_custom_list"].(types.List).Elems)
+	}, o.Attributes()["duration_custom_list"].(types.List).Elements())
 }
 
 func TestCopyTo_ChangeListSize(t *testing.T) {
@@ -159,7 +159,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "el1"},
 		types.String{Null: false, Unknown: false, Value: "el2"},
-	}, o.Attrs["string_list"].(types.List).Elems)
+	}, o.Attributes()["string_list"].(types.List).Elements())
 
 	// Increase to 3, array access must not panic.
 	testObject.StringList = []string{"el1", "el2", "el3"}
@@ -170,7 +170,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 		types.String{Null: false, Unknown: false, Value: "el1"},
 		types.String{Null: false, Unknown: false, Value: "el2"},
 		types.String{Null: false, Unknown: false, Value: "el3"},
-	}, o.Attrs["string_list"].(types.List).Elems)
+	}, o.Attributes()["string_list"].(types.List).Elements())
 
 	// Decrease to a single element, others should be removed.
 	testObject.StringList = []string{"elX"}
@@ -179,7 +179,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 
 	require.Equal(t, []attr.Value{
 		types.String{Null: false, Unknown: false, Value: "elX"},
-	}, o.Attrs["string_list"].(types.List).Elems)
+	}, o.Attributes()["string_list"].(types.List).Elements())
 }
 
 func TestCopyToNestedList(t *testing.T) {
@@ -188,63 +188,63 @@ func TestCopyToNestedList(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	nestedList := o.Attrs["nested_list"].(types.List)
-	firstEl := nestedList.Elems[0].(types.Object)
+	nestedList := o.Attributes()["nested_list"].(types.List)
+	firstEl := nestedList.Elements()[0].(types.Object)
 
-	require.Len(t, nestedList.Elems, 1)
+	require.Len(t, nestedList.Elements(), 1)
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test"},
-		firstEl.Attrs["str"],
+		firstEl.Attributes()["str"],
 	)
 
-	nestedNestedList := o.Attrs["nested_list"].(types.List).Elems[0].(types.Object).Attrs["nested_list"].(types.List)
+	nestedNestedList := o.Attributes()["nested_list"].(types.List).Elements()[0].(types.Object).Attributes()["nested_list"].(types.List)
 
-	require.Len(t, nestedNestedList.Elems, 2)
+	require.Len(t, nestedNestedList.Elements(), 2)
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test1"},
-		nestedNestedList.Elems[0].(types.Object).Attrs["str"],
+		nestedNestedList.Elements()[0].(types.Object).Attributes()["str"],
 	)
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test2"},
-		nestedNestedList.Elems[1].(types.Object).Attrs["str"],
+		nestedNestedList.Elements()[1].(types.Object).Attributes()["str"],
 	)
 
-	nestedMap := firstEl.Attrs["map"].(types.Map)
+	nestedMap := firstEl.Attributes()["map"].(types.Map)
 
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "value1"},
-		nestedMap.Elems["key1"].(types.String),
+		nestedMap.Elements()["key1"].(types.String),
 	)
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "value2"},
-		nestedMap.Elems["key2"].(types.String),
+		nestedMap.Elements()["key2"].(types.String),
 	)
 
-	nestedMapObject := firstEl.Attrs["map_object_nested"].(types.Map)
+	nestedMapObject := firstEl.Attributes()["map_object_nested"].(types.Map)
 
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test1"},
-		nestedMapObject.Elems["key1"].(types.Object).Attrs["str"].(types.String),
+		nestedMapObject.Elements()["key1"].(types.Object).Attributes()["str"].(types.String),
 	)
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test2"},
-		nestedMapObject.Elems["key2"].(types.Object).Attrs["str"].(types.String),
+		nestedMapObject.Elements()["key2"].(types.Object).Attributes()["str"].(types.String),
 	)
 
-	nestedListNullable := o.Attrs["nested_list_nullable"].(types.List)
+	nestedListNullable := o.Attributes()["nested_list_nullable"].(types.List)
 
-	require.Len(t, nestedListNullable.Elems, 1)
+	require.Len(t, nestedListNullable.Elements(), 1)
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test"},
-		nestedListNullable.Elems[0].(types.Object).Attrs["str"],
+		nestedListNullable.Elements()[0].(types.Object).Attributes()["str"],
 	)
 }
 
@@ -254,7 +254,7 @@ func TestCopyToMap(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	m := o.Attrs["map"].(types.Map).Elems
+	m := o.Attributes()["map"].(types.Map).Elements()
 
 	require.Equal(t, types.String{Null: false, Unknown: false, Value: "value1"}, m["key1"].(types.String))
 	require.Equal(t, types.String{Null: false, Unknown: false, Value: "value2"}, m["key2"].(types.String))
@@ -273,7 +273,7 @@ func TestCopyToCustom(t *testing.T) {
 			types.Bool{Null: false, Unknown: false, Value: false},
 			types.Bool{Null: false, Unknown: false, Value: true},
 		},
-		o.Attrs["bool_custom_list"].(types.List).Elems,
+		o.Attributes()["bool_custom_list"].(types.List).Elements(),
 	)
 }
 
@@ -288,7 +288,7 @@ func TestCopyToOneOfBranch3(t *testing.T) {
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "Test"},
-		o.Attrs["branch3"].(types.String),
+		o.Attributes()["branch3"].(types.String),
 	)
 }
 
@@ -303,7 +303,7 @@ func TestCopyToOneOfBranch2(t *testing.T) {
 	require.Equal(
 		t,
 		types.Int64{Null: false, Unknown: false, Value: 5},
-		o.Attrs["branch2"].(types.Object).Attrs["int32"],
+		o.Attributes()["branch2"].(types.Object).Attributes()["int32"],
 	)
 }
 
@@ -314,9 +314,9 @@ func TestCopyToOneOfNoBranch(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
-	require.True(t, o.Attrs["branch1"].(types.Object).Null)
-	require.True(t, o.Attrs["branch2"].(types.Object).Null)
-	require.True(t, o.Attrs["branch3"].(types.String).Null)
+	require.True(t, o.Attributes()["branch1"].(types.Object).IsNull())
+	require.True(t, o.Attributes()["branch2"].(types.Object).IsNull())
+	require.True(t, o.Attributes()["branch3"].(types.String).IsNull())
 }
 
 func TestCopyToEmbeddedField(t *testing.T) {
@@ -326,11 +326,11 @@ func TestCopyToEmbeddedField(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, "embdtest1", o.Attrs["embedded_string"].(types.String).Value)
-	require.False(t, o.Attrs["embedded_string"].(types.String).Unknown)
-	require.False(t, o.Attrs["embedded_string"].(types.String).Null)
+	require.Equal(t, "embdtest1", o.Attributes()["embedded_string"].(types.String).Value)
+	require.False(t, o.Attributes()["embedded_string"].(types.String).IsUnknown())
+	require.False(t, o.Attributes()["embedded_string"].(types.String).IsNull())
 
-	require.Equal(t, "embdtest2", o.Attrs["embedded_nested_field"].(types.Object).Attrs["embedded_nested_string"].(types.String).Value)
+	require.Equal(t, "embdtest2", o.Attributes()["embedded_nested_field"].(types.Object).Attributes()["embedded_nested_string"].(types.String).Value)
 }
 
 func TestCopyToOneOfLowercase(t *testing.T) {
@@ -344,19 +344,19 @@ func TestCopyToOneOfLowercase(t *testing.T) {
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "1234"},
-		o.Attrs["foo"].(types.String),
+		o.Attributes()["foo"].(types.String),
 	)
 }
 
 func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	nestedNullableType, ok := o.AttrTypes["nested_nullable"].(types.ObjectType)
+	nestedNullableType, ok := o.AttributeTypes(t.Context())["nested_nullable"].(types.ObjectType)
 	require.True(t, ok)
 
-	o.Attrs["nested_nullable"] = types.Object{
+	o.Attributes()["nested_nullable"] = types.Object{
 		Null:      true,
-		AttrTypes: nestedNullableType.AttrTypes,
+		AttrTypes: nestedNullableType.AttributeTypes(),
 	}
 
 	testObj := createTestObj()
@@ -367,50 +367,50 @@ func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
-	nestedNullable := o.Attrs["nested_nullable"].(types.Object)
-	require.False(t, nestedNullable.Null)
-	require.False(t, nestedNullable.Unknown)
+	nestedNullable := o.Attributes()["nested_nullable"].(types.Object)
+	require.False(t, nestedNullable.IsNull())
+	require.False(t, nestedNullable.IsUnknown())
 	require.Equal(
 		t,
 		types.String{Null: false, Unknown: false, Value: "TestString"},
-		nestedNullable.Attrs["str"].(types.String),
+		nestedNullable.Attributes()["str"].(types.String),
 	)
 }
 
 func TestCopyToTerraformPreserveUnknown(t *testing.T) {
 	o := copyToTerraformObject(t)
-	o.Attrs["str"] = types.String{Unknown: true, Value: "stale"}
+	o.Attributes()["str"] = types.String{Unknown: true, Value: "stale"}
 
 	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
-	v := o.Attrs["str"].(types.String)
-	require.True(t, v.Unknown)
-	require.False(t, v.Null)
+	v := o.Attributes()["str"].(types.String)
+	require.True(t, v.IsUnknown())
+	require.False(t, v.IsNull())
 	require.Equal(t, "TestString", v.Value)
 }
 
 func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	nestedType, ok := o.AttrTypes["nested"].(types.ObjectType)
+	nestedType, ok := o.AttributeTypes(t.Context())["nested"].(types.ObjectType)
 	require.True(t, ok)
 
-	nestedListType, ok := nestedType.AttrTypes["nested_list"].(types.ListType)
+	nestedListType, ok := nestedType.AttributeTypes()["nested_list"].(types.ListType)
 	require.True(t, ok)
 
-	o.Attrs["nested"] = types.Object{
+	o.Attributes()["nested"] = types.Object{
 		Unknown:   true,
-		AttrTypes: nestedType.AttrTypes,
+		AttrTypes: nestedType.AttributeTypes(),
 		Attrs: map[string]attr.Value{
 			"str": types.String{Unknown: true, Value: "stale"},
 			"nested_list": types.List{
 				Unknown:  true,
-				ElemType: nestedListType.ElemType,
+				ElemType: nestedListType.ElementType(),
 				Elems: []attr.Value{
 					types.Object{
 						Unknown:   true,
-						AttrTypes: nestedListType.ElemType.(types.ObjectType).AttrTypes,
+						AttrTypes: nestedListType.ElementType().(types.ObjectType).AttributeTypes(),
 						Attrs: map[string]attr.Value{
 							"str": types.String{Unknown: true, Value: "stale"},
 						},
@@ -423,31 +423,31 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
-	nested := o.Attrs["nested"].(types.Object)
-	require.True(t, nested.Unknown)
+	nested := o.Attributes()["nested"].(types.Object)
+	require.True(t, nested.IsUnknown())
 
-	str := nested.Attrs["str"].(types.String)
-	require.True(t, str.Unknown)
+	str := nested.Attributes()["str"].(types.String)
+	require.True(t, str.IsUnknown())
 	require.Equal(t, "TestString", str.Value)
 
-	nestedList := nested.Attrs["nested_list"].(types.List)
-	require.True(t, nestedList.Unknown)
-	require.Len(t, nestedList.Elems, 2)
+	nestedList := nested.Attributes()["nested_list"].(types.List)
+	require.True(t, nestedList.IsUnknown())
+	require.Len(t, nestedList.Elements(), 2)
 
-	firstElem := nestedList.Elems[0].(types.Object)
-	require.True(t, firstElem.Unknown)
-	require.Equal(t, "Test1", firstElem.Attrs["str"].(types.String).Value)
-	require.True(t, firstElem.Attrs["str"].(types.String).Unknown)
+	firstElem := nestedList.Elements()[0].(types.Object)
+	require.True(t, firstElem.IsUnknown())
+	require.Equal(t, "Test1", firstElem.Attributes()["str"].(types.String).Value)
+	require.True(t, firstElem.Attributes()["str"].(types.String).IsUnknown())
 
-	secondElem := nestedList.Elems[1].(types.Object)
-	require.False(t, secondElem.Unknown)
-	require.Equal(t, "Test2", secondElem.Attrs["str"].(types.String).Value)
-	require.False(t, secondElem.Attrs["str"].(types.String).Unknown)
+	secondElem := nestedList.Elements()[1].(types.Object)
+	require.False(t, secondElem.IsUnknown())
+	require.Equal(t, "Test2", secondElem.Attributes()["str"].(types.String).Value)
+	require.False(t, secondElem.Attributes()["str"].(types.String).IsUnknown())
 }
 
 func TestCopyToCustomPreserveUnknown(t *testing.T) {
 	o := copyToTerraformObject(t)
-	o.Attrs["bool_custom_list"] = types.List{
+	o.Attributes()["bool_custom_list"] = types.List{
 		Unknown: true,
 		Elems: []attr.Value{
 			types.Bool{Unknown: false, Value: false},
@@ -460,7 +460,7 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
-	v := o.Attrs["bool_custom_list"].(types.List)
+	v := o.Attributes()["bool_custom_list"].(types.List)
 
 	require.True(t, v.IsUnknown())
 	require.Equal(t,
@@ -469,6 +469,6 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 			types.Bool{Null: false, Unknown: true, Value: false},
 			types.Bool{Null: false, Unknown: true, Value: true},
 		},
-		v.Elems,
+		v.Elements(),
 	)
 }

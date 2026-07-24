@@ -95,10 +95,10 @@ func (t TimeValue) Type(_ context.Context) attr.Type {
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
 func (t TimeValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
-	if t.Null {
+	if t.IsNull() {
 		return tftypes.NewValue(tftypes.String, nil), nil
 	}
-	if t.Unknown {
+	if t.IsUnknown() {
 		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
 	}
 
@@ -111,13 +111,13 @@ func (t TimeValue) Equal(other attr.Value) bool {
 	if !ok {
 		return false
 	}
-	if t.Unknown != o.Unknown {
+	if t.IsUnknown() != o.IsUnknown() {
 		return false
 	}
-	if t.Null != o.Null {
+	if t.IsNull() != o.IsNull() {
 		return false
 	}
-	return t.Value == o.Value
+	return t.Value.Equal(o.Value)
 }
 
 // IsNull returns true if receiver is null
@@ -132,11 +132,11 @@ func (t TimeValue) IsUnknown() bool {
 
 // String returns the string representation of the receiver
 func (t TimeValue) String() string {
-	if t.Unknown {
+	if t.IsUnknown() {
 		return attr.UnknownValueString
 	}
 
-	if t.Null {
+	if t.IsNull() {
 		return attr.NullValueString
 	}
 
@@ -217,10 +217,10 @@ func (t DurationValue) Type(_ context.Context) attr.Type {
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
 func (t DurationValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
-	if t.Null {
+	if t.IsNull() {
 		return tftypes.NewValue(tftypes.String, nil), nil
 	}
-	if t.Unknown {
+	if t.IsUnknown() {
 		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
 	}
 	return tftypes.NewValue(tftypes.String, t.Value.String()), nil
@@ -232,10 +232,10 @@ func (t DurationValue) Equal(other attr.Value) bool {
 	if !ok {
 		return false
 	}
-	if t.Unknown != o.Unknown {
+	if t.IsUnknown() != o.IsUnknown() {
 		return false
 	}
-	if t.Null != o.Null {
+	if t.IsNull() != o.IsNull() {
 		return false
 	}
 	return t.Value == o.Value
@@ -253,11 +253,11 @@ func (t DurationValue) IsUnknown() bool {
 
 // String returns the string representation of the receiver
 func (t DurationValue) String() string {
-	if t.Unknown {
+	if t.IsUnknown() {
 		return attr.UnknownValueString
 	}
 
-	if t.Null {
+	if t.IsNull() {
 		return attr.NullValueString
 	}
 

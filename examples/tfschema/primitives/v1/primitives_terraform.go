@@ -168,7 +168,7 @@ func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_pl
 func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
-		a, ok := tf.Attrs["bool_list"]
+		a, ok := tf.Attributes()["bool_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.bool_list"})
 		} else {
@@ -176,15 +176,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.BoolList = make([]bool, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.BoolList = make([]bool, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.bool_list", "github_com_hashicorp_terraform_plugin_framework_types.Bool"})
 						} else {
 							var t bool
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = bool(v.Value)
 							}
 							obj.BoolList[k] = t
@@ -195,7 +195,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["bool_value"]
+		a, ok := tf.Attributes()["bool_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.bool_value"})
 		} else {
@@ -204,7 +204,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 			} else {
 				var t bool
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = bool(v.Value)
 				}
 				obj.BoolValue = t
@@ -212,7 +212,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["bytes_list"]
+		a, ok := tf.Attributes()["bytes_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.bytes_list"})
 		} else {
@@ -220,15 +220,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.BytesList = make([][]byte, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.BytesList = make([][]byte, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.bytes_list", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 						} else {
 							var t []byte
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = []byte(v.Value)
 							}
 							obj.BytesList[k] = t
@@ -239,7 +239,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["bytes_value"]
+		a, ok := tf.Attributes()["bytes_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.bytes_value"})
 		} else {
@@ -248,7 +248,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t []byte
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = []byte(v.Value)
 				}
 				obj.BytesValue = t
@@ -256,7 +256,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["double_list"]
+		a, ok := tf.Attributes()["double_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.double_list"})
 		} else {
@@ -264,15 +264,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.DoubleList = make([]float64, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.DoubleList = make([]float64, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.double_list", "github_com_hashicorp_terraform_plugin_framework_types.Float64"})
 						} else {
 							var t float64
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = float64(v.Value)
 							}
 							obj.DoubleList[k] = t
@@ -283,7 +283,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["double_value"]
+		a, ok := tf.Attributes()["double_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.double_value"})
 		} else {
@@ -292,7 +292,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 			} else {
 				var t float64
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = float64(v.Value)
 				}
 				obj.DoubleValue = t
@@ -300,7 +300,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["enum_list"]
+		a, ok := tf.Attributes()["enum_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.enum_list"})
 		} else {
@@ -308,15 +308,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.EnumList = make([]github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.EnumList = make([]github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.enum_list", "github_com_hashicorp_terraform_plugin_framework_types.Int64"})
 						} else {
 							var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.Value)
 							}
 							obj.EnumList[k] = t
@@ -327,7 +327,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["enum_value"]
+		a, ok := tf.Attributes()["enum_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.enum_value"})
 		} else {
@@ -336,7 +336,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
 				var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.Value)
 				}
 				obj.EnumValue = t
@@ -344,7 +344,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["float_list"]
+		a, ok := tf.Attributes()["float_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.float_list"})
 		} else {
@@ -352,15 +352,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.FloatList = make([]float32, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.FloatList = make([]float32, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.float_list", "github_com_hashicorp_terraform_plugin_framework_types.Float64"})
 						} else {
 							var t float32
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = float32(v.Value)
 							}
 							obj.FloatList[k] = t
@@ -371,7 +371,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["float_value"]
+		a, ok := tf.Attributes()["float_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.float_value"})
 		} else {
@@ -380,7 +380,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 			} else {
 				var t float32
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = float32(v.Value)
 				}
 				obj.FloatValue = t
@@ -388,7 +388,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["id"]
+		a, ok := tf.Attributes()["id"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.id"})
 		} else {
@@ -397,7 +397,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.Id = t
@@ -405,7 +405,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["int32_list"]
+		a, ok := tf.Attributes()["int32_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.int32_list"})
 		} else {
@@ -413,15 +413,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.Int32List = make([]int32, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.Int32List = make([]int32, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.int32_list", "github_com_hashicorp_terraform_plugin_framework_types.Int64"})
 						} else {
 							var t int32
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = int32(v.Value)
 							}
 							obj.Int32List[k] = t
@@ -432,7 +432,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["int32_value"]
+		a, ok := tf.Attributes()["int32_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.int32_value"})
 		} else {
@@ -441,7 +441,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
 				var t int32
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = int32(v.Value)
 				}
 				obj.Int32Value = t
@@ -449,7 +449,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["int64_list"]
+		a, ok := tf.Attributes()["int64_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.int64_list"})
 		} else {
@@ -457,15 +457,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.Int64List = make([]int64, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.Int64List = make([]int64, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.int64_list", "github_com_hashicorp_terraform_plugin_framework_types.Int64"})
 						} else {
 							var t int64
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = int64(v.Value)
 							}
 							obj.Int64List[k] = t
@@ -476,7 +476,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["int64_value"]
+		a, ok := tf.Attributes()["int64_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.int64_value"})
 		} else {
@@ -485,7 +485,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
 				var t int64
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = int64(v.Value)
 				}
 				obj.Int64Value = t
@@ -493,7 +493,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["string_list"]
+		a, ok := tf.Attributes()["string_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.string_list"})
 		} else {
@@ -501,15 +501,15 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.StringList = make([]string, len(v.Elems))
-				if !v.Null && !v.Unknown {
-					for k, a := range v.Elems {
+				obj.StringList = make([]string, len(v.Elements()))
+				if !v.IsNull() && !v.IsUnknown() {
+					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.string_list", "github_com_hashicorp_terraform_plugin_framework_types.String"})
 						} else {
 							var t string
-							if !v.Null && !v.Unknown {
+							if !v.IsNull() && !v.IsUnknown() {
 								t = string(v.Value)
 							}
 							obj.StringList[k] = t
@@ -520,7 +520,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 		}
 	}
 	{
-		a, ok := tf.Attrs["string_value"]
+		a, ok := tf.Attributes()["string_value"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Primitives.string_value"})
 		} else {
@@ -529,7 +529,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 				diags.Append(attrReadConversionFailureDiag{"Primitives.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.StringValue = t
@@ -550,11 +550,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
-	if tf.Attrs == nil {
+	if tf.Attributes() == nil {
 		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
 	}
 	{
-		a, ok := tf.AttrTypes["bool_list"]
+		a, ok := tf.AttributeTypes(ctx)["bool_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.bool_list"})
 		} else {
@@ -562,30 +562,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["bool_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["bool_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.BoolList) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.BoolList) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolList))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.BoolList {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bool_list", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -603,25 +603,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["bool_list"] = c
+				tf.Attributes()["bool_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["bool_value"]
+		t, ok := tf.AttributeTypes(ctx)["bool_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.bool_value"})
 		} else {
-			v, ok := tf.Attrs["bool_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
+			v, ok := tf.Attributes()["bool_value"].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 			if !ok {
-				if tf.Attrs["bool_value"] != nil {
+				if tf.Attributes()["bool_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bool_value", "github.com/hashicorp/terraform-plugin-framework/types.Bool"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -639,11 +639,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["bool_value"] = v
+			tf.Attributes()["bool_value"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["bytes_list"]
+		a, ok := tf.AttributeTypes(ctx)["bytes_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.bytes_list"})
 		} else {
@@ -651,30 +651,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["bytes_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["bytes_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.BytesList) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.BytesList) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BytesList))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.BytesList {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bytes_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -692,25 +692,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["bytes_list"] = c
+				tf.Attributes()["bytes_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["bytes_value"]
+		t, ok := tf.AttributeTypes(ctx)["bytes_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.bytes_value"})
 		} else {
-			v, ok := tf.Attrs["bytes_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["bytes_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["bytes_value"] != nil {
+				if tf.Attributes()["bytes_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.bytes_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -728,11 +728,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["bytes_value"] = v
+			tf.Attributes()["bytes_value"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["double_list"]
+		a, ok := tf.AttributeTypes(ctx)["double_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.double_list"})
 		} else {
@@ -740,30 +740,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["double_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["double_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.DoubleList) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.DoubleList) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DoubleList))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.DoubleList {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.double_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -781,25 +781,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["double_list"] = c
+				tf.Attributes()["double_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["double_value"]
+		t, ok := tf.AttributeTypes(ctx)["double_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.double_value"})
 		} else {
-			v, ok := tf.Attrs["double_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+			v, ok := tf.Attributes()["double_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				if tf.Attrs["double_value"] != nil {
+				if tf.Attributes()["double_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.double_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -817,11 +817,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["double_value"] = v
+			tf.Attributes()["double_value"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["enum_list"]
+		a, ok := tf.AttributeTypes(ctx)["enum_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.enum_list"})
 		} else {
@@ -829,30 +829,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["enum_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["enum_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.EnumList) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.EnumList) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.EnumList))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.EnumList {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -870,25 +870,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["enum_list"] = c
+				tf.Attributes()["enum_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["enum_value"]
+		t, ok := tf.AttributeTypes(ctx)["enum_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.enum_value"})
 		} else {
-			v, ok := tf.Attrs["enum_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			v, ok := tf.Attributes()["enum_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				if tf.Attrs["enum_value"] != nil {
+				if tf.Attributes()["enum_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -906,11 +906,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["enum_value"] = v
+			tf.Attributes()["enum_value"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["float_list"]
+		a, ok := tf.AttributeTypes(ctx)["float_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.float_list"})
 		} else {
@@ -918,30 +918,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["float_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["float_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.FloatList) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.FloatList) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.FloatList))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.FloatList {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.float_list", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -959,25 +959,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["float_list"] = c
+				tf.Attributes()["float_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["float_value"]
+		t, ok := tf.AttributeTypes(ctx)["float_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.float_value"})
 		} else {
-			v, ok := tf.Attrs["float_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
+			v, ok := tf.Attributes()["float_value"].(github_com_hashicorp_terraform_plugin_framework_types.Float64)
 			if !ok {
-				if tf.Attrs["float_value"] != nil {
+				if tf.Attributes()["float_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.float_value", "github.com/hashicorp/terraform-plugin-framework/types.Float64"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -995,17 +995,17 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["float_value"] = v
+			tf.Attributes()["float_value"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["id"]
+		t, ok := tf.AttributeTypes(ctx)["id"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.id"})
 		} else {
-			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["id"] != nil {
+				if tf.Attributes()["id"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1023,11 +1023,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["id"] = v
+			tf.Attributes()["id"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["int32_list"]
+		a, ok := tf.AttributeTypes(ctx)["int32_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.int32_list"})
 		} else {
@@ -1035,30 +1035,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["int32_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["int32_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.Int32List) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.Int32List) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int32List))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.Int32List {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int32_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1076,25 +1076,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["int32_list"] = c
+				tf.Attributes()["int32_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["int32_value"]
+		t, ok := tf.AttributeTypes(ctx)["int32_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.int32_value"})
 		} else {
-			v, ok := tf.Attrs["int32_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			v, ok := tf.Attributes()["int32_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				if tf.Attrs["int32_value"] != nil {
+				if tf.Attributes()["int32_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int32_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1112,11 +1112,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["int32_value"] = v
+			tf.Attributes()["int32_value"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["int64_list"]
+		a, ok := tf.AttributeTypes(ctx)["int64_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.int64_list"})
 		} else {
@@ -1124,30 +1124,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["int64_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["int64_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.Int64List) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.Int64List) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.Int64List))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.Int64List {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int64_list", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1165,25 +1165,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["int64_list"] = c
+				tf.Attributes()["int64_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["int64_value"]
+		t, ok := tf.AttributeTypes(ctx)["int64_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.int64_value"})
 		} else {
-			v, ok := tf.Attrs["int64_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+			v, ok := tf.Attributes()["int64_value"].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 			if !ok {
-				if tf.Attrs["int64_value"] != nil {
+				if tf.Attributes()["int64_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.int64_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1201,11 +1201,11 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["int64_value"] = v
+			tf.Attributes()["int64_value"] = v
 		}
 	}
 	{
-		a, ok := tf.AttrTypes["string_list"]
+		a, ok := tf.AttributeTypes(ctx)["string_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.string_list"})
 		} else {
@@ -1213,30 +1213,30 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !ok {
 				diags.Append(attrWriteConversionFailureDiag{"Primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.ListType"})
 			} else {
-				c, ok := tf.Attrs["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
+				c, ok := tf.Attributes()["string_list"].(github_com_hashicorp_terraform_plugin_framework_types.List)
 				if !ok {
 					c = github_com_hashicorp_terraform_plugin_framework_types.List{
 
-						ElemType: o.ElemType,
+						ElemType: o.ElementType(),
 						Elems:    make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList)),
 						Null:     true,
 					}
 				} else {
-					if c.Elems == nil {
+					if c.Elements() == nil {
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
 					}
 				}
 				{
-					t := o.ElemType
-					if len(obj.StringList) != len(c.Elems) {
+					t := o.ElementType()
+					if len(obj.StringList) != len(c.Elements()) {
 						newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringList))
-						copy(newElems, c.Elems)
+						copy(newElems, c.Elements())
 						c.Elems = newElems
 					}
 					for k, a := range obj.StringList {
-						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
+						v, ok := c.Elements()[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
-							if c.Elems[k] != nil {
+							if c.Elements()[k] != nil {
 								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.string_list", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 							}
 							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1254,25 +1254,25 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 						if !preserveUnknown {
 							v.Unknown = false
 						}
-						c.Elems[k] = v
+						c.Elements()[k] = v
 					}
 				}
 				c.Null = false
 				if !preserveUnknown {
 					c.Unknown = false
 				}
-				tf.Attrs["string_list"] = c
+				tf.Attributes()["string_list"] = c
 			}
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["string_value"]
+		t, ok := tf.AttributeTypes(ctx)["string_value"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Primitives.string_value"})
 		} else {
-			v, ok := tf.Attrs["string_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["string_value"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["string_value"] != nil {
+				if tf.Attributes()["string_value"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Primitives.string_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -1290,7 +1290,7 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["string_value"] = v
+			tf.Attributes()["string_value"] = v
 		}
 	}
 	return diags
@@ -1310,7 +1310,7 @@ func (d attrReadMissingDiag) Summary() string {
 }
 
 func (d attrReadMissingDiag) Detail() string {
-	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attrs", d.Path)
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attributes", d.Path)
 }
 
 func (d attrReadMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
@@ -1353,7 +1353,7 @@ func (d attrWriteMissingDiag) Summary() string {
 }
 
 func (d attrWriteMissingDiag) Detail() string {
-	return fmt.Sprintf("A value for %v is missing in the source Terraform object AttrTypes", d.Path)
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object AttributeTypes", d.Path)
 }
 
 func (d attrWriteMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {

@@ -130,21 +130,21 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
-		a, ok := tf.Attrs["bool_custom"]
+		a, ok := tf.Attributes()["bool_custom"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.bool_custom"})
 		}
 		CopyFromBoolSpecial(diags, a, &obj.BoolCustom)
 	}
 	{
-		a, ok := tf.Attrs["bool_custom_list"]
+		a, ok := tf.Attributes()["bool_custom_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.bool_custom_list"})
 		}
 		CopyFromBoolSpecialList(diags, a, &obj.BoolCustomList)
 	}
 	{
-		a, ok := tf.Attrs["computed"]
+		a, ok := tf.Attributes()["computed"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.computed"})
 		} else {
@@ -153,7 +153,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.computed", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.Computed = t
@@ -161,7 +161,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["id"]
+		a, ok := tf.Attributes()["id"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.id"})
 		} else {
@@ -170,7 +170,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.Id = t
@@ -178,7 +178,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["custom_name_override"]
+		a, ok := tf.Attributes()["custom_name_override"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.name_override"})
 		} else {
@@ -187,7 +187,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.NameOverride = t
@@ -195,7 +195,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["plan_modifier"]
+		a, ok := tf.Attributes()["plan_modifier"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.plan_modifier"})
 		} else {
@@ -204,7 +204,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.PlanModifier = t
@@ -212,7 +212,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["required"]
+		a, ok := tf.Attributes()["required"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.required"})
 		} else {
@@ -221,7 +221,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.required", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.Required = t
@@ -229,7 +229,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["schema_override"]
+		a, ok := tf.Attributes()["schema_override"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.schema_override"})
 		} else {
@@ -238,7 +238,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.schema_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t OverrideCastType
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = OverrideCastType(v.Value)
 				}
 				obj.SchemaOverride = t
@@ -246,7 +246,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["sensitive"]
+		a, ok := tf.Attributes()["sensitive"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.sensitive"})
 		} else {
@@ -255,7 +255,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.sensitive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.Sensitive = t
@@ -263,14 +263,14 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 		}
 	}
 	{
-		a, ok := tf.Attrs["string_override"]
+		a, ok := tf.Attributes()["string_override"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.string_override"})
 		}
 		CopyFromStringCustom(diags, a, &obj.StringOverride)
 	}
 	{
-		a, ok := tf.Attrs["validated"]
+		a, ok := tf.Attributes()["validated"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Custom.validated"})
 		} else {
@@ -279,7 +279,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 				diags.Append(attrReadConversionFailureDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 			} else {
 				var t string
-				if !v.Null && !v.Unknown {
+				if !v.IsNull() && !v.IsUnknown() {
 					t = string(v.Value)
 				}
 				obj.Validated = t
@@ -300,35 +300,35 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	tf.Null = false
 	tf.Unknown = false
-	if tf.Attrs == nil {
+	if tf.Attributes() == nil {
 		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
 	}
 	{
-		t, ok := tf.AttrTypes["bool_custom"]
+		t, ok := tf.AttributeTypes(ctx)["bool_custom"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom"})
 		} else {
-			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, tf.Attrs["bool_custom"], preserveUnknown)
-			tf.Attrs["bool_custom"] = v
+			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, tf.Attributes()["bool_custom"], preserveUnknown)
+			tf.Attributes()["bool_custom"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["bool_custom_list"]
+		t, ok := tf.AttributeTypes(ctx)["bool_custom_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom_list"})
 		} else {
-			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"], preserveUnknown)
-			tf.Attrs["bool_custom_list"] = v
+			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, tf.Attributes()["bool_custom_list"], preserveUnknown)
+			tf.Attributes()["bool_custom_list"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["computed"]
+		t, ok := tf.AttributeTypes(ctx)["computed"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.computed"})
 		} else {
-			v, ok := tf.Attrs["computed"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["computed"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["computed"] != nil {
+				if tf.Attributes()["computed"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.computed", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -346,17 +346,17 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["computed"] = v
+			tf.Attributes()["computed"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["id"]
+		t, ok := tf.AttributeTypes(ctx)["id"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.id"})
 		} else {
-			v, ok := tf.Attrs["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["id"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["id"] != nil {
+				if tf.Attributes()["id"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -374,17 +374,17 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["id"] = v
+			tf.Attributes()["id"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["custom_name_override"]
+		t, ok := tf.AttributeTypes(ctx)["custom_name_override"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.name_override"})
 		} else {
-			v, ok := tf.Attrs["custom_name_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["custom_name_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["custom_name_override"] != nil {
+				if tf.Attributes()["custom_name_override"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -402,17 +402,17 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["custom_name_override"] = v
+			tf.Attributes()["custom_name_override"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["plan_modifier"]
+		t, ok := tf.AttributeTypes(ctx)["plan_modifier"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.plan_modifier"})
 		} else {
-			v, ok := tf.Attrs["plan_modifier"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["plan_modifier"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["plan_modifier"] != nil {
+				if tf.Attributes()["plan_modifier"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -430,17 +430,17 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["plan_modifier"] = v
+			tf.Attributes()["plan_modifier"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["required"]
+		t, ok := tf.AttributeTypes(ctx)["required"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.required"})
 		} else {
-			v, ok := tf.Attrs["required"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["required"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["required"] != nil {
+				if tf.Attributes()["required"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.required", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -458,17 +458,17 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["required"] = v
+			tf.Attributes()["required"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["schema_override"]
+		t, ok := tf.AttributeTypes(ctx)["schema_override"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.schema_override"})
 		} else {
-			v, ok := tf.Attrs["schema_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["schema_override"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["schema_override"] != nil {
+				if tf.Attributes()["schema_override"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.schema_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -486,17 +486,17 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["schema_override"] = v
+			tf.Attributes()["schema_override"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["sensitive"]
+		t, ok := tf.AttributeTypes(ctx)["sensitive"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.sensitive"})
 		} else {
-			v, ok := tf.Attrs["sensitive"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["sensitive"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["sensitive"] != nil {
+				if tf.Attributes()["sensitive"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.sensitive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -514,26 +514,26 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["sensitive"] = v
+			tf.Attributes()["sensitive"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["string_override"]
+		t, ok := tf.AttributeTypes(ctx)["string_override"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.string_override"})
 		} else {
-			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attrs["string_override"], preserveUnknown)
-			tf.Attrs["string_override"] = v
+			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attributes()["string_override"], preserveUnknown)
+			tf.Attributes()["string_override"] = v
 		}
 	}
 	{
-		t, ok := tf.AttrTypes["validated"]
+		t, ok := tf.AttributeTypes(ctx)["validated"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.validated"})
 		} else {
-			v, ok := tf.Attrs["validated"].(github_com_hashicorp_terraform_plugin_framework_types.String)
+			v, ok := tf.Attributes()["validated"].(github_com_hashicorp_terraform_plugin_framework_types.String)
 			if !ok {
-				if tf.Attrs["validated"] != nil {
+				if tf.Attributes()["validated"] != nil {
 					diags.Append(attrWriteUnexpectedExistingTypeDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 				i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
@@ -551,7 +551,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 			if !preserveUnknown {
 				v.Unknown = false
 			}
-			tf.Attrs["validated"] = v
+			tf.Attributes()["validated"] = v
 		}
 	}
 	return diags
@@ -571,7 +571,7 @@ func (d attrReadMissingDiag) Summary() string {
 }
 
 func (d attrReadMissingDiag) Detail() string {
-	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attrs", d.Path)
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object Attributes", d.Path)
 }
 
 func (d attrReadMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
@@ -614,7 +614,7 @@ func (d attrWriteMissingDiag) Summary() string {
 }
 
 func (d attrWriteMissingDiag) Detail() string {
-	return fmt.Sprintf("A value for %v is missing in the source Terraform object AttrTypes", d.Path)
+	return fmt.Sprintf("A value for %v is missing in the source Terraform object AttributeTypes", d.Path)
 }
 
 func (d attrWriteMissingDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {

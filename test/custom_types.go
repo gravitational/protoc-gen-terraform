@@ -42,15 +42,15 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 		return
 	}
 
-	arr := make([]BoolCustom, len(v.Elems))
-	for i, raw := range v.Elems {
+	arr := make([]BoolCustom, len(v.Elements()))
+	for i, raw := range v.Elements() {
 		el, ok := raw.(types.Bool)
 		if !ok {
 			diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", raw))
 			return
 		}
 
-		if !el.Null && !el.Unknown {
+		if !el.IsNull() && !el.IsUnknown() {
 			arr[i] = BoolCustom(el.Value)
 		}
 	}
@@ -69,19 +69,19 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v 
 	}
 	value.Unknown = preserveUnknown && value.IsUnknown()
 
-	if len(value.Elems) != len(obj) {
+	if len(value.Elements()) != len(obj) {
 		newElems := make([]attr.Value, len(obj))
-		copy(newElems, value.Elems)
+		copy(newElems, value.Elements())
 		value.Elems = newElems
 	}
 
 	for i, b := range obj {
 		elemUnknown := false
-		if value.Elems[i] != nil {
-			elemUnknown = preserveUnknown && value.Elems[i].IsUnknown()
+		if value.Elements()[i] != nil {
+			elemUnknown = preserveUnknown && value.Elements()[i].IsUnknown()
 		}
 
-		value.Elems[i] = types.Bool{
+		value.Elements()[i] = types.Bool{
 			Value:   bool(b),
 			Unknown: elemUnknown,
 		}
@@ -112,14 +112,14 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 	}
 
 	items := make([]string, 0)
-	for _, raw := range v.Elems {
+	for _, raw := range v.Elements() {
 		el, ok := raw.(types.String)
 		if !ok {
 			diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", raw))
 			return
 		}
 
-		if !el.Null && !el.Unknown {
+		if !el.IsNull() && !el.IsUnknown() {
 			items = append(items, el.Value)
 		}
 	}
@@ -141,19 +141,19 @@ func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.
 	value.Unknown = preserveUnknown && value.IsUnknown()
 
 	parts := strings.Split(obj, "/")
-	if len(value.Elems) != len(parts) {
+	if len(value.Elements()) != len(parts) {
 		newElems := make([]attr.Value, len(parts))
-		copy(newElems, value.Elems)
+		copy(newElems, value.Elements())
 		value.Elems = newElems
 	}
 
 	for i, b := range parts {
 		elemUnknown := false
-		if value.Elems[i] != nil {
-			elemUnknown = preserveUnknown && value.Elems[i].IsUnknown()
+		if value.Elements()[i] != nil {
+			elemUnknown = preserveUnknown && value.Elements()[i].IsUnknown()
 		}
 
-		value.Elems[i] = types.String{
+		value.Elements()[i] = types.String{
 			Value:   b,
 			Unknown: elemUnknown,
 		}
