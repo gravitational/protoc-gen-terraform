@@ -185,7 +185,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t bool
 							if !v.IsNull() && !v.IsUnknown() {
-								t = bool(v.Value)
+								t = (v.Value)
 							}
 							obj.BoolList[k] = t
 						}
@@ -205,7 +205,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t bool
 				if !v.IsNull() && !v.IsUnknown() {
-					t = bool(v.Value)
+					t = (v.Value)
 				}
 				obj.BoolValue = t
 			}
@@ -273,7 +273,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t float64
 							if !v.IsNull() && !v.IsUnknown() {
-								t = float64(v.Value)
+								t = (v.Value)
 							}
 							obj.DoubleList[k] = t
 						}
@@ -293,7 +293,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t float64
 				if !v.IsNull() && !v.IsUnknown() {
-					t = float64(v.Value)
+					t = (v.Value)
 				}
 				obj.DoubleValue = t
 			}
@@ -398,7 +398,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Id = t
 			}
@@ -466,7 +466,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t int64
 							if !v.IsNull() && !v.IsUnknown() {
-								t = int64(v.Value)
+								t = (v.Value)
 							}
 							obj.Int64List[k] = t
 						}
@@ -486,7 +486,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t int64
 				if !v.IsNull() && !v.IsUnknown() {
-					t = int64(v.Value)
+					t = (v.Value)
 				}
 				obj.Int64Value = t
 			}
@@ -510,7 +510,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = string(v.Value)
+								t = (v.Value)
 							}
 							obj.StringList[k] = t
 						}
@@ -530,7 +530,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.StringValue = t
 			}

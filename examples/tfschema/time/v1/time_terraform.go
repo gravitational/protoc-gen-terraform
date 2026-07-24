@@ -210,7 +210,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Id = t
 			}

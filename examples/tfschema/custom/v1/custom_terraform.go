@@ -154,7 +154,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Computed = t
 			}
@@ -171,7 +171,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Id = t
 			}
@@ -188,7 +188,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.NameOverride = t
 			}
@@ -205,7 +205,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.PlanModifier = t
 			}
@@ -222,7 +222,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Required = t
 			}
@@ -256,7 +256,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Sensitive = t
 			}
@@ -280,7 +280,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = string(v.Value)
+					t = (v.Value)
 				}
 				obj.Validated = t
 			}
