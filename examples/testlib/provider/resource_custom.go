@@ -73,7 +73,7 @@ func (r customResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	custom := r.p.custom[id.Value]
+	custom := r.p.custom[id.ValueString()]
 
 	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -119,7 +119,7 @@ func (r customResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		return
 	}
 
-	delete(r.p.custom, id.Value)
+	delete(r.p.custom, id.ValueString())
 }
 
 func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {

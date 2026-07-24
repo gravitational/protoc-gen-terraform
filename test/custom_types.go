@@ -51,7 +51,7 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 		}
 
 		if !el.IsNull() && !el.IsUnknown() {
-			arr[i] = BoolCustom(el.Value)
+			arr[i] = BoolCustom(el.ValueBool())
 		}
 	}
 
@@ -120,7 +120,7 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 		}
 
 		if !el.IsNull() && !el.IsUnknown() {
-			items = append(items, el.Value)
+			items = append(items, el.ValueString())
 		}
 	}
 

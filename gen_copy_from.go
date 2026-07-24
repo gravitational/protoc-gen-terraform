@@ -119,12 +119,15 @@ func (f *FieldCopyFromGenerator) genPrimitiveBody(g *j.Group) {
 	g.Var().Id("t").Id(f.i.WithType(f.GoElemType))
 	// if !v.IsNull() {
 	g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
+
+		val := j.Id("v." + f.ValueFromMethod).Call()
+
 		if !f.IsNullable {
 			// obj.Float = float32(v.Value)
-			g.Id("t").Op("=").Id(f.i.WithType(f.ValueCastFromType)).Parens(j.Id("v.Value"))
+			g.Id("t").Op("=").Id(f.i.WithType(f.ValueCastFromType)).Parens(val)
 		} else {
 			// c := float32(v.Value)
-			g.Id("c").Op(":=").Id(f.i.WithType(f.ValueCastFromType)).Parens(j.Id("v.Value"))
+			g.Id("c").Op(":=").Id(f.i.WithType(f.ValueCastFromType)).Parens(val)
 			// obj.Float = &c
 			g.Id("t").Op("=&").Id("c")
 		}

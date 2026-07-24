@@ -663,7 +663,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					obj.LowerSnakeOneof = &Test_Bar{Bar: t}
@@ -682,7 +682,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t bool
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueBool())
 				}
 				obj.Bool = t
 			}
@@ -720,7 +720,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							} else {
 								var t string
 								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.Value)
+									t = (v.ValueString())
 								}
 								obj.Str = t
 							}
@@ -755,7 +755,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							} else {
 								var t int32
 								if !v.IsNull() && !v.IsUnknown() {
-									t = int32(v.Value)
+									t = int32(v.ValueInt64())
 								}
 								obj.Int32 = t
 							}
@@ -776,7 +776,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					obj.OneOf = &Test_Branch3{Branch3: t}
@@ -795,7 +795,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t []byte
 				if !v.IsNull() && !v.IsUnknown() {
-					t = []byte(v.Value)
+					t = []byte(v.ValueString())
 				}
 				obj.Bytes = t
 			}
@@ -819,7 +819,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t []byte
 							if !v.IsNull() && !v.IsUnknown() {
-								t = []byte(v.Value)
+								t = []byte(v.ValueString())
 							}
 							obj.BytesList[k] = t
 						}
@@ -839,7 +839,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t float64
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueFloat64())
 				}
 				obj.Double = t
 			}
@@ -856,7 +856,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = Duration(v.Value)
+					t = Duration(v.ValueDuration())
 				}
 				obj.DurationCustom = t
 			}
@@ -880,7 +880,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t Duration
 							if !v.IsNull() && !v.IsUnknown() {
-								t = Duration(v.Value)
+								t = Duration(v.ValueDuration())
 							}
 							obj.DurationCustomList[k] = t
 						}
@@ -900,7 +900,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = Duration(v.Value)
+					t = Duration(v.ValueDuration())
 				}
 				obj.DurationCustomMissing = t
 			}
@@ -917,7 +917,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t time.Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = time.Duration(v.Value)
+					t = time.Duration(v.ValueDuration())
 				}
 				obj.DurationStandard = t
 			}
@@ -934,7 +934,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t time.Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = time.Duration(v.Value)
+					t = time.Duration(v.ValueDuration())
 				}
 				obj.DurationStandardMissing = t
 			}
@@ -965,7 +965,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							} else {
 								var t string
 								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.Value)
+									t = (v.ValueString())
 								}
 								obj.EmbeddedNestedString = t
 							}
@@ -986,7 +986,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.EmbeddedString = t
 			}
@@ -1019,7 +1019,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t float32
 				if !v.IsNull() && !v.IsUnknown() {
-					t = float32(v.Value)
+					t = float32(v.ValueFloat64())
 				}
 				obj.Float = t
 			}
@@ -1036,7 +1036,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					obj.LowerSnakeOneof = &Test_Foo{Foo: t}
@@ -1055,7 +1055,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t int32
 				if !v.IsNull() && !v.IsUnknown() {
-					t = int32(v.Value)
+					t = int32(v.ValueInt64())
 				}
 				obj.Int32 = t
 			}
@@ -1072,7 +1072,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t int64
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueInt64())
 				}
 				obj.Int64 = t
 			}
@@ -1096,7 +1096,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueString())
 							}
 							obj.Map[k] = t
 						}
@@ -1143,7 +1143,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 													} else {
 														var t string
 														if !v.IsNull() && !v.IsUnknown() {
-															t = (v.Value)
+															t = (v.ValueString())
 														}
 														obj.Map[k] = t
 													}
@@ -1183,7 +1183,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1229,7 +1229,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1254,7 +1254,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Str = t
 										}
@@ -1307,7 +1307,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 													} else {
 														var t string
 														if !v.IsNull() && !v.IsUnknown() {
-															t = (v.Value)
+															t = (v.ValueString())
 														}
 														obj.Map[k] = t
 													}
@@ -1347,7 +1347,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1393,7 +1393,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1418,7 +1418,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Str = t
 										}
@@ -1443,7 +1443,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t Mode
 				if !v.IsNull() && !v.IsUnknown() {
-					t = Mode(v.Value)
+					t = Mode(v.ValueInt64())
 				}
 				obj.Mode = t
 			}
@@ -1480,7 +1480,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Map[k] = t
 										}
@@ -1520,7 +1520,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 														} else {
 															var t string
 															if !v.IsNull() && !v.IsUnknown() {
-																t = (v.Value)
+																t = (v.ValueString())
 															}
 															obj.Str = t
 														}
@@ -1566,7 +1566,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 														} else {
 															var t string
 															if !v.IsNull() && !v.IsUnknown() {
-																t = (v.Value)
+																t = (v.ValueString())
 															}
 															obj.Str = t
 														}
@@ -1591,7 +1591,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							} else {
 								var t string
 								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.Value)
+									t = (v.ValueString())
 								}
 								obj.Str = t
 							}
@@ -1639,7 +1639,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 													} else {
 														var t string
 														if !v.IsNull() && !v.IsUnknown() {
-															t = (v.Value)
+															t = (v.ValueString())
 														}
 														obj.Map[k] = t
 													}
@@ -1679,7 +1679,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1725,7 +1725,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1750,7 +1750,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Str = t
 										}
@@ -1803,7 +1803,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 													} else {
 														var t string
 														if !v.IsNull() && !v.IsUnknown() {
-															t = (v.Value)
+															t = (v.ValueString())
 														}
 														obj.Map[k] = t
 													}
@@ -1843,7 +1843,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1889,7 +1889,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 																	} else {
 																		var t string
 																		if !v.IsNull() && !v.IsUnknown() {
-																			t = (v.Value)
+																			t = (v.ValueString())
 																		}
 																		obj.Str = t
 																	}
@@ -1914,7 +1914,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Str = t
 										}
@@ -1960,7 +1960,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Map[k] = t
 										}
@@ -2000,7 +2000,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 														} else {
 															var t string
 															if !v.IsNull() && !v.IsUnknown() {
-																t = (v.Value)
+																t = (v.ValueString())
 															}
 															obj.Str = t
 														}
@@ -2046,7 +2046,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 														} else {
 															var t string
 															if !v.IsNull() && !v.IsUnknown() {
-																t = (v.Value)
+																t = (v.ValueString())
 															}
 															obj.Str = t
 														}
@@ -2071,7 +2071,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							} else {
 								var t string
 								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.Value)
+									t = (v.ValueString())
 								}
 								obj.Str = t
 							}
@@ -2113,7 +2113,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 										} else {
 											var t string
 											if !v.IsNull() && !v.IsUnknown() {
-												t = (v.Value)
+												t = (v.ValueString())
 											}
 											obj.Map[k] = t
 										}
@@ -2153,7 +2153,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 														} else {
 															var t string
 															if !v.IsNull() && !v.IsUnknown() {
-																t = (v.Value)
+																t = (v.ValueString())
 															}
 															obj.Str = t
 														}
@@ -2199,7 +2199,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 														} else {
 															var t string
 															if !v.IsNull() && !v.IsUnknown() {
-																t = (v.Value)
+																t = (v.ValueString())
 															}
 															obj.Str = t
 														}
@@ -2224,7 +2224,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 							} else {
 								var t string
 								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.Value)
+									t = (v.ValueString())
 								}
 								obj.Str = t
 							}
@@ -2245,7 +2245,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.RequiredStr = t
 			}
@@ -2262,7 +2262,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t OverrideCastType
 				if !v.IsNull() && !v.IsUnknown() {
-					t = OverrideCastType(v.Value)
+					t = OverrideCastType(v.ValueString())
 				}
 				obj.SchemaOverride = t
 			}
@@ -2279,7 +2279,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Str = t
 			}
@@ -2296,7 +2296,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					obj.OneOfWithEmptyMessage = &Test_StringBranch{StringBranch: t}
@@ -2322,7 +2322,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueString())
 							}
 							obj.StringList[k] = t
 						}
@@ -2349,7 +2349,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueString())
 							}
 							obj.StringListEmpty[k] = t
 						}
@@ -2376,7 +2376,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t time.Time
 				if !v.IsNull() && !v.IsUnknown() {
-					t = time.Time(v.Value)
+					t = time.Time(v.ValueTime())
 				}
 				obj.Timestamp = t
 			}
@@ -2400,7 +2400,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t *time.Time
 							if !v.IsNull() && !v.IsUnknown() {
-								c := time.Time(v.Value)
+								c := time.Time(v.ValueTime())
 								t = &c
 							}
 							obj.TimestampList[k] = t
@@ -2421,7 +2421,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t time.Time
 				if !v.IsNull() && !v.IsUnknown() {
-					t = time.Time(v.Value)
+					t = time.Time(v.ValueTime())
 				}
 				obj.TimestampMissing = t
 			}
@@ -2438,7 +2438,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t *time.Time
 				if !v.IsNull() && !v.IsUnknown() {
-					c := time.Time(v.Value)
+					c := time.Time(v.ValueTime())
 					t = &c
 				}
 				obj.TimestampNullable = t
@@ -2456,7 +2456,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t *time.Time
 				if !v.IsNull() && !v.IsUnknown() {
-					c := time.Time(v.Value)
+					c := time.Time(v.ValueTime())
 					t = &c
 				}
 				obj.TimestampNullableWithNilValue = t
@@ -2474,7 +2474,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = Duration(v.Value)
+					t = Duration(v.ValueDuration())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					if obj.MaxAgeDuration == nil {

@@ -154,7 +154,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Computed = t
 			}
@@ -171,7 +171,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Id = t
 			}
@@ -188,7 +188,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.NameOverride = t
 			}
@@ -205,7 +205,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.PlanModifier = t
 			}
@@ -222,7 +222,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Required = t
 			}
@@ -239,7 +239,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t OverrideCastType
 				if !v.IsNull() && !v.IsUnknown() {
-					t = OverrideCastType(v.Value)
+					t = OverrideCastType(v.ValueString())
 				}
 				obj.SchemaOverride = t
 			}
@@ -256,7 +256,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Sensitive = t
 			}
@@ -280,7 +280,7 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Validated = t
 			}

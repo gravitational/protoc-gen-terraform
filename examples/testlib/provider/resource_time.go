@@ -71,7 +71,7 @@ func (r timeResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	time := r.p.time[id.Value]
+	time := r.p.time[id.ValueString()]
 
 	resp.Diagnostics.Append(schemav1.CopyTimeToTerraform(ctx, time, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -117,5 +117,5 @@ func (r timeResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	delete(r.p.time, id.Value)
+	delete(r.p.time, id.ValueString())
 }
