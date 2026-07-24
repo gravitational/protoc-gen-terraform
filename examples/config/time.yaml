@@ -14,6 +14,10 @@ computed_fields:
 time_type:
   type: "TimeType" # Struct name of attrs.Type
   value_type: "TimeValue" # Struct name of attrs.Value
+  value_from_method: "ValueTime" # Method to get value from Terraform attribute
+  value_to_method: "NewTime" # Method to construct Terraform attribute from value
+  null_value_method: "NullTime" # Method to construct a null Terraform attribute
+  unknown_value_method: "UnknownTime" # Method to construct an unknown Terraform attribute
   cast_to_type: "time.Time" # Go type of .Value
   cast_from_type: "time.Time" # Go type of an object field
   type_constructor: UseRFC3339Time()
@@ -21,5 +25,9 @@ time_type:
 duration_type:
   type: "DurationType" # Struct name of attrs.Type
   value_type: "DurationValue" # Struct name of attrs.Value
+  value_from_method: "ValueDuration" # Method to get value from Terraform attribute
+  value_to_method: "NewDuration" # Method to construct Terraform attribute from value
+  null_value_method: "NullDuration" # Method to construct a null Terraform attribute
+  unknown_value_method: "UnknownDuration" # Method to construct an unknown Terraform attribute
   cast_to_type: "time.Duration" # Go type of .Value
   cast_from_type: "time.Duration" # Go type of an object field

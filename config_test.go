@@ -28,26 +28,47 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, cfg.Validators, map[string][]string{"Test.Str": {"UseMockValidator()"}})
 
 	require.Equal(t, cfg.TimeType, &SchemaType{
-		Type:            "TimeType",
-		ValueType:       "TimeValue",
-		CastToType:      "time.Time",
-		CastFromType:    "time.Time",
-		TypeConstructor: "UseRFC3339Time()",
+		Type:               "TimeType",
+		ValueType:          "TimeValue",
+		ValueFromMethod:    "ValueTime",
+		ValueToMethod:      "NewTime",
+		NullValueMethod:    "NullTime",
+		UnknownValueMethod: "UnknownTime",
+		CastToType:         "time.Time",
+		CastFromType:       "time.Time",
+		TypeConstructor:    "UseRFC3339Time()",
 	})
 
 	require.Equal(t, cfg.DurationType, &SchemaType{
-		Type:         "DurationType",
-		ValueType:    "DurationValue",
-		CastToType:   "time.Duration",
-		CastFromType: "time.Duration",
+		Type:               "DurationType",
+		ValueType:          "DurationValue",
+		ValueFromMethod:    "ValueDuration",
+		ValueToMethod:      "NewDuration",
+		NullValueMethod:    "NullDuration",
+		UnknownValueMethod: "UnknownDuration",
+		CastToType:         "time.Duration",
+		CastFromType:       "time.Duration",
 	})
 
 	require.Equal(t, cfg.InjectedFields, map[string][]InjectedField{
 		"Test": {{
-			Name:     "id",
-			Type:     "github.com/hashicorp/terraform-plugin-framework/types.StringType",
-			Computed: true,
+			Name:        "id",
+			Type:        "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			Computed:    true,
+			ValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
 		}},
+	})
+	require.Equal(t, cfg.SchemaTypes, map[string]SchemaType{
+		"Test.SchemaOverride": {
+			Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			ValueType:          "github.com/hashicorp/terraform-plugin-framework/types.String",
+			ValueFromMethod:    "ValueString",
+			ValueToMethod:      "github.com/hashicorp/terraform-plugin-framework/types.StringValue",
+			NullValueMethod:    "github.com/hashicorp/terraform-plugin-framework/types.StringNull",
+			UnknownValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
+			CastToType:         "string",
+			CastFromType:       "OverrideCastType",
+		},
 	})
 
 }
