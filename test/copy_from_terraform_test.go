@@ -155,7 +155,7 @@ func TestCopyFromCustom(t *testing.T) {
 
 func TestCopyFromOneOfScalarBranch(t *testing.T) {
 	obj := copyFromTerraformObject(t)
-	obj.Attrs["branch3"] = types.String{Value: "Test"}
+	obj.Attributes()["branch3"] = types.String{Value: "Test"}
 
 	target := Test{}
 	diags := CopyTestFromTerraform(context.Background(), obj, &target)
@@ -166,7 +166,7 @@ func TestCopyFromOneOfScalarBranch(t *testing.T) {
 
 func TestCopyFromOneOfObjectBranch(t *testing.T) {
 	obj := copyFromTerraformObject(t)
-	obj.Attrs["branch2"] = types.Object{
+	obj.Attributes()["branch2"] = types.Object{
 		Attrs: map[string]attr.Value{
 			"int32": types.Int64{Value: 5},
 		},
@@ -214,7 +214,7 @@ func TestCopyFromNullableEmbeddedFieldWithoutValue(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
 	// set a null value
-	obj.Attrs["max_age"] = DurationValue{Null: true}
+	obj.Attributes()["max_age"] = DurationValue{Null: true}
 
 	target := Test{}
 	diags := CopyTestFromTerraform(context.Background(), obj, &target)

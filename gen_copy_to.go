@@ -64,7 +64,7 @@ func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int,
 				g.Add(diags)
 				g.Id("tf.Null").Op("=").False()
 				g.Id("tf.Unknown").Op("=").False()
-				g.If(j.Id("tf.Attrs").Op("==").Nil()).Block(
+				g.If(j.Id("tf.Attributes").Call().Op("==").Nil()).Block(
 					j.Id("tf.Attrs").Op("=").Make(j.Map(j.String()).Id(m.i.WithPackage(Attr, "Value"))),
 				)
 				m.GenerateFields(g)
@@ -126,8 +126,8 @@ func (f *FieldCopyToGenerator) Generate() *j.Statement {
 // nextField reads current field value from Terraform object and asserts it's type against expected
 func (f *FieldCopyToGenerator) nextField(v string, g func(g *j.Group)) *j.Statement {
 	return j.Block(
-		// _, ok := ft.AttrsTypes["key"]
-		j.List(j.Id(v), j.Id("ok")).Op(":=").Id("tf.AttrTypes").Index(j.Lit(f.NameSnake)),
+		// _, ok := ft.AttributeTypes(ctx)["key"]
+		j.List(j.Id(v), j.Id("ok")).Op(":=").Id("tf").Dot("AttributeTypes").Call(j.Id("ctx")).Index(j.Lit(f.NameSnake)),
 		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag).Else().BlockFunc(g),
 	)
 }
@@ -321,14 +321,14 @@ func (f *FieldCopyToGenerator) genObjectBody(g *j.Group, m *MessageCopyToGenerat
 	}
 
 	g.If(j.Id("!ok")).Block(
-		// v := types.Object{Attrs: make(map[string]attr.Value, len(o.AttrTypes)), AttrTypes: o.AttrTypes}
+		// v := types.Object{Attrs: make(map[string]attr.Value, len(o.AttributeTypes())), AttrTypes: o.AttributeTypes()}
 		j.Id("v").Op("=").Id(f.i.WithType(typ)).Block(j.Dict{
-			j.Id("Attrs"):     j.Make(j.Map(j.String()).Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id("o.AttrTypes"))),
-			j.Id("AttrTypes"): j.Id("o.AttrTypes"),
+			j.Id("Attrs"):     j.Make(j.Map(j.String()).Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id("o.AttributeTypes").Call())),
+			j.Id("AttrTypes"): j.Id("o.AttributeTypes").Call(),
 		}),
 	).Else().Block(
-		j.If(j.Id("v.Attrs").Op("==").Nil()).Block(
-			j.Id("v.Attrs").Op("=").Make(j.Map(j.String()).Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id("tf.AttrTypes"))),
+		j.If(j.Id("v.Attributes").Call().Op("==").Nil()).Block(
+			j.Id("v.Attrs").Op("=").Make(j.Map(j.String()).Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id("o.AttributeTypes").Call())),
 		),
 	)
 	if f.IsNullable {
@@ -370,11 +370,11 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 	fieldName := "obj." + f.Name
 
 	return f.nextField("t", func(g *j.Group) {
-		selector := "tf.Attrs"
+		selector := "tf.Attributes()"
 		index := j.Lit(f.Field.NameSnake)
 		f.getPrimitiveAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
 		f.genPrimitiveBody(g, fieldName)
-		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
+		g.Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})
 }
 
@@ -389,9 +389,9 @@ func (f *FieldCopyToGenerator) genObject() *j.Statement {
 		}
 
 		f.assertTo(f.Field.ElemType, g, func(g *j.Group) {
-			f.getAttr(g, "v", "tf.Attrs", f.i.WithType(f.Field.ElemValueType), j.Lit(f.Field.NameSnake))
+			f.getAttr(g, "v", "tf.Attributes()", f.i.WithType(f.Field.ElemValueType), j.Lit(f.Field.NameSnake))
 			f.genObjectBody(g, m, fieldName, f.Field.ValueType)
-			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
+			g.Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 		})
 	})
 }
@@ -423,53 +423,54 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 
 	return f.nextField("a", func(g *j.Group) {
 		f.assertTo(f.Field.Type, g, func(g *j.Group) {
-			f.getAttr(g, "c", "tf.Attrs", f.Field.ValueType, j.Lit(f.Field.NameSnake))
+			f.getAttr(g, "c", "tf.Attributes()", f.Field.ValueType, j.Lit(f.Field.NameSnake))
 
 			g.If(j.Id("!ok")).Block(
-				// c := types.Object{Elems: make([]attr.Value, ElemType: o.ElemType}
+				// c := types.Object{Elems: make([]attr.Value, ElemType: o.ElementType()}
 				j.Id("c").Op("=").Id(f.i.WithType(f.Field.ValueType)).Block(j.Dict{
 					j.Id("Elems"):    mk,
-					j.Id("ElemType"): j.Id("o.ElemType"),
+					j.Id("ElemType"): j.Id("o.ElementType").Call(),
 					j.Id("Null"):     j.True(),
 				}),
 			).Else().Block(
-				j.If(j.Id("c.Elems").Op("==").Nil()).Block(
+				j.If(j.Id("c.Elements").Call().Op("==").Nil()).Block(
 					j.Id("c.Elems").Op("=").Add(mk),
 				),
 			)
 
 			g.BlockFunc(func(g *j.Group) {
 				if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
-					g.Id("t").Op(":=").Id("o.ElemType")
+					g.Id("t").Op(":=").Id("o.ElementType").Call()
 				} else {
-					g.Id("o").Op(":=").Id("o.ElemType").Assert(j.Id(f.i.WithType(f.ElemType)))
+					g.Id("o").Op(":=").Id("o.ElementType").Call().Assert(j.Id(f.i.WithType(f.ElemType)))
 				}
 
 				if f.IsRepeated {
 					// It might happen that we changed the number of elements.
 					// This check creates a new array if that's the case.
 					// Otherwise, we would have a panic at the last line in the For loop or extra elements.
-					g.If(j.Len(j.Id(fieldName)).Op("!=").Len(j.Id("c.Elems"))).Block(
+					g.If(j.Len(j.Id(fieldName)).Op("!=").Len(j.Id("c.Elements").Call())).Block(
 						j.Id("newElems").Op(":=").Add(mk),
-						j.Id("copy").Call(j.Id("newElems"), j.Id("c.Elems")),
+						j.Id("copy").Call(j.Id("newElems"), j.Id("c.Elements").Call()),
 						j.Id("c.Elems").Op("=").Add(j.Id("newElems")),
 					)
 				}
 
 				// for k, a := range obj.List
 				g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id(fieldName).BlockFunc(func(g *j.Group) {
+					selector := "c.Elements()"
+					index := j.Id("k")
+
 					switch f.Kind {
 					case PrimitiveListKind, PrimitiveMapKind:
-						selector := "c.Elems"
-						index := j.Id("k")
 						f.getPrimitiveAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
 						f.genPrimitiveBody(g, "a")
 					default:
 						m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
-						f.getAttr(g, "v", "c.Elems", f.i.WithType(f.Field.ElemValueType), j.Id("k"))
+						f.getAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), j.Id("k"))
 						f.genObjectBody(g, m, "a", f.i.WithType(f.Field.ElemValueType))
 					}
-					g.Id("c.Elems").Index(j.Id("k")).Op("=").Id("v")
+					g.Id(selector).Index(j.Id("k")).Op("=").Id("v")
 				})
 			})
 
@@ -480,7 +481,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				j.Id("c.Unknown").Op("=").False(),
 			)
 
-			g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("c")
+			g.Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)).Op("=").Id("c")
 		})
 	})
 }
@@ -489,8 +490,8 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 func (f *FieldCopyToGenerator) genCustom() *j.Statement {
 	return f.nextField("t", func(g *j.Group) {
 		g.Id("v").Op(":=").Id("CopyTo"+f.Suffix).Params(
-			j.Id("diags"), j.Id("obj."+f.Name), j.Id("t"), j.Id("tf.Attrs").Index(j.Lit(f.NameSnake)), j.Id("preserveUnknown"),
+			j.Id("diags"), j.Id("obj."+f.Name), j.Id("t"), j.Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)), j.Id("preserveUnknown"),
 		)
-		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
+		g.Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})
 }

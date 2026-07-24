@@ -35,7 +35,7 @@ func (v MockValidator) Validate(_ context.Context, req tfsdk.ValidateAttributeRe
 		return
 	}
 
-	if value.Null || value.Unknown {
+	if value.IsNull() || value.IsUnknown() {
 		return
 	}
 

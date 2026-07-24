@@ -12,7 +12,7 @@ func (d attrReadMissingDiag) Summary() string {
 }
 
 func (d attrReadMissingDiag) Detail() string {
-    return fmt.Sprintf("A value for %v is missing in the source Terraform object Attrs", d.Path)
+    return fmt.Sprintf("A value for %v is missing in the source Terraform object Attributes", d.Path)
 }
 
 func (d attrReadMissingDiag) Equal(o diag.Diagnostic) bool {
@@ -55,7 +55,7 @@ func (d attrWriteMissingDiag) Summary() string {
 }
 
 func (d attrWriteMissingDiag) Detail() string {
-    return fmt.Sprintf("A value for %v is missing in the source Terraform object AttrTypes", d.Path)
+    return fmt.Sprintf("A value for %v is missing in the source Terraform object AttributeTypes", d.Path)
 }
 
 func (d attrWriteMissingDiag) Equal(o diag.Diagnostic) bool {
