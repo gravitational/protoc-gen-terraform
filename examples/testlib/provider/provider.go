@@ -3,8 +3,10 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 
 	"github.com/gravitational/protoc-gen-terraform/v4/examples/types"
@@ -38,19 +40,15 @@ func (p *exampleProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// Nothing to configure
 }
 
-// GetDataSources satisfies the provider.Provider interface for exampleProvider.
-func (p *exampleProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
-	return map[string]provider.DataSourceType{
-		// TODO: Add example data source types
-	}, nil
+func (p *exampleProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+	return nil
 }
 
-// GetResources satisfies the provider.Provider interface for exampleProvider.
-func (p *exampleProvider) GetResources(ctx context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
-	return map[string]provider.ResourceType{
-		"example_primitives": primitivesResourceType{},
-		"example_time":       timeResourceType{},
-		"example_objects":    objectsResourceType{},
-		"example_custom":     customResourceType{},
-	}, nil
+func (p *exampleProvider) Resources(ctx context.Context) []func() resource.Resource {
+	return []func() resource.Resource{
+		func() resource.Resource { return primitivesResource{p: p} },
+		func() resource.Resource { return timeResource{p: p} },
+		func() resource.Resource { return objectsResource{p: p} },
+		func() resource.Resource { return customResource{p: p} },
+	}
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -15,24 +14,18 @@ import (
 	extypes "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
 )
 
-var _ provider.ResourceType = &customResourceType{}
-
-type customResourceType struct{}
-
-func (c customResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaCustom(ctx)
-}
-
-func (c customResourceType) NewResource(_ context.Context, p provider.Provider) (resource.Resource, diag.Diagnostics) {
-	return customResource{
-		p: p.(*exampleProvider),
-	}, nil
-}
-
 var _ resource.Resource = &customResource{}
 
 type customResource struct {
 	p *exampleProvider
+}
+
+func (r customResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = "example_custom"
+}
+
+func (r customResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+	return schemav1.GenSchemaCustom(ctx)
 }
 
 func (r customResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
