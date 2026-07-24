@@ -38,7 +38,7 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *BoolCustom)
 	}
 
 	if !v.IsNull() && !v.IsUnknown() {
-		*obj = BoolCustom(v.Value)
+		*obj = BoolCustom(v.ValueBool())
 	}
 }
 
@@ -84,7 +84,7 @@ func CopyFromBoolSpecialList(diags diag.Diagnostics, tf attr.Value, obj *[]BoolC
 		}
 
 		if !el.IsNull() && !el.IsUnknown() {
-			arr[i] = BoolCustomList(el.Value)
+			arr[i] = BoolCustomList(el.ValueBool())
 		}
 	}
 
@@ -152,7 +152,7 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 		}
 
 		if !el.IsNull() && !el.IsUnknown() {
-			items = append(items, el.Value)
+			items = append(items, el.ValueString())
 		}
 	}
 

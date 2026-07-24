@@ -122,7 +122,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration(v.Value)
+					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration(v.ValueDuration())
 				}
 				obj.DurationCustom = t
 			}
@@ -146,7 +146,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration
 							if !v.IsNull() && !v.IsUnknown() {
-								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration(v.Value)
+								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration(v.ValueDuration())
 							}
 							obj.DurationCustomList[k] = t
 						}
@@ -173,7 +173,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t time.Duration
 							if !v.IsNull() && !v.IsUnknown() {
-								t = time.Duration(v.Value)
+								t = time.Duration(v.ValueDuration())
 							}
 							obj.DurationList[k] = t
 						}
@@ -193,7 +193,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t time.Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = time.Duration(v.Value)
+					t = time.Duration(v.ValueDuration())
 				}
 				obj.DurationStandard = t
 			}
@@ -210,7 +210,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Id = t
 			}
@@ -227,7 +227,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t *time.Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					c := time.Duration(v.Value)
+					c := time.Duration(v.ValueDuration())
 					t = &c
 				}
 				obj.NullableDuration = t
@@ -245,7 +245,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t *time.Time
 				if !v.IsNull() && !v.IsUnknown() {
-					c := time.Time(v.Value)
+					c := time.Time(v.ValueTime())
 					t = &c
 				}
 				obj.NullableTimestamp = t
@@ -270,7 +270,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 						} else {
 							var t time.Time
 							if !v.IsNull() && !v.IsUnknown() {
-								t = time.Time(v.Value)
+								t = time.Time(v.ValueTime())
 							}
 							obj.TimestampList[k] = t
 						}
@@ -290,7 +290,7 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			} else {
 				var t time.Time
 				if !v.IsNull() && !v.IsUnknown() {
-					t = time.Time(v.Value)
+					t = time.Time(v.ValueTime())
 				}
 				obj.TimestampValue = t
 			}

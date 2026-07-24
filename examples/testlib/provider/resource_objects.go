@@ -87,7 +87,7 @@ func (r objectsResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	objects := r.p.objects[id.Value]
+	objects := r.p.objects[id.ValueString()]
 
 	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, objects, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -150,5 +150,5 @@ func (r objectsResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
-	delete(r.p.objects, id.Value)
+	delete(r.p.objects, id.ValueString())
 }

@@ -185,7 +185,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t bool
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueBool())
 							}
 							obj.BoolList[k] = t
 						}
@@ -205,7 +205,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t bool
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueBool())
 				}
 				obj.BoolValue = t
 			}
@@ -229,7 +229,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t []byte
 							if !v.IsNull() && !v.IsUnknown() {
-								t = []byte(v.Value)
+								t = []byte(v.ValueString())
 							}
 							obj.BytesList[k] = t
 						}
@@ -249,7 +249,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t []byte
 				if !v.IsNull() && !v.IsUnknown() {
-					t = []byte(v.Value)
+					t = []byte(v.ValueString())
 				}
 				obj.BytesValue = t
 			}
@@ -273,7 +273,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t float64
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueFloat64())
 							}
 							obj.DoubleList[k] = t
 						}
@@ -293,7 +293,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t float64
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueFloat64())
 				}
 				obj.DoubleValue = t
 			}
@@ -317,7 +317,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue
 							if !v.IsNull() && !v.IsUnknown() {
-								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.Value)
+								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.ValueInt64())
 							}
 							obj.EnumList[k] = t
 						}
@@ -337,7 +337,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue
 				if !v.IsNull() && !v.IsUnknown() {
-					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.Value)
+					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.ValueInt64())
 				}
 				obj.EnumValue = t
 			}
@@ -361,7 +361,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t float32
 							if !v.IsNull() && !v.IsUnknown() {
-								t = float32(v.Value)
+								t = float32(v.ValueFloat64())
 							}
 							obj.FloatList[k] = t
 						}
@@ -381,7 +381,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t float32
 				if !v.IsNull() && !v.IsUnknown() {
-					t = float32(v.Value)
+					t = float32(v.ValueFloat64())
 				}
 				obj.FloatValue = t
 			}
@@ -398,7 +398,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.Id = t
 			}
@@ -422,7 +422,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t int32
 							if !v.IsNull() && !v.IsUnknown() {
-								t = int32(v.Value)
+								t = int32(v.ValueInt64())
 							}
 							obj.Int32List[k] = t
 						}
@@ -442,7 +442,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t int32
 				if !v.IsNull() && !v.IsUnknown() {
-					t = int32(v.Value)
+					t = int32(v.ValueInt64())
 				}
 				obj.Int32Value = t
 			}
@@ -466,7 +466,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t int64
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueInt64())
 							}
 							obj.Int64List[k] = t
 						}
@@ -486,7 +486,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t int64
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueInt64())
 				}
 				obj.Int64Value = t
 			}
@@ -510,7 +510,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueString())
 							}
 							obj.StringList[k] = t
 						}
@@ -530,7 +530,7 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				obj.StringValue = t
 			}
