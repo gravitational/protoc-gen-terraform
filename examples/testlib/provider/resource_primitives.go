@@ -87,7 +87,7 @@ func (r primitivesResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	primitives := r.p.primitives[id.Value]
+	primitives := r.p.primitives[id.ValueString()]
 
 	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, primitives, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -148,5 +148,5 @@ func (r primitivesResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
-	delete(r.p.primitives, id.Value)
+	delete(r.p.primitives, id.ValueString())
 }

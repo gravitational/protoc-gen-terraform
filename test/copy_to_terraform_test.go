@@ -32,31 +32,31 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, "TestString", o.Attributes()["str"].(types.String).Value)
+	require.Equal(t, "TestString", o.Attributes()["str"].(types.String).ValueString())
 	require.False(t, o.Attributes()["str"].(types.String).IsUnknown())
 	require.False(t, o.Attributes()["str"].(types.String).IsNull())
 
-	require.Equal(t, int64(888), o.Attributes()["int32"].(types.Int64).Value)
+	require.Equal(t, int64(888), o.Attributes()["int32"].(types.Int64).ValueInt64())
 	require.False(t, o.Attributes()["int32"].(types.Int64).IsUnknown())
 	require.False(t, o.Attributes()["int32"].(types.Int64).IsNull())
 
-	require.Equal(t, int64(999), o.Attributes()["int64"].(types.Int64).Value)
+	require.Equal(t, int64(999), o.Attributes()["int64"].(types.Int64).ValueInt64())
 	require.False(t, o.Attributes()["int64"].(types.Int64).IsUnknown())
 	require.False(t, o.Attributes()["int64"].(types.Int64).IsNull())
 
-	require.Equal(t, float64(88.5), o.Attributes()["float"].(types.Float64).Value)
+	require.Equal(t, float64(88.5), o.Attributes()["float"].(types.Float64).ValueFloat64())
 	require.False(t, o.Attributes()["float"].(types.Float64).IsUnknown())
 	require.False(t, o.Attributes()["float"].(types.Float64).IsNull())
 
-	require.Equal(t, float64(99.5), o.Attributes()["double"].(types.Float64).Value)
+	require.Equal(t, float64(99.5), o.Attributes()["double"].(types.Float64).ValueFloat64())
 	require.False(t, o.Attributes()["double"].(types.Float64).IsUnknown())
 	require.False(t, o.Attributes()["double"].(types.Float64).IsNull())
 
-	require.True(t, o.Attributes()["bool"].(types.Bool).Value)
+	require.True(t, o.Attributes()["bool"].(types.Bool).ValueBool())
 	require.False(t, o.Attributes()["bool"].(types.Bool).IsUnknown())
 	require.False(t, o.Attributes()["bool"].(types.Bool).IsNull())
 
-	require.Equal(t, "TestBytes", o.Attributes()["bytes"].(types.String).Value)
+	require.Equal(t, "TestBytes", o.Attributes()["bytes"].(types.String).ValueString())
 	require.False(t, o.Attributes()["bytes"].(types.String).IsUnknown())
 	require.False(t, o.Attributes()["bytes"].(types.String).IsNull())
 }
@@ -67,11 +67,11 @@ func TestCopyToTime(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, timestamp, o.Attributes()["timestamp"].(TimeValue).Value)
+	require.Equal(t, timestamp, o.Attributes()["timestamp"].(TimeValue).ValueTime())
 	require.False(t, o.Attributes()["timestamp"].(TimeValue).IsUnknown())
 	require.False(t, o.Attributes()["timestamp"].(TimeValue).IsNull())
 
-	require.Equal(t, time.Time{}, o.Attributes()["timestamp_missing"].(TimeValue).Value)
+	require.Equal(t, time.Time{}, o.Attributes()["timestamp_missing"].(TimeValue).ValueTime())
 	require.False(t, o.Attributes()["timestamp_missing"].(TimeValue).IsUnknown())
 	// Handle empty time value
 	// require.True(t, o.Attributes()["timestamp_missing"].(TimeValue).IsNull())
@@ -83,11 +83,11 @@ func TestCopyToDuration(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, duration, o.Attributes()["duration_standard"].(DurationValue).Value)
+	require.Equal(t, duration, o.Attributes()["duration_standard"].(DurationValue).ValueDuration())
 	require.False(t, o.Attributes()["duration_standard"].(DurationValue).IsUnknown())
 	require.False(t, o.Attributes()["duration_standard"].(DurationValue).IsNull())
 
-	require.Equal(t, duration, o.Attributes()["duration_custom"].(DurationValue).Value)
+	require.Equal(t, duration, o.Attributes()["duration_custom"].(DurationValue).ValueDuration())
 	require.False(t, o.Attributes()["duration_custom"].(DurationValue).IsUnknown())
 	require.False(t, o.Attributes()["duration_custom"].(DurationValue).IsNull())
 }
@@ -326,11 +326,11 @@ func TestCopyToEmbeddedField(t *testing.T) {
 	diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
-	require.Equal(t, "embdtest1", o.Attributes()["embedded_string"].(types.String).Value)
+	require.Equal(t, "embdtest1", o.Attributes()["embedded_string"].(types.String).ValueString())
 	require.False(t, o.Attributes()["embedded_string"].(types.String).IsUnknown())
 	require.False(t, o.Attributes()["embedded_string"].(types.String).IsNull())
 
-	require.Equal(t, "embdtest2", o.Attributes()["embedded_nested_field"].(types.Object).Attributes()["embedded_nested_string"].(types.String).Value)
+	require.Equal(t, "embdtest2", o.Attributes()["embedded_nested_field"].(types.Object).Attributes()["embedded_nested_string"].(types.String).ValueString())
 }
 
 func TestCopyToOneOfLowercase(t *testing.T) {
@@ -387,7 +387,7 @@ func TestCopyToTerraformPreserveUnknown(t *testing.T) {
 	v := o.Attributes()["str"].(types.String)
 	require.True(t, v.IsUnknown())
 	require.False(t, v.IsNull())
-	require.Equal(t, "TestString", v.Value)
+	require.Equal(t, "TestString", v.ValueString())
 }
 
 func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
@@ -428,7 +428,7 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 
 	str := nested.Attributes()["str"].(types.String)
 	require.True(t, str.IsUnknown())
-	require.Equal(t, "TestString", str.Value)
+	require.Equal(t, "TestString", str.ValueString())
 
 	nestedList := nested.Attributes()["nested_list"].(types.List)
 	require.True(t, nestedList.IsUnknown())
@@ -436,12 +436,12 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 
 	firstElem := nestedList.Elements()[0].(types.Object)
 	require.True(t, firstElem.IsUnknown())
-	require.Equal(t, "Test1", firstElem.Attributes()["str"].(types.String).Value)
+	require.Equal(t, "Test1", firstElem.Attributes()["str"].(types.String).ValueString())
 	require.True(t, firstElem.Attributes()["str"].(types.String).IsUnknown())
 
 	secondElem := nestedList.Elements()[1].(types.Object)
 	require.False(t, secondElem.IsUnknown())
-	require.Equal(t, "Test2", secondElem.Attributes()["str"].(types.String).Value)
+	require.Equal(t, "Test2", secondElem.Attributes()["str"].(types.String).ValueString())
 	require.False(t, secondElem.Attributes()["str"].(types.String).IsUnknown())
 }
 

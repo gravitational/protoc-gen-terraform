@@ -85,36 +85,36 @@ func TestCopyToOptionalFieldsSet(t *testing.T) {
 	require.False(t, diags.HasError())
 
 	// Optional fields with values set
-	require.Equal(t, "world", o.Attributes()["optional_str"].(types.String).Value)
+	require.Equal(t, "world", o.Attributes()["optional_str"].(types.String).ValueString())
 	require.False(t, o.Attributes()["optional_str"].(types.String).IsNull())
 
-	require.Equal(t, int64(42), o.Attributes()["optional_int64"].(types.Int64).Value)
+	require.Equal(t, int64(42), o.Attributes()["optional_int64"].(types.Int64).ValueInt64())
 	require.False(t, o.Attributes()["optional_int64"].(types.Int64).IsNull())
 
-	require.True(t, o.Attributes()["optional_bool"].(types.Bool).Value)
+	require.True(t, o.Attributes()["optional_bool"].(types.Bool).ValueBool())
 	require.False(t, o.Attributes()["optional_bool"].(types.Bool).IsNull())
 
 	// Real oneof
-	require.Equal(t, "picked_b", o.Attributes()["choice_b"].(types.String).Value)
+	require.Equal(t, "picked_b", o.Attributes()["choice_b"].(types.String).ValueString())
 
 	// Populated map
 	m := o.Attributes()["optional_map"].(types.Map)
 	require.False(t, m.IsNull())
 	require.Len(t, m.Elements(), 2)
-	require.Equal(t, "val1", m.Elements()["key1"].(types.String).Value)
-	require.Equal(t, "val2", m.Elements()["key2"].(types.String).Value)
+	require.Equal(t, "val1", m.Elements()["key1"].(types.String).ValueString())
+	require.Equal(t, "val2", m.Elements()["key2"].(types.String).ValueString())
 
 	// Populated inner message
 	inner := o.Attributes()["optional_inner_message"].(types.Object)
 	require.False(t, inner.IsNull())
-	require.True(t, inner.Attributes()["inner_bool"].(types.Bool).Value)
+	require.True(t, inner.Attributes()["inner_bool"].(types.Bool).ValueBool())
 
 	// Populated list
 	l := o.Attributes()["string_list"].(types.List)
 	require.False(t, l.IsNull())
 	require.Len(t, l.Elements(), 2)
-	require.Equal(t, "test1", l.Elements()[0].(types.String).Value)
-	require.Equal(t, "test2", l.Elements()[1].(types.String).Value)
+	require.Equal(t, "test1", l.Elements()[0].(types.String).ValueString())
+	require.Equal(t, "test2", l.Elements()[1].(types.String).ValueString())
 }
 
 func TestCopyToOptionalFieldsNil(t *testing.T) {

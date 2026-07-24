@@ -105,7 +105,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					obj.RealOneOf = &OptionalTest_ChoiceA{ChoiceA: t}
@@ -124,7 +124,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			} else {
 				var t string
 				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.Value)
+					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
 					obj.RealOneOf = &OptionalTest_ChoiceB{ChoiceB: t}
@@ -143,7 +143,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			} else {
 				var t *bool
 				if !v.IsNull() && !v.IsUnknown() {
-					c := (v.Value)
+					c := (v.ValueBool())
 					t = &c
 				}
 				obj.OptionalBool = t
@@ -175,7 +175,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 							} else {
 								var t *bool
 								if !v.IsNull() && !v.IsUnknown() {
-									c := (v.Value)
+									c := (v.ValueBool())
 									t = &c
 								}
 								obj.InnerBool = t
@@ -197,7 +197,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			} else {
 				var t *int64
 				if !v.IsNull() && !v.IsUnknown() {
-					c := (v.Value)
+					c := (v.ValueInt64())
 					t = &c
 				}
 				obj.OptionalInt64 = t
@@ -222,7 +222,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueString())
 							}
 							obj.OptionalMap[k] = t
 						}
@@ -242,7 +242,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 			} else {
 				var t *string
 				if !v.IsNull() && !v.IsUnknown() {
-					c := (v.Value)
+					c := (v.ValueString())
 					t = &c
 				}
 				obj.OptionalStr = t
@@ -267,7 +267,7 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 						} else {
 							var t string
 							if !v.IsNull() && !v.IsUnknown() {
-								t = (v.Value)
+								t = (v.ValueString())
 							}
 							obj.StringList[k] = t
 						}
