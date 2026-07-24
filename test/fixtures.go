@@ -113,7 +113,7 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 	s, d := GenSchemaTest(context.Background())
 
 	require.False(t, d.HasError())
-	typ := s.AttributeType()
+	typ := s.Type()
 
 	obj, ok := typ.(types.ObjectType)
 	require.True(t, ok)
@@ -448,7 +448,7 @@ func copyToTerraformObject(t *testing.T) types.Object {
 	s, d := GenSchemaTest(context.Background())
 
 	require.False(t, d.HasError())
-	typ := s.AttributeType()
+	typ := s.Type()
 
 	obj, ok := typ.(types.ObjectType)
 	require.True(t, ok)

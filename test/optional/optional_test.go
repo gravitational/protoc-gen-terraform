@@ -29,7 +29,7 @@ func schemaObject(t *testing.T) types.Object {
 	t.Helper()
 	s, d := GenSchemaOptionalTest(context.Background())
 	require.False(t, d.HasError())
-	typ := s.AttributeType()
+	typ := s.Type()
 	obj, ok := typ.(types.ObjectType)
 	require.True(t, ok)
 	return types.Object{
@@ -146,7 +146,7 @@ func TestCopyFromOptionalFields(t *testing.T) {
 	s, d := GenSchemaOptionalTest(context.Background())
 	require.False(t, d.HasError())
 
-	typ := s.AttributeType()
+	typ := s.Type()
 	obj, ok := typ.(types.ObjectType)
 	require.True(t, ok)
 
@@ -225,7 +225,7 @@ func TestCopyFromOptionalFieldsNull(t *testing.T) {
 	s, d := GenSchemaOptionalTest(context.Background())
 	require.False(t, d.HasError())
 
-	typ := s.AttributeType()
+	typ := s.Type()
 	objType, ok := typ.(types.ObjectType)
 	require.True(t, ok)
 
