@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -28,26 +30,88 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, cfg.Validators, map[string][]string{"Test.Str": {"UseMockValidator()"}})
 
 	require.Equal(t, cfg.TimeType, &SchemaType{
-		Type:            "TimeType",
-		ValueType:       "TimeValue",
-		CastToType:      "time.Time",
-		CastFromType:    "time.Time",
-		TypeConstructor: "UseRFC3339Time()",
+		Type:               "TimeType",
+		ValueType:          "TimeValue",
+		ValueFromMethod:    "ValueTime",
+		ValueToMethod:      "NewTime",
+		NullValueMethod:    "NullTime",
+		UnknownValueMethod: "UnknownTime",
+		CastToType:         "time.Time",
+		CastFromType:       "time.Time",
+		TypeConstructor:    "UseRFC3339Time()",
 	})
 
 	require.Equal(t, cfg.DurationType, &SchemaType{
-		Type:         "DurationType",
-		ValueType:    "DurationValue",
-		CastToType:   "time.Duration",
-		CastFromType: "time.Duration",
+		Type:               "DurationType",
+		ValueType:          "DurationValue",
+		ValueFromMethod:    "ValueDuration",
+		ValueToMethod:      "NewDuration",
+		NullValueMethod:    "NullDuration",
+		UnknownValueMethod: "UnknownDuration",
+		CastToType:         "time.Duration",
+		CastFromType:       "time.Duration",
 	})
 
 	require.Equal(t, cfg.InjectedFields, map[string][]InjectedField{
 		"Test": {{
-			Name:     "id",
-			Type:     "github.com/hashicorp/terraform-plugin-framework/types.StringType",
-			Computed: true,
+			Name:        "id",
+			Type:        "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			Computed:    true,
+			ValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
 		}},
 	})
+	require.Equal(t, cfg.SchemaTypes, map[string]SchemaType{
+		"Test.SchemaOverride": {
+			Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			ValueType:          "github.com/hashicorp/terraform-plugin-framework/types.String",
+			ValueFromMethod:    "ValueString",
+			ValueToMethod:      "github.com/hashicorp/terraform-plugin-framework/types.StringValue",
+			NullValueMethod:    "github.com/hashicorp/terraform-plugin-framework/types.StringNull",
+			UnknownValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
+			CastToType:         "string",
+			CastFromType:       "OverrideCastType",
+		},
+	})
 
+}
+
+func TestConfigSchemaTypeValidation(t *testing.T) {
+	path := writeConfig(t, `
+types:
+  - Test
+time_type:
+  type: TimeType
+  value_type: TimeValue
+  cast_to_type: time.Time
+  cast_from_type: time.Time
+`)
+
+	_, err := ReadConfig(map[string]string{"config": path})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "time_type.value_from_method is required")
+}
+
+func TestConfigInjectedFieldValidation(t *testing.T) {
+	path := writeConfig(t, `
+types:
+  - Test
+injected_fields:
+  Test:
+    - name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+`)
+
+	_, err := ReadConfig(map[string]string{"config": path})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "injected_fields.Test.id.value_method is required")
+}
+
+func writeConfig(t *testing.T, contents string) string {
+	t.Helper()
+
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	require.NoError(t, os.WriteFile(path, []byte(contents), 0o600))
+
+	return path
 }
