@@ -62,32 +62,30 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
-		value = types.List{
-			Null:     true,
-			ElemType: types.BoolType,
-		}
+		value = types.ListNull(types.BoolType)
 	}
-	value.Unknown = preserveUnknown && value.IsUnknown()
 
-	if len(value.Elements()) != len(obj) {
-		newElems := make([]attr.Value, len(obj))
-		copy(newElems, value.Elements())
-		value.Elems = newElems
+	if preserveUnknown && value.IsUnknown() {
+		return types.ListUnknown(types.BoolType)
+	}
+
+	elems := value.Elements()
+	if len(elems) != len(obj) {
+		resized := make([]attr.Value, len(obj))
+		copy(resized, elems)
+		elems = resized
 	}
 
 	for i, b := range obj {
-		elemUnknown := false
-		if value.Elements()[i] != nil {
-			elemUnknown = preserveUnknown && value.Elements()[i].IsUnknown()
+		if preserveUnknown && elems[i] != nil && elems[i].IsUnknown() {
+			elems[i] = types.BoolUnknown()
+			continue
 		}
 
-		value.Elements()[i] = types.Bool{
-			Value:   bool(b),
-			Unknown: elemUnknown,
-		}
+		elems[i] = types.BoolValue(bool(b))
 	}
 
-	return value
+	return types.ListValueMust(types.BoolType, elems)
 }
 
 // StringCustom is a custom type that maps a Terraform List of string, onto a
@@ -132,34 +130,31 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
-		value = types.List{
-			Null:     true,
-			Unknown:  false,
-			ElemType: types.StringType,
-		}
+		value = types.ListNull(types.StringType)
 	}
-	value.Unknown = preserveUnknown && value.IsUnknown()
+
+	if preserveUnknown && value.IsUnknown() {
+		return types.ListUnknown(types.StringType)
+	}
 
 	parts := strings.Split(obj, "/")
-	if len(value.Elements()) != len(parts) {
-		newElems := make([]attr.Value, len(parts))
-		copy(newElems, value.Elements())
-		value.Elems = newElems
+	elems := value.Elements()
+	if len(elems) != len(parts) {
+		resized := make([]attr.Value, len(parts))
+		copy(resized, elems)
+		elems = resized
 	}
 
 	for i, b := range parts {
-		elemUnknown := false
-		if value.Elements()[i] != nil {
-			elemUnknown = preserveUnknown && value.Elements()[i].IsUnknown()
+		if preserveUnknown && elems[i] != nil && elems[i].IsUnknown() {
+			elems[i] = types.StringUnknown()
+			continue
 		}
 
-		value.Elements()[i] = types.String{
-			Value:   b,
-			Unknown: elemUnknown,
-		}
+		elems[i] = types.StringValue(b)
 	}
 
-	return value
+	return types.ListValueMust(types.StringType, elems)
 }
 
 type OverrideCastType string
