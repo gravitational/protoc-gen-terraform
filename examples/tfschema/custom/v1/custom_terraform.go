@@ -340,11 +340,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.computed", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.Computed)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.Computed)
 			}
 			tf.Attributes()["computed"] = v
 		}
@@ -368,11 +370,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.id", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.Id)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.Id)
 			}
 			tf.Attributes()["id"] = v
 		}
@@ -396,11 +400,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.name_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.NameOverride)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.NameOverride)
 			}
 			tf.Attributes()["custom_name_override"] = v
 		}
@@ -424,11 +430,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.plan_modifier", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.PlanModifier)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.PlanModifier)
 			}
 			tf.Attributes()["plan_modifier"] = v
 		}
@@ -452,11 +460,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.required", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.Required)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.Required)
 			}
 			tf.Attributes()["required"] = v
 		}
@@ -480,11 +490,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.schema_override", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.SchemaOverride)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.SchemaOverride)
 			}
 			tf.Attributes()["schema_override"] = v
 		}
@@ -508,11 +520,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.sensitive", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.Sensitive)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.Sensitive)
 			}
 			tf.Attributes()["sensitive"] = v
 		}
@@ -545,11 +559,13 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 					diags.Append(attrWriteConversionFailureDiag{"Custom.validated", "github.com/hashicorp/terraform-plugin-framework/types.String"})
 				}
 			}
-
-			v.Null = false
-			v.Value = string(obj.Validated)
-			if !preserveUnknown {
+			if preserveUnknown && v.IsUnknown() {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+			} else {
 				v.Unknown = false
+
+				v.Null = false
+				v.Value = string(obj.Validated)
 			}
 			tf.Attributes()["validated"] = v
 		}
