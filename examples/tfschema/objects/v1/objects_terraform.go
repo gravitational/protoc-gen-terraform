@@ -1577,7 +1577,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				{
 					obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects_BranchBool)
 					if !ok {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.BoolNull()
 					} else {
 						v.Null = false
 						v.Value = bool(obj.BranchBool)
@@ -1617,7 +1617,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				} else {
 					v.Unknown = false
 					if obj.BranchEmpty == nil {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 					} else {
 						v.Null = false
 						tf := &v
@@ -1644,7 +1644,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 									v = github_com_hashicorp_terraform_plugin_framework_types.BoolUnknown()
 								} else {
 									v.Unknown = false
-									v.Null = true
+									v = github_com_hashicorp_terraform_plugin_framework_types.BoolNull()
 								}
 								tf.Attributes()["active"] = v
 							}
@@ -1681,7 +1681,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				{
 					obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects_BranchInt)
 					if !ok {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.Int64Null()
 					} else {
 						v.Null = false
 						v.Value = int64(obj.BranchInt)
@@ -1721,7 +1721,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				} else {
 					v.Unknown = false
 					if obj.BranchLeaf == nil {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 					} else {
 						v.Null = false
 						obj := obj.BranchLeaf
@@ -1792,7 +1792,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				} else {
 					v.Unknown = false
 					if obj.BranchNested == nil {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 					} else {
 						v.Null = false
 						obj := obj.BranchNested
@@ -1894,7 +1894,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				{
 					obj, ok := obj.OneOfPrimitives.(*github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects_BranchString)
 					if !ok {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 					} else {
 						v.Null = false
 						v.Value = string(obj.BranchString)
@@ -1928,7 +1928,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 			} else {
 				v.Unknown = false
 				if obj.LeafEmbedded == nil {
-					v.Null = true
+					v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 				} else {
 					v.Null = false
 					v.Value = string(obj.EmbeddedValue)
@@ -1963,7 +1963,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				} else {
 					v.Unknown = false
 					if obj.Empty == nil {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 					} else {
 						v.Null = false
 						tf := &v
@@ -1990,7 +1990,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 									v = github_com_hashicorp_terraform_plugin_framework_types.BoolUnknown()
 								} else {
 									v.Unknown = false
-									v.Null = true
+									v = github_com_hashicorp_terraform_plugin_framework_types.BoolNull()
 								}
 								tf.Attributes()["active"] = v
 							}
@@ -2437,7 +2437,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				} else {
 					v.Unknown = false
 					if obj.NestedNullable == nil {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 					} else {
 						v.Null = false
 						obj := obj.NestedNullable
@@ -2565,7 +2565,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 							} else {
 								v.Unknown = false
 								if a == nil {
-									v.Null = true
+									v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 								} else {
 									v.Null = false
 									obj := a
@@ -2692,7 +2692,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 							} else {
 								v.Unknown = false
 								if a == nil {
-									v.Null = true
+									v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 								} else {
 									v.Null = false
 									obj := a

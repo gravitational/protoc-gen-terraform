@@ -319,7 +319,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 				{
 					obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceA)
 					if !ok {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 					} else {
 						v.Null = false
 						v.Value = string(obj.ChoiceA)
@@ -355,7 +355,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 				{
 					obj, ok := obj.RealOneOf.(*OptionalTest_ChoiceB)
 					if !ok {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 					} else {
 						v.Null = false
 						v.Value = string(obj.ChoiceB)
@@ -389,7 +389,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 			} else {
 				v.Unknown = false
 				if obj.OptionalBool == nil {
-					v.Null = true
+					v = github_com_hashicorp_terraform_plugin_framework_types.BoolNull()
 				} else {
 					v.Null = false
 					v.Value = bool(*obj.OptionalBool)
@@ -424,7 +424,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 				} else {
 					v.Unknown = false
 					if obj.OptionalInnerMessage == nil {
-						v.Null = true
+						v = github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(o.AttributeTypes())
 					} else {
 						v.Null = false
 						obj := obj.OptionalInnerMessage
@@ -453,7 +453,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 								} else {
 									v.Unknown = false
 									if obj.InnerBool == nil {
-										v.Null = true
+										v = github_com_hashicorp_terraform_plugin_framework_types.BoolNull()
 									} else {
 										v.Null = false
 										v.Value = bool(*obj.InnerBool)
@@ -492,7 +492,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 			} else {
 				v.Unknown = false
 				if obj.OptionalInt64 == nil {
-					v.Null = true
+					v = github_com_hashicorp_terraform_plugin_framework_types.Int64Null()
 				} else {
 					v.Null = false
 					v.Value = int64(*obj.OptionalInt64)
@@ -585,7 +585,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 			} else {
 				v.Unknown = false
 				if obj.OptionalStr == nil {
-					v.Null = true
+					v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 				} else {
 					v.Null = false
 					v.Value = string(*obj.OptionalStr)

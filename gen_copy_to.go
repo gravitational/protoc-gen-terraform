@@ -229,7 +229,7 @@ func (f *FieldCopyToGenerator) genAssignValue(fieldName string) *j.Statement {
 //
 //	v.Null = true
 func (f *FieldCopyToGenerator) genAssignPlaceholderValue() *j.Statement {
-	return j.Id("v.Null").Op("=").True()
+	return j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call()
 }
 
 // genAssignOptionalEmbeddedValue generates a statement to assign an optional embedded value.
@@ -244,7 +244,7 @@ func (f *FieldCopyToGenerator) genAssignPlaceholderValue() *j.Statement {
 //	}
 func (f *FieldCopyToGenerator) genAssignOptionalEmbeddedValue(fieldName string) *j.Statement {
 	return j.If(j.Id("obj."+f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
-		j.Id("v.Null").Op("=").True(),
+		j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 	).Else().Block(
 		j.Id("v.Null").Op("=").False(),
 		j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
@@ -263,7 +263,7 @@ func (f *FieldCopyToGenerator) genAssignOptionalEmbeddedValue(fieldName string) 
 //	}
 func (f *FieldCopyToGenerator) genAssignNullableValue(fieldName string) *j.Statement {
 	return j.If(j.Id(fieldName).Op("==").Nil()).Block(
-		j.Id("v.Null").Op("=").True(),
+		j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 	).Else().Block(
 		j.Id("v.Null").Op("=").False(),
 		j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
@@ -285,7 +285,7 @@ func (f *FieldCopyToGenerator) genAssignOneOf(fieldName string) *j.Statement {
 	return j.Block(
 		j.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj."+f.OneOfName).Assert(j.Id("*"+f.i.WithType(f.OneOfType))),
 		j.If(j.Id("!ok")).Block(
-			j.Id("v.Null").Op("=").True(),
+			j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 		).Else().Block(
 			j.Id("v.Null").Op("=").False(),
 			j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
@@ -343,7 +343,7 @@ func (f *FieldCopyToGenerator) genObjectBody(g *j.Group, m *MessageCopyToGenerat
 		if f.IsNullable {
 			// if obj.Nested == nil
 			g.If(j.Id(fieldName).Op("==").Nil()).Block(
-				j.Id("v.Null").Op("=").True(),
+				j.Id("v").Op("=").Id(f.i.WithPackage(Types, "ObjectNull")).Call(j.Id("o").Dot("AttributeTypes").Call()),
 			).Else().BlockFunc(
 				copyObj,
 			)
