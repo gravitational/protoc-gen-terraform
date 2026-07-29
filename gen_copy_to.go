@@ -243,11 +243,10 @@ func (f *FieldCopyToGenerator) genAssignPlaceholderValue() *j.Statement {
 //		v.Value = <f.ValueCastToType>(<fieldName>)
 //	}
 func (f *FieldCopyToGenerator) genAssignOptionalEmbeddedValue(fieldName string) *j.Statement {
-	return j.If(j.Id("obj."+f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
+	return j.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
 		j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 	).Else().Block(
-		j.Id("v.Null").Op("=").False(),
-		j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
+		j.Id("v").Op("=").Id(f.i.WithType(f.ValueToMethod)).Call(j.Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))),
 	)
 }
 
@@ -265,8 +264,7 @@ func (f *FieldCopyToGenerator) genAssignNullableValue(fieldName string) *j.State
 	return j.If(j.Id(fieldName).Op("==").Nil()).Block(
 		j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 	).Else().Block(
-		j.Id("v.Null").Op("=").False(),
-		j.Id("v.Value").Op("=").Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName))),
+		j.Id("v").Op("=").Id(f.i.WithType(f.ValueToMethod)).Call(j.Id(f.i.WithType(f.GoElemTypeIndirect)).Parens(j.Op("*").Add(j.Id(fieldName)))),
 	)
 }
 
@@ -287,8 +285,7 @@ func (f *FieldCopyToGenerator) genAssignOneOf(fieldName string) *j.Statement {
 		j.If(j.Id("!ok")).Block(
 			j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 		).Else().Block(
-			j.Id("v.Null").Op("=").False(),
-			j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
+			j.Id("v").Op("=").Id(f.i.WithType(f.ValueToMethod)).Call(j.Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName))),
 		),
 	)
 }
@@ -300,11 +297,7 @@ func (f *FieldCopyToGenerator) genAssignOneOf(fieldName string) *j.Statement {
 //	v.Null = false
 //	v.Value = <f.ValueCastToType>(<fieldName>)
 func (f *FieldCopyToGenerator) genAssignNonNullableValue(fieldName string) *j.Statement {
-	return j.Custom(
-		j.Options{Multi: true},
-		j.Id("v.Null").Op("=").False(),
-		j.Id("v.Value").Op("=").Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)),
-	)
+	return j.Id("v").Op("=").Id(f.i.WithType(f.ValueToMethod)).Call(j.Id(f.i.WithType(f.ValueCastToType)).Parens(j.Id(fieldName)))
 }
 
 // genObjectBody generates block statement that reads a message into
@@ -416,16 +409,25 @@ func (f *FieldCopyToGenerator) genOneOfStub(g *j.Group) {
 func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 	fieldName := "obj." + f.Name
 
-	var makeUnknown, makeElems j.Code
+	var makeValue, makeUnknown, makeElems, elemType j.Code
 
 	if f.IsMap {
+		makeValue = j.Id(f.i.WithPackage(Types, "MapValue"))
 		makeUnknown = j.Id(f.i.WithPackage(Types, "MapUnknown"))
 		makeElems = j.Make(j.Map(j.String()).Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id(fieldName)))
+
+		elemType = j.Id("elemType").Op(":=").
+			Id("o").Dot("ElementType").Call()
+
 	}
 
 	if f.IsRepeated {
+		makeValue = j.Id(f.i.WithPackage(Types, "ListValue"))
 		makeUnknown = j.Id(f.i.WithPackage(Types, "ListUnknown"))
 		makeElems = j.Make(j.Index().Id(f.i.WithPackage(Attr, "Value")), j.Len(j.Id(fieldName)))
+
+		elemType = j.Id("elemType").Op(":=").
+			Id("o").Dot("ElementType").Call()
 	}
 
 	return f.nextField("a", func(g *j.Group) {
@@ -445,6 +447,8 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				),
 			)
 
+			g.Add(elemType)
+
 			g.If(
 				j.Id("preserveUnknown").Op("&&").Id("c").Dot("IsUnknown").Call(),
 			).Block(
@@ -454,41 +458,45 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 				g.Id("c.Null").Op("=").False()
 				g.Id("c.Unknown").Op("=").False()
 
-				g.BlockFunc(func(g *j.Group) {
-					if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
-						g.Id("t").Op(":=").Id("o.ElementType").Call()
-					} else {
-						g.Id("o").Op(":=").Id("o.ElementType").Call().Assert(j.Id(f.i.WithType(f.ElemType)))
+				if (f.Kind == PrimitiveListKind) || (f.Kind == PrimitiveMapKind) {
+					g.Id("t").Op(":=").Id("o.ElementType").Call()
+				} else {
+					g.Id("o").Op(":=").Id("o.ElementType").Call().Assert(j.Id(f.i.WithType(f.ElemType)))
+				}
+
+				g.Id("elems").Op(":=").Add(makeElems)
+
+				if f.IsRepeated {
+					g.Id("copy").Call(j.Id("elems"), j.Id("c").Dot("Elements").Call())
+				}
+
+				// for k, a := range obj.List
+				g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id(fieldName).BlockFunc(func(g *j.Group) {
+					readSelector := "elems"
+					if f.IsMap {
+						readSelector = "c.Elements()"
 					}
+					index := j.Id("k")
 
-					if f.IsRepeated {
-						// It might happen that we changed the number of elements.
-						// This check creates a new array if that's the case.
-						// Otherwise, we would have a panic at the last line in the For loop or extra elements.
-						g.If(j.Len(j.Id(fieldName)).Op("!=").Len(j.Id("c.Elements").Call())).Block(
-							j.Id("newElems").Op(":=").Add(makeElems),
-							j.Id("copy").Call(j.Id("newElems"), j.Id("c.Elements").Call()),
-							j.Id("c.Elems").Op("=").Add(j.Id("newElems")),
-						)
+					switch f.Kind {
+					case PrimitiveListKind, PrimitiveMapKind:
+						f.getPrimitiveAttr(g, "v", readSelector, f.i.WithType(f.Field.ElemValueType), index)
+						f.genPrimitiveBody(g, "a")
+					default:
+						m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
+						f.getAttr(g, "v", readSelector, f.i.WithType(f.Field.ElemValueType), j.Id("k"))
+						f.genObjectBody(g, m, "a", f.i.WithType(f.Field.ElemValueType))
 					}
-
-					// for k, a := range obj.List
-					g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id(fieldName).BlockFunc(func(g *j.Group) {
-						selector := "c.Elements()"
-						index := j.Id("k")
-
-						switch f.Kind {
-						case PrimitiveListKind, PrimitiveMapKind:
-							f.getPrimitiveAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), index)
-							f.genPrimitiveBody(g, "a")
-						default:
-							m := NewMessageCopyToGenerator(f.getValueField().Message, f.i)
-							f.getAttr(g, "v", selector, f.i.WithType(f.Field.ElemValueType), j.Id("k"))
-							f.genObjectBody(g, m, "a", f.i.WithType(f.Field.ElemValueType))
-						}
-						g.Id(selector).Index(j.Id("k")).Op("=").Id("v")
-					})
+					g.Id("elems").Index(j.Id("k")).Op("=").Id("v")
 				})
+
+				g.List(j.Id("result"), j.Id("resultDiags")).Op(":=").
+					Add(makeValue).
+					Call(j.Id("elemType"), j.Id("elems"))
+
+				g.Id("diags.Append").Call(j.Id("resultDiags").Op("..."))
+
+				g.Id("c").Op("=").Id("result")
 			})
 
 			g.Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)).Op("=").Id("c")

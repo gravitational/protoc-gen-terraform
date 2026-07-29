@@ -100,13 +100,13 @@ func TestCopyToNested(t *testing.T) {
 
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "TestString"},
+		types.StringValue("TestString"),
 		o.Attributes()["nested"].(types.Object).Attributes()["str"].(types.String),
 	)
 
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "TestString"},
+		types.StringValue("TestString"),
 		o.Attributes()["nested_nullable"].(types.Object).Attributes()["str"].(types.String),
 	)
 
@@ -120,30 +120,28 @@ func TestCopyToList(t *testing.T) {
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
-		types.String{Null: false, Unknown: false, Value: "el1"},
-		types.String{Null: false, Unknown: false, Value: "el2"},
+		types.StringValue("el1"),
+		types.StringValue("el2"),
 	}, o.Attributes()["string_list"].(types.List).Elements())
 
-	require.Equal(t, types.List{
-		Null:     false,
-		Unknown:  false,
-		Elems:    make([]attr.Value, 0),
-		ElemType: types.StringType,
-	}, o.Attributes()["string_list_empty"].(types.List))
+	require.Equal(t, types.ListValueMust(
+		types.StringType,
+		make([]attr.Value, 0),
+	), o.Attributes()["string_list_empty"].(types.List))
 
 	require.Equal(t, []attr.Value{
-		types.String{Null: false, Unknown: false, Value: "bytes1"},
-		types.String{Null: false, Unknown: false, Value: "bytes2"},
+		types.StringValue("bytes1"),
+		types.StringValue("bytes2"),
 	}, o.Attributes()["bytes_list"].(types.List).Elements())
 
 	require.Equal(t, []attr.Value{
-		TimeValue{Null: false, Unknown: false, Value: timestamp, Format: time.RFC3339},
-		TimeValue{Null: false, Unknown: false, Value: timestamp, Format: time.RFC3339},
+		NewTime(timestamp),
+		NewTime(timestamp),
 	}, o.Attributes()["timestamp_list"].(types.List).Elements())
 
 	require.Equal(t, []attr.Value{
-		DurationValue{Null: false, Unknown: false, Value: duration},
-		DurationValue{Null: false, Unknown: false, Value: duration},
+		NewDuration(duration),
+		NewDuration(duration),
 	}, o.Attributes()["duration_custom_list"].(types.List).Elements())
 }
 
@@ -157,8 +155,8 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
-		types.String{Null: false, Unknown: false, Value: "el1"},
-		types.String{Null: false, Unknown: false, Value: "el2"},
+		types.StringValue("el1"),
+		types.StringValue("el2"),
 	}, o.Attributes()["string_list"].(types.List).Elements())
 
 	// Increase to 3, array access must not panic.
@@ -167,9 +165,9 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
-		types.String{Null: false, Unknown: false, Value: "el1"},
-		types.String{Null: false, Unknown: false, Value: "el2"},
-		types.String{Null: false, Unknown: false, Value: "el3"},
+		types.StringValue("el1"),
+		types.StringValue("el2"),
+		types.StringValue("el3"),
 	}, o.Attributes()["string_list"].(types.List).Elements())
 
 	// Decrease to a single element, others should be removed.
@@ -178,7 +176,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
-		types.String{Null: false, Unknown: false, Value: "elX"},
+		types.StringValue("elX"),
 	}, o.Attributes()["string_list"].(types.List).Elements())
 }
 
@@ -194,7 +192,7 @@ func TestCopyToNestedList(t *testing.T) {
 	require.Len(t, nestedList.Elements(), 1)
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test"},
+		types.StringValue("Test"),
 		firstEl.Attributes()["str"],
 	)
 
@@ -203,12 +201,12 @@ func TestCopyToNestedList(t *testing.T) {
 	require.Len(t, nestedNestedList.Elements(), 2)
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test1"},
+		types.StringValue("Test1"),
 		nestedNestedList.Elements()[0].(types.Object).Attributes()["str"],
 	)
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test2"},
+		types.StringValue("Test2"),
 		nestedNestedList.Elements()[1].(types.Object).Attributes()["str"],
 	)
 
@@ -216,12 +214,12 @@ func TestCopyToNestedList(t *testing.T) {
 
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "value1"},
+		types.StringValue("value1"),
 		nestedMap.Elements()["key1"].(types.String),
 	)
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "value2"},
+		types.StringValue("value2"),
 		nestedMap.Elements()["key2"].(types.String),
 	)
 
@@ -229,12 +227,12 @@ func TestCopyToNestedList(t *testing.T) {
 
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test1"},
+		types.StringValue("Test1"),
 		nestedMapObject.Elements()["key1"].(types.Object).Attributes()["str"].(types.String),
 	)
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test2"},
+		types.StringValue("Test2"),
 		nestedMapObject.Elements()["key2"].(types.Object).Attributes()["str"].(types.String),
 	)
 
@@ -243,7 +241,7 @@ func TestCopyToNestedList(t *testing.T) {
 	require.Len(t, nestedListNullable.Elements(), 1)
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test"},
+		types.StringValue("Test"),
 		nestedListNullable.Elements()[0].(types.Object).Attributes()["str"],
 	)
 }
@@ -256,8 +254,33 @@ func TestCopyToMap(t *testing.T) {
 
 	m := o.Attributes()["map"].(types.Map).Elements()
 
-	require.Equal(t, types.String{Null: false, Unknown: false, Value: "value1"}, m["key1"].(types.String))
-	require.Equal(t, types.String{Null: false, Unknown: false, Value: "value2"}, m["key2"].(types.String))
+	require.Equal(t, types.StringValue("value1"), m["key1"].(types.String))
+	require.Equal(t, types.StringValue("value2"), m["key2"].(types.String))
+}
+
+func TestCopyToMapPreserveUnknownExistingKeys(t *testing.T) {
+	o := copyToTerraformObject(t)
+
+	mapType, ok := o.AttributeTypes(t.Context())["map"].(types.MapType)
+	require.True(t, ok)
+
+	o.Attributes()["map"] = types.MapValueMust(
+		mapType.ElementType(),
+		map[string]attr.Value{
+			"key1":  types.StringUnknown(),
+			"stale": types.StringUnknown(),
+		},
+	)
+
+	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	requireNoDiagErrors(t, diags)
+
+	m := o.Attributes()["map"].(types.Map).Elements()
+	require.Len(t, m, 2)
+
+	require.True(t, m["key1"].(types.String).IsUnknown())
+	require.Equal(t, types.StringValue("value2"), m["key2"].(types.String))
+	require.NotContains(t, m, "stale")
 }
 
 func TestCopyToCustom(t *testing.T) {
@@ -287,7 +310,7 @@ func TestCopyToOneOfBranch3(t *testing.T) {
 
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "Test"},
+		types.StringValue("Test"),
 		o.Attributes()["branch3"].(types.String),
 	)
 }
@@ -302,7 +325,7 @@ func TestCopyToOneOfBranch2(t *testing.T) {
 
 	require.Equal(
 		t,
-		types.Int64{Null: false, Unknown: false, Value: 5},
+		types.Int64Value(5),
 		o.Attributes()["branch2"].(types.Object).Attributes()["int32"],
 	)
 }
@@ -343,7 +366,7 @@ func TestCopyToOneOfLowercase(t *testing.T) {
 
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "1234"},
+		types.StringValue("1234"),
 		o.Attributes()["foo"].(types.String),
 	)
 }
@@ -372,7 +395,7 @@ func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 	require.False(t, nestedNullable.IsUnknown())
 	require.Equal(
 		t,
-		types.String{Null: false, Unknown: false, Value: "TestString"},
+		types.StringValue("TestString"),
 		nestedNullable.Attributes()["str"].(types.String),
 	)
 }
