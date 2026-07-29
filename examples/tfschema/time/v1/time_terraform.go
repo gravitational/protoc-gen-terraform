@@ -336,9 +336,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				v = UnknownDuration()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = time.Duration(obj.DurationCustom)
+				v = NewDuration(time.Duration(obj.DurationCustom))
 			}
 			tf.Attributes()["duration_custom"] = v
 		}
@@ -365,44 +363,41 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
 					}
 				}
+				elemType := o.ElementType()
 				if preserveUnknown && c.IsUnknown() {
 					c = github_com_hashicorp_terraform_plugin_framework_types.ListUnknown(o.ElementType())
 				} else {
 					c.Null = false
 					c.Unknown = false
-					{
-						t := o.ElementType()
-						if len(obj.DurationCustomList) != len(c.Elements()) {
-							newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
-							copy(newElems, c.Elements())
-							c.Elems = newElems
-						}
-						for k, a := range obj.DurationCustomList {
-							v, ok := c.Elements()[k].(DurationValue)
+					t := o.ElementType()
+					elems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationCustomList))
+					copy(elems, c.Elements())
+					for k, a := range obj.DurationCustomList {
+						v, ok := elems[k].(DurationValue)
+						if !ok {
+							if elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_custom_list", "DurationValue"})
+							}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Time.duration_custom_list", err})
+							}
+							v, ok = i.(DurationValue)
 							if !ok {
-								if c.Elements()[k] != nil {
-									diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_custom_list", "DurationValue"})
-								}
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"Time.duration_custom_list", err})
-								}
-								v, ok = i.(DurationValue)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom_list", "DurationValue"})
-								}
+								diags.Append(attrWriteConversionFailureDiag{"Time.duration_custom_list", "DurationValue"})
 							}
-							if preserveUnknown && v.IsUnknown() {
-								v = UnknownDuration()
-							} else {
-								v.Unknown = false
-
-								v.Null = false
-								v.Value = time.Duration(a)
-							}
-							c.Elements()[k] = v
 						}
+						if preserveUnknown && v.IsUnknown() {
+							v = UnknownDuration()
+						} else {
+							v.Unknown = false
+							v = NewDuration(time.Duration(a))
+						}
+						elems[k] = v
 					}
+					result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ListValue(elemType, elems)
+					diags.Append(resultDiags...)
+					c = result
 				}
 				tf.Attributes()["duration_custom_list"] = c
 			}
@@ -430,44 +425,41 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
 					}
 				}
+				elemType := o.ElementType()
 				if preserveUnknown && c.IsUnknown() {
 					c = github_com_hashicorp_terraform_plugin_framework_types.ListUnknown(o.ElementType())
 				} else {
 					c.Null = false
 					c.Unknown = false
-					{
-						t := o.ElementType()
-						if len(obj.DurationList) != len(c.Elements()) {
-							newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
-							copy(newElems, c.Elements())
-							c.Elems = newElems
-						}
-						for k, a := range obj.DurationList {
-							v, ok := c.Elements()[k].(DurationValue)
+					t := o.ElementType()
+					elems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.DurationList))
+					copy(elems, c.Elements())
+					for k, a := range obj.DurationList {
+						v, ok := elems[k].(DurationValue)
+						if !ok {
+							if elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_list", "DurationValue"})
+							}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Time.duration_list", err})
+							}
+							v, ok = i.(DurationValue)
 							if !ok {
-								if c.Elements()[k] != nil {
-									diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.duration_list", "DurationValue"})
-								}
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"Time.duration_list", err})
-								}
-								v, ok = i.(DurationValue)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Time.duration_list", "DurationValue"})
-								}
+								diags.Append(attrWriteConversionFailureDiag{"Time.duration_list", "DurationValue"})
 							}
-							if preserveUnknown && v.IsUnknown() {
-								v = UnknownDuration()
-							} else {
-								v.Unknown = false
-
-								v.Null = false
-								v.Value = time.Duration(a)
-							}
-							c.Elements()[k] = v
 						}
+						if preserveUnknown && v.IsUnknown() {
+							v = UnknownDuration()
+						} else {
+							v.Unknown = false
+							v = NewDuration(time.Duration(a))
+						}
+						elems[k] = v
 					}
+					result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ListValue(elemType, elems)
+					diags.Append(resultDiags...)
+					c = result
 				}
 				tf.Attributes()["duration_list"] = c
 			}
@@ -496,9 +488,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				v = UnknownDuration()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = time.Duration(obj.DurationStandard)
+				v = NewDuration(time.Duration(obj.DurationStandard))
 			}
 			tf.Attributes()["duration_standard"] = v
 		}
@@ -526,9 +516,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.Id)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Id))
 			}
 			tf.Attributes()["id"] = v
 		}
@@ -559,8 +547,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				if obj.NullableDuration == nil {
 					v = NullDuration()
 				} else {
-					v.Null = false
-					v.Value = time.Duration(*obj.NullableDuration)
+					v = NewDuration(time.Duration(*obj.NullableDuration))
 				}
 			}
 			tf.Attributes()["nullable_duration"] = v
@@ -592,8 +579,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				if obj.NullableTimestamp == nil {
 					v = NullTime()
 				} else {
-					v.Null = false
-					v.Value = time.Time(*obj.NullableTimestamp)
+					v = NewTime(time.Time(*obj.NullableTimestamp))
 				}
 			}
 			tf.Attributes()["nullable_timestamp"] = v
@@ -621,44 +607,41 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 						c.Elems = make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
 					}
 				}
+				elemType := o.ElementType()
 				if preserveUnknown && c.IsUnknown() {
 					c = github_com_hashicorp_terraform_plugin_framework_types.ListUnknown(o.ElementType())
 				} else {
 					c.Null = false
 					c.Unknown = false
-					{
-						t := o.ElementType()
-						if len(obj.TimestampList) != len(c.Elements()) {
-							newElems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
-							copy(newElems, c.Elements())
-							c.Elems = newElems
-						}
-						for k, a := range obj.TimestampList {
-							v, ok := c.Elements()[k].(TimeValue)
+					t := o.ElementType()
+					elems := make([]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.TimestampList))
+					copy(elems, c.Elements())
+					for k, a := range obj.TimestampList {
+						v, ok := elems[k].(TimeValue)
+						if !ok {
+							if elems[k] != nil {
+								diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.timestamp_list", "TimeValue"})
+							}
+							i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
+							if err != nil {
+								diags.Append(attrWriteGeneralError{"Time.timestamp_list", err})
+							}
+							v, ok = i.(TimeValue)
 							if !ok {
-								if c.Elements()[k] != nil {
-									diags.Append(attrWriteUnexpectedExistingTypeDiag{"Time.timestamp_list", "TimeValue"})
-								}
-								i, err := t.ValueFromTerraform(ctx, github_com_hashicorp_terraform_plugin_go_tftypes.NewValue(t.TerraformType(ctx), nil))
-								if err != nil {
-									diags.Append(attrWriteGeneralError{"Time.timestamp_list", err})
-								}
-								v, ok = i.(TimeValue)
-								if !ok {
-									diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_list", "TimeValue"})
-								}
+								diags.Append(attrWriteConversionFailureDiag{"Time.timestamp_list", "TimeValue"})
 							}
-							if preserveUnknown && v.IsUnknown() {
-								v = UnknownTime()
-							} else {
-								v.Unknown = false
-
-								v.Null = false
-								v.Value = time.Time(a)
-							}
-							c.Elements()[k] = v
 						}
+						if preserveUnknown && v.IsUnknown() {
+							v = UnknownTime()
+						} else {
+							v.Unknown = false
+							v = NewTime(time.Time(a))
+						}
+						elems[k] = v
 					}
+					result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ListValue(elemType, elems)
+					diags.Append(resultDiags...)
+					c = result
 				}
 				tf.Attributes()["timestamp_list"] = c
 			}
@@ -687,9 +670,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 				v = UnknownTime()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = time.Time(obj.TimestampValue)
+				v = NewTime(time.Time(obj.TimestampValue))
 			}
 			tf.Attributes()["timestamp_value"] = v
 		}
