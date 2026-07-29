@@ -344,9 +344,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.Computed)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Computed))
 			}
 			tf.Attributes()["computed"] = v
 		}
@@ -374,9 +372,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.Id)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Id))
 			}
 			tf.Attributes()["id"] = v
 		}
@@ -404,9 +400,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.NameOverride)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.NameOverride))
 			}
 			tf.Attributes()["custom_name_override"] = v
 		}
@@ -434,9 +428,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.PlanModifier)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.PlanModifier))
 			}
 			tf.Attributes()["plan_modifier"] = v
 		}
@@ -464,9 +456,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.Required)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Required))
 			}
 			tf.Attributes()["required"] = v
 		}
@@ -494,9 +484,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.SchemaOverride)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.SchemaOverride))
 			}
 			tf.Attributes()["schema_override"] = v
 		}
@@ -524,9 +512,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.Sensitive)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Sensitive))
 			}
 			tf.Attributes()["sensitive"] = v
 		}
@@ -563,9 +549,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 				v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 			} else {
 				v.Unknown = false
-
-				v.Null = false
-				v.Value = string(obj.Validated)
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Validated))
 			}
 			tf.Attributes()["validated"] = v
 		}
