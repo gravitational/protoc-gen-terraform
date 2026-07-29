@@ -557,7 +557,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 			} else {
 				v.Unknown = false
 				if obj.NullableDuration == nil {
-					v.Null = true
+					v = NullDuration()
 				} else {
 					v.Null = false
 					v.Value = time.Duration(*obj.NullableDuration)
@@ -590,7 +590,7 @@ func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gra
 			} else {
 				v.Unknown = false
 				if obj.NullableTimestamp == nil {
-					v.Null = true
+					v = NullTime()
 				} else {
 					v.Null = false
 					v.Value = time.Time(*obj.NullableTimestamp)
