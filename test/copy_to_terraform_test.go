@@ -29,7 +29,7 @@ import (
 func TestCopyToTerraformPrimitives(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "TestString", o.Attributes()["str"].(types.String).ValueString())
@@ -64,7 +64,7 @@ func TestCopyToTerraformPrimitives(t *testing.T) {
 func TestCopyToTime(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, timestamp, o.Attributes()["timestamp"].(TimeValue).ValueTime())
@@ -80,7 +80,7 @@ func TestCopyToTime(t *testing.T) {
 func TestCopyToDuration(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, duration, o.Attributes()["duration_standard"].(DurationValue).ValueDuration())
@@ -95,7 +95,7 @@ func TestCopyToDuration(t *testing.T) {
 func TestCopyToNested(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(
@@ -116,7 +116,7 @@ func TestCopyToNested(t *testing.T) {
 func TestCopyToList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
@@ -151,7 +151,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 	testObject := createTestObj()
 
 	// Start with two elements.
-	diags := CopyTestToTerraform(context.Background(), testObject, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObject, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
@@ -161,7 +161,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 
 	// Increase to 3, array access must not panic.
 	testObject.StringList = []string{"el1", "el2", "el3"}
-	diags = CopyTestToTerraform(context.Background(), testObject, &o)
+	o, diags = CopyTestToTerraform(context.Background(), testObject, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
@@ -172,7 +172,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 
 	// Decrease to a single element, others should be removed.
 	testObject.StringList = []string{"elX"}
-	diags = CopyTestToTerraform(context.Background(), testObject, &o)
+	o, diags = CopyTestToTerraform(context.Background(), testObject, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, []attr.Value{
@@ -183,7 +183,7 @@ func TestCopyTo_ChangeListSize(t *testing.T) {
 func TestCopyToNestedList(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	nestedList := o.Attributes()["nested_list"].(types.List)
@@ -249,7 +249,7 @@ func TestCopyToNestedList(t *testing.T) {
 func TestCopyToMap(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	m := o.Attributes()["map"].(types.Map).Elements()
@@ -272,7 +272,7 @@ func TestCopyToMapPreserveUnknownExistingKeys(t *testing.T) {
 		},
 	)
 
-	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
 	m := o.Attributes()["map"].(types.Map).Elements()
@@ -286,7 +286,7 @@ func TestCopyToMapPreserveUnknownExistingKeys(t *testing.T) {
 func TestCopyToCustom(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
+	o, diags := CopyTestToTerraform(context.Background(), createTestObj(), &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(
@@ -305,7 +305,7 @@ func TestCopyToOneOfBranch3(t *testing.T) {
 	testObj := createTestObj()
 	testObj.OneOf = &Test_Branch3{Branch3: "Test"}
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(
@@ -320,7 +320,7 @@ func TestCopyToOneOfBranch2(t *testing.T) {
 	testObj := createTestObj()
 	testObj.OneOf = &Test_Branch2{Branch2: &Branch2{Int32: 5}}
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(
@@ -334,7 +334,7 @@ func TestCopyToOneOfNoBranch(t *testing.T) {
 	o := copyToTerraformObject(t)
 	testObj := createTestObj()
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.True(t, o.Attributes()["branch1"].(types.Object).IsNull())
@@ -346,7 +346,7 @@ func TestCopyToEmbeddedField(t *testing.T) {
 	o := copyToTerraformObject(t)
 	testObj := createTestObj()
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(t, "embdtest1", o.Attributes()["embedded_string"].(types.String).ValueString())
@@ -361,7 +361,7 @@ func TestCopyToOneOfLowercase(t *testing.T) {
 	testObj := createTestObj()
 	testObj.LowerSnakeOneof = &Test_Foo{Foo: "1234"}
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
 	require.Equal(
@@ -387,7 +387,7 @@ func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 		Str: "TestString",
 	}
 
-	diags := CopyTestToTerraform(context.Background(), testObj, &o)
+	o, diags := CopyTestToTerraform(context.Background(), testObj, &o)
 	requireNoDiagErrors(t, diags)
 
 	nestedNullable := o.Attributes()["nested_nullable"].(types.Object)
@@ -404,7 +404,7 @@ func TestCopyToTerraformPreserveUnknown(t *testing.T) {
 	o := copyToTerraformObject(t)
 	o.Attributes()["str"] = types.StringUnknown()
 
-	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
 	v := o.Attributes()["str"].(types.String)
@@ -439,7 +439,7 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 	requireNoDiagErrors(t, diags)
 	o.Attributes()["nested"] = nestedValue
 
-	diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	o, diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
 	nested := o.Attributes()["nested"].(types.Object)
@@ -470,7 +470,7 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 		ElemType: types.BoolType,
 	}
 
-	diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
 	v := o.Attributes()["bool_custom_list"].(types.List)
@@ -490,7 +490,7 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 		ElemType: types.BoolType,
 	}
 
-	diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	o, diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
 	v = o.Attributes()["bool_custom_list"].(types.List)

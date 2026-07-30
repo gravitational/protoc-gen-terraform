@@ -33,7 +33,12 @@ func (m *MessageCopyToGenerator) Generate(writer io.Writer) (int, error) {
 				j.Id("obj").Op("*").Id(m.i.WithType(m.GoType)),
 				j.Id("tf").Op("*").Id(m.i.WithPackage(Types, "Object")),
 			).
-			Id(m.i.WithPackage(Diag, "Diagnostics")).
+			Parens(
+				j.List(
+					j.Id(m.i.WithPackage(Types, "Object")),
+					j.Id(m.i.WithPackage(Diag, "Diagnostics")),
+				),
+			).
 			BlockFunc(func(g *j.Group) {
 				g.Return(j.Id(helperName).Call(j.Id("ctx"), j.Id("obj"), j.Id("tf"), j.False()))
 			})
@@ -60,7 +65,12 @@ func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int,
 				j.Id("tf").Op("*").Id(m.i.WithPackage(Types, "Object")),
 				j.Id("preserveUnknown").Id("bool"),
 			).
-			Id(m.i.WithPackage(Diag, "Diagnostics")).
+			Parens(
+				j.List(
+					j.Id(m.i.WithPackage(Types, "Object")),
+					j.Id(m.i.WithPackage(Diag, "Diagnostics")),
+				),
+			).
 			BlockFunc(func(g *j.Group) {
 				// schema, diags := GenSchemaFoo(ctx)
 				g.List(j.Id("schema"), j.Id("diags")).Op(":=").Id("GenSchema" + m.Name).Call(j.Id("ctx"))
@@ -70,7 +80,7 @@ func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int,
 				// }
 				g.If(j.Id("diags.HasError").Call()).Block(
 					j.Return(
-						// j.Id(m.i.WithPackage(Types, "Object")).Values(),
+						j.Id(m.i.WithPackage(Types, "Object")).Values(),
 						j.Id("diags"),
 					),
 				)
@@ -104,11 +114,7 @@ func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int,
 				g.Id("diags.Append").Call(j.Id("resultDiags").Op("..."))
 
 				// return result, diags
-				// g.Return(j.Id("result"), j.Id("diags"))
-
-				g.Id("*tf").Op("=").Id("result")
-
-				g.Return(j.Id("diags"))
+				g.Return(j.Id("result"), j.Id("diags"))
 			})
 
 	return writer.Write([]byte(method.GoString() + "\n"))
