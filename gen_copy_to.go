@@ -489,7 +489,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 func (f *FieldCopyToGenerator) genCustom() *j.Statement {
 	return f.nextField("t", func(g *j.Group) {
 		g.Id("v").Op(":=").Id("CopyTo"+f.Suffix).Params(
-			j.Id("diags"), j.Id("obj."+f.Name), j.Id("t"), j.Id("tf.Attrs").Index(j.Lit(f.NameSnake)), j.Id("preserveUnknown"),
+			j.Id("&diags"), j.Id("obj."+f.Name), j.Id("t"), j.Id("tf.Attrs").Index(j.Lit(f.NameSnake)), j.Id("preserveUnknown"),
 		)
 		g.Id("tf.Attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})

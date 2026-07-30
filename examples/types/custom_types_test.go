@@ -10,7 +10,7 @@ import (
 )
 
 func TestCopyToBoolSpecialPreserveUnknownWithNil(t *testing.T) {
-	var diags diag.Diagnostics
+	diags := &diag.Diagnostics{}
 
 	result := CopyToBoolSpecial(diags, BoolCustom(true), types.BoolType, nil, true)
 
@@ -24,7 +24,7 @@ func TestCopyToBoolSpecialPreserveUnknownWithNil(t *testing.T) {
 }
 
 func TestCopyToBoolSpecialPreserveUnknown(t *testing.T) {
-	var diags diag.Diagnostics
+	diags := &diag.Diagnostics{}
 
 	val := types.Bool{Unknown: true, Value: false}
 	result := CopyToBoolSpecial(diags, BoolCustom(true), types.BoolType, val, true)
@@ -39,7 +39,7 @@ func TestCopyToBoolSpecialPreserveUnknown(t *testing.T) {
 }
 
 func TestCopyToBoolSpecialListPreserveUnknownWithEmptySlice(t *testing.T) {
-	var diags diag.Diagnostics
+	diags := &diag.Diagnostics{}
 
 	val := types.List{
 		Unknown:  true,

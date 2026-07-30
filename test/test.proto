@@ -16,6 +16,7 @@ syntax = "proto3";
 package test;
 
 import "gogoproto/gogo.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option (gogoproto.marshaler_all) = false;
@@ -186,6 +187,9 @@ message Test {
 
   // RequiredStr is a required string field
   string RequiredStr = 44;
+
+  // Struct is a recursive struct field.
+  google.protobuf.Struct Struct = 45;
 }
 
 message MaxAgeDuration {

@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -39,10 +40,27 @@ type MessageBuildContext struct {
 	desc     *generator.Descriptor
 	path     string
 	namePath string
+
+	// ancestors is a list of this message's ancestors, including the current
+	// message, used to detect cycles.
+	ancestors []ancestor
+}
+
+// ancestor is a record of a particular message in the generator hierarchy
+type ancestor struct {
+	// desc is the protobuf field descriptor for this ancestor
+	desc *generator.Descriptor
+	// path is the message path
+	path string
 }
 
 // NewMessageBuildContext creates new message build context
-func NewMessageBuildContext(plugin *Plugin, desc *generator.Descriptor, path string) MessageBuildContext {
+func NewMessageBuildContext(
+	plugin *Plugin,
+	desc *generator.Descriptor,
+	path string,
+	ancestors []ancestor,
+) MessageBuildContext {
 	namePath := path
 	if path == "" {
 		namePath = desc.GetName()
@@ -55,7 +73,37 @@ func NewMessageBuildContext(plugin *Plugin, desc *generator.Descriptor, path str
 	}
 	namePath = strings.Replace(namePath, ".", "", -1)
 
-	return MessageBuildContext{plugin, plugin.GetImports(), plugin.GetConfig(), plugin.GetGenerator(), desc, path, namePath}
+	// Clone and append, adding an entry for this field.
+	ancestors = append(slices.Clone(ancestors), ancestor{
+		desc: desc,
+		path: path,
+	})
+
+	return MessageBuildContext{
+		plugin:    plugin,
+		imports:   plugin.GetImports(),
+		config:    plugin.GetConfig(),
+		gen:       plugin.GetGenerator(),
+		desc:      desc,
+		path:      path,
+		namePath:  namePath,
+		ancestors: ancestors,
+	}
+}
+
+// GetAncestorPath returns the path of the first matching ancestor for the given
+// descriptor. Equality is determined by the file and type name. Returns
+// `path, true` for a valid match, or `"", false` if no match is found.
+func (c MessageBuildContext) GetAncestorPath(desc *generator.Descriptor) (string, bool) {
+	for _, a := range c.ancestors {
+		sameFile := a.desc.File().GetName() == desc.File().GetName()
+		sameType := slices.Equal(a.desc.TypeName(), desc.TypeName())
+		if sameFile && sameType {
+			return a.path, true
+		}
+	}
+
+	return "", false
 }
 
 // GetGoType returns go type for a message

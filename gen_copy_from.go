@@ -296,9 +296,9 @@ func (f *FieldCopyFromGenerator) genObjectListOrMap() *j.Statement {
 // genCustom generates statement representing custom type
 func (f *FieldCopyFromGenerator) genCustom() *j.Statement {
 	return j.Block(
-		// a, ok := ft.Attrs["key"]
 		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attrs").Index(j.Lit(f.NameSnake)),
-		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag),
-		j.Id("CopyFrom"+f.Suffix).Params(j.Id("diags"), j.Id("a"), j.Id("&obj."+f.Name)),
+		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag).Else().Block(
+			j.Id("CopyFrom"+f.Suffix).Params(j.Id("&diags"), j.Id("a"), j.Id("&obj."+f.Name)),
+		),
 	)
 }
