@@ -52,12 +52,13 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	r.p.custom[id] = custom
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &plan)...)
+	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r customResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -75,12 +76,13 @@ func (r customResource) Read(ctx context.Context, req resource.ReadRequest, resp
 
 	custom := r.p.custom[id.ValueString()]
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &state)...)
+	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &state)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r customResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -98,12 +100,13 @@ func (r customResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	r.p.custom[custom.Id] = custom
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &plan)...)
+	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r customResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -148,14 +151,15 @@ func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanR
 		return
 	}
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)...)
+	result, diags := schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	if hasID {
-		plan.Attributes()["id"] = id
+		result.Attributes()["id"] = id
 	}
 
-	resp.Diagnostics.Append(resp.Plan.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.Plan.Set(ctx, &result)...)
 }

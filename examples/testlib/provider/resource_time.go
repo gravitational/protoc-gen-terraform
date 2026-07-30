@@ -50,12 +50,13 @@ func (r timeResource) Create(ctx context.Context, req resource.CreateRequest, re
 
 	r.p.time[id] = time
 
-	resp.Diagnostics.Append(schemav1.CopyTimeToTerraform(ctx, time, &plan)...)
+	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r timeResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -73,12 +74,13 @@ func (r timeResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 	time := r.p.time[id.ValueString()]
 
-	resp.Diagnostics.Append(schemav1.CopyTimeToTerraform(ctx, time, &state)...)
+	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &state)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r timeResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -96,12 +98,13 @@ func (r timeResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	r.p.time[time.Id] = time
 
-	resp.Diagnostics.Append(schemav1.CopyTimeToTerraform(ctx, time, &plan)...)
+	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r timeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
