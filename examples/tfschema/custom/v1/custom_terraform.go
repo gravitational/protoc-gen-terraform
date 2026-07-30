@@ -296,119 +296,131 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 // CopyCustomToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
-	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
-	tf.Null = false
-	tf.Unknown = false
-	if tf.Attributes() == nil {
-		tf.Attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
+	schema, diags := GenSchemaCustom(ctx)
+	if diags.HasError() {
+		return diags
+	}
+	attrType := schema.Type().(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+	var attrs map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value
+	if tf == nil || tf.Attributes() == nil {
+		attrs = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value)
+	} else {
+		attrs = tf.Attributes()
 	}
 	{
-		t, ok := tf.AttributeTypes(ctx)["bool_custom"]
+		t, ok := attrType.AttributeTypes()["bool_custom"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom"})
 		} else {
-			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, tf.Attributes()["bool_custom"], preserveUnknown)
-			tf.Attributes()["bool_custom"] = v
+			v := CopyToBoolSpecial(diags, obj.BoolCustom, t, attrs["bool_custom"], preserveUnknown)
+			attrs["bool_custom"] = v
 		}
 	}
 	{
-		t, ok := tf.AttributeTypes(ctx)["bool_custom_list"]
+		t, ok := attrType.AttributeTypes()["bool_custom_list"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.bool_custom_list"})
 		} else {
-			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, tf.Attributes()["bool_custom_list"], preserveUnknown)
-			tf.Attributes()["bool_custom_list"] = v
+			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, attrs["bool_custom_list"], preserveUnknown)
+			attrs["bool_custom_list"] = v
 		}
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["computed"]
+		existing := attrs["computed"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Computed))
 		}
-		tf.Attributes()["computed"] = v
+		attrs["computed"] = v
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["id"]
+		existing := attrs["id"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Id))
 		}
-		tf.Attributes()["id"] = v
+		attrs["id"] = v
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["custom_name_override"]
+		existing := attrs["custom_name_override"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.NameOverride))
 		}
-		tf.Attributes()["custom_name_override"] = v
+		attrs["custom_name_override"] = v
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["plan_modifier"]
+		existing := attrs["plan_modifier"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.PlanModifier))
 		}
-		tf.Attributes()["plan_modifier"] = v
+		attrs["plan_modifier"] = v
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["required"]
+		existing := attrs["required"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Required))
 		}
-		tf.Attributes()["required"] = v
+		attrs["required"] = v
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["schema_override"]
+		existing := attrs["schema_override"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.SchemaOverride))
 		}
-		tf.Attributes()["schema_override"] = v
+		attrs["schema_override"] = v
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["sensitive"]
+		existing := attrs["sensitive"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Sensitive))
 		}
-		tf.Attributes()["sensitive"] = v
+		attrs["sensitive"] = v
 	}
 	{
-		t, ok := tf.AttributeTypes(ctx)["string_override"]
+		t, ok := attrType.AttributeTypes()["string_override"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Custom.string_override"})
 		} else {
-			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attributes()["string_override"], preserveUnknown)
-			tf.Attributes()["string_override"] = v
+			v := CopyToStringCustom(diags, obj.StringOverride, t, attrs["string_override"], preserveUnknown)
+			attrs["string_override"] = v
 		}
 	}
 	{
 		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := tf.Attributes()["validated"]
+		existing := attrs["validated"]
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Validated))
 		}
-		tf.Attributes()["validated"] = v
+		attrs["validated"] = v
 	}
+	_, ok := attrs["injected"]
+	if !ok {
+		attrs["injected"] = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+	}
+	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
+	diags.Append(resultDiags...)
+	*tf = result
 	return diags
 }
 
