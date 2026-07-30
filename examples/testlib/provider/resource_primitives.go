@@ -66,12 +66,13 @@ func (r primitivesResource) Create(ctx context.Context, req resource.CreateReque
 
 	r.p.primitives[id] = &newPrimitives
 
-	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)...)
+	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r primitivesResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -89,12 +90,13 @@ func (r primitivesResource) Read(ctx context.Context, req resource.ReadRequest, 
 
 	primitives := r.p.primitives[id.ValueString()]
 
-	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, primitives, &state)...)
+	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, primitives, &state)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r primitivesResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -127,12 +129,13 @@ func (r primitivesResource) Update(ctx context.Context, req resource.UpdateReque
 
 	r.p.primitives[newPrimitives.Id] = &newPrimitives
 
-	resp.Diagnostics.Append(schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)...)
+	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r primitivesResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

@@ -81,7 +81,7 @@ func TestCopyToOptionalFieldsSet(t *testing.T) {
 		StringList:           []string{"test1", "test2"},
 	}
 
-	diags := CopyOptionalTestToTerraform(context.Background(), obj, &o)
+	o, diags := CopyOptionalTestToTerraform(context.Background(), obj, &o)
 	require.False(t, diags.HasError())
 
 	// Optional fields with values set
@@ -128,7 +128,7 @@ func TestCopyToOptionalFieldsNil(t *testing.T) {
 		StringList:           nil,
 	}
 
-	diags := CopyOptionalTestToTerraform(context.Background(), obj, &o)
+	o, diags := CopyOptionalTestToTerraform(context.Background(), obj, &o)
 	require.False(t, diags.HasError())
 
 	// Optional fields with nil should be null

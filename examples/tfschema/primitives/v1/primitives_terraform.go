@@ -539,16 +539,16 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 }
 
 // CopyPrimitivesToTerraform copies contents of the source Terraform object into a target struct
-func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyPrimitivesToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
 // CopyPrimitivesToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
 // Set preserveUnknown to true to preserve unknown values.
-func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaPrimitives(ctx)
 	if diags.HasError() {
-		return diags
+		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}
 	attrType := schema.Type().(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 	var attrs map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value
@@ -961,8 +961,7 @@ func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_c
 	}
 	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
 	diags.Append(resultDiags...)
-	*tf = result
-	return diags
+	return result, diags
 }
 
 // attrReadMissingDiag represents diagnostic message on an attribute missing in the source object

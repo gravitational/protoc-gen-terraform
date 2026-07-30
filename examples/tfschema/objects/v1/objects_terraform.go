@@ -1477,16 +1477,16 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 }
 
 // CopyObjectsToTerraform copies contents of the source Terraform object into a target struct
-func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyObjectsToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
 // CopyObjectsToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
 // Set preserveUnknown to true to preserve unknown values.
-func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaObjects(ctx)
 	if diags.HasError() {
-		return diags
+		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}
 	attrType := schema.Type().(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
 	var attrs map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value
@@ -2889,8 +2889,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 	}
 	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
 	diags.Append(resultDiags...)
-	*tf = result
-	return diags
+	return result, diags
 }
 
 // attrReadMissingDiag represents diagnostic message on an attribute missing in the source object
