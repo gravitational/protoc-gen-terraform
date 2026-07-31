@@ -37,7 +37,7 @@ func (m MockPlanModifier) Modify(ctx context.Context, req tfsdk.ModifyAttributeP
 	}
 
 	if value.IsNull() || value.IsUnknown() {
-		resp.AttributePlan = types.String{Value: "modified_value"}
+		resp.AttributePlan = types.StringValue("modified_value")
 		return
 	}
 

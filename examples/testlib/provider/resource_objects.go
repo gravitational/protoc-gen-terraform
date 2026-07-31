@@ -41,7 +41,7 @@ func (r objectsResource) Create(ctx context.Context, req resource.CreateRequest,
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.String{Value: id}
+	plan.Attributes()["id"] = types.StringValue(id)
 
 	objects := &extypes.Objects{}
 	resp.Diagnostics.Append(schemav1.CopyObjectsFromTerraform(ctx, plan, objects)...)
