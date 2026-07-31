@@ -377,10 +377,7 @@ func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 	nestedNullableType, ok := o.AttributeTypes(t.Context())["nested_nullable"].(types.ObjectType)
 	require.True(t, ok)
 
-	o.Attributes()["nested_nullable"] = types.Object{
-		Null:      true,
-		AttrTypes: nestedNullableType.AttributeTypes(),
-	}
+	o.Attributes()["nested_nullable"] = types.ObjectNull(nestedNullableType.AttributeTypes())
 
 	testObj := createTestObj()
 	testObj.NestedNullable = &Nested{
@@ -460,15 +457,14 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 
 func TestCopyToCustomPreserveUnknown(t *testing.T) {
 	o := copyToTerraformObject(t)
-	o.Attributes()["bool_custom_list"] = types.List{
-		Unknown: false,
-		Elems: []attr.Value{
+	o.Attributes()["bool_custom_list"] = types.ListValueMust(
+		types.BoolType,
+		[]attr.Value{
 			types.BoolValue(false),
 			types.BoolUnknown(),
 			types.BoolUnknown(),
 		},
-		ElemType: types.BoolType,
-	}
+	)
 
 	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
@@ -485,11 +481,7 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 		v.Elements(),
 	)
 
-	o.Attributes()["bool_custom_list"] = types.List{
-		Unknown:  true,
-		ElemType: types.BoolType,
-	}
-
+	o.Attributes()["bool_custom_list"] = types.ListUnknown(types.BoolType)
 	o, diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 

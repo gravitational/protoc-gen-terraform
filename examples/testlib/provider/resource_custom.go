@@ -40,9 +40,9 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.String{Value: id}
-	plan.Attributes()["computed"] = types.String{Value: "computed"}
-	plan.Attributes()["injected"] = types.String{Value: "injected"}
+	plan.Attributes()["id"] = types.StringValue(id)
+	plan.Attributes()["computed"] = types.StringValue("computed")
+	plan.Attributes()["injected"] = types.StringValue("injected")
 
 	custom := &extypes.Custom{}
 	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)

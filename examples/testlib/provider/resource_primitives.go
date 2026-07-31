@@ -41,7 +41,7 @@ func (r primitivesResource) Create(ctx context.Context, req resource.CreateReque
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.String{Value: id}
+	plan.Attributes()["id"] = types.StringValue(id)
 
 	primitives := &extypes.Primitives{}
 	resp.Diagnostics.Append(schemav1.CopyPrimitivesFromTerraform(ctx, plan, primitives)...)
