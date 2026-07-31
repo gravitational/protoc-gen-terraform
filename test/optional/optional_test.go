@@ -17,6 +17,7 @@ package optional
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -26,17 +27,49 @@ import (
 )
 
 func schemaObject(t *testing.T) types.Object {
-	t.Helper()
 	s, d := GenSchemaOptionalTest(context.Background())
 	require.False(t, d.HasError())
-	typ := s.Type()
-	obj, ok := typ.(types.ObjectType)
+
+	obj, ok := s.Type().(types.ObjectType)
 	require.True(t, ok)
-	return types.Object{
-		Null:      false,
-		Unknown:   false,
-		Attrs:     make(map[string]attr.Value),
-		AttrTypes: obj.AttributeTypes(),
+
+	attrTypes := obj.AttributeTypes()
+
+	return types.ObjectValueMust(attrTypes, nullAttrs(attrTypes))
+}
+
+func nullAttrs(attrTypes map[string]attr.Type) map[string]attr.Value {
+	attrs := make(map[string]attr.Value, len(attrTypes))
+
+	for name, attrType := range attrTypes {
+		attrs[name] = nullValue(attrType)
+	}
+
+	return attrs
+}
+
+func nullValue(attrType attr.Type) attr.Value {
+	if attrType.Equal(types.StringType) {
+		return types.StringNull()
+	}
+	if attrType.Equal(types.Int64Type) {
+		return types.Int64Null()
+	}
+	if attrType.Equal(types.Float64Type) {
+		return types.Float64Null()
+	}
+	if attrType.Equal(types.BoolType) {
+		return types.BoolNull()
+	}
+	switch t := attrType.(type) {
+	case types.ListType:
+		return types.ListNull(t.ElementType())
+	case types.MapType:
+		return types.MapNull(t.ElementType())
+	case types.ObjectType:
+		return types.ObjectNull(t.AttributeTypes())
+	default:
+		panic(fmt.Sprintf("unsupported fixture attr type %T", attrType))
 	}
 }
 
@@ -154,38 +187,36 @@ func TestCopyFromOptionalFields(t *testing.T) {
 	mapType := obj.AttributeTypes()["optional_map"].(types.MapType)
 	listType := obj.AttributeTypes()["string_list"].(types.ListType)
 
-	tf := types.Object{
-		Null:    false,
-		Unknown: false,
-		Attrs: map[string]attr.Value{
-			"optional_str":   types.String{Value: "test"},
-			"optional_int64": types.Int64{Value: 42},
-			"optional_bool":  types.Bool{Value: true},
-			"choice_a":       types.String{Null: true},
-			"choice_b":       types.String{Value: "picked_b"},
-			"optional_map": types.Map{
-				ElemType: mapType.ElementType(),
-				Elems: map[string]attr.Value{
-					"key1": types.String{Value: "val1"},
-					"key2": types.String{Value: "val2"},
+	tf := types.ObjectValueMust(
+		obj.AttributeTypes(),
+		map[string]attr.Value{
+			"optional_str":   types.StringValue("test"),
+			"optional_int64": types.Int64Value(42),
+			"optional_bool":  types.BoolValue(true),
+			"choice_a":       types.StringNull(),
+			"choice_b":       types.StringValue("picked_b"),
+			"optional_map": types.MapValueMust(
+				mapType.ElementType(),
+				map[string]attr.Value{
+					"key1": types.StringValue("val1"),
+					"key2": types.StringValue("val2"),
 				},
-			},
-			"optional_inner_message": types.Object{
-				AttrTypes: innerType.AttributeTypes(),
-				Attrs: map[string]attr.Value{
-					"inner_bool": types.Bool{Value: true},
+			),
+			"optional_inner_message": types.ObjectValueMust(
+				innerType.AttributeTypes(),
+				map[string]attr.Value{
+					"inner_bool": types.BoolValue(true),
 				},
-			},
-			"string_list": types.List{
-				ElemType: listType.ElementType(),
-				Elems: []attr.Value{
-					types.String{Value: "test1"},
-					types.String{Value: "test2"},
+			),
+			"string_list": types.ListValueMust(
+				listType.ElementType(),
+				[]attr.Value{
+					types.StringValue("test1"),
+					types.StringValue("test2"),
 				},
-			},
+			),
 		},
-		AttrTypes: obj.AttributeTypes(),
-	}
+	)
 
 	optionalTest := &OptionalTest{}
 
@@ -229,21 +260,23 @@ func TestCopyFromOptionalFieldsNull(t *testing.T) {
 	objType, ok := typ.(types.ObjectType)
 	require.True(t, ok)
 
-	tf := types.Object{
-		Null:    false,
-		Unknown: false,
-		Attrs: map[string]attr.Value{
-			"optional_str":           types.String{Null: true},
-			"optional_int64":         types.Int64{Null: true},
-			"optional_bool":          types.Bool{Null: true},
-			"choice_a":               types.String{Null: true},
-			"choice_b":               types.String{Null: true},
-			"optional_map":           types.Map{Null: true},
-			"optional_inner_message": types.Object{Null: true},
-			"string_list":            types.List{Null: true},
+	innerType := objType.AttributeTypes()["optional_inner_message"].(types.ObjectType)
+	mapType := objType.AttributeTypes()["optional_map"].(types.MapType)
+	listType := objType.AttributeTypes()["string_list"].(types.ListType)
+
+	tf := types.ObjectValueMust(
+		objType.AttributeTypes(),
+		map[string]attr.Value{
+			"optional_str":           types.StringNull(),
+			"optional_int64":         types.Int64Null(),
+			"optional_bool":          types.BoolNull(),
+			"choice_a":               types.StringNull(),
+			"choice_b":               types.StringNull(),
+			"optional_map":           types.MapNull(mapType.ElementType()),
+			"optional_inner_message": types.ObjectNull(innerType.AttributeTypes()),
+			"string_list":            types.ListNull(listType.ElementType()),
 		},
-		AttrTypes: objType.AttributeTypes(),
-	}
+	)
 
 	obj := &OptionalTest{}
 	diags := CopyOptionalTestFromTerraform(context.Background(), tf, obj)
