@@ -59,7 +59,7 @@ specific package names.
 
 ```yaml
 import_path_overrides:
-    "types": "github.com/gravitational/teleport/api/types"
+  "types": "github.com/gravitational/teleport/api/types"
 ```
 
 ## Specifying types to export
@@ -108,12 +108,12 @@ You also can set list of `Validators` and `PlanModifiers` using configuration fi
 
 ```yaml
 validators:
-    "Metadata.Expires":
-        - rfc3339TimeValidator
+  "Metadata.Expires":
+    - rfc3339TimeValidator
 
 plan_modifiers:
-    "Role.Options":
-        - "github.com/hashicorp/terraform-plugin-framework/resource.RequiresReplace()"
+  "Role.Options":
+    - "github.com/hashicorp/terraform-plugin-framework/resource.RequiresReplace()"
 ```
 
 ## UseStateForUnknown by default
@@ -133,10 +133,10 @@ There are cases when you need to add fields not existing in the object to schema
 ```yaml
 injected_fields:
   Test: # Path to inject
-    -
-      name: id
+    - name: id
       type: github.com/hashicorp/terraform-plugin-framework/types.StringType
       computed: true
+      value_method: github.com/hashicorp/terraform-plugin-framework/types.StringUnknown
 ```
 
 ## Schema field naming
@@ -147,22 +147,26 @@ If you need to rename field in schema, use `name_overrides` option:
 
 ```yaml
 name_overrides:
-    "Role.Spec.AWSRoleARNs": aws_arns
+  "Role.Spec.AWSRoleARNs": aws_arns
 ```
 
 ## Custom fields
 
-If your proto generated objects use type alias for duration fields, you can set `custom_duration` to the name of a custom duration type.
+If your proto generated objects use type alias for duration fields, you can set `duration_custom_type` to the name of a custom duration type.
 
 `time_type`, `duration_type` and `schema_types` options are used to override Terraform types.
 
 ```yaml
 time_type:
-    type: "TimeType"                    # attr.Type
-    value_type: "TimeValue"             # attr.Value
-    cast_to_type: "time.Time"           # TimeValue.Value type
-    cast_from_type: "time.Time"         # Go object field type
-    type_constructor: UseRFC3339Time()  # Function to put into schema definition Type, will generate TimeType{} if missing
+  type: "TimeType" # attr.Type
+  value_type: "TimeValue" # attr.Value
+  value_from_method: "ValueTime" # method on TimeValue returning the Go value
+  value_to_method: "NewTime" # constructor for a known TimeValue
+  null_value_method: "NullTime" # constructor for a null TimeValue
+  unknown_value_method: "UnknownTime" # constructor for an unknown TimeValue
+  cast_to_type: "time.Time" # Go type passed to value_to_method
+  cast_from_type: "time.Time" # Go object field type
+  type_constructor: UseRFC3339Time() # Function to put into schema definition Type, will generate TimeType{} if missing
 ```
 
 ## Custom duration value
@@ -194,7 +198,7 @@ The signatures for `Test` resource would be the following:
 // tf must have all the object attrs present (including null and unknown).
 // Hence, tf must be the result of req.Plan.Get or similar Terraform method.
 // Otherwise, error would be returned.
-func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics
+func CopyTestFromTerraform(ctx context.Context, tf types.Object, obj *Test) diag.Diagnostics
 ```
 
 They can be used as following:
@@ -209,8 +213,8 @@ func (r resource) Create(ctx context.Context, req resource.CreateRequest, resp *
         return
     }
 
-    obj := types.Object{}
-    diags := tfschema.CopyObjFromTerraform(plan, &obj)
+    obj := &Test{}
+    diags = tfschema.CopyTestFromTerraform(ctx, plan, obj)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
         return
@@ -219,6 +223,7 @@ func (r resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 ```
 
 The following rules apply:
+
 1. Source Terraform object must contain values for all target object fields.
 2. Unknown values are treated as nulls. Target object value would be set to either nil or zero value.
 
@@ -226,17 +231,21 @@ So, the source Terraform object might be Plan, State or Object.
 
 ### CopyTo
 
-Copies object to Terraform object.
+Copies object to Terraform object returning a new Terraform object.
 
 ```go
-func CopyTestToTerraform(obj Test, tf *types.Object, updateOnly bool) error
+func CopyTestToTerraform(ctx context.Context, obj *Test, tf *types.Object) (types.Object, diag.Diagnostics)
 ```
 
-Target Terraform object must have AttrTypes for all fields of Object.
+Target Terraform object is used as the source of existing values and attribute
+types. The returned object contains the updated attributes.
 
 The following rules apply:
-1. All target attributes are marked as known.
-2. In case an attribute is present in AttrTypes, but is missing in AttrValues, it is created.
+
+1. The source Terraform object must have attribute types for all generated fields.
+2. Missing attribute values are created in the returned object.
+3. Unknown values are replaced by known values by default.
+4. Use `Copy*ToTerraformPreserveUnknown(..., true)` to preserve unknown values already present in the source object.
 
 ## Note on gogoproto.customtype
 
@@ -246,7 +255,7 @@ If a field has `gogoproto.customtype` flag, schema and converters for this field
 
 ```yaml
 suffixes:
-    "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
+  "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
 ```
 
 In the example above, `GenTraitsSchema` method will be called. Without this option, method name would be `GenGithubComGravitationalTeleportApiTypesWrappersTraits`.
@@ -259,7 +268,7 @@ Protobuf allows to define messages with no fields. Terraform treats such objects
 
 Run:
 
-```make test```
+`make test`
 
 # Build and test using Docker
 
@@ -269,6 +278,7 @@ make build test
 ```
 
 On Mac M1 use:
+
 ```sh
 cd build.assets
 make build test PROTOC_PLATFORM=linux-aarch_64
@@ -276,7 +286,7 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 
 # Printing version
 
-```protoc-gen-terraform version```
+`protoc-gen-terraform version`
 
 will print version number and quit.
 
@@ -307,6 +317,7 @@ make gen
 ```
 
 Debuggers can be configured to read stdin from the file:
-* in GoLand: on a `Go Build` target, set `Redirect input from` to the dump file path
-* in VSCode: in the `Launch.json` file, set `stdinFrom` to the dump file path
-* with `dlv`: `dlv exec ./build/protoc-gen-terraform --listen=:2345 --headless=true --api-version=2 --accept-multiclient --redirect stdin:"$PROTOC_GEN_TERRAFORM_DUMP"
+
+- in GoLand: on a `Go Build` target, set `Redirect input from` to the dump file path
+- in VSCode: in the `Launch.json` file, set `stdinFrom` to the dump file path
+- with `dlv`: `dlv exec ./build/protoc-gen-terraform --listen=:2345 --headless=true --api-version=2 --accept-multiclient --redirect stdin:"$PROTOC_GEN_TERRAFORM_DUMP"
