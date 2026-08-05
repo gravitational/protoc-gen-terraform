@@ -25,6 +25,15 @@ jobs:
     - name: Install protoc-gen-go
       run: go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
 
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.14.6
+        terraform_wrapper: false
+
+    - name: Export Terraform path
+      run: echo "TF_ACC_TERRAFORM_PATH=$(command -v terraform)" >> "$GITHUB_ENV"
+
     - name: Build
       run: make build
 
