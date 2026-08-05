@@ -20,7 +20,10 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
 
     - name: Install protoc-gen-gogo
-      run: go install github.com/gogo/protobuf/protoc-gen-gogo
+      run: go install github.com/gogo/protobuf/protoc-gen-gogo@v1.3.2
+
+    - name: Install protoc-gen-go
+      run: go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
 
     - name: Build
       run: make build
