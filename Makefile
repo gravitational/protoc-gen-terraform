@@ -8,6 +8,10 @@ BINFILE = $(PWD)/$(BUILD_DIR)/protoc-gen-terraform
 GOPATH = $(shell go env GOPATH)
 SRCPATH = $(GOPATH)/src
 
+# Find gogo/protobuf so we can include it in the protoc include path, otherwise
+# it looks for a nonexistent vendored copy.
+GOGOPROTO_PATH := $(shell go list -mod=mod -m -f '{{.Dir}}' github.com/gogo/protobuf)
+
 .PHONY: clean
 clean:
 	@mkdir -p ./$(BUILD_DIR)
@@ -27,14 +31,14 @@ test: build gen
 	@protoc \
 		-I$(PWD) \
 		-I$(PWD)/test \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--gogo_out=test \
 		test.proto
 
 	@protoc \
 		-I$(PWD) \
 		-I$(PWD)/test \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--plugin=$(BINFILE) \
 		--terraform_out=config=test/config.yaml:test \
 		test.proto
@@ -68,7 +72,7 @@ gen: build
 	@protoc \
 		-I$(PWD) \
 		-I$(EXAMPLES_PROTO_DIR) \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--gogo_out=examples/types \
 		$(EXAMPLES_PROTO_FILES)
 
@@ -76,7 +80,7 @@ gen: build
 	@protoc \
 		-I$(PWD) \
 		-I$(EXAMPLES_PROTO_DIR) \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--plugin=$(BINFILE) \
 		--terraform_out=config=examples/config/primitives.yaml:examples/tfschema \
 		primitives.proto
@@ -84,7 +88,7 @@ gen: build
 	@protoc \
 		-I$(PWD) \
 		-I$(EXAMPLES_PROTO_DIR) \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--plugin=$(BINFILE) \
 		--terraform_out=config=examples/config/time.yaml:examples/tfschema \
 		time.proto
@@ -92,7 +96,7 @@ gen: build
 	@protoc \
 		-I$(PWD) \
 		-I$(EXAMPLES_PROTO_DIR) \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--plugin=$(BINFILE) \
 		--terraform_out=config=examples/config/objects.yaml:examples/tfschema \
 		objects.proto
@@ -100,7 +104,7 @@ gen: build
 	@protoc \
 		-I$(PWD) \
 		-I$(EXAMPLES_PROTO_DIR) \
-		-I$(PWD)/vendor/github.com/gogo/protobuf \
+		-I$(GOGOPROTO_PATH) \
 		--plugin=$(BINFILE) \
 		--terraform_out=config=examples/config/custom.yaml:./examples/tfschema \
 		custom.proto
