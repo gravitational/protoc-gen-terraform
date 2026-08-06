@@ -107,9 +107,10 @@ func (p *Plugin) GetImports() *Imports {
 // build builds the message dictionary from a messages in protoc file
 func (p *Plugin) build(file *generator.FileDescriptor) {
 	for _, message := range file.Messages() {
-		m, err := BuildMessage(p, message, true, "")
+		m, err := BuildMessage(p, message, true, "", nil)
 		if err != nil {
-			log.WithError(err).Warningf("failed to build the message %v", message.GetName())
+			// Explicitly fail instead of logging a warning.
+			p.Generator.Fail(trace.Wrap(err, "failed to build the message %v", message.GetName()).Error())
 			continue
 		}
 
