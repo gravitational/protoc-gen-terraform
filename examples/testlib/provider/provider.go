@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+	"github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 )
 
 var _ provider.Provider = &exampleProvider{}

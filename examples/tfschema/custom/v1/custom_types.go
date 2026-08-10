@@ -1,6 +1,6 @@
 package v1
 
-import "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+import "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 
 type BoolCustom = types.BoolCustom
 type BoolCustomList = types.BoolCustomList

@@ -245,7 +245,7 @@ const file_optional_proto_rawDesc = "" +
 	"\fInnerMessage\x12\"\n" +
 	"\n" +
 	"inner_bool\x18\x01 \x01(\bH\x00R\tinnerBool\x88\x01\x01B\r\n" +
-	"\v_inner_boolB@Z>github.com/gravitational/protoc-gen-terraform/v4/test/optionalb\x06proto3"
+	"\v_inner_boolB@Z>github.com/gravitational/protoc-gen-terraform/v5/test/optionalb\x06proto3"
 
 var (
 	file_optional_proto_rawDescOnce sync.Once

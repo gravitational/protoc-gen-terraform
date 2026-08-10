@@ -26,7 +26,7 @@ import (
 	"github.com/gogo/protobuf/protoc-gen-gogo/generator"
 	plugin_go "github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/gogo/protobuf/vanity/command"
-	"github.com/gravitational/protoc-gen-terraform/v4/resource"
+	"github.com/gravitational/protoc-gen-terraform/v5/resource"
 	"github.com/gravitational/trace"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/imports"

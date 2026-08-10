@@ -25,7 +25,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gravitational_protoc_gen_terraform_v4_examples_types "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -123,7 +123,7 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 }
 
 // CopyCustomFromTerraform copies contents of the source Terraform object into a target struct
-func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Custom) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
 		a, ok := tf.Attributes()["bool_custom"]
@@ -286,13 +286,13 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 }
 
 // CopyCustomToTerraform copies contents of source struct into a Terraform object.
-func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyCustomToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
 // CopyCustomToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
-func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaCustom(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags

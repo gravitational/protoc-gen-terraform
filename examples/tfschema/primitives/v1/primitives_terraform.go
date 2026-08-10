@@ -25,7 +25,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gravitational_protoc_gen_terraform_v4_examples_types "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -160,7 +160,7 @@ func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_pl
 }
 
 // CopyPrimitivesFromTerraform copies contents of the source Terraform object into a target struct
-func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Primitives) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
 		a, ok := tf.Attributes()["bool_list"]
@@ -303,16 +303,16 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.enum_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.EnumList = make([]github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue, len(v.Elements()))
+				obj.EnumList = make([]github_com_gravitational_protoc_gen_terraform_v5_examples_types.EnumValue, len(v.Elements()))
 				if !v.IsNull() && !v.IsUnknown() {
 					for k, a := range v.Elements() {
 						v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Primitives.enum_list", "github_com_hashicorp_terraform_plugin_framework_types.Int64"})
 						} else {
-							var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue
+							var t github_com_gravitational_protoc_gen_terraform_v5_examples_types.EnumValue
 							if !v.IsNull() && !v.IsUnknown() {
-								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.ValueInt64())
+								t = github_com_gravitational_protoc_gen_terraform_v5_examples_types.EnumValue(v.ValueInt64())
 							}
 							obj.EnumList[k] = t
 						}
@@ -330,9 +330,9 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Primitives.enum_value", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
 			} else {
-				var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue
+				var t github_com_gravitational_protoc_gen_terraform_v5_examples_types.EnumValue
 				if !v.IsNull() && !v.IsUnknown() {
-					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.EnumValue(v.ValueInt64())
+					t = github_com_gravitational_protoc_gen_terraform_v5_examples_types.EnumValue(v.ValueInt64())
 				}
 				obj.EnumValue = t
 			}
@@ -535,13 +535,13 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 }
 
 // CopyPrimitivesToTerraform copies contents of source struct into a Terraform object.
-func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyPrimitivesToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
 // CopyPrimitivesToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
-func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaPrimitives(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
