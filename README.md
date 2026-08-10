@@ -7,7 +7,7 @@ protoc plugin to generate Terraform Framework schema definitions and getter/sett
 Install the generator binary.
 
 ```
-go install github.com/gravitational/protoc-gen-terraform/v4@v4.0.0
+go install github.com/gravitational/protoc-gen-terraform/v5@v5.0.0-dev
 ```
 
 # Dependencies

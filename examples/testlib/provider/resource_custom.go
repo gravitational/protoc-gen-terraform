@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	schemav1 "github.com/gravitational/protoc-gen-terraform/v4/examples/tfschema/custom/v1"
-	extypes "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+	schemav1 "github.com/gravitational/protoc-gen-terraform/v5/examples/tfschema/custom/v1"
+	extypes "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 )
 
 var _ resource.Resource = &customResource{}

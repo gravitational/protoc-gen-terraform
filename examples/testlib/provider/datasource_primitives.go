@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	schemav1 "github.com/gravitational/protoc-gen-terraform/v4/examples/tfschema/primitives/v1"
+	schemav1 "github.com/gravitational/protoc-gen-terraform/v5/examples/tfschema/primitives/v1"
 )
 
 var _ datasource.DataSource = &primitivesDataSource{}

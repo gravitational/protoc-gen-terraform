@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/stretchr/testify/suite"
 
-	providerlib "github.com/gravitational/protoc-gen-terraform/v4/examples/testlib/provider"
+	providerlib "github.com/gravitational/protoc-gen-terraform/v5/examples/testlib/provider"
 )
 
 func TestTerraform(t *testing.T) {
