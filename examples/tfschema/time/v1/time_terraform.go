@@ -26,7 +26,7 @@ import (
 
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_gravitational_protoc_gen_terraform_v4_examples_types "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource "github.com/hashicorp/terraform-plugin-framework/resource"
@@ -108,7 +108,7 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 }
 
 // CopyTimeFromTerraform copies contents of the source Terraform object into a target struct
-func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Time) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
+func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_plugin_framework_types.Object, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Time) github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	{
 		a, ok := tf.Attributes()["duration_custom"]
@@ -119,9 +119,9 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Time.duration_custom", "DurationValue"})
 			} else {
-				var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration
+				var t github_com_gravitational_protoc_gen_terraform_v5_examples_types.Duration
 				if !v.IsNull() && !v.IsUnknown() {
-					t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration(v.ValueDuration())
+					t = github_com_gravitational_protoc_gen_terraform_v5_examples_types.Duration(v.ValueDuration())
 				}
 				obj.DurationCustom = t
 			}
@@ -136,16 +136,16 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Time.duration_custom_list", "github.com/hashicorp/terraform-plugin-framework/types.List"})
 			} else {
-				obj.DurationCustomList = make([]github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration, len(v.Elements()))
+				obj.DurationCustomList = make([]github_com_gravitational_protoc_gen_terraform_v5_examples_types.Duration, len(v.Elements()))
 				if !v.IsNull() && !v.IsUnknown() {
 					for k, a := range v.Elements() {
 						v, ok := a.(DurationValue)
 						if !ok {
 							diags.Append(attrReadConversionFailureDiag{"Time.duration_custom_list", "DurationValue"})
 						} else {
-							var t github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration
+							var t github_com_gravitational_protoc_gen_terraform_v5_examples_types.Duration
 							if !v.IsNull() && !v.IsUnknown() {
-								t = github_com_gravitational_protoc_gen_terraform_v4_examples_types.Duration(v.ValueDuration())
+								t = github_com_gravitational_protoc_gen_terraform_v5_examples_types.Duration(v.ValueDuration())
 							}
 							obj.DurationCustomList[k] = t
 						}
@@ -299,13 +299,13 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 }
 
 // CopyTimeToTerraform copies contents of the source Terraform object into a target struct
-func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyTimeToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
 // CopyTimeToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
 // Set preserveUnknown to true to preserve unknown values.
-func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaTime(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
