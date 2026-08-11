@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -71,4 +73,45 @@ func TestConfig(t *testing.T) {
 		},
 	})
 
+}
+
+func TestConfigSchemaTypeValidation(t *testing.T) {
+	path := writeConfig(t, `
+types:
+  - Test
+time_type:
+  type: TimeType
+  value_type: TimeValue
+  cast_to_type: time.Time
+  cast_from_type: time.Time
+`)
+
+	_, err := ReadConfig(map[string]string{"config": path})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "time_type.value_from_method is required")
+}
+
+func TestConfigInjectedFieldValidation(t *testing.T) {
+	path := writeConfig(t, `
+types:
+  - Test
+injected_fields:
+  Test:
+    - name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+`)
+
+	_, err := ReadConfig(map[string]string{"config": path})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "injected_fields.Test.id.value_method is required")
+}
+
+func writeConfig(t *testing.T, contents string) string {
+	t.Helper()
+
+	path := filepath.Join(t.TempDir(), "config.yaml")
+	require.NoError(t, os.WriteFile(path, []byte(contents), 0o600))
+
+	return path
 }

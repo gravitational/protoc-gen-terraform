@@ -177,9 +177,72 @@ func ReadConfig(params map[string]string) (*Config, error) {
 		return nil, trace.Errorf("Please, specify explicit top level type list, e.g. --terraform-out=types=UserV2+UserSpecV2:./_out")
 	}
 
+	err = c.validate()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
 	c.dump()
 
 	return c, nil
+}
+
+func (c *Config) validate() error {
+	if err := validateSchemaType("time_type", c.TimeType); err != nil {
+		return trace.Wrap(err)
+	}
+
+	if err := validateSchemaType("duration_type", c.DurationType); err != nil {
+		return trace.Wrap(err)
+	}
+
+	for path, schemaType := range c.SchemaTypes {
+		if err := validateSchemaType("schema_types."+path, &schemaType); err != nil {
+			return trace.Wrap(err)
+		}
+	}
+
+	for path, fields := range c.InjectedFields {
+		for _, field := range fields {
+			if strings.TrimSpace(field.ValueMethod) == "" {
+				return trace.BadParameter("injected_fields.%v.%v.value_method is required", path, field.Name)
+			}
+		}
+	}
+
+	return nil
+}
+
+func validateSchemaType(name string, schemaType *SchemaType) error {
+	if schemaType == nil {
+		return nil
+	}
+
+	if schemaType.Type == "PlaceholderType" {
+		return nil
+	}
+
+	required := []struct {
+		name  string
+		value string
+	}{
+		{name: "type", value: schemaType.Type},
+		{name: "value_type", value: schemaType.ValueType},
+		{name: "value_from_method", value: schemaType.ValueFromMethod},
+		{name: "value_to_method", value: schemaType.ValueToMethod},
+		{name: "null_value_method", value: schemaType.NullValueMethod},
+		{name: "unknown_value_method", value: schemaType.UnknownValueMethod},
+		{name: "cast_to_type", value: schemaType.CastToType},
+		{name: "cast_from_type", value: schemaType.CastFromType},
+	}
+
+	for _, field := range required {
+		if strings.TrimSpace(field.value) == "" {
+			return trace.BadParameter("%v.%v is required", name, field.name)
+		}
+	}
+
+	return nil
 }
 
 // getStringParam trims and returns string CLI param value
