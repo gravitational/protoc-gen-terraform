@@ -288,12 +288,12 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 	return diags
 }
 
-// CopyCustomToTerraform copies contents of the source Terraform object into a target struct
+// CopyCustomToTerraform copies contents of source struct into a Terraform object.
 func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyCustomToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
-// CopyCustomToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// CopyCustomToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaCustom(ctx)

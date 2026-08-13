@@ -278,12 +278,12 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 	return diags
 }
 
-// CopyOptionalTestToTerraform copies contents of the source Terraform object into a target struct
+// CopyOptionalTestToTerraform copies contents of source struct into a Terraform object.
 func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyOptionalTestToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
-// CopyOptionalTestToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// CopyOptionalTestToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *OptionalTest, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaOptionalTest(ctx)

@@ -538,12 +538,12 @@ func CopyPrimitivesFromTerraform(_ context.Context, tf github_com_hashicorp_terr
 	return diags
 }
 
-// CopyPrimitivesToTerraform copies contents of the source Terraform object into a target struct
+// CopyPrimitivesToTerraform copies contents of source struct into a Terraform object.
 func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyPrimitivesToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
-// CopyPrimitivesToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// CopyPrimitivesToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaPrimitives(ctx)

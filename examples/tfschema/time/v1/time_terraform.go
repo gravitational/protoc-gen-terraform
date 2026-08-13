@@ -298,12 +298,12 @@ func CopyTimeFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 	return diags
 }
 
-// CopyTimeToTerraform copies contents of the source Terraform object into a target struct
+// CopyTimeToTerraform copies contents of source struct into a Terraform object.
 func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyTimeToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
-// CopyTimeToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// CopyTimeToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaTime(ctx)

@@ -117,16 +117,16 @@ func (f *FieldCopyFromGenerator) nextField(g func(g *j.Group)) *j.Statement {
 func (f *FieldCopyFromGenerator) genPrimitiveBody(g *j.Group) {
 	// var t float32 || *float32, acts as zero value if needed
 	g.Var().Id("t").Id(f.i.WithType(f.GoElemType))
-	// if !v.IsNull() {
+	// if !v.IsNull() && !v.IsUnknown()
 	g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 
 		val := j.Id("v." + f.ValueFromMethod).Call()
 
 		if !f.IsNullable {
-			// obj.Float = float32(v.Value)
+			// obj.Float = float32(v.ValueFloat64())
 			g.Id("t").Op("=").Id(f.i.WithType(f.ValueCastFromType)).Parens(val)
 		} else {
-			// c := float32(v.Value)
+			// c := float32(v.ValueFloat64())
 			g.Id("c").Op(":=").Id(f.i.WithType(f.ValueCastFromType)).Parens(val)
 			// obj.Float = &c
 			g.Id("t").Op("=&").Id("c")
@@ -141,7 +141,7 @@ func (f *FieldCopyFromGenerator) genListOrMapIterator(g *j.Group, typ *j.Stateme
 	// obj.List = make([]string, len(v.Elements())) - same for maps
 	g.Id(objFieldName).Op("=").Make(j.Id(f.i.WithType(f.GoType)), j.Len(j.Id("v.Elements").Call()))
 
-	// if !v.IsNull()
+	// if !v.IsNull() && !v.IsUnknown()
 	g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 		// for k, el := range v.Elements() - where k is either index or map key
 		g.For(j.List(j.Id("k"), j.Id("a"))).Op(":=").Range().Id("v.Elements").Call().BlockFunc(func(g *j.Group) {
@@ -198,7 +198,7 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 				// obj.Nested = Nested{}
 				g.Id(objFieldName).Op("=").Id(f.i.WithType(f.GoElemType)).Values()
 			}
-			// if !v.IsNull()
+			// if !v.IsNull() && !v.IsUnknown()
 			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				if !m.IsEmpty {
 					// tf := v

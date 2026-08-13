@@ -23,10 +23,10 @@ func (m *MessageCopyToGenerator) Generate(writer io.Writer) (int, error) {
 	methodName := "Copy" + m.Name + "ToTerraform"
 	helperName := "Copy" + m.Name + "ToTerraformPreserveUnknown"
 
-	// func Copy<name>ToTerraform(ctx context.Context, tf types.Object, obj *apitypes.<name>)
+	// func Copy<name>ToTerraform(ctx context.Context, tf types.Object, obj *apitypes.<name>) (types.Object, diag.Diagnostics)
 	// ... statements for a fields
 	method :=
-		j.Commentf("// %v copies contents of the source Terraform object into a target struct\n", methodName).
+		j.Commentf("// %v copies contents of source struct into a Terraform object.\n", methodName).
 			Func().Id(methodName).
 			Params(
 				j.Id("ctx").Id(m.i.WithPackage("context", "Context")),
@@ -50,10 +50,10 @@ func (m *MessageCopyToGenerator) Generate(writer io.Writer) (int, error) {
 // If the `preserveUnknown` flag is enabled, Unknown values are preserved.
 func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int, error) {
 	methodName := "Copy" + m.Name + "ToTerraformPreserveUnknown"
-	comment := "// %v copies contents of the source Terraform object into a target struct.\n" +
+	comment := "// %v copies contents of source struct into a Terraform object.\n" +
 		"// Set preserveUnknown to true to preserve unknown values.\n"
 
-	// func Copy<name>ToTerraformPreserveUnknown(ctx context.Context, tf types.Object, obj *apitypes.<name>, preserveUnknown bool)
+	// func Copy<name>ToTerraformPreserveUnknown(ctx context.Context, tf types.Object, obj *apitypes.<name>, preserveUnknown bool) (types.Object, diag.Diagnostics)
 	// ... statements for a fields
 
 	method :=
@@ -185,69 +185,6 @@ func (f *FieldCopyToGenerator) nextField(v string, g func(g *j.Group)) *j.Statem
 		j.List(j.Id(v), j.Id("ok")).Op(":=").Id("attrType").Dot("AttributeTypes").Call().Index(j.Lit(f.NameSnake)),
 		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag).Else().BlockFunc(g),
 	)
-}
-
-// getAttr generates a statement to read the value of an attribute at the specified index.
-//
-// Expected format: `<varName>, ok := <selector>[<index>].(valType)`
-func (f *FieldCopyToGenerator) getAttr(g *j.Group, varName, selector, valType string, index *j.Statement) {
-	g.List(j.Id(varName), j.Id("ok")).
-		Op(":=").
-		Id(selector).
-		Index(index).
-		Assert(j.Id(f.i.WithType(valType)))
-}
-
-// getPrimitiveAttr generates a statement to read the value of an attribute at the specified index.
-// The value will be initialized if it does not exist or the type assertion fails.
-//
-// Expected format:
-//
-//	<varName>, ok := <selector>[<index>].(valType)
-//	if !ok {
-//		genPrimitiveZeroValue()
-//	}
-func (f *FieldCopyToGenerator) getPrimitiveAttr(g *j.Group, varName, selector, valType string, index *j.Statement) {
-	g.List(j.Id(varName), j.Id("ok")).
-		Op(":=").
-		Id(selector).
-		Index(index).
-		Assert(j.Id(f.i.WithType(valType)))
-
-	g.If(j.Id("!ok")).BlockFunc(f.genPrimitiveZeroValue(j.Id(selector).Index(index), f.Field.ElemValueType))
-}
-
-// genPrimitiveZeroValue generates zero value from an empty AttrType
-func (f *FieldCopyToGenerator) genPrimitiveZeroValue(existing *j.Statement, expectedType string) func(*j.Group) {
-	return func(g *j.Group) {
-		// First we check if the field was really uninitialized.
-		// If it's not, we don't know what's going on and need to fail.
-		g.If(existing.Op("!=").Nil()).Block(
-			j.Id("diags.Append").Call(
-				j.Id("attrWriteUnexpectedExistingTypeDiag").Values(j.Lit(f.Path), j.Lit(expectedType)),
-			),
-		)
-
-		// This generates an empty attr.Value from a Terraform type
-		// v, err = t.ValueFromTerraform(ctx, tftypes.NewValue(t.TerraformType(ctx, nil)))
-		g.List(j.Id("i"), j.Id("err")).Op(":=").Id("t.ValueFromTerraform").Call(
-			j.Id("ctx"),
-			j.Id(f.i.WithPackage(TFTypes, "NewValue")).Call(
-				j.Id("t.TerraformType").Call(j.Id("ctx")), j.Nil(),
-			),
-		)
-
-		// if err != nil { diags.AddError }
-		g.If(j.Id("err != nil")).Block(
-			j.Id("diags.Append").Call(j.Id("attrWriteGeneralError").Values(j.Lit(f.Path), j.Id("err"))),
-		)
-
-		// v, ok = i.(types.Time)
-		g.List(j.Id("v"), j.Id("ok")).Op("=").Id("i").Assert(j.Id(f.i.WithType(f.ElemValueType)))
-
-		// if !ok { diags.AddError }
-		g.If(j.Id("!ok")).BlockFunc(f.errAttrConversionFailure(f.Path, f.ElemValueType))
-	}
 }
 
 // genPrimitiveBody generates a block statement that reads an object field into

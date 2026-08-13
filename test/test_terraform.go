@@ -2487,12 +2487,12 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 	return diags
 }
 
-// CopyTestToTerraform copies contents of the source Terraform object into a target struct
+// CopyTestToTerraform copies contents of source struct into a Terraform object.
 func CopyTestToTerraform(ctx context.Context, obj *Test, tf *github_com_hashicorp_terraform_plugin_framework_types.Object) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return CopyTestToTerraformPreserveUnknown(ctx, obj, tf, false)
 }
 
-// CopyTestToTerraformPreserveUnknown copies contents of the source Terraform object into a target struct.
+// CopyTestToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	schema, diags := GenSchemaTest(ctx)
