@@ -29,7 +29,7 @@ protoc \
     types.proto
 ```
 
-This command will generate `types_terraform.go` in `tfschema` folder. 
+This command will generate `types_terraform.go` in `tfschema` folder.
 
 See [Makefile](Makefile) for details.
 
@@ -113,7 +113,7 @@ validators:
 
 plan_modifiers:
     "Role.Options":
-        - "github.com/hashicorp/terraform-plugin-framework/tfsdk.RequiresReplace()"
+        - "github.com/hashicorp/terraform-plugin-framework/resource.RequiresReplace()"
 ```
 
 ## UseStateForUnknown by default
@@ -124,7 +124,7 @@ The following setting:
 use_state_for_unknown_by_default: true
 ```
 
-will add `tfsdk.UseStateForUnknown()` PlanModifier to all computed fields.
+will add `resource.UseStateForUnknown()` PlanModifier to all computed fields.
 
 ## Injecting fields into schema
 
@@ -147,7 +147,7 @@ If you need to rename field in schema, use `name_overrides` option:
 
 ```yaml
 name_overrides:
-    "Role.Spec.AWSRoleARNs": aws_arns 
+    "Role.Spec.AWSRoleARNs": aws_arns
 ```
 
 ## Custom fields
@@ -191,7 +191,7 @@ The signatures for `Test` resource would be the following:
 
 ```go
 // CopyTestFromTerraform copies Terraform object fields to obj
-// tf must have all the object attrs present (including null and unknown). 
+// tf must have all the object attrs present (including null and unknown).
 // Hence, tf must be the result of req.Plan.Get or similar Terraform method.
 // Otherwise, error would be returned.
 func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics
@@ -201,7 +201,7 @@ They can be used as following:
 
 ```go
 // Create template resource create method
-func (r resource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
     var plan types.Object
     diags := req.Plan.Get(ctx, &plan)
     resp.Diagnostics.Append(diags...)
@@ -210,8 +210,8 @@ func (r resource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, r
     }
 
     obj := types.Object{}
-    diags := tfschema.CopyObjFromTerraform(plan, &obj)	
-    resp.Diagnostics.Append(diags...)	
+    diags := tfschema.CopyObjFromTerraform(plan, &obj)
+    resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
         return
     }
