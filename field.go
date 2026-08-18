@@ -221,7 +221,9 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		return nil, trace.Wrap(err)
 	}
 
-	if f.IsMessage && !c.IsMap() {
+	// Build normal messages. Skips maps (handled below) and fields with type
+	// overrides (handled elsewhere).
+	if f.IsMessage && !c.IsMap() && !c.IsCustomType() {
 		err = f.setMessage(c)
 		if err != nil {
 			return nil, trace.Wrap(err)
@@ -257,7 +259,9 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		f.setRepeatedGoElemType()
 	}
 
-	if c.IsMap() {
+	// Set map values for maps, unless there's a custom type override
+	// configured.
+	if c.IsMap() && !c.IsCustomType() {
 		err = f.setMapValues(c)
 		if err != nil {
 			return nil, trace.Wrap(err)
@@ -364,7 +368,25 @@ func (f *Field) getMessage(c *FieldBuildContext) (*Message, error) {
 		return nil, trace.Wrap(err)
 	}
 
-	m, err := BuildMessage(c.plugin, d, false, c.path)
+	// Check for cycles/recursive messages, e.g. `google.protobuf.Struct`. These
+	// aren't valid as a Terraform schema and must have a custom type override.
+	if entry, ok := c.GetAncestorPath(d); ok {
+		// This `path` value can be empty for e.g. the root message.
+		if entry == "" {
+			entry = c.GetPath()
+		}
+
+		// Proto type names are prefixed with '.', so trim that off for user
+		// display
+		typeName := strings.TrimPrefix(c.field.GetTypeName(), ".")
+
+		return nil, trace.BadParameter("type %v is recursive and cannot be "+
+			"expanded into a valid Terraform schema; the parent field %v must "+
+			"be excluded via exclude_fields or given a custom_types entry "+
+			"with a handwritten implementation", typeName, entry)
+	}
+
+	m, err := BuildMessage(c.plugin, d, false, c.path, c.ancestors)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}

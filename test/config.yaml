@@ -51,6 +51,10 @@ validators:
 custom_types:
   "Test.StringOverride": StringCustom
 
+  # Recursive fields (including google.protobuf.Struct) require a custom field
+  # type.
+  "Test.Struct": Struct
+
 schema_types:
   "Test.SchemaOverride":
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"

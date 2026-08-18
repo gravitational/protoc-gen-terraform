@@ -30,7 +30,7 @@ func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribu
 }
 
 // CopyFromBoolSpecial copies target value to the source
-func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *BoolCustom) {
+func CopyFromBoolSpecial(diags *diag.Diagnostics, tf attr.Value, obj *BoolCustom) {
 	v, ok := tf.(types.Bool)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.Bool", tf))
@@ -43,7 +43,7 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *BoolCustom)
 }
 
 // CopyToBoolSpecial copies source value to the target
-func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+func CopyToBoolSpecial(diags *diag.Diagnostics, obj BoolCustom, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	unknown := false
 	if v != nil {
 		unknown = preserveUnknown && v.IsUnknown()
@@ -68,7 +68,7 @@ func GenSchemaBoolSpecialList(_ context.Context, attr tfsdk.Attribute) tfsdk.Att
 }
 
 // CopyFromBoolSpecialList copies target value to the source
-func CopyFromBoolSpecialList(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustomList) {
+func CopyFromBoolSpecialList(diags *diag.Diagnostics, tf attr.Value, obj *[]BoolCustomList) {
 	v, ok := tf.(types.List)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
@@ -92,7 +92,7 @@ func CopyFromBoolSpecialList(diags diag.Diagnostics, tf attr.Value, obj *[]BoolC
 }
 
 // CopyToBoolSpecialList copies source value to the target
-func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+func CopyToBoolSpecialList(diags *diag.Diagnostics, obj []BoolCustomList, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{
@@ -136,7 +136,7 @@ func GenSchemaStringCustom(_ context.Context, attr tfsdk.Attribute) tfsdk.Attrib
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into
 // the source (a single string) by joining all elements with "/".
-func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
+func CopyFromStringCustom(diags *diag.Diagnostics, tf attr.Value, obj *string) {
 	v, ok := tf.(types.List)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
@@ -161,7 +161,7 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 
 // CopyToStringCustom copies a source value (single string) into the Terraform
 // value (a list of strings) by splitting the string on every "/".
-func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+func CopyToStringCustom(diags *diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{

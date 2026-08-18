@@ -10,6 +10,8 @@ import (
 	diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"google.golang.org/protobuf/proto"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 )
 
 // Duration custom duration type
@@ -35,7 +37,7 @@ func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribu
 }
 
 // CopyFromBoolSpecial copies target value to the source
-func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustom) {
+func CopyFromBoolSpecial(diags *diag.Diagnostics, tf attr.Value, obj *[]BoolCustom) {
 	v, ok := tf.(types.List)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
@@ -59,7 +61,7 @@ func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCusto
 }
 
 // CopyToBoolSpecial copies source value to the target
-func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+func CopyToBoolSpecial(diags *diag.Diagnostics, obj []BoolCustom, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{
@@ -104,7 +106,7 @@ func GenSchemaStringCustom(_ context.Context, _ tfsdk.Attribute) tfsdk.Attribute
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into
 // the source (a single string) by joining all elements with "/".
-func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
+func CopyFromStringCustom(diags *diag.Diagnostics, tf attr.Value, obj *string) {
 	v, ok := tf.(types.List)
 	if !ok {
 		diags.AddError("Error reading value from Terraform", fmt.Sprintf("Failed to cast %T to types.List", tf))
@@ -129,7 +131,7 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string) {
 
 // CopyToStringCustom copies a source value (single string) into the Terraform
 // value (a list of strings) by splitting the string on every "/".
-func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+func CopyToStringCustom(diags *diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
 	value, ok := v.(types.List)
 	if !ok {
 		value = types.List{
@@ -163,3 +165,81 @@ func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.
 }
 
 type OverrideCastType string
+
+func GenSchemaStruct(_ context.Context, a tfsdk.Attribute) tfsdk.Attribute {
+	return tfsdk.Attribute{
+		Type:          types.StringType,
+		Description:   a.Description,
+		Required:      a.Required,
+		Optional:      a.Optional,
+		Sensitive:     a.Sensitive,
+		Validators:    a.Validators,
+		Computed:      a.Computed,
+		PlanModifiers: a.PlanModifiers,
+	}
+}
+
+func CopyFromStruct(diags *diag.Diagnostics, tf attr.Value, obj **structpb.Struct) {
+	v, ok := tf.(types.String)
+	if !ok {
+		diags.AddError(
+			"Error reading value from Terraform",
+			fmt.Sprintf("Failed to cast %T to types.String", tf),
+		)
+		return
+	}
+
+	if v.Null || v.Unknown || v.Value == "" {
+		*obj = nil
+		return
+	}
+
+	s := &structpb.Struct{}
+	if err := s.UnmarshalJSON([]byte(v.Value)); err != nil {
+		diags.AddError(
+			"Error reading value from Terraform",
+			fmt.Sprintf("Failed to parse %q as JSON: %v", v.Value, err),
+		)
+		return
+	}
+
+	*obj = s
+}
+
+func CopyToStruct(diags *diag.Diagnostics, obj *structpb.Struct, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+	if obj == nil {
+		// Pass through unknown values.
+		unknown := false
+		if v != nil && (preserveUnknown && v.IsUnknown()) {
+			unknown = true
+		}
+
+		return types.String{Null: true, Unknown: unknown}
+	}
+
+	// Ugly nesting, but don't attempt to reparse an existing object if it's
+	// semantically equal per `proto.Equal()`. This helps mitigate potential
+	// plan drift if the JSON representation shifts.
+	if existing, ok := v.(types.String); ok {
+		sane := !existing.Null && !existing.Unknown && existing.Value != ""
+		if sane {
+			prev := &structpb.Struct{}
+			if err := prev.UnmarshalJSON([]byte(existing.Value)); err == nil {
+				if proto.Equal(prev, obj) {
+					return existing
+				}
+			}
+		}
+	}
+
+	b, err := obj.MarshalJSON()
+	if err != nil {
+		diags.AddError(
+			"Error writing value to Terraform",
+			fmt.Sprintf("Failed to marshal JSON: %v", err),
+		)
+		return types.String{Null: true}
+	}
+
+	return types.String{Value: string(b)}
+}

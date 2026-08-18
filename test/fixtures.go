@@ -24,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 var (
@@ -105,7 +106,24 @@ func createTestObj() *Test {
 		},
 
 		SchemaOverride: "hello",
+
+		Struct: mustCreateStruct(map[string]any{
+			"string": "value",
+			"number": float64(1),
+			"bool":   true,
+			"nested": map[string]any{"inner": "value"},
+			"list":   []any{"a", "b"},
+		}),
 	}
+}
+
+func mustCreateStruct(m map[string]any) *structpb.Struct {
+	s, err := structpb.NewStruct(m)
+	if err != nil {
+		panic(err)
+	}
+
+	return s
 }
 
 // copyFromTerraformObject returns a base object used in CopyFrom* tests
@@ -438,6 +456,7 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 			"bar":             types.String{Value: "ham"},
 			"schema_override": types.String{Value: "hello"},
 			"required_str":    types.String{Value: "Test"},
+			"struct":          types.String{Value: `{"bool":true,"list":["a","b"],"nested":{"inner":"value"},"number":1,"string":"value"}`},
 		},
 		AttrTypes: obj.AttrTypes,
 	}

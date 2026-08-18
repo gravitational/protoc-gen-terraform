@@ -32,6 +32,7 @@ import (
 	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 	github_com_hashicorp_terraform_plugin_go_tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
+	_ "google.golang.org/protobuf/types/known/structpb"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -612,6 +613,10 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		}),
+		"struct": GenSchemaStruct(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+			Description: "Struct is a recursive struct field.",
+			Optional:    true,
+		}),
 		"timestamp": {
 			Computed:      true,
 			Description:   "Timestamp time.Time field",
@@ -692,8 +697,9 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		a, ok := tf.Attrs["bool_custom_list"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Test.BoolCustomList"})
+		} else {
+			CopyFromBoolSpecial(&diags, a, &obj.BoolCustomList)
 		}
-		CopyFromBoolSpecial(diags, a, &obj.BoolCustomList)
 	}
 	{
 		a, ok := tf.Attrs["branch1"]
@@ -2362,8 +2368,17 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 		a, ok := tf.Attrs["string_override"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Test.StringOverride"})
+		} else {
+			CopyFromStringCustom(&diags, a, &obj.StringOverride)
 		}
-		CopyFromStringCustom(diags, a, &obj.StringOverride)
+	}
+	{
+		a, ok := tf.Attrs["struct"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Test.Struct"})
+		} else {
+			CopyFromStruct(&diags, a, &obj.Struct)
+		}
 	}
 	{
 		a, ok := tf.Attrs["timestamp"]
@@ -2569,7 +2584,7 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.BoolCustomList"})
 		} else {
-			v := CopyToBoolSpecial(diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"], preserveUnknown)
+			v := CopyToBoolSpecial(&diags, obj.BoolCustomList, t, tf.Attrs["bool_custom_list"], preserveUnknown)
 			tf.Attrs["bool_custom_list"] = v
 		}
 	}
@@ -5787,8 +5802,17 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Test.StringOverride"})
 		} else {
-			v := CopyToStringCustom(diags, obj.StringOverride, t, tf.Attrs["string_override"], preserveUnknown)
+			v := CopyToStringCustom(&diags, obj.StringOverride, t, tf.Attrs["string_override"], preserveUnknown)
 			tf.Attrs["string_override"] = v
+		}
+	}
+	{
+		t, ok := tf.AttrTypes["struct"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Test.Struct"})
+		} else {
+			v := CopyToStruct(&diags, obj.Struct, t, tf.Attrs["struct"], preserveUnknown)
+			tf.Attrs["struct"] = v
 		}
 	}
 	{

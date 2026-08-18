@@ -52,9 +52,12 @@ type Message struct {
 // check must be false for nested messages. Otherwise, we'll have to specify a full list of allowed
 // types which would be overexplicit. Use ExcludeFields if you need to skip a nested fields.
 //
+// ancestors is a list of ancestor messages, used to detect cycles. This should be nil for root
+// messages.
+//
 // nil returned means that operation was successful, but message needs to be skipped.
-func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path string) (*Message, error) {
-	c := NewMessageBuildContext(plugin, desc, path)
+func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path string, ancestors []ancestor) (*Message, error) {
+	c := NewMessageBuildContext(plugin, desc, path, ancestors)
 
 	// Remove full type name for *top level* types whose package is the DefaultPackageName.
 	// The configuration for top-level type names is (example)
