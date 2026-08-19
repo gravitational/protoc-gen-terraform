@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 // Package plugin is gogoprotobuf package for Terraform code generation
-package main
+package resource
 
 import (
 	"bytes"

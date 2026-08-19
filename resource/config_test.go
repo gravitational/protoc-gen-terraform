@@ -1,4 +1,4 @@
-package main
+package resource
 
 import (
 	"os"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	cfg, err := ReadConfig(map[string]string{"config": "test/config.yaml", "types": "foo+bar"})
+	cfg, err := ReadConfig(map[string]string{"config": "fixtures/config.yaml", "types": "foo+bar"})
 	require.NoError(t, err)
 
 	require.Equal(t, cfg.Types, flagMap{"foo": struct{}{}, "bar": struct{}{}})
