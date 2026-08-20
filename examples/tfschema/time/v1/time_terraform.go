@@ -52,7 +52,7 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			CustomType:    DurationType{},
 			Description:   "duration_custom time.Duration field using casttype.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 		"duration_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
@@ -73,7 +73,7 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			CustomType:    DurationType{},
 			Description:   "duration_standard time.Duration field using stdduration.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
@@ -103,7 +103,7 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			CustomType:    UseRFC3339Time(),
 			Description:   "timestamp_value time.Time field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 	}}, nil
 }
