@@ -89,7 +89,6 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() j.Dict {
 // generateInjectedField generates code for injected field
 func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 	d := j.Dict{
-		j.Id("Type"):     j.Id(m.i.WithType(f.Type)),
 		j.Id("Required"): j.Lit(f.Required),
 		j.Id("Computed"): j.Lit(f.Computed),
 		j.Id("Optional"): j.Lit(f.Optional),
@@ -103,7 +102,7 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, f.PlanModifiers)
 	}
 
-	return j.Values(d)
+	return j.Id(m.i.WithPackage(Schema, attributeTypeForTerraformType(f.Type))).Values(d)
 }
 
 // FieldSchemaGenerator represents the decorator for Field code generation
@@ -119,10 +118,23 @@ func NewFieldSchemaGenerator(f *Field, i *Imports) *FieldSchemaGenerator {
 
 // Generate returns field schema
 func (f *FieldSchemaGenerator) Generate() *j.Statement {
+	d := f.baseAttributeDict()
+
+	switch f.Kind {
+	case ObjectKind:
+		return f.singleNestedAttribute(d)
+	case ObjectListKind:
+		return f.listNestedAttribute(d)
+	case ObjectMapKind:
+		return f.mapNestedAttribute(d)
+	default:
+		return f.primitiveAttributeType().Values(d)
+	}
+}
+
+func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
-		j.Id("Type"):        f.schemaType(), // nils are automatically omitted
-		j.Id("Attributes"):  f.attributes(),
 	}
 
 	// Required/Optional
@@ -152,73 +164,37 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, f.PlanModifiers)
 	}
 
-	if f.Kind == CustomKind {
-		return j.Id("GenSchema"+f.Suffix).Call(j.Id("ctx"), j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d))
-	}
-
-	return j.Values(d)
+	return d
 }
 
-// SchemaType returns the schema Type field value
-func (f *FieldSchemaGenerator) schemaType() *j.Statement {
-	switch f.Kind {
-	case PrimitiveKind:
-		return f.primitiveSchemaTypeDef()
-	case PrimitiveListKind:
-		return j.Id(f.i.WithType(f.Type)).Values(j.Dict{
-			j.Id("ElemType"): f.primitiveSchemaTypeDef(),
-		})
-	case PrimitiveMapKind:
-		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
-
-		return j.Id(f.i.WithType(f.Type)).Values(j.Dict{
-			j.Id("ElemType"): g.primitiveSchemaTypeDef(),
-		})
-	}
-
-	return nil
+func (f *FieldSchemaGenerator) primitiveAttributeType() *j.Statement {
+	return j.Id(f.i.WithPackage(Schema, attributeTypeForTerraformType(f.Type)))
 }
 
-// Attributes returns a nested attribute definitions
-func (f *FieldSchemaGenerator) attributes() *j.Statement {
-	switch f.Kind {
-	case ObjectKind:
-		m := NewMessageSchemaGenerator(f.Message, f.i)
-
-		return f.xNestedAttributes("Single", m)
-	case ObjectMapKind:
-		m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i)
-
-		return f.xNestedAttributes("Map", m)
-	case ObjectListKind:
-		m := NewMessageSchemaGenerator(f.Message, f.i)
-
-		return f.xNestedAttributes("List", m)
-	}
-	return nil
+func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) *j.Statement {
+	return j.Map(j.String()).Id(f.i.WithPackage(Schema, "Attribute")).Values(m.fieldsDictSchema())
 }
 
-// primitiveSchemaTypeDef returns the primitive type
-func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
-	if f.IsTypeScalar {
-		return j.Id(f.i.WithType(f.ElemType))
-	}
-
-	if f.TypeConstructor != "" {
-		return j.Id(f.i.WithType(f.TypeConstructor))
-	}
-
-	return j.Id(f.i.WithType(f.ElemType)).Values()
+func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) *j.Statement {
+	m := NewMessageSchemaGenerator(f.Message, f.i)
+	d[j.Id("Attributes")] = f.nestedAttributes(m)
+	return j.Id(f.i.WithPackage(Schema, "SingleNestedAttribute")).Values(d)
 }
 
-// xNestedAttributes generates *NestedAttributes call
-func (f *FieldSchemaGenerator) xNestedAttributes(typ string, m *MessageSchemaGenerator) *j.Statement {
-	var options *j.Statement
+func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) *j.Statement {
+	m := NewMessageSchemaGenerator(f.Message, f.i)
+	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(Schema, "NestedAttributeObject")).Values(j.Dict{
+		j.Id("Attributes"): f.nestedAttributes(m),
+	})
+	return j.Id(f.i.WithPackage(Schema, "ListNestedAttribute")).Values(d)
+}
 
-	return j.Id(f.i.WithPackage(SDK, typ+"NestedAttributes")).Params(
-		j.Map(j.String()).Id(f.i.WithPackage(SDK, "Attribute")).Values(m.fieldsDictSchema()),
-		options,
-	)
+func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) *j.Statement {
+	m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i)
+	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(Schema, "NestedAttributeObject")).Values(j.Dict{
+		j.Id("Attributes"): f.nestedAttributes(m),
+	})
+	return j.Id(f.i.WithPackage(Schema, "MapNestedAttribute")).Values(d)
 }
 
 func generatePlanModifiers(imports *Imports, pm []string) j.Code {
@@ -237,4 +213,25 @@ func generateValidators(imports *Imports, vals []string) j.Code {
 	}
 
 	return j.Index().Id(imports.WithPackage(SDK, "AttributeValidator")).Values(v...)
+}
+
+func attributeTypeForTerraformType(t string) string {
+	switch t {
+	case Types + ".StringType":
+		return "StringAttribute"
+	case Types + ".BoolType":
+		return "BoolAttribute"
+	case Types + ".Int64Type":
+		return "Int64Attribute"
+	case Types + ".Float64Type":
+		return "Float64Attribute"
+	case Types + ".ListType":
+		return "ListAttribute"
+	case Types + ".MapType":
+		return "MapAttribute"
+	case Types + ".ObjectType":
+		return "ObjectAttribute"
+	default:
+		return "ObjectAttribute"
+	}
 }

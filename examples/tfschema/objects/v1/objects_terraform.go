@@ -42,361 +42,325 @@ var _ = math.Inf
 // GenSchemaObjects returns tfsdk.Schema definition for Objects
 func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
-		"bool_map": {
+		"bool_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
 			Description:   "bool_map map of bools.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 		},
-		"branch_bool": {
+		"branch_bool": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"branch_empty": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
+		"branch_empty": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"active": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 				Computed:    true,
 				Description: "Automatically generated field preventing empty message errors",
 				Optional:    true,
-				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-			}}),
+			}},
 			Description: "",
 			Optional:    true,
 		},
-		"branch_int": {
+		"branch_int": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"branch_leaf": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"branch_leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-				Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-			}}),
+			}},
 			Description: "",
 			Optional:    true,
 		},
-		"branch_nested": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"branch_nested": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
+			}},
 			Description: "",
 			Optional:    true,
 		},
-		"branch_string": {
+		"branch_string": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"embedded_value": {
+		"embedded_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"empty": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"active": {
+		"empty": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"active": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 				Computed:    true,
 				Description: "Automatically generated field preventing empty message errors",
 				Optional:    true,
-				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-			}}),
+			}},
 			Description: "empty is an empty field.",
 			Optional:    true,
 		},
-		"id": {
+		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"int_map": {
+		"int_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
 			Description:   "int_map map of ints.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"leaf": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-				Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-			}}),
+			}},
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"nested_list": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"nested_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListNestedAttribute{
+			Computed:    true,
+			Description: "nested_list is a list of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_resource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
-			Computed:      true,
-			Description:   "nested_list is a list of nested objects.",
+			}}},
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"nested_map": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"nested_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapNestedAttribute{
+			Computed:    true,
+			Description: "nested_map is a map of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_resource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
-			Computed:      true,
-			Description:   "nested_map is a map of nested objects.",
+			}}},
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"nested_nullable": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"nested_nullable": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
+			}},
 			Description: "nested_nullable is a nullable nested object.",
 			Optional:    true,
 		},
-		"nested_nullable_list": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.ListNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"nested_nullable_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListNestedAttribute{
+			Computed:    true,
+			Description: "nested_nullable_list is a nullable list of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_resource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
-			Computed:      true,
-			Description:   "nested_nullable_list is a nullable list of nested objects.",
+			}}},
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"nested_nullable_map": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.MapNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"nested_nullable_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapNestedAttribute{
+			Computed:    true,
+			Description: "nested_map is a nullable map of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_resource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
-			Computed:      true,
-			Description:   "nested_map is a nullable map of nested objects.",
+			}}},
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"nested_value": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"leaf": {
-				Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"value": {
+		"nested_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-				}}),
+				}},
 				Computed:      true,
 				Description:   "",
 				Optional:      true,
 				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			}}),
+			}},
 			Computed:      true,
 			Description:   "nested_value is a nested object.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"primitives": {
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-				"bool_list": {
+		"primitives": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
+				"bool_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "bool_list bool list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 				},
-				"bool_value": {
+				"bool_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 					Computed:      true,
 					Description:   "bool_value bool field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 				},
-				"bytes_list": {
+				"bytes_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "bytes_list bytes list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
-				"bytes_value": {
+				"bytes_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "bytes_value bytes field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"double_list": {
+				"double_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "double_list double list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 				},
-				"double_value": {
+				"double_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.Float64Attribute{
 					Computed:      true,
 					Description:   "double_value float64 field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 				},
-				"enum_list": {
+				"enum_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "enum_list enum list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
-				"enum_value": {
+				"enum_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
 					Computed:      true,
 					Description:   "enum_value enum field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
-				"float_list": {
+				"float_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "float_list float list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 				},
-				"float_value": {
+				"float_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.Float64Attribute{
 					Computed:      true,
 					Description:   "float_value float32 field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 				},
-				"id": {
+				"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-				"int32_list": {
+				"int32_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "int32_list int32 list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
-				"int32_value": {
+				"int32_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
 					Computed:      true,
 					Description:   "int32_value int32 field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
-				"int64_list": {
+				"int64_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "int64_list int64 list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 				},
-				"int64_value": {
+				"int64_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
 					Computed:      true,
 					Description:   "int64_value int64 field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 				},
-				"string_list": {
+				"string_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "string_list string list field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 				},
-				"string_value": {
+				"string_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 					Computed:      true,
 					Description:   "string_value string field.",
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-					Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 				},
-			}),
+			},
 			Computed:      true,
 			Description:   "primitives field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
-		"string_map": {
+		"string_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
 			Description:   "string_map map of strings.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }
