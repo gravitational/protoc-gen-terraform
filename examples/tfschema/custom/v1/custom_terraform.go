@@ -54,6 +54,7 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 		"bool_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "bool_custom_list custom bool list field.",
+			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
