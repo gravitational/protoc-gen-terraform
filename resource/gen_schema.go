@@ -20,6 +20,7 @@ import (
 	// . significantly improves readability of a generator statements.
 	// That's also the reason to extract it into the separate package.
 
+	"cmp"
 	"io"
 
 	"github.com/dave/jennifer/jen"
@@ -159,13 +160,13 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 
 	// Validators
 	if len(f.Validators) > 0 {
-		valType := validatorTypeForTerraformType(f.Type)
+		valType := validatorTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
 		d[j.Id("Validators")] = generateValidators(f.i, valType, f.Validators)
 	}
 
 	// Plan modifiers
 	if len(f.PlanModifiers) > 0 {
-		pmType := planModifierTypeForTerraformType(f.Type)
+		pmType := planModifierTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, pmType, f.PlanModifiers)
 	}
 
@@ -201,7 +202,7 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 }
 
 func (f *FieldSchemaGenerator) primitiveAttributeType() *j.Statement {
-	return j.Id(f.i.WithPackage(Schema, attributeTypeForTerraformType(f.Type)))
+	return j.Id(f.i.WithPackage(Schema, attributeTypeForTerraformType(cmp.Or(f.BaseType, f.Type))))
 }
 
 func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) *j.Statement {
@@ -265,7 +266,7 @@ func attributeTypeForTerraformType(t string) string {
 	case Types + ".ObjectType":
 		return "ObjectAttribute"
 	default:
-		return "ObjectAttribute"
+		return ""
 	}
 }
 
@@ -286,7 +287,7 @@ func planModifierTypeForTerraformType(t string) string {
 	case Types + ".ObjectType":
 		return PlanModifier + ".Object"
 	default:
-		return PlanModifier + ".Object"
+		return ""
 	}
 }
 

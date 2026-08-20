@@ -48,6 +48,9 @@ const (
 type TerraformType struct {
 	// Type represents Terraform attr.Type name
 	Type string
+	// BaseType represents base Terraform attr.Type name used by custom types
+	// to satisfy interfaces
+	BaseType string
 	// ValueType represents Terraform attr.Value name
 	ValueType string
 	// ValueFromMethod is the method called on an attr.Value to get the underlying value
