@@ -17,6 +17,7 @@ limitations under the License.
 package resource
 
 import (
+	"cmp"
 	"strconv"
 	"strings"
 
@@ -527,7 +528,7 @@ func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) ([]string, e
 	}
 
 	if c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		return []string{useStateForUnknownMethodForAttributeType(tt.Type)}, nil
+		return []string{useStateForUnknownMethodForAttributeType(cmp.Or(tt.BaseType, tt.Type))}, nil
 	}
 
 	return []string{}, nil
