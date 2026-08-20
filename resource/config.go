@@ -72,6 +72,8 @@ type SchemaType struct {
 	CastFromType string `yaml:"cast_from_type,omitempty"`
 	// TypeConstructor represents statement used to produce empty type value in schema
 	TypeConstructor string `yaml:"type_constructor,omitempty"`
+	// ElementType specifies the element type for list or map types.
+	ElementType string `yaml:"element_type,omitempty"`
 }
 
 // InjectedField represents custom injected field descriptor

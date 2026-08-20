@@ -528,7 +528,14 @@ func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) ([]string, e
 	}
 
 	if c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		return []string{useStateForUnknownMethodForAttributeType(cmp.Or(tt.BaseType, tt.Type))}, nil
+		attrType := cmp.Or(tt.BaseType, tt.Type)
+		if override := c.GetTerraformTypeOverride(); override != nil {
+			attrType = override.Type
+		}
+		pm := useStateForUnknownMethodForAttributeType(attrType)
+		if pm != "" {
+			return []string{pm}, nil
+		}
 	}
 
 	return []string{}, nil
