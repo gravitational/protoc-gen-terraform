@@ -507,21 +507,26 @@ func (c *FieldBuildContext) GetValidators() []string {
 }
 
 // GetPlanModifiers returns field validators
-func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) []string {
+func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) ([]string, error) {
 	v, ok := c.config.PlanModifiers[c.GetPath()]
 	if !ok {
 		v, ok = c.config.PlanModifiers[c.GetNameWithTypeName()]
 	}
 
 	if ok {
-		return v
+		return v, nil
+	}
+
+	tt, err := c.GetTerraformType()
+	if err != nil {
+		return nil, trace.Wrap(err)
 	}
 
 	if c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		return []string{"github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"}
+		return []string{useStateForUnknownMethodForAttributeType(tt.Type)}, nil
 	}
 
-	return []string{}
+	return []string{}, nil
 }
 
 // GetNullable returns the nullable flag
@@ -571,4 +576,25 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 	}
 
 	return c.config.DefaultPackageName + "." + name
+}
+
+func useStateForUnknownMethodForAttributeType(t string) string {
+	switch t {
+	case Types + ".StringType":
+		return Schema + "/stringplanmodifier.UseStateForUnknown()"
+	case Types + ".BoolType":
+		return Schema + "/boolplanmodifier.UseStateForUnknown()"
+	case Types + ".Int64Type":
+		return Schema + "/int64planmodifier.UseStateForUnknown()"
+	case Types + ".Float64Type":
+		return Schema + "/float64planmodifier.UseStateForUnknown()"
+	case Types + ".ListType":
+		return Schema + "/listplanmodifier.UseStateForUnknown()"
+	case Types + ".MapType":
+		return Schema + "/mapplanmodifier.UseStateForUnknown()"
+	case Types + ".ObjectType":
+		return Schema + "/objectplanmodifier.UseStateForUnknown()"
+	default:
+		return ""
+	}
 }
