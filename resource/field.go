@@ -216,7 +216,6 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		IsNullable:       c.GetNullable(),
 		IsProto3Optional: isProto3Optional,
 		Validators:       c.GetValidators(),
-		PlanModifiers:    c.GetPlanModifiers(isProto3Optional),
 		Path:             c.GetPath(),
 		Comment:          c.GetComment(),
 	}
@@ -225,6 +224,11 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	f.GoElemType = f.GoType
 
 	f.TerraformType, err = c.GetTerraformType()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	f.PlanModifiers, err = c.GetPlanModifiers(isProto3Optional)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
