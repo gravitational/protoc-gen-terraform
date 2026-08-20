@@ -95,11 +95,13 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 	}
 
 	if len(f.Validators) > 0 {
-		d[j.Id("Validators")] = generateValidators(m.i, f.Validators)
+		valType := validatorTypeForTerraformType(f.Type)
+		d[j.Id("Validators")] = generateValidators(m.i, valType, f.Validators)
 	}
 
 	if len(f.PlanModifiers) > 0 {
-		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, f.PlanModifiers)
+		pmType := planModifierTypeForTerraformType(f.Type)
+		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, pmType, f.PlanModifiers)
 	}
 
 	return j.Id(m.i.WithPackage(Schema, attributeTypeForTerraformType(f.Type))).Values(d)
@@ -157,12 +159,14 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 
 	// Validators
 	if len(f.Validators) > 0 {
-		d[j.Id("Validators")] = generateValidators(f.i, f.Validators)
+		valType := validatorTypeForTerraformType(f.Type)
+		d[j.Id("Validators")] = generateValidators(f.i, valType, f.Validators)
 	}
 
 	// Plan modifiers
 	if len(f.PlanModifiers) > 0 {
-		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, f.PlanModifiers)
+		pmType := planModifierTypeForTerraformType(f.Type)
+		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, pmType, f.PlanModifiers)
 	}
 
 	return d
@@ -226,22 +230,22 @@ func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) *j.Statement {
 	return j.Id(f.i.WithPackage(Schema, "MapNestedAttribute")).Values(d)
 }
 
-func generatePlanModifiers(imports *Imports, pm []string) j.Code {
+func generatePlanModifiers(imports *Imports, pmType string, pm []string) j.Code {
 	v := make([]jen.Code, len(pm))
 	for i, n := range pm {
 		v[i] = j.Id(imports.WithType(n))
 	}
 
-	return j.Index().Id(imports.WithPackage(SDK, "AttributePlanModifier")).Values(v...)
+	return j.Index().Id(imports.WithType(pmType)).Values(v...)
 }
 
-func generateValidators(imports *Imports, vals []string) j.Code {
+func generateValidators(imports *Imports, valType string, vals []string) j.Code {
 	v := make([]jen.Code, len(vals))
 	for i, n := range vals {
 		v[i] = j.Id(imports.WithType(n))
 	}
 
-	return j.Index().Id(imports.WithPackage(SDK, "AttributeValidator")).Values(v...)
+	return j.Index().Id(imports.WithType(valType)).Values(v...)
 }
 
 func attributeTypeForTerraformType(t string) string {
@@ -262,5 +266,47 @@ func attributeTypeForTerraformType(t string) string {
 		return "ObjectAttribute"
 	default:
 		return "ObjectAttribute"
+	}
+}
+
+func planModifierTypeForTerraformType(t string) string {
+	switch t {
+	case Types + ".StringType":
+		return PlanModifier + ".String"
+	case Types + ".BoolType":
+		return PlanModifier + ".Bool"
+	case Types + ".Int64Type":
+		return PlanModifier + ".Int64"
+	case Types + ".Float64Type":
+		return PlanModifier + ".Float64"
+	case Types + ".ListType":
+		return PlanModifier + ".List"
+	case Types + ".MapType":
+		return PlanModifier + ".Map"
+	case Types + ".ObjectType":
+		return PlanModifier + ".Object"
+	default:
+		return PlanModifier + ".Object"
+	}
+}
+
+func validatorTypeForTerraformType(t string) string {
+	switch t {
+	case Types + ".StringType":
+		return Validator + ".String"
+	case Types + ".BoolType":
+		return Validator + ".Bool"
+	case Types + ".Int64Type":
+		return Validator + ".Int64"
+	case Types + ".Float64Type":
+		return Validator + ".Float64"
+	case Types + ".ListType":
+		return Validator + ".List"
+	case Types + ".MapType":
+		return Validator + ".Map"
+	case Types + ".ObjectType":
+		return Validator + ".Object"
+	default:
+		return ""
 	}
 }
