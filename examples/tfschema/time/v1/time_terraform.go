@@ -47,11 +47,11 @@ var _ = time.Kitchen
 // GenSchemaTime returns tfsdk.Schema definition for Time
 func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
-		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
+		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "duration_custom time.Duration field using casttype.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Object{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
 		},
 		"duration_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
@@ -67,11 +67,11 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
-		"duration_standard": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
+		"duration_standard": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "duration_standard time.Duration field using stdduration.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Object{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
 		},
 		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
@@ -79,11 +79,11 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"nullable_duration": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
+		"nullable_duration": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Description: "nullable_duration nullable time.Duration field.",
 			Optional:    true,
 		},
-		"nullable_timestamp": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
+		"nullable_timestamp": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Description: "nullable_timestamp nullable time.Time field.",
 			Optional:    true,
 		},
@@ -94,11 +94,11 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
-		"timestamp_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
+		"timestamp_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "timestamp_value time.Time field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Object{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
 		},
 	}}, nil
 }

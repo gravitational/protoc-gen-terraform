@@ -227,6 +227,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		}
 		t = TerraformType{
 			Type:               c.config.TimeType.Type,
+			BaseType:           Types + ".StringType",
 			ValueType:          c.config.TimeType.ValueType,
 			ValueFromMethod:    c.config.TimeType.ValueFromMethod,
 			ValueToMethod:      c.config.TimeType.ValueToMethod,
@@ -244,6 +245,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		}
 		t = TerraformType{
 			Type:               c.config.DurationType.Type,
+			BaseType:           Types + ".StringType",
 			ValueType:          c.config.DurationType.ValueType,
 			ValueFromMethod:    c.config.DurationType.ValueFromMethod,
 			ValueToMethod:      c.config.DurationType.ValueToMethod,
@@ -306,11 +308,13 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 
 	if c.IsRepeated() {
 		t.Type = Types + ".ListType"
+		t.BaseType = Types + ".ListType"
 		t.ValueType = Types + ".List"
 	}
 
 	if c.IsMap() {
 		t.Type = Types + ".MapType"
+		t.BaseType = Types + ".MapType"
 		t.ValueType = Types + ".Map"
 	}
 
