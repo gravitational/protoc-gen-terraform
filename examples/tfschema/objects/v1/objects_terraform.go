@@ -45,6 +45,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 		"bool_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
 			Description:   "bool_map map of bools.",
+			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
@@ -125,6 +126,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 		"int_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
 			Description:   "int_map map of ints.",
+			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},
@@ -251,6 +253,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"bool_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "bool_list bool list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -263,6 +266,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"bytes_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "bytes_list bytes list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -275,6 +279,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"double_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "double_list double list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -287,6 +292,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"enum_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "enum_list enum list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -299,6 +305,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"float_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "float_list float list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -317,6 +324,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"int32_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "int32_list int32 list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -329,6 +337,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"int64_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "int64_list int64 list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -341,6 +350,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 				"string_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 					Computed:      true,
 					Description:   "string_list string list field.",
+					ElementType:   github_com_hashicorp_terraform_plugin_framework_types.StringType,
 					Optional:      true,
 					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 				},
@@ -359,6 +369,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 		"string_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
 			Description:   "string_map map of strings.",
+			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		},

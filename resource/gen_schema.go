@@ -135,6 +135,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
+		j.Id("ElementType"): f.elemType(), // nils are automatically omitted
 	}
 
 	// Required/Optional
@@ -165,6 +166,34 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	}
 
 	return d
+}
+
+// elemType returns the element type
+func (f *FieldSchemaGenerator) elemType() *j.Statement {
+	switch f.Kind {
+	case PrimitiveKind:
+		return nil
+	case PrimitiveListKind:
+		return f.primitiveSchemaTypeDef()
+	case PrimitiveMapKind:
+		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
+		return g.primitiveSchemaTypeDef()
+	}
+
+	return nil
+}
+
+// primitiveSchemaTypeDef returns the primitive type
+func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
+	if f.IsTypeScalar {
+		return j.Id(f.i.WithType(f.ElemType))
+	}
+
+	if f.TypeConstructor != "" {
+		return j.Id(f.i.WithType(f.TypeConstructor))
+	}
+
+	return j.Id(f.i.WithType(f.ElemType)).Values()
 }
 
 func (f *FieldSchemaGenerator) primitiveAttributeType() *j.Statement {
