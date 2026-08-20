@@ -66,6 +66,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		"bool_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "BoolCustomList []bool field",
+			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
@@ -116,6 +117,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		},
 		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationCustom time.Duration field (with casttype)",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
@@ -129,18 +131,21 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		},
 		"duration_custom_missing": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationCustomMissing time.Duration field (with casttype) missing in input data",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
 		},
 		"duration_standard": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationStandard time.Duration field (standard)",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
 		},
 		"duration_standard_missing": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationStandardMissing time.Duration field (standard) missing in input data",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
@@ -298,6 +303,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		},
 		"max_age": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
@@ -575,6 +581,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		},
 		"timestamp": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    UseRFC3339Time(),
 			Description:   "Timestamp time.Time field",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
@@ -588,15 +595,18 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 		},
 		"timestamp_missing": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    UseRFC3339Time(),
 			Description:   "Timestamp time.Time field",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{},
 		},
 		"timestamp_nullable": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
 			Description: "TimestampNullable *time.Time field",
 			Optional:    true,
 		},
 		"timestamp_nullable_with_nil_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
 			Description: "TimestampNullableWithNilValue *time.Time field",
 			Optional:    true,
 		},

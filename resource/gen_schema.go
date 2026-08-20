@@ -138,7 +138,8 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
-		j.Id("ElementType"): f.elemType(), // nils are automatically omitted
+		j.Id("CustomType"):  f.customType(), // nils are automatically omitted
+		j.Id("ElementType"): f.elemType(),   // nils are automatically omitted
 	}
 
 	// Required/Optional
@@ -173,6 +174,16 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	return d
 }
 
+func (f *FieldSchemaGenerator) customType() *j.Statement {
+	if f.Kind != PrimitiveKind {
+		return nil
+	}
+	if f.BaseType == "" || f.BaseType == f.Type {
+		return nil
+	}
+	return f.primitiveSchemaTypeDef()
+}
+
 // elemType returns the element type
 func (f *FieldSchemaGenerator) elemType() *j.Statement {
 	switch f.Kind {
@@ -183,8 +194,11 @@ func (f *FieldSchemaGenerator) elemType() *j.Statement {
 	case PrimitiveMapKind:
 		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
 		return g.primitiveSchemaTypeDef()
+	case CustomKind:
+		if f.IsRepeated {
+			return f.primitiveSchemaTypeDef()
+		}
 	}
-
 	return nil
 }
 

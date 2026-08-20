@@ -6,6 +6,8 @@ import (
 	time "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tftypes "github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
@@ -18,6 +20,8 @@ type TimeType struct {
 	attr.Type
 	Format string
 }
+
+var _ basetypes.StringTypable = TimeType{}
 
 // UseRFC3339Time creates TimeType for rfc3339
 func UseRFC3339Time() TimeType {
@@ -50,26 +54,37 @@ func (t TimeType) TerraformType(_ context.Context) tftypes.Type {
 
 // ValueFromTerraform decodes terraform value and returns it as TimeType
 func (t TimeType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if !in.IsKnown() {
+	value, err := basetypes.StringType{}.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	stringValue, ok := value.(basetypes.StringValue)
+	if !ok {
+		return nil, fmt.Errorf("expected basetypes.StringValue, got %T", value)
+	}
+
+	result, diags := t.ValueFromString(ctx, stringValue)
+	return result, diagnosticsError(diags)
+}
+
+// ValueFromString converts a framework string value into a TimeValue.
+func (t TimeType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {
+	if in.IsUnknown() {
 		return TimeValue{Unknown: true, Format: t.Format}, nil
 	}
 	if in.IsNull() {
 		return TimeValue{Null: true, Format: t.Format}, nil
 	}
-	var raw string
-	err := in.As(&raw)
+
+	value, err := time.Parse(t.Format, in.ValueString())
 	if err != nil {
-		return nil, err
+		return nil, diag.Diagnostics{
+			diag.NewErrorDiagnostic("Invalid Time Value", err.Error()),
+		}
 	}
 
-	// Error is deliberately silenced here. If a value is corrupted, this would be caught in Validate() method which
-	// for some reason is called after ValueFromTerraform().
-	current, err := time.Parse(t.Format, raw)
-	if err != nil {
-		return nil, err
-	}
-
-	return TimeValue{Value: current, Format: t.Format}, nil
+	return TimeValue{Value: value, Format: t.Format}, nil
 }
 
 // NewTime creates a TimeValue with a known value using format RFC3339.
@@ -121,6 +136,8 @@ type TimeValue struct {
 	Format string
 }
 
+var _ basetypes.StringValuable = TimeValue{}
+
 // Type returns value type
 func (t TimeValue) Type(_ context.Context) attr.Type {
 	return TimeType{Format: t.Format}
@@ -129,15 +146,25 @@ func (t TimeValue) Type(_ context.Context) attr.Type {
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
-func (t TimeValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
-	if t.IsNull() {
-		return tftypes.NewValue(tftypes.String, nil), nil
-	}
-	if t.IsUnknown() {
-		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
+func (t TimeValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	value, diags := t.ToStringValue(ctx)
+	if err := diagnosticsError(diags); err != nil {
+		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), err
 	}
 
-	return tftypes.NewValue(tftypes.String, t.Value.Truncate(timeThreshold).Format(t.Format)), nil
+	return value.ToTerraformValue(ctx)
+}
+
+// ToStringValue converts TimeValue into a framework string value.
+func (t TimeValue) ToStringValue(context.Context) (basetypes.StringValue, diag.Diagnostics) {
+	if t.IsNull() {
+		return basetypes.NewStringNull(), nil
+	}
+	if t.IsUnknown() {
+		return basetypes.NewStringUnknown(), nil
+	}
+
+	return basetypes.NewStringValue(t.Value.Truncate(timeThreshold).Format(t.Format)), nil
 }
 
 // Equal returns true if `other` is a *String and has the same value as `s`.
@@ -188,6 +215,8 @@ type DurationType struct {
 	attr.Type
 }
 
+var _ basetypes.StringTypable = DurationType{}
+
 // ApplyTerraform5AttributePathStep is not implemented for TimeType
 func (t DurationType) ApplyTerraform5AttributePathStep(step tftypes.AttributePathStep) (interface{}, error) {
 	return tftypes.Value{}, fmt.Errorf("cannot apply AttributePathStep %T to %s", step, t.String())
@@ -214,26 +243,37 @@ func (t DurationType) TerraformType(_ context.Context) tftypes.Type {
 
 // ValueFromTerraform decodes terraform value and returns it as TimeType
 func (t DurationType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if !in.IsKnown() {
+	value, err := basetypes.StringType{}.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	stringValue, ok := value.(basetypes.StringValue)
+	if !ok {
+		return nil, fmt.Errorf("expected basetypes.StringValue, got %T", value)
+	}
+
+	result, diags := t.ValueFromString(ctx, stringValue)
+	return result, diagnosticsError(diags)
+}
+
+// ValueFromString converts a framework string value into a DurationValue.
+func (t DurationType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {
+	if in.IsUnknown() {
 		return DurationValue{Unknown: true}, nil
 	}
 	if in.IsNull() {
 		return DurationValue{Null: true}, nil
 	}
-	var raw string
-	err := in.As(&raw)
+
+	value, err := time.ParseDuration(in.ValueString())
 	if err != nil {
-		return nil, err
+		return nil, diag.Diagnostics{
+			diag.NewErrorDiagnostic("Invalid Duration Value", err.Error()),
+		}
 	}
 
-	// Error is deliberately silenced here. If a value is corrupted, this would be caught in Validate() method which
-	// for some reason is called after ValueFromTerraform().
-	current, err := time.ParseDuration(raw)
-	if err != nil {
-		return nil, err
-	}
-
-	return DurationValue{Value: current}, nil
+	return DurationValue{Value: value}, nil
 }
 
 // NewDuration creates a DurationValue with a known value.
@@ -280,6 +320,8 @@ type DurationValue struct {
 	Value time.Duration
 }
 
+var _ basetypes.StringValuable = DurationValue{}
+
 // Type returns value type
 func (t DurationValue) Type(_ context.Context) attr.Type {
 	return DurationType{}
@@ -288,14 +330,24 @@ func (t DurationValue) Type(_ context.Context) attr.Type {
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
-func (t DurationValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
+func (t DurationValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	value, diags := t.ToStringValue(ctx)
+	if err := diagnosticsError(diags); err != nil {
+		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), err
+	}
+
+	return value.ToTerraformValue(ctx)
+}
+
+// ToStringValue converts DurationValue into a framework string value.
+func (t DurationValue) ToStringValue(context.Context) (basetypes.StringValue, diag.Diagnostics) {
 	if t.IsNull() {
-		return tftypes.NewValue(tftypes.String, nil), nil
+		return basetypes.NewStringNull(), nil
 	}
 	if t.IsUnknown() {
-		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
+		return basetypes.NewStringUnknown(), nil
 	}
-	return tftypes.NewValue(tftypes.String, t.Value.String()), nil
+	return basetypes.NewStringValue(t.Value.String()), nil
 }
 
 // Equal returns true if `other` is a *String and has the same value as `s`.
@@ -339,4 +391,11 @@ func (t DurationValue) String() string {
 // ValueDuration returns the underlying duration value.
 func (t DurationValue) ValueDuration() time.Duration {
 	return time.Duration(t.Value)
+}
+
+func diagnosticsError(diags diag.Diagnostics) error {
+	for _, d := range diags.Errors() {
+		return fmt.Errorf("%s: %s", d.Summary(), d.Detail())
+	}
+	return nil
 }
