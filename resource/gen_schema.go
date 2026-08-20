@@ -40,9 +40,9 @@ func NewMessageSchemaGenerator(m *Message, i *Imports) *MessageSchemaGenerator {
 // Generate returns Go code for message schema
 func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 	id := "GenSchema" + m.Name
-	schema := m.i.WithPackage(SDK, "Schema")
+	schema := m.i.WithPackage(Schema, "Schema")
 	diags := m.i.WithPackage(Diag, "Diagnostics")
-	attr := m.i.WithPackage(SDK, "Attribute")
+	attr := m.i.WithPackage(Schema, "Attribute")
 
 	j := j.Commentf("// %v returns tfsdk.Schema definition for %v\n", id, m.Name).
 		Func().

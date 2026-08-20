@@ -31,6 +31,13 @@ const (
 	Diag = "github.com/hashicorp/terraform-plugin-framework/diag"
 	// Attr represents the name of Terraform attr package
 	Attr = "github.com/hashicorp/terraform-plugin-framework/attr"
+	// Schema represents the path to the Terraform schema package
+	Schema = "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	// PlanModifier represents the path to the Terraform planmodifier package
+	PlanModifier = "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	// Validator represents the path to the Terraform validator package
+	Validator = "github.com/hashicorp/terraform-plugin-framework/schema/validator"
+
 	// TFTypes represents the name of Terraform SDK TFTypes package
 	TFTypes = "github.com/hashicorp/terraform-plugin-go/tftypes"
 )
