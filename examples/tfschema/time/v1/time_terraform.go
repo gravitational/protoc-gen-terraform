@@ -46,64 +46,55 @@ var _ = time.Kitchen
 // GenSchemaTime returns tfsdk.Schema definition for Time
 func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
-		"duration_custom": {
+		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
 			Computed:      true,
 			Description:   "duration_custom time.Duration field using casttype.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
 		},
-		"duration_custom_list": {
+		"duration_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "duration_custom_list []time.Duration field using casttype.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
 		},
-		"duration_list": {
+		"duration_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "duration_list []time.Duration field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
 		},
-		"duration_standard": {
+		"duration_standard": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
 			Computed:      true,
 			Description:   "duration_standard time.Duration field using stdduration.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
 		},
-		"id": {
+		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"nullable_duration": {
+		"nullable_duration": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
 			Description: "nullable_duration nullable time.Duration field.",
 			Optional:    true,
-			Type:        DurationType{},
 		},
-		"nullable_timestamp": {
+		"nullable_timestamp": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
 			Description: "nullable_timestamp nullable time.Time field.",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
-		"timestamp_list": {
+		"timestamp_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "timestamp_list []time.Time field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: UseRFC3339Time()},
 		},
-		"timestamp_value": {
+		"timestamp_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.ObjectAttribute{
 			Computed:      true,
 			Description:   "timestamp_value time.Time field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          UseRFC3339Time(),
 		},
 	}}, nil
 }
