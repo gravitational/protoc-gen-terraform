@@ -195,7 +195,8 @@ func (f *FieldSchemaGenerator) elemType() *j.Statement {
 		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
 		return g.primitiveSchemaTypeDef()
 	case CustomKind:
-		if f.IsRepeated {
+		switch cmp.Or(f.BaseType, f.Type) {
+		case Types + ".ListType", Types + ".MapType":
 			return f.primitiveSchemaTypeDef()
 		}
 	}

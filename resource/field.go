@@ -17,6 +17,7 @@ limitations under the License.
 package resource
 
 import (
+	"cmp"
 	"sort"
 	"strings"
 
@@ -448,8 +449,7 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 		f.ValueCastToType = o.CastToType
 		f.ValueCastFromType = o.CastFromType
 		f.TypeConstructor = o.TypeConstructor
-
-		f.ElemType = f.Type
+		f.ElemType = cmp.Or(o.ElementType, f.Type)
 		f.ElemValueType = f.ValueType
 		f.GoType = f.ValueCastFromType
 		f.GoElemType = f.ValueCastFromType
