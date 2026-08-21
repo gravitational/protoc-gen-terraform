@@ -7,14 +7,17 @@ type BoolCustomList = types.BoolCustomList
 type OverrideCastType = types.OverrideCastType
 
 var (
-	CopyToBoolSpecial   = types.CopyToBoolSpecial
-	CopyFromBoolSpecial = types.CopyFromBoolSpecial
+	GenSchemaBoolSpecial = types.GenSchemaBoolSpecial
+	CopyToBoolSpecial    = types.CopyToBoolSpecial
+	CopyFromBoolSpecial  = types.CopyFromBoolSpecial
 
-	CopyToBoolSpecialList   = types.CopyToBoolSpecialList
-	CopyFromBoolSpecialList = types.CopyFromBoolSpecialList
+	GenSchemaBoolSpecialList = types.GenSchemaBoolSpecialList
+	CopyToBoolSpecialList    = types.CopyToBoolSpecialList
+	CopyFromBoolSpecialList  = types.CopyFromBoolSpecialList
 
-	CopyToStringCustom   = types.CopyToStringCustom
-	CopyFromStringCustom = types.CopyFromStringCustom
+	GenSchemaStringCustom = types.GenSchemaStringCustom
+	CopyToStringCustom    = types.CopyToStringCustom
+	CopyFromStringCustom  = types.CopyFromStringCustom
 
 	UseMockValidator    = types.UseMockValidator
 	UseMockPlanModifier = types.UseMockPlanModifier

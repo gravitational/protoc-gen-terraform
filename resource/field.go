@@ -17,7 +17,6 @@ limitations under the License.
 package resource
 
 import (
-	"cmp"
 	"sort"
 	"strings"
 
@@ -287,16 +286,6 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 	f.Kind = f.getKind()
 
-	if override := c.GetTerraformTypeOverride(); override != nil && isCollectionSchemaType(override.Type) {
-		switch f.Kind {
-		case PrimitiveListKind, PrimitiveMapKind, CustomKind:
-		default:
-			return nil, trace.BadParameter(
-				"schema_types.%v uses collection type %v; add custom_type or use a collection proto field",
-				c.GetPath(), override.Type)
-		}
-	}
-
 	isOneOf, err := c.IsOneOf()
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -468,7 +457,8 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 		f.ValueCastToType = o.CastToType
 		f.ValueCastFromType = o.CastFromType
 		f.TypeConstructor = o.TypeConstructor
-		f.ElemType = cmp.Or(o.ElementType, f.Type)
+
+		f.ElemType = f.Type
 		f.ElemValueType = f.ValueType
 		f.GoType = f.ValueCastFromType
 		f.GoElemType = f.ValueCastFromType

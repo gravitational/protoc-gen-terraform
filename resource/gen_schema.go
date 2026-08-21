@@ -54,6 +54,7 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 			j.Id(diags),
 		).
 		Block(
+			j.Var().Id("diags").Id(diags),
 			j.Return(
 				j.Id(schema).Values(
 					j.Dict{
@@ -62,7 +63,7 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 						),
 					},
 				),
-				j.Nil(),
+				j.Id("diags"),
 			),
 		)
 
@@ -130,6 +131,8 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 		return f.listNestedAttribute(d)
 	case ObjectMapKind:
 		return f.mapNestedAttribute(d)
+	case CustomKind:
+		return f.customAttribute(d)
 	default:
 		return f.primitiveAttributeType().Values(d)
 	}
@@ -194,13 +197,9 @@ func (f *FieldSchemaGenerator) elemType() *j.Statement {
 	case PrimitiveMapKind:
 		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
 		return g.primitiveSchemaTypeDef()
-	case CustomKind:
-		switch cmp.Or(f.BaseType, f.Type) {
-		case Types + ".ListType", Types + ".MapType":
-			return f.primitiveSchemaTypeDef()
-		}
+	default:
+		return nil
 	}
-	return nil
 }
 
 // primitiveSchemaTypeDef returns the primitive type
@@ -217,7 +216,8 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 }
 
 func (f *FieldSchemaGenerator) primitiveAttributeType() *j.Statement {
-	return j.Id(f.i.WithPackage(Schema, attributeTypeForTerraformType(cmp.Or(f.BaseType, f.Type))))
+	attrType := attributeTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
+	return j.Id(f.i.WithPackage(Schema, attrType))
 }
 
 func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) *j.Statement {
@@ -244,6 +244,16 @@ func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) *j.Statement {
 		j.Id("Attributes"): f.nestedAttributes(m),
 	})
 	return j.Id(f.i.WithPackage(Schema, "MapNestedAttribute")).Values(d)
+}
+
+func (f *FieldSchemaGenerator) customAttribute(d j.Dict) *j.Statement {
+	attrType := attributeTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
+	return j.Id("GenSchema"+f.Suffix).
+		Call(
+			j.Id("ctx"),
+			j.Op("&").Id("diags"),
+			j.Id(f.i.WithPackage(Schema, attrType)).Values(d),
+		)
 }
 
 func generatePlanModifiers(imports *Imports, pmType string, pm []string) j.Code {

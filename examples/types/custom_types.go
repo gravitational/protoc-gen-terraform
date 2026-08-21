@@ -1,12 +1,14 @@
 package types
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -20,6 +22,18 @@ func (d Duration) String() string {
 
 // BoolCustom custom bool array
 type BoolCustom bool
+
+// GenSchemaBoolSpecial generates custom field schema (bool list)
+func GenSchemaBoolSpecial(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
+	customAttr, ok := attr.(schema.BoolAttribute)
+	if !ok {
+		diags.Append(diag.NewErrorDiagnostic(
+			"Invalid schema attribute",
+			fmt.Sprintf("expected BoolAttribute received %T", attr)))
+		return nil
+	}
+	return customAttr
+}
 
 // CopyFromBoolSpecial copies target value to the source
 func CopyFromBoolSpecial(diags diag.Diagnostics, tf attr.Value, obj *BoolCustom) {
@@ -44,6 +58,19 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v at
 }
 
 type BoolCustomList bool
+
+// GenSchemaBoolSpecialList generates custom field schema (bool list)
+func GenSchemaBoolSpecialList(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
+	customAttr, ok := attr.(schema.ListAttribute)
+	if !ok {
+		diags.Append(diag.NewErrorDiagnostic(
+			"Invalid schema attribute",
+			fmt.Sprintf("expected ListAttribute received %T", attr)))
+		return nil
+	}
+	customAttr.ElementType = types.BoolType
+	return customAttr
+}
 
 // CopyFromBoolSpecialList copies target value to the source
 func CopyFromBoolSpecialList(diags diag.Diagnostics, tf attr.Value, obj *[]BoolCustomList) {
@@ -101,6 +128,19 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 
 // StringCustom is a custom type that maps a Terraform List of string, onto a
 // single go string by joining all elements with "/".
+
+// GenSchemaStringCustom returns the StringCustom schema.
+func GenSchemaStringCustom(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
+	customAttr, ok := attr.(schema.ListAttribute)
+	if !ok {
+		diags.Append(diag.NewErrorDiagnostic(
+			"Invalid schema attribute",
+			fmt.Sprintf("expected ListAttribute received %T", attr)))
+		return nil
+	}
+	customAttr.ElementType = types.StringType
+	return customAttr
+}
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into
 // the source (a single string) by joining all elements with "/".

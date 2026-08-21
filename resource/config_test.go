@@ -62,7 +62,6 @@ func TestConfig(t *testing.T) {
 	})
 	require.Equal(t, cfg.SchemaTypes, map[string]SchemaType{
 		"Test.SchemaOverride": {
-			CustomType:         "OverrideCustom",
 			Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
 			ValueType:          "github.com/hashicorp/terraform-plugin-framework/types.String",
 			ValueFromMethod:    "ValueString",
@@ -90,27 +89,6 @@ time_type:
 	_, err := ReadConfig(map[string]string{"config": path})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "time_type.value_from_method is required")
-}
-
-func TestConfigSchemaTypeRequiresElementType(t *testing.T) {
-	path := writeConfig(t, `
-types:
-  - Test
-schema_types:
-  Test.StringOverride:
-    type: github.com/hashicorp/terraform-plugin-framework/types.ListType
-    value_type: github.com/hashicorp/terraform-plugin-framework/types.List
-    value_from_method: Elements
-    value_to_method: github.com/hashicorp/terraform-plugin-framework/types.ListValue
-    null_value_method: github.com/hashicorp/terraform-plugin-framework/types.ListNull
-    unknown_value_method: github.com/hashicorp/terraform-plugin-framework/types.ListUnknown
-    cast_to_type: "[]string"
-    cast_from_type: string
-`)
-
-	_, err := ReadConfig(map[string]string{"config": path})
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "schema_types.Test.StringOverride.element_type is required")
 }
 
 func TestConfigInjectedFieldValidation(t *testing.T) {

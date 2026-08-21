@@ -37,6 +37,7 @@ var _ = math.Inf
 
 // GenSchemaOptionalTest returns tfsdk.Schema definition for OptionalTest
 func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"choice_a": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:    true,
@@ -80,7 +81,7 @@ func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_
 			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
 		},
-	}}, nil
+	}}, diags
 }
 
 // CopyOptionalTestFromTerraform copies contents of the source Terraform object into a target struct

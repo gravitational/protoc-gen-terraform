@@ -50,6 +50,7 @@ var _ = time.Kitchen
 
 // GenSchemaTest returns tfsdk.Schema definition for Test
 func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"bar": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
@@ -63,13 +64,12 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Bool{github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier.UseStateForUnknown()},
 		},
-		"bool_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+		"bool_custom_list": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "BoolCustomList []bool field",
-			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
-		},
+		}),
 		"branch1": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
 			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"str": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 				Computed:      true,
@@ -573,13 +573,12 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
-		"string_override": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+		"string_override": GenSchemaStringCustom(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "StringOverride is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
-			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
-		},
+		}),
 		"timestamp": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			CustomType:    UseRFC3339Time(),
@@ -611,7 +610,7 @@ func GenSchemaTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Description: "TimestampNullableWithNilValue *time.Time field",
 			Optional:    true,
 		},
-	}}, nil
+	}}, diags
 }
 
 // CopyTestFromTerraform copies contents of the source Terraform object into a target struct

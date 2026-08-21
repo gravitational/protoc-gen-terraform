@@ -45,6 +45,7 @@ var _ = math.Inf
 
 // GenSchemaPrimitives returns tfsdk.Schema definition for Primitives
 func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"bool_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
@@ -156,7 +157,7 @@ func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_pl
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-	}}, nil
+	}}, diags
 }
 
 // CopyPrimitivesFromTerraform copies contents of the source Terraform object into a target struct

@@ -46,6 +46,7 @@ var _ = time.Kitchen
 
 // GenSchemaTime returns tfsdk.Schema definition for Time
 func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
@@ -105,7 +106,7 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-	}}, nil
+	}}, diags
 }
 
 // CopyTimeFromTerraform copies contents of the source Terraform object into a target struct

@@ -62,7 +62,6 @@ custom_types:
 
 schema_types:
   "Test.SchemaOverride":
-    custom_type: OverrideCustom
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
     value_from_method: "ValueString"

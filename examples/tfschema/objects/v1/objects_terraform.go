@@ -47,6 +47,7 @@ var _ = math.Inf
 
 // GenSchemaObjects returns tfsdk.Schema definition for Objects
 func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"bool_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:      true,
@@ -379,7 +380,7 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Map{github_com_hashicorp_terraform_plugin_framework_resource_schema_mapplanmodifier.UseStateForUnknown()},
 		},
-	}}, nil
+	}}, diags
 }
 
 // CopyObjectsFromTerraform copies contents of the source Terraform object into a target struct

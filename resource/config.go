@@ -53,8 +53,6 @@ func flagMapFromArray(v []string) flagMap {
 
 // SchemaType represents a struct used for the schema type overrides
 type SchemaType struct {
-	// CustomType marks the field as a custom type and names the custom schema/copy suffix.
-	CustomType string `yaml:"custom_type,omitempty"`
 	// Type is a Go attr.Type struct name
 	Type string `yaml:"type,omitempty"`
 	// ValueType is a Go attr.Value struct name
@@ -74,8 +72,6 @@ type SchemaType struct {
 	CastFromType string `yaml:"cast_from_type,omitempty"`
 	// TypeConstructor represents statement used to produce empty type value in schema
 	TypeConstructor string `yaml:"type_constructor,omitempty"`
-	// ElementType specifies the element type for list or map types.
-	ElementType string `yaml:"element_type,omitempty"`
 }
 
 // InjectedField represents custom injected field descriptor
@@ -238,12 +234,6 @@ func validateSchemaType(name string, schemaType *SchemaType) error {
 		{name: "unknown_value_method", value: schemaType.UnknownValueMethod},
 		{name: "cast_to_type", value: schemaType.CastToType},
 		{name: "cast_from_type", value: schemaType.CastFromType},
-	}
-
-	if isCollectionSchemaType(schemaType.Type) {
-		if strings.TrimSpace(schemaType.ElementType) == "" {
-			return trace.BadParameter("%v.element_type is required for %v", name, schemaType.Type)
-		}
 	}
 
 	for _, field := range required {
