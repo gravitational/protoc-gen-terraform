@@ -37,9 +37,6 @@ suffixes:
   BoolCustom: BoolSpecial
   BoolCustomList: BoolSpecialList
 
-custom_types:
-  "Custom.string_override": StringCustom
-
 validators:
   "Custom.validated":
     - UseMockValidator()
@@ -50,6 +47,7 @@ plan_modifiers:
 
 schema_types:
   "Custom.string_override":
+    custom_type: StringCustom
     type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
     value_from_method: "Elements"

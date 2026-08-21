@@ -287,6 +287,16 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 	f.Kind = f.getKind()
 
+	if override := c.GetTerraformTypeOverride(); override != nil && isCollectionSchemaType(override.Type) {
+		switch f.Kind {
+		case PrimitiveListKind, PrimitiveMapKind, CustomKind:
+		default:
+			return nil, trace.BadParameter(
+				"schema_types.%v uses collection type %v; add custom_type or use a collection proto field",
+				c.GetPath(), override.Type)
+		}
+	}
+
 	isOneOf, err := c.IsOneOf()
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -434,6 +444,15 @@ func (f *Field) getKind() Kind {
 		return ObjectKind // ex: struct
 	}
 	return PrimitiveKind // ex: string
+}
+
+func isCollectionSchemaType(t string) bool {
+	switch t {
+	case Types + ".ListType", Types + ".MapType":
+		return true
+	default:
+		return false
+	}
 }
 
 // setSchemaCustomType sets schema type override

@@ -57,11 +57,9 @@ validators:
   "Test.Str":
     - UseMockValidator()
 
-custom_types:
-  "Test.StringOverride": StringCustom
-
 schema_types:
   "Test.StringOverride":
+    custom_type: StringCustom
     type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
     value_from_method: "Elements"

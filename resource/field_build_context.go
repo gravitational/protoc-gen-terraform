@@ -344,12 +344,21 @@ func (c *FieldBuildContext) IsMessage() bool {
 // IsCustomType returns true if fields has gogo.custom_type flag
 // or if there's a custom type override in configuration.
 func (c *FieldBuildContext) IsCustomType() bool {
-	_, ok := c.config.CustomTypes[c.GetPath()]
-	return c.field.IsCustomType() || ok
+	if c.field.IsCustomType() {
+		return true
+	}
+	if _, ok := c.config.CustomTypes[c.GetPath()]; ok {
+		return true
+	}
+	override := c.GetTerraformTypeOverride()
+	return override != nil && strings.TrimSpace(override.CustomType) != ""
 }
 
 // GetCustomType returns true if fields has gogo.custom_type flag
 func (c *FieldBuildContext) GetCustomType() string {
+	if override := c.GetTerraformTypeOverride(); override != nil && strings.TrimSpace(override.CustomType) != "" {
+		return override.CustomType
+	}
 	if customType, ok := c.config.CustomTypes[c.GetPath()]; ok {
 		return customType
 	}
