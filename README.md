@@ -221,16 +221,26 @@ duration_type:
 
 ## Custom types
 
-`custom_types` lets you replace the generator's normal schema and copy logic
-for a specific field with handwritten functions.
+`schema_types.<field>.custom_type` lets you replace the generator's normal
+schema and copy logic for a specific field with handwritten functions.
 
 ```yaml
-custom_types:
-  "Custom.string_override": StringCustom
+schema_types:
+  "Custom.string_override":
+    custom_type: StringCustom
+    type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
+    value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
+    value_from_method: "Elements"
+    value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.ListValue"
+    null_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListNull"
+    unknown_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListUnknown"
+    cast_to_type: "[]string"
+    cast_from_type: "string"
+    element_type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
 ```
 
-The map key is the field path. The value is the suffix used to find the custom
-functions. For the example above, the generator expects these functions to be
+The `custom_type` value is the suffix used to find the custom functions. For the
+example above, the generator expects these functions to be
 available:
 
 ```go
@@ -239,14 +249,14 @@ func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string)
 func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value
 ```
 
-Use `custom_types` when the Terraform representation is shaped differently from
-the Go field. For example, a Go `string` field can be represented in Terraform
-as a list of strings, with custom copy functions joining and splitting the
-value.
+Use `custom_type` when the Terraform representation is shaped differently from
+the Go field. For example, a Go `string` field can be represented in Terraform as
+a list of strings, with custom copy functions joining and splitting the value.
 
 Use `schema_types` when the generator can still perform the conversion and only
-needs different Terraform type/value constructors. Use `custom_types` when you
-need to own the schema and both copy directions for the field.
+needs different Terraform type/value constructors. Use `custom_type` when you need
+to own the schema and both copy directions for the field. The top-level
+`custom_types` map is still supported for existing configs.
 
 ## Custom duration value
 
