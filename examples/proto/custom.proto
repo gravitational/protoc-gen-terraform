@@ -53,4 +53,14 @@ message Custom {
     (gogoproto.jsontag) = "schema_override",
     (gogoproto.casttype) = "OverrideCastType"
   ];
+
+  BoolValue bool_option = 13 [
+    (gogoproto.nullable) = true,
+    (gogoproto.jsontag) = "bool_option,omitempty",
+    (gogoproto.customtype) = "BoolOption"
+  ];
+}
+
+message BoolValue {
+  bool Value = 1;
 }

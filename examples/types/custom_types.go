@@ -200,3 +200,51 @@ func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.
 }
 
 type OverrideCastType string
+
+type BoolOption struct {
+	// Value is a value of the option
+	Value bool
+}
+
+// GenSchemaBoolOptions returns Terraform schema for BoolOption type
+func GenSchemaBoolOption(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
+	boolAttr, ok := attr.(schema.BoolAttribute)
+	if !ok {
+		diags.Append(diag.NewErrorDiagnostic(
+			"Invalid schema attribute",
+			fmt.Sprintf("expected BoolAttribute received %T", attr)))
+		return nil
+	}
+	boolAttr.Optional = true
+	return boolAttr
+}
+
+func CopyFromBoolOption(diags diag.Diagnostics, tf attr.Value, o **BoolOption) {
+	v, ok := tf.(types.Bool)
+	if !ok {
+		diags.AddError("Error reading from Terraform object", fmt.Sprintf("Can not convert %T to types.Bool", tf))
+		return
+	}
+
+	if v.IsNull() || v.IsUnknown() {
+		*o = nil
+		return
+	}
+
+	value := BoolOption{Value: v.ValueBool()}
+	*o = &value
+}
+
+// CopyToBoolOption converts a Teleport [apitypes.BoolOption] into a Terraform
+// [types.Bool] value. Set `preserveUnknown` to preserve unknown values.
+func CopyToBoolOption(_ diag.Diagnostics, o *BoolOption, _ attr.Type, v attr.Value, preserveUnknown bool) attr.Value {
+	if preserveUnknown && v != nil && v.IsUnknown() {
+		return types.BoolUnknown()
+	}
+
+	if o == nil {
+		return types.BoolNull()
+	}
+
+	return types.BoolValue(o.Value)
+}

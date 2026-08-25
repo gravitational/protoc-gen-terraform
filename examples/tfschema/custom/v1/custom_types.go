@@ -19,6 +19,10 @@ var (
 	CopyToStringCustom    = types.CopyToStringCustom
 	CopyFromStringCustom  = types.CopyFromStringCustom
 
+	GenSchemaBoolOption = types.GenSchemaBoolOption
+	CopyToBoolOption    = types.CopyToBoolOption
+	CopyFromBoolOption  = types.CopyFromBoolOption
+
 	UseMockValidator    = types.UseMockValidator
 	UseMockPlanModifier = types.UseMockPlanModifier
 )

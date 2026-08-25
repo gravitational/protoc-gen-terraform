@@ -58,6 +58,12 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		}),
+		"bool_option": GenSchemaBoolOption(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Bool{github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier.UseStateForUnknown()},
+		}),
 		"computed": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "computed is a computed field.",
@@ -137,6 +143,13 @@ func CopyCustomFromTerraform(_ context.Context, tf github_com_hashicorp_terrafor
 			diags.Append(attrReadMissingDiag{"Custom.bool_custom_list"})
 		}
 		CopyFromBoolSpecialList(diags, a, &obj.BoolCustomList)
+	}
+	{
+		a, ok := tf.Attributes()["bool_option"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Custom.bool_option"})
+		}
+		CopyFromBoolOption(diags, a, &obj.BoolOption)
 	}
 	{
 		a, ok := tf.Attributes()["computed"]
@@ -319,6 +332,15 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 		} else {
 			v := CopyToBoolSpecialList(diags, obj.BoolCustomList, t, attrs["bool_custom_list"], preserveUnknown)
 			attrs["bool_custom_list"] = v
+		}
+	}
+	{
+		t, ok := attrType.AttributeTypes()["bool_option"]
+		if !ok {
+			diags.Append(attrWriteMissingDiag{"Custom.bool_option"})
+		} else {
+			v := CopyToBoolOption(diags, obj.BoolOption, t, attrs["bool_option"], preserveUnknown)
+			attrs["bool_option"] = v
 		}
 	}
 	{

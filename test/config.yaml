@@ -23,6 +23,7 @@ name_overrides:
 
 time_type:
   type: "TimeType" # Struct name of attrs.Type
+  custom_type: "UseRFC3339Time()"
   value_type: "TimeValue" # Struct name of attrs.Value
   value_from_method: "ValueTime" # Method to get value from Terraform attribute
   value_to_method: "NewTime" # Method to construct Terraform attribute from value
@@ -34,6 +35,7 @@ time_type:
 
 duration_type:
   type: "DurationType" # Struct name of attrs.Type
+  custom_type: "DurationType{}"
   value_type: "DurationValue" # Struct name of attrs.Value
   value_from_method: "ValueDuration" # Method to get value from Terraform attribute
   value_to_method: "NewDuration" # Method to construct Terraform attribute from value
@@ -60,17 +62,28 @@ validators:
 custom_types:
   "Test.StringOverride": StringCustom
 
+
+custom:
+  BoolOption:
+    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.BoolAttribute"
+    custom_type: "BoolOption"
+
+  StringCustom:
+    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.ListAttribute"
+    custom_type: "StringCustom"
+
 schema_types:
-  "Test.StringOverride":
-    type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
-    value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
-    value_from_method: "Elements"
-    value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.ListValue"
-    null_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListNull"
-    unknown_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListUnknown"
-    cast_to_type: "[]string"
-    cast_from_type: "string"
+  # "Test.StringOverride":
+  #   type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
+  #   value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
+  #   value_from_method: "Elements"
+  #   value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.ListValue"
+  #   null_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListNull"
+  #   unknown_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListUnknown"
+  #   cast_to_type: "[]string"
+  #   cast_from_type: "string"
   "Test.SchemaOverride":
+    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.StringAttribute"
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
     value_from_method: "ValueString"
