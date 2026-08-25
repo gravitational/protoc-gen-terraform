@@ -38,7 +38,7 @@ func TestConfig(t *testing.T) {
 		UnknownValueMethod: "UnknownTime",
 		CastToType:         "time.Time",
 		CastFromType:       "time.Time",
-		// TypeConstructor:    "UseRFC3339Time()",
+		TypeConstructor:    "UseRFC3339Time()",
 	})
 
 	require.Equal(t, cfg.DurationType, &SchemaType{
@@ -50,6 +50,7 @@ func TestConfig(t *testing.T) {
 		UnknownValueMethod: "UnknownDuration",
 		CastToType:         "time.Duration",
 		CastFromType:       "time.Duration",
+		TypeConstructor:    "DurationType{}",
 	})
 
 	require.Equal(t, cfg.InjectedFields, map[string][]InjectedField{

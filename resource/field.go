@@ -46,14 +46,10 @@ const (
 
 // TerraformType represents Terraform type information
 type TerraformType struct {
-	// Type represents Terraform attr.Type name
-	Type string
-
 	// AttributeType represents Terraform schema.Attribute name
 	AttributeType string
-	// CustomType represents a Terraform custom attribute type
-	CustomType string
-
+	// Type represents Terraform attr.Type name
+	Type string
 	// ValueType represents Terraform attr.Value name
 	ValueType string
 	// ValueFromMethod is the method called on an attr.Value to get the underlying value
@@ -81,17 +77,14 @@ type TerraformType struct {
 	// IsMessage field is a nested message? (might be map or list at the same time)
 	IsMessage bool
 	// TypeConstructor represents expression which is used to initialize type in schema
-	//
-	// Deprecated: Use CustomType
-	// TypeConstructor string
+	TypeConstructor string
 }
 
-func (t *TerraformType) applyOverride(customTypeOverride *Custom, schemaOverride *SchemaType) {
-	// Note: schemaOverride takes precedence over customTypeOverride
+func (t *TerraformType) applyOverride(attributeOverride string, schemaOverride *SchemaType) {
+	// schemaOverride takes precedence over attributeOverride
 
-	if customTypeOverride != nil {
-		t.AttributeType = customTypeOverride.AttributeType
-		t.CustomType = customTypeOverride.CustomType
+	if attributeOverride != "" {
+		t.AttributeType = attributeOverride
 	}
 
 	if schemaOverride != nil {
@@ -104,7 +97,7 @@ func (t *TerraformType) applyOverride(customTypeOverride *Custom, schemaOverride
 		t.UnknownValueMethod = schemaOverride.UnknownValueMethod
 		t.ValueCastToType = schemaOverride.CastToType
 		t.ValueCastFromType = schemaOverride.CastFromType
-		// t.TypeConstructor = o.TypeConstructor
+		t.TypeConstructor = schemaOverride.TypeConstructor
 
 		t.ElemType = t.Type
 		t.ElemValueType = t.ValueType

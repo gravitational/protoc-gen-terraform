@@ -231,9 +231,8 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			return t, trace.Errorf("%v field has time type, but config.time_type is not defined", c.path)
 		}
 		t = TerraformType{
-			Type:               c.config.TimeType.Type,
 			AttributeType:      Schema + ".StringAttribute",
-			CustomType:         c.config.TimeType.CustomType,
+			Type:               c.config.TimeType.Type,
 			ValueType:          c.config.TimeType.ValueType,
 			ValueFromMethod:    c.config.TimeType.ValueFromMethod,
 			ValueToMethod:      c.config.TimeType.ValueToMethod,
@@ -243,16 +242,15 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ElemValueType:      c.config.TimeType.ValueType,
 			ValueCastToType:    c.config.TimeType.CastToType,
 			ValueCastFromType:  c.config.TimeType.CastFromType,
-			// TypeConstructor:    c.config.TimeType.TypeConstructor,
+			TypeConstructor:    c.config.TimeType.TypeConstructor,
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
 			return t, trace.Errorf("%v field has duration type, but config.duration_type is not defined", c.path)
 		}
 		t = TerraformType{
-			Type:               c.config.DurationType.Type,
 			AttributeType:      Schema + ".StringAttribute",
-			CustomType:         c.config.DurationType.CustomType,
+			Type:               c.config.DurationType.Type,
 			ValueType:          c.config.DurationType.ValueType,
 			ValueFromMethod:    c.config.DurationType.ValueFromMethod,
 			ValueToMethod:      c.config.DurationType.ValueToMethod,
@@ -262,7 +260,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ElemValueType:      c.config.DurationType.ValueType,
 			ValueCastToType:    c.config.DurationType.CastToType,
 			ValueCastFromType:  c.config.DurationType.CastFromType,
-			// TypeConstructor:    c.config.DurationType.TypeConstructor,
+			TypeConstructor:    c.config.DurationType.TypeConstructor,
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
@@ -329,7 +327,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueCastFromType = elemType
 	}
 
-	t.applyOverride(c.GetCustomTypeOverride(), c.GetTerraformTypeOverride())
+	t.applyOverride(c.GetAttributeMapping(), c.GetTerraformTypeOverride())
 
 	return t, nil
 }
@@ -564,13 +562,12 @@ func (c *FieldBuildContext) GetTerraformTypeOverride() *SchemaType {
 	return nil
 }
 
-// GetCustomTypeOverride returns custom type overrides
-func (c *FieldBuildContext) GetCustomTypeOverride() *Custom {
-	v, ok := c.config.Custom[c.GetCustomType()]
+func (c *FieldBuildContext) GetAttributeMapping() string {
+	v, ok := c.config.AttributeMapping[c.GetCustomType()]
 	if ok {
-		return &v
+		return v
 	}
-	return nil
+	return ""
 }
 
 // GetOneOfFieldName returns OneOf container name

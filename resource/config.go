@@ -53,16 +53,12 @@ func flagMapFromArray(v []string) flagMap {
 
 // SchemaType represents a struct used for the schema type overrides
 type SchemaType struct {
+	// AttributeType is the Terraform schema.Attribute type name
+	AttributeType string `yaml:"attribute_type,omitempty"`
 	// Type is a Go attr.Type struct name
 	Type string `yaml:"type,omitempty"`
 	// ValueType is a Go attr.Value struct name
 	ValueType string `yaml:"value_type,omitempty"`
-	// AttributeType is the Terraform schema.Attribute type name
-	AttributeType string `yaml:"attribute_type,omitempty"`
-
-	// CustomType is the Terraform custom attribute type
-	CustomType string `yaml:"custom_type,omitempty"`
-
 	// ValueFromMethod is the method on attr.Value that will be called to get
 	// the underlying value
 	ValueFromMethod string `yaml:"value_from_method,omitempty"`
@@ -76,8 +72,8 @@ type SchemaType struct {
 	CastToType string `yaml:"cast_to_type,omitempty"`
 	// CastToType is a go type of the object field
 	CastFromType string `yaml:"cast_from_type,omitempty"`
-	// // TypeConstructor represents statement used to produce empty type value in schema
-	// TypeConstructor string `yaml:"type_constructor,omitempty"`
+	// TypeConstructor represents statement used to produce empty type value in schema
+	TypeConstructor string `yaml:"type_constructor,omitempty"`
 }
 
 type Custom struct {
@@ -169,9 +165,8 @@ type Config struct {
 	// CustomTypes fields marks fields as custom types like the
 	// "gogoproto.customtype" tag would do.
 	CustomTypes map[string]string `yaml:"custom_types,omitempty"`
-
-	// Custom contains custom type mapping
-	Custom map[string]Custom `yaml:"custom,omitempty"`
+	// AttributeMapping maps a custom attribute to a base Terraform schema.Attribute
+	AttributeMapping map[string]string `yaml:"attribute_mapping,omitempty"`
 
 	// params represents CLI params passed from the plugin
 	params map[string]string `yaml:"-"`
