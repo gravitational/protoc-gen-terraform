@@ -102,7 +102,7 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() (j.Dict, error) {
 }
 
 // generateInjectedField generates code for injected field
-func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) (j.Code, error) {
+func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) (*j.Statement, error) {
 	d := j.Dict{
 		j.Id("Required"): j.Lit(f.Required),
 		j.Id("Computed"): j.Lit(f.Computed),
@@ -209,17 +209,16 @@ func (f *FieldSchemaGenerator) customType() *j.Statement {
 	if f.Kind != PrimitiveKind {
 		return nil
 	}
-	if f.BaseType == "" || f.BaseType == f.Type {
-		return nil
+
+	if f.TerraformType.CustomType != "" {
+		return j.Id(f.TerraformType.CustomType)
 	}
-	return f.primitiveSchemaTypeDef()
+	return nil
 }
 
 // elemType returns the element type
 func (f *FieldSchemaGenerator) elemType() *j.Statement {
 	switch f.Kind {
-	case PrimitiveKind:
-		return nil
 	case PrimitiveListKind:
 		return f.primitiveSchemaTypeDef()
 	case PrimitiveMapKind:
@@ -236,8 +235,8 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 		return j.Id(f.i.WithType(f.ElemType))
 	}
 
-	if f.TypeConstructor != "" {
-		return j.Id(f.i.WithType(f.TypeConstructor))
+	if f.TerraformType.CustomType != "" {
+		return j.Id(f.TerraformType.CustomType)
 	}
 
 	return j.Id(f.i.WithType(f.ElemType)).Values()
@@ -247,7 +246,7 @@ func (f *FieldSchemaGenerator) primitiveAttribute() *j.Statement {
 	return j.Id(f.i.WithType(f.AttributeType))
 }
 
-func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) (j.Code, error) {
+func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) (*j.Statement, error) {
 	fieldsDict, err := m.fieldsDictSchema()
 	if err != nil {
 		return nil, trace.Wrap(err)
@@ -255,7 +254,7 @@ func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) (j.Co
 	return j.Map(j.String()).Id(f.i.WithPackage(Schema, "Attribute")).Values(fieldsDict), nil
 }
 
-func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) (j.Code, error) {
+func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) (*j.Statement, error) {
 	m := NewMessageSchemaGenerator(f.Message, f.i)
 	nestedAttributes, err := f.nestedAttributes(m)
 	if err != nil {
@@ -265,7 +264,7 @@ func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) (j.Code, error) {
 	return j.Id(f.i.WithPackage(Schema, "SingleNestedAttribute")).Values(d), nil
 }
 
-func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) (j.Code, error) {
+func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) (*j.Statement, error) {
 	m := NewMessageSchemaGenerator(f.Message, f.i)
 	nestedAttributes, err := f.nestedAttributes(m)
 	if err != nil {
@@ -277,7 +276,7 @@ func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) (j.Code, error) {
 	return j.Id(f.i.WithPackage(Schema, "ListNestedAttribute")).Values(d), nil
 }
 
-func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) (j.Code, error) {
+func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) (*j.Statement, error) {
 	m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i)
 	nestedAttributes, err := f.nestedAttributes(m)
 	if err != nil {
@@ -298,7 +297,7 @@ func (f *FieldSchemaGenerator) customAttribute(d j.Dict) *j.Statement {
 		)
 }
 
-func (f *FieldSchemaGenerator) generatePlanModifiers() (j.Code, error) {
+func (f *FieldSchemaGenerator) generatePlanModifiers() (*j.Statement, error) {
 	planModifierType, err := f.planModifierTypeForAttributeType(f.AttributeType)
 	if err != nil {
 		return nil, trace.Wrap(err, "failed to get plan modifier type")
@@ -307,7 +306,7 @@ func (f *FieldSchemaGenerator) generatePlanModifiers() (j.Code, error) {
 	return generatePlanModifiers(f.i, planModifierType, f.PlanModifiers), nil
 }
 
-func (f *FieldSchemaGenerator) generateValidators() (j.Code, error) {
+func (f *FieldSchemaGenerator) generateValidators() (*j.Statement, error) {
 	validatorType, err := f.validatorTypeForAttributeType(f.AttributeType)
 	if err != nil {
 		return nil, trace.Wrap(err, "failed to get validator type")
@@ -316,7 +315,7 @@ func (f *FieldSchemaGenerator) generateValidators() (j.Code, error) {
 	return generateValidators(f.i, validatorType, f.Validators), nil
 }
 
-func generatePlanModifiers(imports *Imports, planModiferType j.Code, pm []string) j.Code {
+func generatePlanModifiers(imports *Imports, planModiferType *j.Statement, pm []string) *j.Statement {
 	v := make([]jen.Code, len(pm))
 	for i, n := range pm {
 		v[i] = j.Id(imports.WithType(n))
@@ -325,7 +324,7 @@ func generatePlanModifiers(imports *Imports, planModiferType j.Code, pm []string
 	return j.Index().Add(planModiferType).Values(v...)
 }
 
-func generateValidators(imports *Imports, validatorType j.Code, vals []string) j.Code {
+func generateValidators(imports *Imports, validatorType *j.Statement, vals []string) *j.Statement {
 	v := make([]jen.Code, len(vals))
 	for i, n := range vals {
 		v[i] = j.Id(imports.WithType(n))
@@ -352,7 +351,7 @@ func baseTypeForAttributeType(t string) (string, error) {
 	return baseType, nil
 }
 
-func (f *FieldSchemaGenerator) planModifierTypeForAttributeType(t string) (j.Code, error) {
+func (f *FieldSchemaGenerator) planModifierTypeForAttributeType(t string) (*j.Statement, error) {
 	baseType, ok := baseByAttributeType[t]
 	if !ok {
 		return nil, trace.BadParameter("unexpected attribute type %q", t)
@@ -361,7 +360,7 @@ func (f *FieldSchemaGenerator) planModifierTypeForAttributeType(t string) (j.Cod
 	return j.Id(f.i.WithType(PlanModifier + baseType)), nil
 }
 
-func (f *FieldSchemaGenerator) validatorTypeForAttributeType(t string) (j.Code, error) {
+func (f *FieldSchemaGenerator) validatorTypeForAttributeType(t string) (*j.Statement, error) {
 	baseType, ok := baseByAttributeType[t]
 	if !ok {
 		return nil, trace.BadParameter("unexpected attribute type %q", t)

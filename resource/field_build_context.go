@@ -233,6 +233,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t = TerraformType{
 			Type:               c.config.TimeType.Type,
 			AttributeType:      Schema + ".StringAttribute",
+			CustomType:         c.config.TimeType.CustomType,
 			ValueType:          c.config.TimeType.ValueType,
 			ValueFromMethod:    c.config.TimeType.ValueFromMethod,
 			ValueToMethod:      c.config.TimeType.ValueToMethod,
@@ -242,7 +243,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ElemValueType:      c.config.TimeType.ValueType,
 			ValueCastToType:    c.config.TimeType.CastToType,
 			ValueCastFromType:  c.config.TimeType.CastFromType,
-			TypeConstructor:    c.config.TimeType.TypeConstructor,
+			// TypeConstructor:    c.config.TimeType.TypeConstructor,
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
@@ -251,6 +252,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t = TerraformType{
 			Type:               c.config.DurationType.Type,
 			AttributeType:      Schema + ".StringAttribute",
+			CustomType:         c.config.DurationType.CustomType,
 			ValueType:          c.config.DurationType.ValueType,
 			ValueFromMethod:    c.config.DurationType.ValueFromMethod,
 			ValueToMethod:      c.config.DurationType.ValueToMethod,
@@ -260,7 +262,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ElemValueType:      c.config.DurationType.ValueType,
 			ValueCastToType:    c.config.DurationType.CastToType,
 			ValueCastFromType:  c.config.DurationType.CastFromType,
-			TypeConstructor:    c.config.DurationType.TypeConstructor,
+			// TypeConstructor:    c.config.DurationType.TypeConstructor,
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
@@ -327,9 +329,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueCastFromType = elemType
 	}
 
-	if override := c.GetTerraformTypeOverride(); override != nil {
-		t.applyOverride(*override)
-	}
+	t.applyOverride(c.GetCustomTypeOverride(), c.GetTerraformTypeOverride())
 
 	return t, nil
 }
@@ -561,6 +561,15 @@ func (c *FieldBuildContext) GetTerraformTypeOverride() *SchemaType {
 		return &v
 	}
 
+	return nil
+}
+
+// GetCustomTypeOverride returns custom type overrides
+func (c *FieldBuildContext) GetCustomTypeOverride() *Custom {
+	v, ok := c.config.Custom[c.GetCustomType()]
+	if ok {
+		return &v
+	}
 	return nil
 }
 

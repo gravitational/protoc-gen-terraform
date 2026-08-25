@@ -14,6 +14,7 @@ computed_fields:
 time_type:
   type: "TimeType" # Struct name of attrs.Type
   value_type: "TimeValue" # Struct name of attrs.Value
+  custom_type: "UseRFC3339Time()"
   value_from_method: "ValueTime" # Method to get value from Terraform attribute
   value_to_method: "NewTime" # Method to construct Terraform attribute from value
   null_value_method: "NullTime" # Method to construct a null Terraform attribute
@@ -24,6 +25,7 @@ time_type:
 
 duration_type:
   type: "DurationType" # Struct name of attrs.Type
+  custom_type: "DurationType{}"
   value_type: "DurationValue" # Struct name of attrs.Value
   value_from_method: "ValueDuration" # Method to get value from Terraform attribute
   value_to_method: "NewDuration" # Method to construct Terraform attribute from value

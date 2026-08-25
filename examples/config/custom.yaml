@@ -48,17 +48,24 @@ plan_modifiers:
 custom_types:
   "Custom.string_override": StringCustom
 
-schema_types:
-  "Custom.string_override":
-    type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
+custom:
+  BoolOption:
+    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.BoolAttribute"
+    custom_type: "BoolOption"
+
+    gen_schema_func: "GenSchemaBoolOption"
+    copy_from_func: "CopyFromBoolOption"
+    copy_to_func: "CopyToBoolOption"
+
+  StringCustom:
     attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.ListAttribute"
-    value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
-    value_from_method: "Elements"
-    value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.ListValue"
-    null_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListNull"
-    unknown_value_method: "github.com/hashicorp/terraform-plugin-framework/types.ListUnknown"
-    cast_to_type: "[]string"
-    cast_from_type: "string"
+    custom_type: "StringCustom"
+
+    gen_schema_func: "GenSchemaStringCustom"
+    copy_from_func: "CopyFromStringCustom"
+    copy_to_func: "CopyToStringCustom"
+
+schema_types:
   "Custom.schema_override":
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
     attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.StringAttribute"

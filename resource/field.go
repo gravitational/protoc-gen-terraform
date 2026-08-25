@@ -48,14 +48,11 @@ const (
 type TerraformType struct {
 	// Type represents Terraform attr.Type name
 	Type string
-	// BaseType represents base Terraform attr.Type name used by custom types
-	// to satisfy interfaces
-	//
-	// Deprecated: Use AttributeType
-	BaseType string
 
 	// AttributeType represents Terraform schema.Attribute name
 	AttributeType string
+	// CustomType represents a Terraform custom attribute type
+	CustomType string
 
 	// ValueType represents Terraform attr.Value name
 	ValueType string
@@ -84,23 +81,35 @@ type TerraformType struct {
 	// IsMessage field is a nested message? (might be map or list at the same time)
 	IsMessage bool
 	// TypeConstructor represents expression which is used to initialize type in schema
-	TypeConstructor string
+	//
+	// Deprecated: Use CustomType
+	// TypeConstructor string
 }
 
-func (t *TerraformType) applyOverride(o SchemaType) {
-	t.Type = o.Type
-	t.AttributeType = o.AttributeType
-	t.ValueType = o.ValueType
-	t.ValueFromMethod = o.ValueFromMethod
-	t.ValueToMethod = o.ValueToMethod
-	t.NullValueMethod = o.NullValueMethod
-	t.UnknownValueMethod = o.UnknownValueMethod
-	t.ValueCastToType = o.CastToType
-	t.ValueCastFromType = o.CastFromType
-	t.TypeConstructor = o.TypeConstructor
+func (t *TerraformType) applyOverride(customTypeOverride *Custom, schemaOverride *SchemaType) {
+	// Note: schemaOverride takes precedence over customTypeOverride
 
-	t.ElemType = t.Type
-	t.ElemValueType = t.ValueType
+	if customTypeOverride != nil {
+		t.AttributeType = customTypeOverride.AttributeType
+		t.CustomType = customTypeOverride.CustomType
+	}
+
+	if schemaOverride != nil {
+		t.Type = schemaOverride.Type
+		t.AttributeType = schemaOverride.AttributeType
+		t.ValueType = schemaOverride.ValueType
+		t.ValueFromMethod = schemaOverride.ValueFromMethod
+		t.ValueToMethod = schemaOverride.ValueToMethod
+		t.NullValueMethod = schemaOverride.NullValueMethod
+		t.UnknownValueMethod = schemaOverride.UnknownValueMethod
+		t.ValueCastToType = schemaOverride.CastToType
+		t.ValueCastFromType = schemaOverride.CastFromType
+		// t.TypeConstructor = o.TypeConstructor
+
+		t.ElemType = t.Type
+		t.ElemValueType = t.ValueType
+	}
+
 }
 
 // ProtobufType represents protobuf object field type information
