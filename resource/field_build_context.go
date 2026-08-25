@@ -17,7 +17,6 @@ limitations under the License.
 package resource
 
 import (
-	"cmp"
 	"strconv"
 	"strings"
 
@@ -31,6 +30,7 @@ import (
 var (
 	float64Type = TerraformType{
 		Type:               Types + ".Float64Type",
+		AttributeType:      Schema + ".Float64Attribute",
 		ValueType:          Types + ".Float64",
 		ValueFromMethod:    "ValueFloat64",
 		ValueToMethod:      Types + ".Float64Value",
@@ -46,6 +46,7 @@ var (
 
 	int64Type = TerraformType{
 		Type:               Types + ".Int64Type",
+		AttributeType:      Schema + ".Int64Attribute",
 		ValueType:          Types + ".Int64",
 		ValueFromMethod:    "ValueInt64",
 		ValueToMethod:      Types + ".Int64Value",
@@ -61,6 +62,7 @@ var (
 
 	stringType = TerraformType{
 		Type:               Types + ".StringType",
+		AttributeType:      Schema + ".StringAttribute",
 		ValueType:          Types + ".String",
 		ValueFromMethod:    "ValueString",
 		ValueToMethod:      Types + ".StringValue",
@@ -76,6 +78,7 @@ var (
 
 	boolType = TerraformType{
 		Type:               Types + ".BoolType",
+		AttributeType:      Schema + ".BoolAttribute",
 		ValueType:          Types + ".Bool",
 		ValueFromMethod:    "ValueBool",
 		ValueToMethod:      Types + ".BoolValue",
@@ -91,6 +94,7 @@ var (
 
 	objectType = TerraformType{
 		Type:          Types + ".ObjectType",
+		AttributeType: Schema + ".ObjectAttribute",
 		ValueType:     Types + ".Object",
 		ElemType:      Types + ".ObjectType",
 		ElemValueType: Types + ".Object",
@@ -228,7 +232,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		}
 		t = TerraformType{
 			Type:               c.config.TimeType.Type,
-			BaseType:           Types + ".StringType",
+			AttributeType:      Schema + ".StringAttribute",
 			ValueType:          c.config.TimeType.ValueType,
 			ValueFromMethod:    c.config.TimeType.ValueFromMethod,
 			ValueToMethod:      c.config.TimeType.ValueToMethod,
@@ -246,7 +250,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		}
 		t = TerraformType{
 			Type:               c.config.DurationType.Type,
-			BaseType:           Types + ".StringType",
+			AttributeType:      Schema + ".StringAttribute",
 			ValueType:          c.config.DurationType.ValueType,
 			ValueFromMethod:    c.config.DurationType.ValueFromMethod,
 			ValueToMethod:      c.config.DurationType.ValueToMethod,
@@ -309,18 +313,22 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 
 	if c.IsRepeated() {
 		t.Type = Types + ".ListType"
-		t.BaseType = Types + ".ListType"
+		t.AttributeType = Schema + ".ListAttribute"
 		t.ValueType = Types + ".List"
 	}
 
 	if c.IsMap() {
 		t.Type = Types + ".MapType"
-		t.BaseType = Types + ".MapType"
+		t.AttributeType = Schema + ".MapAttribute"
 		t.ValueType = Types + ".Map"
 	}
 
 	if c.IsCastType() {
 		t.ValueCastFromType = elemType
+	}
+
+	if override := c.GetTerraformTypeOverride(); override != nil {
+		t.applyOverride(*override)
 	}
 
 	return t, nil
@@ -458,6 +466,16 @@ func (c *FieldBuildContext) GetFlagValue(f map[string]struct{}) bool {
 	return ok1 || ok2
 }
 
+// IsSensitive returns true if a field is required
+func (c *FieldBuildContext) IsRequired() bool {
+	return c.GetFlagValue(c.config.RequiredFields)
+}
+
+// IsSensitive returns true if a field is sensitive
+func (c *FieldBuildContext) IsSensitive() bool {
+	return c.GetFlagValue(c.config.SensitiveFields)
+}
+
 // IsComputed returns true if a field is computed
 func (c *FieldBuildContext) IsComputed(isProto3optional bool) bool {
 	// Required fields cannot be computed
@@ -512,33 +530,17 @@ func (c *FieldBuildContext) GetValidators() []string {
 }
 
 // GetPlanModifiers returns field validators
-func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) ([]string, error) {
+func (c *FieldBuildContext) GetPlanModifiers() []string {
 	v, ok := c.config.PlanModifiers[c.GetPath()]
 	if !ok {
 		v, ok = c.config.PlanModifiers[c.GetNameWithTypeName()]
 	}
 
 	if ok {
-		return v, nil
+		return v
 	}
 
-	tt, err := c.GetTerraformType()
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	if c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		attrType := cmp.Or(tt.BaseType, tt.Type)
-		if override := c.GetTerraformTypeOverride(); override != nil {
-			attrType = override.Type
-		}
-		pm := useStateForUnknownMethodForAttributeType(attrType)
-		if pm != "" {
-			return []string{pm}, nil
-		}
-	}
-
-	return []string{}, nil
+	return []string{}
 }
 
 // GetNullable returns the nullable flag
@@ -590,23 +592,21 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 	return c.config.DefaultPackageName + "." + name
 }
 
-func useStateForUnknownMethodForAttributeType(t string) string {
-	switch t {
-	case Types + ".StringType":
-		return Schema + "/stringplanmodifier.UseStateForUnknown()"
-	case Types + ".BoolType":
-		return Schema + "/boolplanmodifier.UseStateForUnknown()"
-	case Types + ".Int64Type":
-		return Schema + "/int64planmodifier.UseStateForUnknown()"
-	case Types + ".Float64Type":
-		return Schema + "/float64planmodifier.UseStateForUnknown()"
-	case Types + ".ListType":
-		return Schema + "/listplanmodifier.UseStateForUnknown()"
-	case Types + ".MapType":
-		return Schema + "/mapplanmodifier.UseStateForUnknown()"
-	case Types + ".ObjectType":
-		return Schema + "/objectplanmodifier.UseStateForUnknown()"
-	default:
-		return ""
+var planModifierByAttributeType = map[string]string{
+	Schema + ".StringAttribute":  "/stringplanmodifier",
+	Schema + ".BoolAttribute":    "/boolplanmodifier",
+	Schema + ".Int64Attribute":   "/int64planmodifier",
+	Schema + ".Float64Attribute": "/float64planmodifier",
+	Schema + ".ListAttribute":    "/listplanmodifier",
+	Schema + ".MapAttribute":     "/mapplanmodifier",
+	Schema + ".ObjectAttribute":  "/objectplanmodifier",
+}
+
+func useStateForUnknownForType(t string) (string, error) {
+	planModifier, ok := planModifierByAttributeType[t]
+	if !ok {
+		return "", trace.BadParameter("unexpected attribute type %q", t)
 	}
+
+	return Schema + planModifier + ".UseStateForUnknown()", nil
 }

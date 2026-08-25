@@ -99,7 +99,39 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 		IsEmpty:        c.IsEmpty(),
 	}
 
+	// Set injected fields attribute type
+	for index, injectedField := range message.InjectedFields {
+		if injectedField.AttributeType != "" {
+			continue
+		}
+
+		attributeType, err := attributeTypeForTerraformType(injectedField.Type)
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		message.InjectedFields[index].AttributeType = attributeType
+	}
+
 	message.Comment = c.GetComment()
 
 	return message, nil
+}
+
+var attributeTypeByType = map[string]string{
+	Types + ".StringType":  ".StringAttribute",
+	Types + ".BoolType":    ".BoolAttribute",
+	Types + ".Int64Type":   ".Int64Attribute",
+	Types + ".Float64Type": ".Float64Attribute",
+	Types + ".ListType":    ".ListAttribute",
+	Types + ".MapType":     ".MapAttribute",
+	Types + ".ObjectType":  ".ObjectAttribute",
+}
+
+func attributeTypeForTerraformType(t string) (string, error) {
+	attributeType, ok := attributeTypeByType[t]
+	if !ok {
+		return "", trace.BadParameter("unexpected type %q", t)
+	}
+
+	return Schema + attributeType, nil
 }

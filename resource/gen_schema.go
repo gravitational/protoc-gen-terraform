@@ -20,11 +20,11 @@ import (
 	// . significantly improves readability of a generator statements.
 	// That's also the reason to extract it into the separate package.
 
-	"cmp"
 	"io"
 
 	"github.com/dave/jennifer/jen"
 	j "github.com/dave/jennifer/jen"
+	"github.com/gravitational/trace"
 )
 
 // MessageSchemaGenerator is the decorator struct to generate tfsdk.Schema of a message
@@ -45,6 +45,11 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 	diags := m.i.WithPackage(Diag, "Diagnostics")
 	attr := m.i.WithPackage(Schema, "Attribute")
 
+	fieldsDict, err := m.fieldsDictSchema()
+	if err != nil {
+		return 0, trace.Wrap(err)
+	}
+
 	j := j.Commentf("// %v returns tfsdk.Schema definition for %v\n", id, m.Name).
 		Func().
 		Id(id).
@@ -59,7 +64,7 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 				j.Id(schema).Values(
 					j.Dict{
 						j.Id("Attributes"): j.Map(j.String()).Id(attr).Values(
-							m.fieldsDictSchema(),
+							fieldsDict,
 						),
 					},
 				),
@@ -71,25 +76,33 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 }
 
 // FieldsDictSchema reutrns jen.Dict of the generated message fields
-func (m *MessageSchemaGenerator) fieldsDictSchema() j.Dict {
+func (m *MessageSchemaGenerator) fieldsDictSchema() (j.Dict, error) {
 	d := j.Dict{}
 
 	for _, f := range m.Fields {
 		f := NewFieldSchemaGenerator(f, m.i)
-		d[j.Lit(f.NameSnake)] = f.Generate()
+		field, err := f.Generate()
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		d[j.Lit(f.NameSnake)] = field
 	}
 
 	if len(m.Message.InjectedFields) > 0 {
 		for _, f := range m.Message.InjectedFields {
-			d[j.Lit(f.Name)] = m.generateInjectedField(f)
+			injected, err := m.generateInjectedField(f)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+			d[j.Lit(f.Name)] = injected
 		}
 	}
 
-	return d
+	return d, nil
 }
 
 // generateInjectedField generates code for injected field
-func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
+func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) (j.Code, error) {
 	d := j.Dict{
 		j.Id("Required"): j.Lit(f.Required),
 		j.Id("Computed"): j.Lit(f.Computed),
@@ -97,16 +110,22 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 	}
 
 	if len(f.Validators) > 0 {
-		valType := validatorTypeForTerraformType(f.Type)
-		d[j.Id("Validators")] = generateValidators(m.i, valType, f.Validators)
+		baseType, err := baseTypeForAttributeType(f.AttributeType)
+		if err != nil {
+			return nil, trace.Wrap(err, "failed to get base type")
+		}
+		d[j.Id("Validators")] = generateValidators(m.i, j.Id(m.i.WithType(Validator+baseType)), f.Validators)
 	}
 
 	if len(f.PlanModifiers) > 0 {
-		pmType := planModifierTypeForTerraformType(f.Type)
-		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, pmType, f.PlanModifiers)
+		baseType, err := baseTypeForAttributeType(f.AttributeType)
+		if err != nil {
+			return nil, trace.Wrap(err, "failed to get base type")
+		}
+		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, j.Id(m.i.WithType(PlanModifier+baseType)), f.PlanModifiers)
 	}
 
-	return j.Id(m.i.WithPackage(Schema, attributeTypeForTerraformType(f.Type))).Values(d)
+	return j.Id(m.i.WithType(f.AttributeType)).Values(d), nil
 }
 
 // FieldSchemaGenerator represents the decorator for Field code generation
@@ -121,8 +140,11 @@ func NewFieldSchemaGenerator(f *Field, i *Imports) *FieldSchemaGenerator {
 }
 
 // Generate returns field schema
-func (f *FieldSchemaGenerator) Generate() *j.Statement {
-	d := f.baseAttributeDict()
+func (f *FieldSchemaGenerator) Generate() (j.Code, error) {
+	d, err := f.baseAttributeDict()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
 
 	switch f.Kind {
 	case ObjectKind:
@@ -132,13 +154,13 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 	case ObjectMapKind:
 		return f.mapNestedAttribute(d)
 	case CustomKind:
-		return f.customAttribute(d)
+		return f.customAttribute(d), nil
 	default:
-		return f.primitiveAttributeType().Values(d)
+		return f.primitiveAttribute().Values(d), nil
 	}
 }
 
-func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
+func (f *FieldSchemaGenerator) baseAttributeDict() (j.Dict, error) {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
 		j.Id("CustomType"):  f.customType(), // nils are automatically omitted
@@ -164,17 +186,23 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 
 	// Validators
 	if len(f.Validators) > 0 {
-		valType := validatorTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
-		d[j.Id("Validators")] = generateValidators(f.i, valType, f.Validators)
+		validators, err := f.generateValidators()
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		d[j.Id("Validators")] = validators
 	}
 
 	// Plan modifiers
 	if len(f.PlanModifiers) > 0 {
-		pmType := planModifierTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
-		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, pmType, f.PlanModifiers)
+		planModifiers, err := f.generatePlanModifiers()
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		d[j.Id("PlanModifiers")] = planModifiers
 	}
 
-	return d
+	return d, nil
 }
 
 func (f *FieldSchemaGenerator) customType() *j.Statement {
@@ -215,124 +243,129 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 	return j.Id(f.i.WithType(f.ElemType)).Values()
 }
 
-func (f *FieldSchemaGenerator) primitiveAttributeType() *j.Statement {
-	attrType := attributeTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
-	return j.Id(f.i.WithPackage(Schema, attrType))
+func (f *FieldSchemaGenerator) primitiveAttribute() *j.Statement {
+	return j.Id(f.i.WithType(f.AttributeType))
 }
 
-func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) *j.Statement {
-	return j.Map(j.String()).Id(f.i.WithPackage(Schema, "Attribute")).Values(m.fieldsDictSchema())
+func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) (j.Code, error) {
+	fieldsDict, err := m.fieldsDictSchema()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	return j.Map(j.String()).Id(f.i.WithPackage(Schema, "Attribute")).Values(fieldsDict), nil
 }
 
-func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) *j.Statement {
+func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) (j.Code, error) {
 	m := NewMessageSchemaGenerator(f.Message, f.i)
-	d[j.Id("Attributes")] = f.nestedAttributes(m)
-	return j.Id(f.i.WithPackage(Schema, "SingleNestedAttribute")).Values(d)
+	nestedAttributes, err := f.nestedAttributes(m)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+	d[j.Id("Attributes")] = nestedAttributes
+	return j.Id(f.i.WithPackage(Schema, "SingleNestedAttribute")).Values(d), nil
 }
 
-func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) *j.Statement {
+func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) (j.Code, error) {
 	m := NewMessageSchemaGenerator(f.Message, f.i)
+	nestedAttributes, err := f.nestedAttributes(m)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
 	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(Schema, "NestedAttributeObject")).Values(j.Dict{
-		j.Id("Attributes"): f.nestedAttributes(m),
+		j.Id("Attributes"): nestedAttributes,
 	})
-	return j.Id(f.i.WithPackage(Schema, "ListNestedAttribute")).Values(d)
+	return j.Id(f.i.WithPackage(Schema, "ListNestedAttribute")).Values(d), nil
 }
 
-func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) *j.Statement {
+func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) (j.Code, error) {
 	m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i)
+	nestedAttributes, err := f.nestedAttributes(m)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
 	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(Schema, "NestedAttributeObject")).Values(j.Dict{
-		j.Id("Attributes"): f.nestedAttributes(m),
+		j.Id("Attributes"): nestedAttributes,
 	})
-	return j.Id(f.i.WithPackage(Schema, "MapNestedAttribute")).Values(d)
+	return j.Id(f.i.WithPackage(Schema, "MapNestedAttribute")).Values(d), nil
 }
 
 func (f *FieldSchemaGenerator) customAttribute(d j.Dict) *j.Statement {
-	attrType := attributeTypeForTerraformType(cmp.Or(f.BaseType, f.Type))
 	return j.Id("GenSchema"+f.Suffix).
 		Call(
 			j.Id("ctx"),
 			j.Op("&").Id("diags"),
-			j.Id(f.i.WithPackage(Schema, attrType)).Values(d),
+			j.Id(f.i.WithType(f.AttributeType)).Values(d),
 		)
 }
 
-func generatePlanModifiers(imports *Imports, pmType string, pm []string) j.Code {
+func (f *FieldSchemaGenerator) generatePlanModifiers() (j.Code, error) {
+	planModifierType, err := f.planModifierTypeForAttributeType(f.AttributeType)
+	if err != nil {
+		return nil, trace.Wrap(err, "failed to get plan modifier type")
+	}
+
+	return generatePlanModifiers(f.i, planModifierType, f.PlanModifiers), nil
+}
+
+func (f *FieldSchemaGenerator) generateValidators() (j.Code, error) {
+	validatorType, err := f.validatorTypeForAttributeType(f.AttributeType)
+	if err != nil {
+		return nil, trace.Wrap(err, "failed to get validator type")
+	}
+
+	return generateValidators(f.i, validatorType, f.Validators), nil
+}
+
+func generatePlanModifiers(imports *Imports, planModiferType j.Code, pm []string) j.Code {
 	v := make([]jen.Code, len(pm))
 	for i, n := range pm {
 		v[i] = j.Id(imports.WithType(n))
 	}
 
-	return j.Index().Id(imports.WithType(pmType)).Values(v...)
+	return j.Index().Add(planModiferType).Values(v...)
 }
 
-func generateValidators(imports *Imports, valType string, vals []string) j.Code {
+func generateValidators(imports *Imports, validatorType j.Code, vals []string) j.Code {
 	v := make([]jen.Code, len(vals))
 	for i, n := range vals {
 		v[i] = j.Id(imports.WithType(n))
 	}
 
-	return j.Index().Id(imports.WithType(valType)).Values(v...)
+	return j.Index().Add(validatorType).Values(v...)
 }
 
-func attributeTypeForTerraformType(t string) string {
-	switch t {
-	case Types + ".StringType":
-		return "StringAttribute"
-	case Types + ".BoolType":
-		return "BoolAttribute"
-	case Types + ".Int64Type":
-		return "Int64Attribute"
-	case Types + ".Float64Type":
-		return "Float64Attribute"
-	case Types + ".ListType":
-		return "ListAttribute"
-	case Types + ".MapType":
-		return "MapAttribute"
-	case Types + ".ObjectType":
-		return "ObjectAttribute"
-	default:
-		return ""
-	}
+var baseByAttributeType = map[string]string{
+	Schema + ".StringAttribute":  ".String",
+	Schema + ".BoolAttribute":    ".Bool",
+	Schema + ".Int64Attribute":   ".Int64",
+	Schema + ".Float64Attribute": ".Float64",
+	Schema + ".ListAttribute":    ".List",
+	Schema + ".MapAttribute":     ".Map",
+	Schema + ".ObjectAttribute":  ".Object",
 }
 
-func planModifierTypeForTerraformType(t string) string {
-	switch t {
-	case Types + ".StringType":
-		return PlanModifier + ".String"
-	case Types + ".BoolType":
-		return PlanModifier + ".Bool"
-	case Types + ".Int64Type":
-		return PlanModifier + ".Int64"
-	case Types + ".Float64Type":
-		return PlanModifier + ".Float64"
-	case Types + ".ListType":
-		return PlanModifier + ".List"
-	case Types + ".MapType":
-		return PlanModifier + ".Map"
-	case Types + ".ObjectType":
-		return PlanModifier + ".Object"
-	default:
-		return ""
+func baseTypeForAttributeType(t string) (string, error) {
+	baseType, ok := baseByAttributeType[t]
+	if !ok {
+		return "", trace.BadParameter("unexpected attribute type %q", t)
 	}
+	return baseType, nil
 }
 
-func validatorTypeForTerraformType(t string) string {
-	switch t {
-	case Types + ".StringType":
-		return Validator + ".String"
-	case Types + ".BoolType":
-		return Validator + ".Bool"
-	case Types + ".Int64Type":
-		return Validator + ".Int64"
-	case Types + ".Float64Type":
-		return Validator + ".Float64"
-	case Types + ".ListType":
-		return Validator + ".List"
-	case Types + ".MapType":
-		return Validator + ".Map"
-	case Types + ".ObjectType":
-		return Validator + ".Object"
-	default:
-		return ""
+func (f *FieldSchemaGenerator) planModifierTypeForAttributeType(t string) (j.Code, error) {
+	baseType, ok := baseByAttributeType[t]
+	if !ok {
+		return nil, trace.BadParameter("unexpected attribute type %q", t)
 	}
+
+	return j.Id(f.i.WithType(PlanModifier + baseType)), nil
+}
+
+func (f *FieldSchemaGenerator) validatorTypeForAttributeType(t string) (j.Code, error) {
+	baseType, ok := baseByAttributeType[t]
+	if !ok {
+		return nil, trace.BadParameter("unexpected attribute type %q", t)
+	}
+
+	return j.Id(f.i.WithType(Validator + baseType)), nil
 }

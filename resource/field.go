@@ -50,7 +50,13 @@ type TerraformType struct {
 	Type string
 	// BaseType represents base Terraform attr.Type name used by custom types
 	// to satisfy interfaces
+	//
+	// Deprecated: Use AttributeType
 	BaseType string
+
+	// AttributeType represents Terraform schema.Attribute name
+	AttributeType string
+
 	// ValueType represents Terraform attr.Value name
 	ValueType string
 	// ValueFromMethod is the method called on an attr.Value to get the underlying value
@@ -79,6 +85,22 @@ type TerraformType struct {
 	IsMessage bool
 	// TypeConstructor represents expression which is used to initialize type in schema
 	TypeConstructor string
+}
+
+func (t *TerraformType) applyOverride(o SchemaType) {
+	t.Type = o.Type
+	t.AttributeType = o.AttributeType
+	t.ValueType = o.ValueType
+	t.ValueFromMethod = o.ValueFromMethod
+	t.ValueToMethod = o.ValueToMethod
+	t.NullValueMethod = o.NullValueMethod
+	t.UnknownValueMethod = o.UnknownValueMethod
+	t.ValueCastToType = o.CastToType
+	t.ValueCastFromType = o.CastFromType
+	t.TypeConstructor = o.TypeConstructor
+
+	t.ElemType = t.Type
+	t.ElemValueType = t.ValueType
 }
 
 // ProtobufType represents protobuf object field type information
@@ -208,32 +230,39 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		return nil, trace.Wrap(err)
 	}
 
+	terraformType, err := c.GetTerraformType()
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
 	f := &Field{
 		Name:             c.GetName(),
 		NameSnake:        c.GetNameSnake(),
-		IsRequired:       c.GetFlagValue(c.config.RequiredFields),
+		IsRequired:       c.IsRequired(),
 		IsComputed:       c.IsComputed(isProto3Optional),
-		IsSensitive:      c.GetFlagValue(c.config.SensitiveFields),
+		IsSensitive:      c.IsSensitive(),
 		IsRepeated:       c.IsRepeated(),
 		IsMap:            c.IsMap(),
 		IsNullable:       c.GetNullable(),
 		IsProto3Optional: isProto3Optional,
+		PlanModifiers:    c.GetPlanModifiers(),
 		Validators:       c.GetValidators(),
 		Path:             c.GetPath(),
 		Comment:          c.GetComment(),
+		TerraformType:    terraformType,
 	}
 
 	f.GoType = c.GetGoType()
 	f.GoElemType = f.GoType
 
-	f.TerraformType, err = c.GetTerraformType()
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-
-	f.PlanModifiers, err = c.GetPlanModifiers(isProto3Optional)
-	if err != nil {
-		return nil, trace.Wrap(err)
+	// Set default UseStateForUnknown plan modifier for computed attributes
+	// when use_state_for_unknown_by_default=true.
+	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
+		planModifier, err := useStateForUnknownForType(terraformType.AttributeType)
+		if err != nil {
+			return nil, trace.Wrap(err, "failed to get UseStateForUnknown method")
+		}
+		f.PlanModifiers = append(f.PlanModifiers, planModifier)
 	}
 
 	if f.IsMessage && !c.IsMap() {
@@ -279,7 +308,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		}
 	}
 
-	f.setTerraformTypeOverride(c)
+	f.setProtobufTypeOverride(c)
 	f.setCustomType(c)
 
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
@@ -435,31 +464,10 @@ func (f *Field) getKind() Kind {
 	return PrimitiveKind // ex: string
 }
 
-func isCollectionSchemaType(t string) bool {
-	switch t {
-	case Types + ".ListType", Types + ".MapType":
-		return true
-	default:
-		return false
-	}
-}
-
-// setSchemaCustomType sets schema type override
-func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
+// setProtobufTypeOverride sets protobuf type override
+func (f *Field) setProtobufTypeOverride(c *FieldBuildContext) {
 	o := c.GetTerraformTypeOverride()
 	if o != nil {
-		f.Type = o.Type
-		f.ValueType = o.ValueType
-		f.ValueFromMethod = o.ValueFromMethod
-		f.ValueToMethod = o.ValueToMethod
-		f.NullValueMethod = o.NullValueMethod
-		f.UnknownValueMethod = o.UnknownValueMethod
-		f.ValueCastToType = o.CastToType
-		f.ValueCastFromType = o.CastFromType
-		f.TypeConstructor = o.TypeConstructor
-
-		f.ElemType = f.Type
-		f.ElemValueType = f.ValueType
 		f.GoType = f.ValueCastFromType
 		f.GoElemType = f.ValueCastFromType
 	}

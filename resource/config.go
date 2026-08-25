@@ -57,6 +57,8 @@ type SchemaType struct {
 	Type string `yaml:"type,omitempty"`
 	// ValueType is a Go attr.Value struct name
 	ValueType string `yaml:"value_type,omitempty"`
+	// AttributeType is the Terraform schema.Attribute type name
+	AttributeType string `yaml:"attribute_type,omitempty"`
 	// ValueFromMethod is the method on attr.Value that will be called to get
 	// the underlying value
 	ValueFromMethod string `yaml:"value_from_method,omitempty"`
@@ -80,6 +82,10 @@ type InjectedField struct {
 	Name string `yaml:"name,omitempty"`
 	// Type represents field type
 	Type string `yaml:"type,omitempty"`
+
+	// AttributeType represents Terraform schema.Attribute type name
+	AttributeType string `yaml:"attribute_type,omitempty"`
+
 	// Required is the required flag
 	Required bool `yaml:"required,omitempty"`
 	// Computed is the computed flag

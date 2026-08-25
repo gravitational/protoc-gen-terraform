@@ -51,6 +51,7 @@ custom_types:
 schema_types:
   "Custom.string_override":
     type: "github.com/hashicorp/terraform-plugin-framework/types.ListType"
+    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.ListAttribute"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.List"
     value_from_method: "Elements"
     value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.ListValue"
@@ -60,6 +61,7 @@ schema_types:
     cast_from_type: "string"
   "Custom.schema_override":
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
+    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.StringAttribute"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
     value_from_method: "ValueString"
     value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.StringValue"
