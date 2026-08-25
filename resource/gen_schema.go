@@ -211,7 +211,7 @@ func (f *FieldSchemaGenerator) customType() *j.Statement {
 	}
 
 	if f.TerraformType.TypeConstructor != "" {
-		return j.Id(f.TerraformType.TypeConstructor)
+		return j.Id(f.i.WithType(f.TerraformType.TypeConstructor))
 	}
 	return nil
 }
@@ -236,7 +236,7 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 	}
 
 	if f.TerraformType.TypeConstructor != "" {
-		return j.Id(f.TerraformType.TypeConstructor)
+		return j.Id(f.i.WithType(f.TerraformType.TypeConstructor))
 	}
 
 	return j.Id(f.i.WithType(f.ElemType)).Values()
