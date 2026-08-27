@@ -49,12 +49,12 @@ custom_types:
   "Custom.string_override": StringCustom
 
 attribute_mapping:
-  BoolOption: "github.com/hashicorp/terraform-plugin-framework/resource/schema.BoolAttribute"
-  StringCustom: "github.com/hashicorp/terraform-plugin-framework/resource/schema.ListAttribute"
+  BoolOption: "BoolAttribute"
+  StringCustom: "ListAttribute"
 
 schema_types:
   "Custom.schema_override":
-    attribute_type: "github.com/hashicorp/terraform-plugin-framework/resource/schema.StringAttribute"
+    attribute_type: "StringAttribute"
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
     value_from_method: "ValueString"

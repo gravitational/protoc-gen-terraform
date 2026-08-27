@@ -27,6 +27,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
@@ -43,8 +44,8 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// GenSchemaPrimitives returns tfsdk.Schema definition for Primitives
-func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaPrimitivesResource returns tfsdk.Schema definition for Primitives
+func GenSchemaPrimitivesResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"bool_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
@@ -156,6 +157,106 @@ func GenSchemaPrimitives(ctx context.Context) (github_com_hashicorp_terraform_pl
 			Description:   "string_value string field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
+		},
+	}}, diags
+}
+
+// GenSchemaPrimitivesDataSource returns tfsdk.Schema definition for Primitives
+func GenSchemaPrimitivesDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
+	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+		"bool_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "bool_list bool list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+			Optional:    true,
+		},
+		"bool_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+			Computed:    true,
+			Description: "bool_value bool field.",
+			Optional:    true,
+		},
+		"bytes_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "bytes_list bytes list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Optional:    true,
+		},
+		"bytes_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "bytes_value bytes field.",
+			Optional:    true,
+		},
+		"double_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "double_list double list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+			Optional:    true,
+		},
+		"double_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Float64Attribute{
+			Computed:    true,
+			Description: "double_value float64 field.",
+			Optional:    true,
+		},
+		"enum_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "enum_list enum list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+			Optional:    true,
+		},
+		"enum_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+			Computed:    true,
+			Description: "enum_value enum field.",
+			Optional:    true,
+		},
+		"float_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "float_list float list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+			Optional:    true,
+		},
+		"float_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Float64Attribute{
+			Computed:    true,
+			Description: "float_value float32 field.",
+			Optional:    true,
+		},
+		"id": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"int32_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "int32_list int32 list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+			Optional:    true,
+		},
+		"int32_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+			Computed:    true,
+			Description: "int32_value int32 field.",
+			Optional:    true,
+		},
+		"int64_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "int64_list int64 list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+			Optional:    true,
+		},
+		"int64_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+			Computed:    true,
+			Description: "int64_value int64 field.",
+			Optional:    true,
+		},
+		"string_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "string_list string list field.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Optional:    true,
+		},
+		"string_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "string_value string field.",
+			Optional:    true,
 		},
 	}}, diags
 }
@@ -543,7 +644,7 @@ func CopyPrimitivesToTerraform(ctx context.Context, obj *github_com_gravitationa
 // CopyPrimitivesToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyPrimitivesToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Primitives, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaPrimitives(ctx)
+	schema, diags := GenSchemaPrimitivesResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}

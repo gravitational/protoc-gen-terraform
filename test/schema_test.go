@@ -10,7 +10,7 @@ import (
 )
 
 func TestSchema(t *testing.T) {
-	s, diags := GenSchemaTest(t.Context())
+	s, diags := GenSchemaTestResource(t.Context())
 	require.False(t, diags.HasError())
 
 	t.Run("string flags", func(t *testing.T) {

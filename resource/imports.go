@@ -23,23 +23,20 @@ import (
 )
 
 const (
-	// SDK represents the path to Terraform SDK package
-	SDK = "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	// Types represents the path to Terraform types package
 	Types = "github.com/hashicorp/terraform-plugin-framework/types"
 	// Diag represents the path to Terraform diag package
 	Diag = "github.com/hashicorp/terraform-plugin-framework/diag"
 	// Attr represents the name of Terraform attr package
 	Attr = "github.com/hashicorp/terraform-plugin-framework/attr"
-	// Schema represents the path to the Terraform schema package
-	Schema = "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	// DataSourceSchema represents the path to the Terraform datasource schema package
+	DataSourceSchema = "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	// ResourceSchema represents the path to the Terraform resource schema package
+	ResourceSchema = "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	// PlanModifier represents the path to the Terraform planmodifier package
 	PlanModifier = "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	// Validator represents the path to the Terraform validator package
 	Validator = "github.com/hashicorp/terraform-plugin-framework/schema/validator"
-
-	// TFTypes represents the name of Terraform SDK TFTypes package
-	TFTypes = "github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 // Imports represents the collection of imports and acts as the facade for generator.PluginImports

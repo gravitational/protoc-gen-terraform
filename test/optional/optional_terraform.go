@@ -25,6 +25,7 @@ import (
 
 	proto "github.com/gogo/protobuf/proto"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
@@ -35,8 +36,8 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// GenSchemaOptionalTest returns tfsdk.Schema definition for OptionalTest
-func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaOptionalTestResource returns tfsdk.Schema definition for OptionalTest
+func GenSchemaOptionalTestResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"choice_a": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
@@ -76,6 +77,55 @@ func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:    true,
 		},
 		"string_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+			Computed:    true,
+			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Optional:    true,
+		},
+	}}, diags
+}
+
+// GenSchemaOptionalTestDataSource returns tfsdk.Schema definition for OptionalTest
+func GenSchemaOptionalTestDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
+	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+		"choice_a": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"choice_b": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"optional_bool": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+			Description: "OptionalBool is a proto3 optional bool field",
+			Optional:    true,
+		},
+		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+				Description: "",
+				Optional:    true,
+			}},
+			Description: "OptionalInnerMessage is a proto3 optional message field",
+			Optional:    true,
+		},
+		"optional_int64": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+			Description: "OptionalInt64 is a proto3 optional int64 field",
+			Optional:    true,
+		},
+		"optional_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapAttribute{
+			Computed:    true,
+			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Optional:    true,
+		},
+		"optional_str": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Description: "OptionalStr is a proto3 optional string field",
+			Optional:    true,
+		},
+		"string_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "lists don't support the optional keyword, but we add it here to check the generation",
 			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
@@ -281,7 +331,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 // CopyOptionalTestToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *OptionalTest, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaOptionalTest(ctx)
+	schema, diags := GenSchemaOptionalTestResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}

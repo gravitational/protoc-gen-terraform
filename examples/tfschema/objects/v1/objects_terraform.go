@@ -27,6 +27,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
@@ -45,8 +46,8 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// GenSchemaObjects returns tfsdk.Schema definition for Objects
-func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaObjectsResource returns tfsdk.Schema definition for Objects
+func GenSchemaObjectsResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"bool_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
@@ -379,6 +380,296 @@ func GenSchemaObjects(ctx context.Context) (github_com_hashicorp_terraform_plugi
 			ElementType:   github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Map{github_com_hashicorp_terraform_plugin_framework_resource_schema_mapplanmodifier.UseStateForUnknown()},
+		},
+	}}, diags
+}
+
+// GenSchemaObjectsDataSource returns tfsdk.Schema definition for Objects
+func GenSchemaObjectsDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
+	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+		"bool_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapAttribute{
+			Computed:    true,
+			Description: "bool_map map of bools.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+			Optional:    true,
+		},
+		"branch_bool": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"branch_empty": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"active": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+				Computed:    true,
+				Description: "Automatically generated field preventing empty message errors",
+				Optional:    true,
+			}},
+			Description: "",
+			Optional:    true,
+		},
+		"branch_int": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"branch_leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}},
+			Description: "",
+			Optional:    true,
+		},
+		"branch_nested": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}},
+			Description: "",
+			Optional:    true,
+		},
+		"branch_string": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"embedded_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"empty": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"active": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+				Computed:    true,
+				Description: "Automatically generated field preventing empty message errors",
+				Optional:    true,
+			}},
+			Description: "empty is an empty field.",
+			Optional:    true,
+		},
+		"id": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"int_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapAttribute{
+			Computed:    true,
+			Description: "int_map map of ints.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+			Optional:    true,
+		},
+		"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}},
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"nested_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListNestedAttribute{
+			Computed:    true,
+			Description: "nested_list is a list of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_datasource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}}},
+			Optional: true,
+		},
+		"nested_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapNestedAttribute{
+			Computed:    true,
+			Description: "nested_map is a map of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_datasource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}}},
+			Optional: true,
+		},
+		"nested_nullable": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}},
+			Description: "nested_nullable is a nullable nested object.",
+			Optional:    true,
+		},
+		"nested_nullable_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListNestedAttribute{
+			Computed:    true,
+			Description: "nested_nullable_list is a nullable list of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_datasource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}}},
+			Optional: true,
+		},
+		"nested_nullable_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapNestedAttribute{
+			Computed:    true,
+			Description: "nested_map is a nullable map of nested objects.",
+			NestedObject: github_com_hashicorp_terraform_plugin_framework_datasource_schema.NestedAttributeObject{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}}},
+			Optional: true,
+		},
+		"nested_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"leaf": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+				Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				}},
+				Computed:    true,
+				Description: "",
+				Optional:    true,
+			}},
+			Computed:    true,
+			Description: "nested_value is a nested object.",
+			Optional:    true,
+		},
+		"primitives": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+				"bool_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "bool_list bool list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+					Optional:    true,
+				},
+				"bool_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+					Computed:    true,
+					Description: "bool_value bool field.",
+					Optional:    true,
+				},
+				"bytes_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "bytes_list bytes list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Optional:    true,
+				},
+				"bytes_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "bytes_value bytes field.",
+					Optional:    true,
+				},
+				"double_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "double_list double list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+					Optional:    true,
+				},
+				"double_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Float64Attribute{
+					Computed:    true,
+					Description: "double_value float64 field.",
+					Optional:    true,
+				},
+				"enum_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "enum_list enum list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+					Optional:    true,
+				},
+				"enum_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+					Computed:    true,
+					Description: "enum_value enum field.",
+					Optional:    true,
+				},
+				"float_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "float_list float list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
+					Optional:    true,
+				},
+				"float_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Float64Attribute{
+					Computed:    true,
+					Description: "float_value float32 field.",
+					Optional:    true,
+				},
+				"id": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "",
+					Optional:    true,
+				},
+				"int32_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "int32_list int32 list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+					Optional:    true,
+				},
+				"int32_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+					Computed:    true,
+					Description: "int32_value int32 field.",
+					Optional:    true,
+				},
+				"int64_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "int64_list int64 list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+					Optional:    true,
+				},
+				"int64_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+					Computed:    true,
+					Description: "int64_value int64 field.",
+					Optional:    true,
+				},
+				"string_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+					Computed:    true,
+					Description: "string_list string list field.",
+					ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+					Optional:    true,
+				},
+				"string_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed:    true,
+					Description: "string_value string field.",
+					Optional:    true,
+				},
+			},
+			Computed:    true,
+			Description: "primitives field.",
+			Optional:    true,
+		},
+		"string_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapAttribute{
+			Computed:    true,
+			Description: "string_map map of strings.",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			Optional:    true,
 		},
 	}}, diags
 }
@@ -1467,7 +1758,7 @@ func CopyObjectsToTerraform(ctx context.Context, obj *github_com_gravitational_p
 // CopyObjectsToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaObjects(ctx)
+	schema, diags := GenSchemaObjectsResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}

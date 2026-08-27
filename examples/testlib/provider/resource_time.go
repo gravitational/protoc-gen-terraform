@@ -24,7 +24,7 @@ func (r timeResource) Metadata(ctx context.Context, req resource.MetadataRequest
 }
 
 func (r timeResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	schema, diags := schemav1.GenSchemaTime(ctx)
+	schema, diags := schemav1.GenSchemaTimeResource(ctx)
 	resp.Schema = schema
 	resp.Diagnostics.Append(diags...)
 }

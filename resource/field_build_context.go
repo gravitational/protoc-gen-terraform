@@ -29,8 +29,8 @@ import (
 
 var (
 	float64Type = TerraformType{
+		AttributeType:      "Float64Attribute",
 		Type:               Types + ".Float64Type",
-		AttributeType:      Schema + ".Float64Attribute",
 		ValueType:          Types + ".Float64",
 		ValueFromMethod:    "ValueFloat64",
 		ValueToMethod:      Types + ".Float64Value",
@@ -45,8 +45,8 @@ var (
 	}
 
 	int64Type = TerraformType{
+		AttributeType:      "Int64Attribute",
 		Type:               Types + ".Int64Type",
-		AttributeType:      Schema + ".Int64Attribute",
 		ValueType:          Types + ".Int64",
 		ValueFromMethod:    "ValueInt64",
 		ValueToMethod:      Types + ".Int64Value",
@@ -61,8 +61,8 @@ var (
 	}
 
 	stringType = TerraformType{
+		AttributeType:      "StringAttribute",
 		Type:               Types + ".StringType",
-		AttributeType:      Schema + ".StringAttribute",
 		ValueType:          Types + ".String",
 		ValueFromMethod:    "ValueString",
 		ValueToMethod:      Types + ".StringValue",
@@ -77,8 +77,8 @@ var (
 	}
 
 	boolType = TerraformType{
+		AttributeType:      "BoolAttribute",
 		Type:               Types + ".BoolType",
-		AttributeType:      Schema + ".BoolAttribute",
 		ValueType:          Types + ".Bool",
 		ValueFromMethod:    "ValueBool",
 		ValueToMethod:      Types + ".BoolValue",
@@ -93,8 +93,8 @@ var (
 	}
 
 	objectType = TerraformType{
+		AttributeType: "ObjectAttribute",
 		Type:          Types + ".ObjectType",
-		AttributeType: Schema + ".ObjectAttribute",
 		ValueType:     Types + ".Object",
 		ElemType:      Types + ".ObjectType",
 		ElemValueType: Types + ".Object",
@@ -231,7 +231,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			return t, trace.Errorf("%v field has time type, but config.time_type is not defined", c.path)
 		}
 		t = TerraformType{
-			AttributeType:      Schema + ".StringAttribute",
+			AttributeType:      "StringAttribute",
 			Type:               c.config.TimeType.Type,
 			ValueType:          c.config.TimeType.ValueType,
 			ValueFromMethod:    c.config.TimeType.ValueFromMethod,
@@ -249,7 +249,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			return t, trace.Errorf("%v field has duration type, but config.duration_type is not defined", c.path)
 		}
 		t = TerraformType{
-			AttributeType:      Schema + ".StringAttribute",
+			AttributeType:      "StringAttribute",
 			Type:               c.config.DurationType.Type,
 			ValueType:          c.config.DurationType.ValueType,
 			ValueFromMethod:    c.config.DurationType.ValueFromMethod,
@@ -312,14 +312,14 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 	}
 
 	if c.IsRepeated() {
+		t.AttributeType = "ListAttribute"
 		t.Type = Types + ".ListType"
-		t.AttributeType = Schema + ".ListAttribute"
 		t.ValueType = Types + ".List"
 	}
 
 	if c.IsMap() {
+		t.AttributeType = "MapAttribute"
 		t.Type = Types + ".MapType"
-		t.AttributeType = Schema + ".MapAttribute"
 		t.ValueType = Types + ".Map"
 	}
 
@@ -599,13 +599,13 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 }
 
 var planModifierByAttributeType = map[string]string{
-	Schema + ".StringAttribute":  "/stringplanmodifier",
-	Schema + ".BoolAttribute":    "/boolplanmodifier",
-	Schema + ".Int64Attribute":   "/int64planmodifier",
-	Schema + ".Float64Attribute": "/float64planmodifier",
-	Schema + ".ListAttribute":    "/listplanmodifier",
-	Schema + ".MapAttribute":     "/mapplanmodifier",
-	Schema + ".ObjectAttribute":  "/objectplanmodifier",
+	"StringAttribute":  "/stringplanmodifier",
+	"BoolAttribute":    "/boolplanmodifier",
+	"Int64Attribute":   "/int64planmodifier",
+	"Float64Attribute": "/float64planmodifier",
+	"ListAttribute":    "/listplanmodifier",
+	"MapAttribute":     "/mapplanmodifier",
+	"ObjectAttribute":  "/objectplanmodifier",
 }
 
 func useStateForUnknownForType(t string) (string, error) {
@@ -614,5 +614,5 @@ func useStateForUnknownForType(t string) (string, error) {
 		return "", trace.BadParameter("unexpected attribute type %q", t)
 	}
 
-	return Schema + planModifier + ".UseStateForUnknown()", nil
+	return ResourceSchema + planModifier + ".UseStateForUnknown()", nil
 }

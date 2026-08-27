@@ -28,6 +28,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
@@ -44,8 +45,8 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-// GenSchemaTime returns tfsdk.Schema definition for Time
-func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaTimeResource returns tfsdk.Schema definition for Time
+func GenSchemaTimeResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
@@ -105,6 +106,64 @@ func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_f
 			Description:   "timestamp_value time.Time field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
+		},
+	}}, diags
+}
+
+// GenSchemaTimeDataSource returns tfsdk.Schema definition for Time
+func GenSchemaTimeDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
+	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+		"duration_custom": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			CustomType:  DurationType{},
+			Description: "duration_custom time.Duration field using casttype.",
+			Optional:    true,
+		},
+		"duration_custom_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "duration_custom_list []time.Duration field using casttype.",
+			ElementType: DurationType{},
+			Optional:    true,
+		},
+		"duration_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "duration_list []time.Duration field.",
+			ElementType: DurationType{},
+			Optional:    true,
+		},
+		"duration_standard": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			CustomType:  DurationType{},
+			Description: "duration_standard time.Duration field using stdduration.",
+			Optional:    true,
+		},
+		"id": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"nullable_duration": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			CustomType:  DurationType{},
+			Description: "nullable_duration nullable time.Duration field.",
+			Optional:    true,
+		},
+		"nullable_timestamp": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
+			Description: "nullable_timestamp nullable time.Time field.",
+			Optional:    true,
+		},
+		"timestamp_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "timestamp_list []time.Time field.",
+			ElementType: UseRFC3339Time(),
+			Optional:    true,
+		},
+		"timestamp_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			CustomType:  UseRFC3339Time(),
+			Description: "timestamp_value time.Time field.",
+			Optional:    true,
 		},
 	}}, diags
 }
@@ -308,7 +367,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 // CopyTimeToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaTime(ctx)
+	schema, diags := GenSchemaTimeResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}

@@ -27,6 +27,7 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gravitational_protoc_gen_terraform_v5_examples_types "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
@@ -42,8 +43,8 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// GenSchemaCustom returns tfsdk.Schema definition for Custom
-func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaCustomResource returns tfsdk.Schema definition for Custom
+func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
 		"bool_custom": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
@@ -123,6 +124,79 @@ func GenSchemaCustom(ctx context.Context) (github_com_hashicorp_terraform_plugin
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 			Validators:    []github_com_hashicorp_terraform_plugin_framework_schema_validator.String{UseMockValidator()},
+		},
+	}}, diags
+}
+
+// GenSchemaCustomDataSource returns tfsdk.Schema definition for Custom
+func GenSchemaCustomDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
+	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+		"bool_custom": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+			Computed:    true,
+			Description: "bool_custom custom bool field.",
+			Optional:    true,
+		}),
+		"bool_custom_list": GenSchemaBoolSpecialList(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "bool_custom_list custom bool list field.",
+			Optional:    true,
+		}),
+		"bool_option": GenSchemaBoolOption(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		}),
+		"computed": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "computed is a computed field.",
+			Optional:    true,
+		},
+		"custom_name_override": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "name_override is a field with a name override.",
+			Optional:    true,
+		},
+		"id": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"injected": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed: true,
+			Optional: false,
+			Required: false,
+		},
+		"plan_modifier": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "plan_modifier is a field with a plan modifier.",
+			Optional:    true,
+		},
+		"required": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Description: "required is a required field.",
+			Required:    true,
+		},
+		"schema_override": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
+		"sensitive": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "sensitive is a sensitive field.",
+			Optional:    true,
+			Sensitive:   true,
+		},
+		"string_override": GenSchemaStringCustom(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+			Computed:    true,
+			Description: "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
+			Optional:    true,
+		}),
+		"validated": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "validated is a validated field.",
+			Optional:    true,
+			Validators:  []github_com_hashicorp_terraform_plugin_framework_schema_validator.String{UseMockValidator()},
 		},
 	}}, diags
 }
@@ -305,7 +379,7 @@ func CopyCustomToTerraform(ctx context.Context, obj *github_com_gravitational_pr
 // CopyCustomToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v5_examples_types.Custom, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaCustom(ctx)
+	schema, diags := GenSchemaCustomResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}
