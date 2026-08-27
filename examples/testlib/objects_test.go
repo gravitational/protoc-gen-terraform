@@ -86,6 +86,22 @@ func (s *TerraformSuite) TestObjectsNullValues() {
 	})
 }
 
+func (s *TerraformSuite) TestObjectsDataSource() {
+	t := s.T()
+	name := "data.example_objects.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("objects_datasource.tf"),
+				Check:  s.testCheckObjectResource(name),
+			},
+		},
+	})
+}
+
 func (s *TerraformSuite) testCheckObjectResource(name string) resource.TestCheckFunc {
 	return resource.ComposeTestCheckFunc(
 		resource.TestCheckResourceAttr(name, "primitives.string_value", "string"),

@@ -34,29 +34,29 @@ type schemaTarget interface {
 	SupportsPlanModifiers() bool
 }
 
-type resourceschemaTarget struct{}
+type resourceSchemaTarget struct{}
 
-func (resourceschemaTarget) SchemaPackage() string { return ResourceSchema }
-func (resourceschemaTarget) FunctionName(name string) string {
+func (resourceSchemaTarget) SchemaPackage() string { return ResourceSchema }
+func (resourceSchemaTarget) FunctionName(name string) string {
 	return "GenSchema" + name + "Resource"
 }
 
-func (resourceschemaTarget) AttributeType(t string) string {
+func (resourceSchemaTarget) AttributeType(t string) string {
 	return ResourceSchema + "." + t
 }
-func (resourceschemaTarget) SupportsPlanModifiers() bool { return true }
+func (resourceSchemaTarget) SupportsPlanModifiers() bool { return true }
 
-type dataSourceschemaTarget struct{}
+type dataSourceSchemaTarget struct{}
 
-func (dataSourceschemaTarget) SchemaPackage() string { return DataSourceSchema }
-func (dataSourceschemaTarget) FunctionName(name string) string {
+func (dataSourceSchemaTarget) SchemaPackage() string { return DataSourceSchema }
+func (dataSourceSchemaTarget) FunctionName(name string) string {
 	return "GenSchema" + name + "DataSource"
 }
 
-func (dataSourceschemaTarget) AttributeType(t string) string {
+func (dataSourceSchemaTarget) AttributeType(t string) string {
 	return DataSourceSchema + "." + t
 }
-func (dataSourceschemaTarget) SupportsPlanModifiers() bool { return false }
+func (dataSourceSchemaTarget) SupportsPlanModifiers() bool { return false }
 
 // MessageSchemaGenerator is the decorator struct to generate tfsdk.Schema of a message
 type MessageSchemaGenerator struct {
@@ -322,7 +322,7 @@ func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) (*j.Statement, error
 }
 
 func (f *FieldSchemaGenerator) customAttribute(d j.Dict) *j.Statement {
-	return j.Id("GenSchema"+f.Suffix).
+	return j.Id(f.target.FunctionName(f.Suffix)).
 		Call(
 			j.Id("ctx"),
 			j.Op("&").Id("diags"),

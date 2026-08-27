@@ -41,7 +41,12 @@ func (p *exampleProvider) Configure(ctx context.Context, req provider.ConfigureR
 }
 
 func (p *exampleProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		func() datasource.DataSource { return primitivesDataSource{p: p} },
+		func() datasource.DataSource { return timeDataSource{p: p} },
+		func() datasource.DataSource { return objectsDataSource{p: p} },
+		func() datasource.DataSource { return customDataSource{p: p} },
+	}
 }
 
 func (p *exampleProvider) Resources(ctx context.Context) []func() resource.Resource {

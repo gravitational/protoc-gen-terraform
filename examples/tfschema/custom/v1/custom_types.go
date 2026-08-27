@@ -1,27 +1,33 @@
 package v1
 
-import "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
+import (
+	"github.com/gravitational/protoc-gen-terraform/v5/examples/types"
+)
 
 type BoolCustom = types.BoolCustom
 type BoolCustomList = types.BoolCustomList
 type OverrideCastType = types.OverrideCastType
 
 var (
-	GenSchemaBoolSpecial = types.GenSchemaBoolSpecial
-	CopyToBoolSpecial    = types.CopyToBoolSpecial
-	CopyFromBoolSpecial  = types.CopyFromBoolSpecial
+	GenSchemaBoolSpecialDataSource = types.GenSchemaBoolSpecialDataSource
+	GenSchemaBoolSpecialResource   = types.GenSchemaBoolSpecialResource
+	CopyToBoolSpecial              = types.CopyToBoolSpecial
+	CopyFromBoolSpecial            = types.CopyFromBoolSpecial
 
-	GenSchemaBoolSpecialList = types.GenSchemaBoolSpecialList
-	CopyToBoolSpecialList    = types.CopyToBoolSpecialList
-	CopyFromBoolSpecialList  = types.CopyFromBoolSpecialList
+	GenSchemaBoolSpecialListDataSource = types.GenSchemaBoolSpecialListDataSource
+	GenSchemaBoolSpecialListResource   = types.GenSchemaBoolSpecialListResource
+	CopyToBoolSpecialList              = types.CopyToBoolSpecialList
+	CopyFromBoolSpecialList            = types.CopyFromBoolSpecialList
 
-	GenSchemaStringCustom = types.GenSchemaStringCustom
-	CopyToStringCustom    = types.CopyToStringCustom
-	CopyFromStringCustom  = types.CopyFromStringCustom
+	GenSchemaStringCustomDataSource = types.GenSchemaStringCustomDataSource
+	GenSchemaStringCustomResource   = types.GenSchemaStringCustomResource
+	CopyToStringCustom              = types.CopyToStringCustom
+	CopyFromStringCustom            = types.CopyFromStringCustom
 
-	GenSchemaBoolOption = types.GenSchemaBoolOption
-	CopyToBoolOption    = types.CopyToBoolOption
-	CopyFromBoolOption  = types.CopyFromBoolOption
+	GenSchemaBoolOptionDataSource = types.GenSchemaBoolOptionDataSource
+	GenSchemaBoolOptionResource   = types.GenSchemaBoolOptionResource
+	CopyToBoolOption              = types.CopyToBoolOption
+	CopyFromBoolOption            = types.CopyFromBoolOption
 
 	UseMockValidator    = types.UseMockValidator
 	UseMockPlanModifier = types.UseMockPlanModifier

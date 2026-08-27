@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -23,16 +24,13 @@ func (d Duration) String() string {
 // BoolCustom custom bool array
 type BoolCustom bool
 
-// GenSchemaBoolSpecial generates custom field schema (bool list)
-func GenSchemaBoolSpecial(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
-	customAttr, ok := attr.(schema.BoolAttribute)
-	if !ok {
-		diags.Append(diag.NewErrorDiagnostic(
-			"Invalid schema attribute",
-			fmt.Sprintf("expected BoolAttribute received %T", attr)))
-		return nil
-	}
-	return customAttr
+// GenSchemaBoolSpecialDataSource generates custom field schema
+func GenSchemaBoolSpecialDataSource(_ context.Context, diags *diag.Diagnostics, attr dschema.BoolAttribute) dschema.BoolAttribute {
+	return attr
+}
+
+func GenSchemaBoolSpecialResource(_ context.Context, diags *diag.Diagnostics, attr rschema.BoolAttribute) rschema.BoolAttribute {
+	return attr
 }
 
 // CopyFromBoolSpecial copies target value to the source
@@ -60,16 +58,14 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v at
 type BoolCustomList bool
 
 // GenSchemaBoolSpecialList generates custom field schema (bool list)
-func GenSchemaBoolSpecialList(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
-	customAttr, ok := attr.(schema.ListAttribute)
-	if !ok {
-		diags.Append(diag.NewErrorDiagnostic(
-			"Invalid schema attribute",
-			fmt.Sprintf("expected ListAttribute received %T", attr)))
-		return nil
-	}
-	customAttr.ElementType = types.BoolType
-	return customAttr
+func GenSchemaBoolSpecialListDataSource(_ context.Context, diags *diag.Diagnostics, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.BoolType
+	return attr
+}
+
+func GenSchemaBoolSpecialListResource(_ context.Context, diags *diag.Diagnostics, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.BoolType
+	return attr
 }
 
 // CopyFromBoolSpecialList copies target value to the source
@@ -129,17 +125,14 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 // StringCustom is a custom type that maps a Terraform List of string, onto a
 // single go string by joining all elements with "/".
 
-// GenSchemaStringCustom returns the StringCustom schema.
-func GenSchemaStringCustom(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
-	customAttr, ok := attr.(schema.ListAttribute)
-	if !ok {
-		diags.Append(diag.NewErrorDiagnostic(
-			"Invalid schema attribute",
-			fmt.Sprintf("expected ListAttribute received %T", attr)))
-		return nil
-	}
-	customAttr.ElementType = types.StringType
-	return customAttr
+func GenSchemaStringCustomDataSource(_ context.Context, diags *diag.Diagnostics, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.StringType
+	return attr
+}
+
+func GenSchemaStringCustomResource(_ context.Context, diags *diag.Diagnostics, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.StringType
+	return attr
 }
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into
@@ -206,17 +199,14 @@ type BoolOption struct {
 	Value bool
 }
 
-// GenSchemaBoolOptions returns Terraform schema for BoolOption type
-func GenSchemaBoolOption(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
-	boolAttr, ok := attr.(schema.BoolAttribute)
-	if !ok {
-		diags.Append(diag.NewErrorDiagnostic(
-			"Invalid schema attribute",
-			fmt.Sprintf("expected BoolAttribute received %T", attr)))
-		return nil
-	}
-	boolAttr.Optional = true
-	return boolAttr
+func GenSchemaBoolOptionDataSource(_ context.Context, diags *diag.Diagnostics, attr dschema.BoolAttribute) dschema.BoolAttribute {
+	attr.Optional = true
+	return attr
+}
+
+func GenSchemaBoolOptionResource(_ context.Context, diags *diag.Diagnostics, attr rschema.BoolAttribute) rschema.BoolAttribute {
+	attr.Optional = true
+	return attr
 }
 
 func CopyFromBoolOption(diags diag.Diagnostics, tf attr.Value, o **BoolOption) {

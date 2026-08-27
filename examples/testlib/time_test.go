@@ -86,6 +86,22 @@ func (s *TerraformSuite) TestTimeNullValues() {
 	})
 }
 
+func (s *TerraformSuite) TestTimeDataSource() {
+	t := s.T()
+	name := "data.example_time.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("time_datasource.tf"),
+				Check:  s.testCheckTimeResource(name),
+			},
+		},
+	})
+}
+
 func (s *TerraformSuite) testCheckTimeResource(name string) resource.TestCheckFunc {
 	return resource.ComposeTestCheckFunc(
 		resource.TestCheckResourceAttr(name, "timestamp_value", "2026-01-02T03:04:05Z"),

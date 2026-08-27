@@ -7,8 +7,9 @@ import (
 	time "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	diag "github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -24,16 +25,14 @@ func (d Duration) String() string {
 type BoolCustom bool
 
 // GenSchemaBoolSpecial generates custom field schema (bool list)
-func GenSchemaBoolSpecial(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
-	customAttr, ok := attr.(schema.ListAttribute)
-	if !ok {
-		diags.Append(diag.NewErrorDiagnostic(
-			"Invalid schema attribute",
-			fmt.Sprintf("expected ListAttribute received %T", attr)))
-		return nil
-	}
-	customAttr.ElementType = types.BoolType
-	return customAttr
+func GenSchemaBoolSpecialResource(_ context.Context, diags *diag.Diagnostics, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.BoolType
+	return attr
+}
+
+func GenSchemaBoolSpecialDataSource(_ context.Context, diags *diag.Diagnostics, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.BoolType
+	return attr
 }
 
 // CopyFromBoolSpecial copies target value to the source
@@ -94,16 +93,14 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v 
 // single go string by joining all elements with "/".
 
 // GenSchemaStringCustom returns the StringCustom schema.
-func GenSchemaStringCustom(_ context.Context, diags *diag.Diagnostics, attr schema.Attribute) schema.Attribute {
-	customAttr, ok := attr.(schema.ListAttribute)
-	if !ok {
-		diags.Append(diag.NewErrorDiagnostic(
-			"Invalid schema attribute",
-			fmt.Sprintf("expected ListAttribute received %T", attr)))
-		return nil
-	}
-	customAttr.ElementType = types.StringType
-	return customAttr
+func GenSchemaStringCustomResource(_ context.Context, diags *diag.Diagnostics, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.StringType
+	return attr
+}
+
+func GenSchemaStringCustomDataSource(_ context.Context, diags *diag.Diagnostics, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.StringType
+	return attr
 }
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into

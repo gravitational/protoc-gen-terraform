@@ -65,7 +65,7 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Bool{github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier.UseStateForUnknown()},
 		},
-		"bool_custom_list": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+		"bool_custom_list": GenSchemaBoolSpecialResource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "BoolCustomList []bool field",
 			Optional:      true,
@@ -574,7 +574,7 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
-		"string_override": GenSchemaStringCustom(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+		"string_override": GenSchemaStringCustomResource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "StringOverride is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:      true,
@@ -628,7 +628,7 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			Description: "Bool bool field",
 			Optional:    true,
 		},
-		"bool_custom_list": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+		"bool_custom_list": GenSchemaBoolSpecialDataSource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "BoolCustomList []bool field",
 			Optional:    true,
@@ -1064,7 +1064,7 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
 		},
-		"string_override": GenSchemaStringCustom(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+		"string_override": GenSchemaStringCustomDataSource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "StringOverride is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:    true,

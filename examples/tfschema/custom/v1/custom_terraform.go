@@ -47,19 +47,19 @@ var _ = math.Inf
 func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
-		"bool_custom": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
+		"bool_custom": GenSchemaBoolSpecialResource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 			Computed:      true,
 			Description:   "bool_custom custom bool field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Bool{github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier.UseStateForUnknown()},
 		}),
-		"bool_custom_list": GenSchemaBoolSpecialList(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+		"bool_custom_list": GenSchemaBoolSpecialListResource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "bool_custom_list custom bool list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		}),
-		"bool_option": GenSchemaBoolOption(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
+		"bool_option": GenSchemaBoolOptionResource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
@@ -112,7 +112,7 @@ func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terrafor
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 			Sensitive:     true,
 		},
-		"string_override": GenSchemaStringCustom(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
+		"string_override": GenSchemaStringCustomResource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:      true,
@@ -132,17 +132,17 @@ func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terrafor
 func GenSchemaCustomDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	var diags github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics
 	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
-		"bool_custom": GenSchemaBoolSpecial(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+		"bool_custom": GenSchemaBoolSpecialDataSource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
 			Computed:    true,
 			Description: "bool_custom custom bool field.",
 			Optional:    true,
 		}),
-		"bool_custom_list": GenSchemaBoolSpecialList(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+		"bool_custom_list": GenSchemaBoolSpecialListDataSource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "bool_custom_list custom bool list field.",
 			Optional:    true,
 		}),
-		"bool_option": GenSchemaBoolOption(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
+		"bool_option": GenSchemaBoolOptionDataSource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
@@ -187,7 +187,7 @@ func GenSchemaCustomDataSource(ctx context.Context) (github_com_hashicorp_terraf
 			Optional:    true,
 			Sensitive:   true,
 		},
-		"string_override": GenSchemaStringCustom(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
+		"string_override": GenSchemaStringCustomDataSource(ctx, &diags, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:    true,
