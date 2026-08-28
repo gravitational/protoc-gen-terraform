@@ -41,9 +41,15 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.StringValue(id)
-	plan.Attributes()["computed"] = types.StringValue("computed")
-	plan.Attributes()["injected"] = types.StringValue("injected")
+	attrs := plan.Attributes()
+	attrs["id"] = types.StringValue(id)
+	attrs["computed"] = types.StringValue("computed")
+	attrs["injected"] = types.StringValue("injected")
+	plan, diags := types.ObjectValue(plan.AttributeTypes(ctx), attrs)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	custom := &extypes.Custom{}
 	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)
@@ -51,7 +57,9 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
+	r.p.Lock()
 	r.p.custom[id] = custom
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -75,7 +83,13 @@ func (r customResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	custom := r.p.custom[id.ValueString()]
+	r.p.RLock()
+	custom, ok := r.p.custom[id.ValueString()]
+	r.p.RUnlock()
+	if !ok {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 
 	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &state)
 	resp.Diagnostics.Append(diags...)
@@ -99,7 +113,9 @@ func (r customResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
+	r.p.Lock()
 	r.p.custom[custom.Id] = custom
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -123,7 +139,9 @@ func (r customResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		return
 	}
 
+	r.p.Lock()
 	delete(r.p.custom, id.ValueString())
+	r.p.Unlock()
 }
 
 func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
@@ -159,7 +177,13 @@ func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanR
 	}
 
 	if hasID {
-		result.Attributes()["id"] = id
+		attrs := result.Attributes()
+		attrs["id"] = id
+		result, diags = types.ObjectValue(result.AttributeTypes(ctx), attrs)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(resp.Plan.Set(ctx, &result)...)

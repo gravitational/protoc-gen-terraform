@@ -260,17 +260,19 @@ func TestCopyToMap(t *testing.T) {
 
 func TestCopyToMapPreserveUnknownExistingKeys(t *testing.T) {
 	o := copyToTerraformObject(t)
-
-	mapType, ok := o.AttributeTypes(t.Context())["map"].(types.MapType)
+	attrs := o.Attributes()
+	mapAttr, ok := attrs["map"].(types.Map)
 	require.True(t, ok)
 
-	o.Attributes()["map"] = types.MapValueMust(
-		mapType.ElementType(),
+	mapAttr = types.MapValueMust(
+		mapAttr.ElementType(t.Context()),
 		map[string]attr.Value{
 			"key1":  types.StringUnknown(),
 			"stale": types.StringUnknown(),
 		},
 	)
+	attrs["map"] = mapAttr
+	o = types.ObjectValueMust(o.AttributeTypes(t.Context()), attrs)
 
 	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
@@ -374,11 +376,6 @@ func TestCopyToOneOfLowercase(t *testing.T) {
 func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 	o := copyToTerraformObject(t)
 
-	nestedNullableType, ok := o.AttributeTypes(t.Context())["nested_nullable"].(types.ObjectType)
-	require.True(t, ok)
-
-	o.Attributes()["nested_nullable"] = types.ObjectNull(nestedNullableType.AttributeTypes())
-
 	testObj := createTestObj()
 	testObj.NestedNullable = &Nested{
 		Str: "TestString",
@@ -399,7 +396,9 @@ func TestCopyToNestedNullableWithNullTerraformObject(t *testing.T) {
 
 func TestCopyToTerraformPreserveUnknown(t *testing.T) {
 	o := copyToTerraformObject(t)
-	o.Attributes()["str"] = types.StringUnknown()
+	attrs := o.Attributes()
+	attrs["str"] = types.StringUnknown()
+	o = types.ObjectValueMust(o.AttributeTypes(t.Context()), attrs)
 
 	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
@@ -411,21 +410,24 @@ func TestCopyToTerraformPreserveUnknown(t *testing.T) {
 
 func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 	o := copyToTerraformObject(t)
+	attrs := o.Attributes()
 
-	nestedType, ok := o.AttributeTypes(t.Context())["nested"].(types.ObjectType)
+	nestedAttr, ok := attrs["nested"].(types.Object)
 	require.True(t, ok)
 
-	nestedListType, ok := nestedType.AttributeTypes()["nested_list"].(types.ListType)
+	nestedTypes := nestedAttr.AttributeTypes(t.Context())
+
+	nestedListType, ok := nestedTypes["nested_list"].(types.ListType)
 	require.True(t, ok)
 
-	mapType, ok := nestedType.AttributeTypes()["map"].(types.MapType)
+	mapType, ok := nestedTypes["map"].(types.MapType)
 	require.True(t, ok)
 
-	mapObjectNestedType, ok := nestedType.AttributeTypes()["map_object_nested"].(types.MapType)
+	mapObjectNestedType, ok := nestedTypes["map_object_nested"].(types.MapType)
 	require.True(t, ok)
 
-	nestedValue, diags := types.ObjectValue(
-		nestedType.AttributeTypes(),
+	attrs["nested"] = types.ObjectValueMust(
+		nestedAttr.AttributeTypes(t.Context()),
 		map[string]attr.Value{
 			"str":               types.StringUnknown(),
 			"nested_list":       types.ListUnknown(nestedListType.ElementType()),
@@ -433,31 +435,34 @@ func TestCopyToTerraformPreserveUnknownNested(t *testing.T) {
 			"map_object_nested": types.MapUnknown(mapObjectNestedType.ElementType()),
 		},
 	)
-	requireNoDiagErrors(t, diags)
-	o.Attributes()["nested"] = nestedValue
 
-	o, diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
+	o = types.ObjectValueMust(o.AttributeTypes(t.Context()), attrs)
+
+	o, diags := CopyTestToTerraformPreserveUnknown(t.Context(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
-	nested := o.Attributes()["nested"].(types.Object)
+	nested, ok := o.Attributes()["nested"].(types.Object)
+	require.True(t, ok)
 	require.False(t, nested.IsUnknown())
 
-	str := nested.Attributes()["str"].(types.String)
+	str := nested.Attributes()["str"]
 	require.True(t, str.IsUnknown())
 
-	nestedList := nested.Attributes()["nested_list"].(types.List)
+	nestedList := nested.Attributes()["nested_list"]
 	require.True(t, nestedList.IsUnknown())
 
-	nestedMap := nested.Attributes()["map"].(types.Map)
+	nestedMap := nested.Attributes()["map"]
 	require.True(t, nestedMap.IsUnknown())
 
-	nestedMapObject := nested.Attributes()["map_object_nested"].(types.Map)
+	nestedMapObject := nested.Attributes()["map_object_nested"]
 	require.True(t, nestedMapObject.IsUnknown())
 }
 
 func TestCopyToCustomPreserveUnknown(t *testing.T) {
 	o := copyToTerraformObject(t)
-	o.Attributes()["bool_custom_list"] = types.ListValueMust(
+	attrs := o.Attributes()
+
+	attrs["bool_custom_list"] = types.ListValueMust(
 		types.BoolType,
 		[]attr.Value{
 			types.BoolValue(false),
@@ -466,10 +471,13 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 		},
 	)
 
+	o = types.ObjectValueMust(o.AttributeTypes(t.Context()), attrs)
+
 	o, diags := CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
-	v := o.Attributes()["bool_custom_list"].(types.List)
+	v, ok := o.Attributes()["bool_custom_list"].(types.List)
+	require.True(t, ok)
 
 	require.False(t, v.IsUnknown())
 	require.Equal(t,
@@ -481,11 +489,14 @@ func TestCopyToCustomPreserveUnknown(t *testing.T) {
 		v.Elements(),
 	)
 
-	o.Attributes()["bool_custom_list"] = types.ListUnknown(types.BoolType)
+	attrs = o.Attributes()
+	attrs["bool_custom_list"] = types.ListUnknown(types.BoolType)
+	o = types.ObjectValueMust(o.AttributeTypes(t.Context()), attrs)
+
 	o, diags = CopyTestToTerraformPreserveUnknown(context.Background(), createTestObj(), &o, true)
 	requireNoDiagErrors(t, diags)
 
-	v = o.Attributes()["bool_custom_list"].(types.List)
-
+	v, ok = o.Attributes()["bool_custom_list"].(types.List)
+	require.True(t, ok)
 	require.True(t, v.IsUnknown())
 }

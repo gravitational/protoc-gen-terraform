@@ -39,13 +39,21 @@ func (d customDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
+	d.p.RLock()
 	custom, ok := d.p.custom[id.ValueString()]
+	d.p.RUnlock()
 	if !ok {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("custom not found", "no example_custom resource exists with the provided id"))
 		return
 	}
 
-	config.Attributes()["injected"] = types.StringValue("injected")
+	attrs := config.Attributes()
+	attrs["injected"] = types.StringValue("injected")
+	config, diags := types.ObjectValue(config.AttributeTypes(ctx), attrs)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &config)
 	resp.Diagnostics.Append(diags...)

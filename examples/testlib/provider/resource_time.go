@@ -41,7 +41,13 @@ func (r timeResource) Create(ctx context.Context, req resource.CreateRequest, re
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.StringValue(id)
+	attrs := plan.Attributes()
+	attrs["id"] = types.StringValue(id)
+	plan, diags := types.ObjectValue(plan.AttributeTypes(ctx), attrs)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	time := &extypes.Time{}
 	resp.Diagnostics.Append(schemav1.CopyTimeFromTerraform(ctx, plan, time)...)
@@ -49,7 +55,9 @@ func (r timeResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
+	r.p.Lock()
 	r.p.time[id] = time
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -73,7 +81,13 @@ func (r timeResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	time := r.p.time[id.ValueString()]
+	r.p.RLock()
+	time, ok := r.p.time[id.ValueString()]
+	r.p.RUnlock()
+	if !ok {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 
 	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &state)
 	resp.Diagnostics.Append(diags...)
@@ -97,7 +111,9 @@ func (r timeResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
+	r.p.Lock()
 	r.p.time[time.Id] = time
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -121,5 +137,7 @@ func (r timeResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
+	r.p.Lock()
 	delete(r.p.time, id.ValueString())
+	r.p.Unlock()
 }

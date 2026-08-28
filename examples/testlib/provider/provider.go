@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"sync"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -13,6 +14,12 @@ import (
 var _ provider.Provider = &exampleProvider{}
 
 type exampleProvider struct {
+	*exampleStore
+}
+
+type exampleStore struct {
+	sync.RWMutex
+
 	primitives map[string]*types.Primitives
 	time       map[string]*types.Time
 	objects    map[string]*types.Objects
@@ -21,10 +28,12 @@ type exampleProvider struct {
 
 func New() provider.Provider {
 	return &exampleProvider{
-		primitives: make(map[string]*types.Primitives),
-		time:       make(map[string]*types.Time),
-		objects:    make(map[string]*types.Objects),
-		custom:     make(map[string]*types.Custom),
+		exampleStore: &exampleStore{
+			primitives: make(map[string]*types.Primitives),
+			time:       make(map[string]*types.Time),
+			objects:    make(map[string]*types.Objects),
+			custom:     make(map[string]*types.Custom),
+		},
 	}
 }
 

@@ -38,7 +38,9 @@ func (d primitivesDataSource) Read(ctx context.Context, req datasource.ReadReque
 		return
 	}
 
+	d.p.RLock()
 	primitives := d.p.primitives[id.ValueString()]
+	d.p.RUnlock()
 
 	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, primitives, &config)
 	resp.Diagnostics.Append(diags...)

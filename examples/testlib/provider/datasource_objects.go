@@ -39,7 +39,9 @@ func (d objectsDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
+	d.p.RLock()
 	objects, ok := d.p.objects[id.ValueString()]
+	d.p.RUnlock()
 	if !ok {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("objects not found", "no example_objects resource exists with the provided id"))
 		return

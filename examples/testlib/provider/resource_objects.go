@@ -42,7 +42,13 @@ func (r objectsResource) Create(ctx context.Context, req resource.CreateRequest,
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.StringValue(id)
+	attrs := plan.Attributes()
+	attrs["id"] = types.StringValue(id)
+	plan, diags := types.ObjectValue(plan.AttributeTypes(ctx), attrs)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	objects := &extypes.Objects{}
 	resp.Diagnostics.Append(schemav1.CopyObjectsFromTerraform(ctx, plan, objects)...)
@@ -65,7 +71,9 @@ func (r objectsResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
+	r.p.Lock()
 	r.p.objects[id] = &newObjects
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -89,7 +97,13 @@ func (r objectsResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	objects := r.p.objects[id.ValueString()]
+	r.p.RLock()
+	objects, ok := r.p.objects[id.ValueString()]
+	r.p.RUnlock()
+	if !ok {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 
 	result, diags := schemav1.CopyObjectsToTerraform(ctx, objects, &state)
 	resp.Diagnostics.Append(diags...)
@@ -113,7 +127,9 @@ func (r objectsResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
+	r.p.Lock()
 	r.p.objects[objects.Id] = objects
+	r.p.Unlock()
 
 	// We proto marshall and unmarshall the resource to test stability through proto round-trip.
 	// This is required because protouf does not preserve the distinction between nil and empty
@@ -130,7 +146,9 @@ func (r objectsResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
+	r.p.Lock()
 	r.p.objects[newObjects.Id] = &newObjects
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -154,5 +172,7 @@ func (r objectsResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
+	r.p.Lock()
 	delete(r.p.objects, id.ValueString())
+	r.p.Unlock()
 }

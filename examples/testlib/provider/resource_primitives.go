@@ -42,7 +42,13 @@ func (r primitivesResource) Create(ctx context.Context, req resource.CreateReque
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.StringValue(id)
+	attrs := plan.Attributes()
+	attrs["id"] = types.StringValue(id)
+	plan, diags := types.ObjectValue(plan.AttributeTypes(ctx), attrs)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	primitives := &extypes.Primitives{}
 	resp.Diagnostics.Append(schemav1.CopyPrimitivesFromTerraform(ctx, plan, primitives)...)
@@ -65,7 +71,9 @@ func (r primitivesResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
+	r.p.Lock()
 	r.p.primitives[id] = &newPrimitives
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -89,7 +97,13 @@ func (r primitivesResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	primitives := r.p.primitives[id.ValueString()]
+	r.p.RLock()
+	primitives, ok := r.p.primitives[id.ValueString()]
+	r.p.RUnlock()
+	if !ok {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 
 	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, primitives, &state)
 	resp.Diagnostics.Append(diags...)
@@ -128,7 +142,9 @@ func (r primitivesResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
+	r.p.Lock()
 	r.p.primitives[newPrimitives.Id] = &newPrimitives
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyPrimitivesToTerraform(ctx, &newPrimitives, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -152,5 +168,7 @@ func (r primitivesResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
+	r.p.Lock()
 	delete(r.p.primitives, id.ValueString())
+	r.p.Unlock()
 }

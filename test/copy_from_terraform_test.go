@@ -155,7 +155,11 @@ func TestCopyFromCustom(t *testing.T) {
 
 func TestCopyFromOneOfScalarBranch(t *testing.T) {
 	obj := copyFromTerraformObject(t)
-	obj.Attributes()["branch3"] = types.StringValue("Test")
+
+	attrs := obj.Attributes()
+	attrs["branch3"] = types.StringValue("Test")
+
+	obj = types.ObjectValueMust(obj.AttributeTypes(t.Context()), attrs)
 
 	target := Test{}
 	diags := CopyTestFromTerraform(context.Background(), obj, &target)
@@ -166,12 +170,21 @@ func TestCopyFromOneOfScalarBranch(t *testing.T) {
 
 func TestCopyFromOneOfObjectBranch(t *testing.T) {
 	obj := copyFromTerraformObject(t)
-	obj.Attributes()["branch2"] = types.ObjectValueMust(
-		obj.AttributeTypes(context.Background())["branch2"].(types.ObjectType).AttrTypes,
+
+	attrs := obj.Attributes()
+
+	branch2, ok := attrs["branch2"].(types.Object)
+	require.True(t, ok)
+
+	branch2 = types.ObjectValueMust(
+		branch2.AttributeTypes(t.Context()),
 		map[string]attr.Value{
 			"int32": types.Int64Value(5),
 		},
 	)
+	attrs["branch2"] = branch2
+
+	obj = types.ObjectValueMust(obj.AttributeTypes(t.Context()), attrs)
 
 	target := Test{}
 	diags := CopyTestFromTerraform(context.Background(), obj, &target)
@@ -214,8 +227,10 @@ func TestCopyFromNullableEmbeddedField(t *testing.T) {
 func TestCopyFromNullableEmbeddedFieldWithoutValue(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
-	// set a null value
-	obj.Attributes()["max_age"] = DurationValue{Null: true}
+	attrs := obj.Attributes()
+	attrs["max_age"] = NullDuration()
+
+	obj = types.ObjectValueMust(obj.AttributeTypes(t.Context()), attrs)
 
 	target := Test{}
 	diags := CopyTestFromTerraform(context.Background(), obj, &target)

@@ -39,7 +39,9 @@ func (d timeDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		return
 	}
 
+	d.p.RLock()
 	time, ok := d.p.time[id.ValueString()]
+	d.p.RUnlock()
 	if !ok {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("time not found", "no example_time resource exists with the provided id"))
 		return
