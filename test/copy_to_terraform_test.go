@@ -260,6 +260,23 @@ func TestCopyToMap(t *testing.T) {
 	require.Equal(t, types.String{Null: false, Unknown: false, Value: "value2"}, m["key2"].(types.String))
 }
 
+func TestCopyToMap_RemovesStaleKeys(t *testing.T) {
+	o := copyToTerraformObject(t)
+	testObject := createTestObj()
+
+	diags := CopyTestToTerraform(context.Background(), testObject, &o)
+	requireNoDiagErrors(t, diags)
+	require.Len(t, o.Attrs["map"].(types.Map).Elems, 2)
+
+	testObject.Map = map[string]string{}
+	diags = CopyTestToTerraform(context.Background(), testObject, &o)
+	requireNoDiagErrors(t, diags)
+
+	m := o.Attrs["map"].(types.Map)
+	require.False(t, m.Null)
+	require.Empty(t, m.Elems)
+}
+
 func TestCopyToCustom(t *testing.T) {
 	o := copyToTerraformObject(t)
 

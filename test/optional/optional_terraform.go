@@ -513,6 +513,7 @@ func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *Option
 				}
 				{
 					t := o.ElemType
+					c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.OptionalMap))
 					for k, a := range obj.OptionalMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {

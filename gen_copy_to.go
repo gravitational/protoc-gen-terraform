@@ -445,6 +445,11 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 					g.Id("o").Op(":=").Id("o.ElemType").Assert(j.Id(f.i.WithType(f.ElemType)))
 				}
 
+				if f.IsMap {
+					// Rebuild maps on every copy so removed stale entries do not remain in Terraform state.
+					g.Id("c.Elems").Op("=").Add(mk)
+				}
+
 				if f.IsRepeated {
 					// It might happen that we changed the number of elements.
 					// This check creates a new array if that's the case.

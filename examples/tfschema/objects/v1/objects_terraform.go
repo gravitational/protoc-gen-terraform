@@ -1515,6 +1515,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				}
 				{
 					t := o.ElemType
+					c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.BoolMap))
 					for k, a := range obj.BoolMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Bool)
 						if !ok {
@@ -2023,6 +2024,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				}
 				{
 					t := o.ElemType
+					c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.IntMap))
 					for k, a := range obj.IntMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Int64)
 						if !ok {
@@ -2262,6 +2264,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				}
 				{
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+					c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedMap))
 					for k, a := range obj.NestedMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
@@ -2599,6 +2602,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				}
 				{
 					o := o.ElemType.(github_com_hashicorp_terraform_plugin_framework_types.ObjectType)
+					c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.NestedNullableMap))
 					for k, a := range obj.NestedNullableMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.Object)
 						if !ok {
@@ -3585,6 +3589,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				}
 				{
 					t := o.ElemType
+					c.Elems = make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(obj.StringMap))
 					for k, a := range obj.StringMap {
 						v, ok := c.Elems[k].(github_com_hashicorp_terraform_plugin_framework_types.String)
 						if !ok {
