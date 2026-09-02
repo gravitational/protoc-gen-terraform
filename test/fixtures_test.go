@@ -18,10 +18,10 @@ package test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
+	"github.com/gravitational/protoc-gen-terraform/v5/test/testhelpers"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -621,40 +621,16 @@ func copyToTerraformObject(t *testing.T) types.Object {
 }
 
 func nullAttrs(attrTypes map[string]attr.Type) map[string]attr.Value {
-	attrs := make(map[string]attr.Value, len(attrTypes))
-
-	for name, attrType := range attrTypes {
-		attrs[name] = nullValue(attrType)
-	}
-
-	return attrs
+	return testhelpers.NullAttrs(attrTypes, customNullValue)
 }
 
-func nullValue(attrType attr.Type) attr.Value {
-	if attrType.Equal(types.StringType) {
-		return types.StringNull()
-	}
-	if attrType.Equal(types.Int64Type) {
-		return types.Int64Null()
-	}
-	if attrType.Equal(types.Float64Type) {
-		return types.Float64Null()
-	}
-	if attrType.Equal(types.BoolType) {
-		return types.BoolNull()
-	}
-	switch t := attrType.(type) {
-	case types.ListType:
-		return types.ListNull(t.ElementType())
-	case types.MapType:
-		return types.MapNull(t.ElementType())
-	case types.ObjectType:
-		return types.ObjectNull(t.AttributeTypes())
+func customNullValue(attrType attr.Type) (attr.Value, bool) {
+	switch attrType.(type) {
 	case TimeType:
-		return NullTime()
+		return NullTime(), true
 	case DurationType:
-		return NullDuration()
+		return NullDuration(), true
 	default:
-		panic(fmt.Sprintf("unsupported fixture attr type %T", attrType))
+		return nil, false
 	}
 }
