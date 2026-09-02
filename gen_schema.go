@@ -29,6 +29,7 @@ import (
 
 type schemaTarget struct {
 	schemaPackage         string
+	schemaDescription     string
 	functionSuffix        string
 	supportsPlanModifiers bool
 }
@@ -36,11 +37,13 @@ type schemaTarget struct {
 var (
 	resourceSchemaTarget = schemaTarget{
 		schemaPackage:         ResourceSchema,
+		schemaDescription:     "resource schema",
 		functionSuffix:        "Resource",
 		supportsPlanModifiers: true,
 	}
 	dataSourceSchemaTarget = schemaTarget{
 		schemaPackage:         DataSourceSchema,
+		schemaDescription:     "datasource schema",
 		functionSuffix:        "DataSource",
 		supportsPlanModifiers: false,
 	}
@@ -54,7 +57,7 @@ func (t schemaTarget) attributeType(attributeType string) string {
 	return t.schemaPackage + "." + attributeType
 }
 
-// MessageSchemaGenerator is the decorator struct to generate tfsdk.Schema of a message
+// MessageSchemaGenerator is the decorator struct to generate Terraform schema for a message.
 type MessageSchemaGenerator struct {
 	*Message
 	i      *Imports
@@ -78,7 +81,7 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 		return 0, trace.Wrap(err)
 	}
 
-	j := j.Commentf("// %v returns tfsdk.Schema definition for %v\n", id, m.Name).
+	j := j.Commentf("// %v returns Terraform Framework %v definition for %v\n", id, m.target.schemaDescription, m.Name).
 		Func().
 		Id(id).
 		Params(j.Id("ctx").Id(m.i.WithType("context.Context"))).
@@ -103,7 +106,7 @@ func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
 	return writer.Write([]byte(j.GoString() + "\n"))
 }
 
-// FieldsDictSchema reutrns jen.Dict of the generated message fields
+// fieldsDictSchema returns jen.Dict of the generated message fields.
 func (m *MessageSchemaGenerator) fieldsDictSchema() (j.Dict, error) {
 	d := j.Dict{}
 

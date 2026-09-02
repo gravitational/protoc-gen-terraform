@@ -6,7 +6,7 @@ import (
 	j "github.com/dave/jennifer/jen"
 )
 
-// MessageCopyFromGenerator is the visitor struct to generate tfsdk.Schema of a message
+// MessageCopyFromGenerator is the visitor struct to generate CopyFromTerraform methods for a message.
 type MessageCopyFromGenerator struct {
 	*Message
 	i *Imports
@@ -52,7 +52,7 @@ func (m *MessageCopyFromGenerator) Generate(writer io.Writer) (int, error) {
 	return writer.Write([]byte(method.GoString() + "\n"))
 }
 
-// GenerateFields generates specific statements for CopyToTF<name> methods
+// GenerateFields generates field-specific statements for Copy<Name>FromTerraform methods.
 func (m *MessageCopyFromGenerator) GenerateFields(g *j.Group) {
 	// Reset all oneOf fields in advance, otherwise if all oneOf branches would be null in the passed
 	// object, the oneOf field won't be nil
