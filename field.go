@@ -80,31 +80,6 @@ type TerraformType struct {
 	TypeConstructor string
 }
 
-func (t *TerraformType) applyOverride(attributeOverride string, schemaOverride *SchemaType) {
-	// schemaOverride takes precedence over attributeOverride
-
-	if attributeOverride != "" {
-		t.AttributeType = attributeOverride
-	}
-
-	if schemaOverride != nil {
-		t.Type = schemaOverride.Type
-		t.AttributeType = schemaOverride.AttributeType
-		t.ValueType = schemaOverride.ValueType
-		t.ValueFromMethod = schemaOverride.ValueFromMethod
-		t.ValueToMethod = schemaOverride.ValueToMethod
-		t.NullValueMethod = schemaOverride.NullValueMethod
-		t.UnknownValueMethod = schemaOverride.UnknownValueMethod
-		t.ValueCastToType = schemaOverride.CastToType
-		t.ValueCastFromType = schemaOverride.CastFromType
-		t.TypeConstructor = schemaOverride.TypeConstructor
-
-		t.ElemType = t.Type
-		t.ElemValueType = t.ValueType
-	}
-
-}
-
 // ProtobufType represents protobuf object field type information
 type ProtobufType struct {
 	// GoType represents raw go type of a source protobuf object field (builtin, struct, slice, map, pointer)
@@ -254,7 +229,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		TerraformType:    terraformType,
 	}
 
-	f.GoType = c.GetGoType()
+	f.GoType = c.GetGoTypeForTerraformType(terraformType)
 	f.GoElemType = f.GoType
 
 	// Set default UseStateForUnknown plan modifier for computed attributes
@@ -310,7 +285,6 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		}
 	}
 
-	f.setProtobufTypeOverride(c)
 	f.setCustomType(c)
 
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
@@ -464,15 +438,6 @@ func (f *Field) getKind() Kind {
 		return ObjectKind // ex: struct
 	}
 	return PrimitiveKind // ex: string
-}
-
-// setProtobufTypeOverride sets protobuf type override
-func (f *Field) setProtobufTypeOverride(c *FieldBuildContext) {
-	o := c.GetTerraformTypeOverride()
-	if o != nil {
-		f.GoType = f.ValueCastFromType
-		f.GoElemType = f.ValueCastFromType
-	}
 }
 
 // setCustomType sets IsCustomType, GoCustomType and Suffix.

@@ -327,9 +327,43 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueCastFromType = elemType
 	}
 
-	t.applyOverride(c.GetAttributeMapping(), c.GetTerraformTypeOverride())
+	t = applyTerraformTypeOverrides(t, c.GetAttributeMapping(), c.GetTerraformTypeOverride())
 
 	return t, nil
+}
+
+func applyTerraformTypeOverrides(t TerraformType, attributeOverride string, schemaOverride *SchemaType) TerraformType {
+	if attributeOverride != "" {
+		t.AttributeType = attributeOverride
+	}
+
+	// A schema override replaces the Terraform type metadata and takes
+	// precedence over the attribute mapping.
+	if schemaOverride != nil {
+		t.Type = schemaOverride.Type
+		t.AttributeType = schemaOverride.AttributeType
+		t.ValueType = schemaOverride.ValueType
+		t.ValueFromMethod = schemaOverride.ValueFromMethod
+		t.ValueToMethod = schemaOverride.ValueToMethod
+		t.NullValueMethod = schemaOverride.NullValueMethod
+		t.UnknownValueMethod = schemaOverride.UnknownValueMethod
+		t.ValueCastToType = schemaOverride.CastToType
+		t.ValueCastFromType = schemaOverride.CastFromType
+		t.TypeConstructor = schemaOverride.TypeConstructor
+
+		t.ElemType = t.Type
+		t.ElemValueType = t.ValueType
+	}
+
+	return t
+}
+
+func (c *FieldBuildContext) GetGoTypeForTerraformType(t TerraformType) string {
+	if c.GetTerraformTypeOverride() != nil {
+		return t.ValueCastFromType
+	}
+
+	return c.GetGoType()
 }
 
 // IsTime returns true if field is time
