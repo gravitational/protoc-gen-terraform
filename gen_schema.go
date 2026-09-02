@@ -366,24 +366,6 @@ func generateValidators(imports *Imports, validatorType *j.Statement, vals []str
 	return j.Index().Add(validatorType).Values(v...)
 }
 
-var baseByAttributeTypeName = map[string]string{
-	"StringAttribute":  ".String",
-	"BoolAttribute":    ".Bool",
-	"Int64Attribute":   ".Int64",
-	"Float64Attribute": ".Float64",
-	"ListAttribute":    ".List",
-	"MapAttribute":     ".Map",
-	"ObjectAttribute":  ".Object",
-}
-
-func baseTypeForAttributeType(t string) (string, error) {
-	baseType, ok := baseByAttributeTypeName[t]
-	if !ok {
-		return "", trace.BadParameter("unexpected attribute type %q", t)
-	}
-	return baseType, nil
-}
-
 func (f *FieldSchemaGenerator) planModifierTypeForAttributeType(t string) (*j.Statement, error) {
 	baseType, err := baseTypeForAttributeType(t)
 	if err != nil {

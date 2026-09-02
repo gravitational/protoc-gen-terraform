@@ -116,22 +116,3 @@ func BuildMessage(plugin *Plugin, desc *generator.Descriptor, isRoot bool, path 
 
 	return message, nil
 }
-
-var attributeTypeByType = map[string]string{
-	Types + ".StringType":  "StringAttribute",
-	Types + ".BoolType":    "BoolAttribute",
-	Types + ".Int64Type":   "Int64Attribute",
-	Types + ".Float64Type": "Float64Attribute",
-	Types + ".ListType":    "ListAttribute",
-	Types + ".MapType":     "MapAttribute",
-	Types + ".ObjectType":  "ObjectAttribute",
-}
-
-func attributeTypeForTerraformType(t string) (string, error) {
-	attributeType, ok := attributeTypeByType[t]
-	if !ok {
-		return "", trace.BadParameter("unexpected type %q", t)
-	}
-
-	return attributeType, nil
-}

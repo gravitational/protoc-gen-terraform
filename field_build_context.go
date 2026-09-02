@@ -597,22 +597,3 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 
 	return c.config.DefaultPackageName + "." + name
 }
-
-var planModifierByAttributeType = map[string]string{
-	"StringAttribute":  "/stringplanmodifier",
-	"BoolAttribute":    "/boolplanmodifier",
-	"Int64Attribute":   "/int64planmodifier",
-	"Float64Attribute": "/float64planmodifier",
-	"ListAttribute":    "/listplanmodifier",
-	"MapAttribute":     "/mapplanmodifier",
-	"ObjectAttribute":  "/objectplanmodifier",
-}
-
-func useStateForUnknownForType(t string) (string, error) {
-	planModifier, ok := planModifierByAttributeType[t]
-	if !ok {
-		return "", trace.BadParameter("unexpected attribute type %q", t)
-	}
-
-	return ResourceSchema + planModifier + ".UseStateForUnknown()", nil
-}
