@@ -26,25 +26,58 @@ import (
 	j "github.com/dave/jennifer/jen"
 )
 
+type schemaTarget struct {
+	schemaPackage         string
+	schemaDescription     string
+	functionSuffix        string
+	supportsPlanModifiers bool
+}
+
+var (
+	resourceSchemaTarget = schemaTarget{
+		// TODO: Migrate to ResourceSchema
+		schemaPackage:         SDK,
+		schemaDescription:     "resource schema",
+		functionSuffix:        "Resource",
+		supportsPlanModifiers: true,
+	}
+	dataSourceSchemaTarget = schemaTarget{
+		// TODO: Migrate to DataSourceSchema
+		schemaPackage:         SDK,
+		schemaDescription:     "datasource schema",
+		functionSuffix:        "DataSource",
+		supportsPlanModifiers: false,
+	}
+)
+
+func (t schemaTarget) functionName(name string) string {
+	return "GenSchema" + name + t.functionSuffix
+}
+
+func (t schemaTarget) attributeType(attributeType string) string {
+	return t.schemaPackage + "." + attributeType
+}
+
 // MessageSchemaGenerator is the decorator struct to generate tfsdk.Schema of a message
 type MessageSchemaGenerator struct {
 	*Message
-	i *Imports
+	i      *Imports
+	target schemaTarget
 }
 
 // NewMessageSchemaGenerator returns new MessageSchemaGenerator struct
-func NewMessageSchemaGenerator(m *Message, i *Imports) *MessageSchemaGenerator {
-	return &MessageSchemaGenerator{Message: m, i: i}
+func NewMessageSchemaGenerator(m *Message, i *Imports, target schemaTarget) *MessageSchemaGenerator {
+	return &MessageSchemaGenerator{Message: m, i: i, target: target}
 }
 
 // Generate returns Go code for message schema
 func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
-	id := "GenSchema" + m.Name
-	schema := m.i.WithPackage(SDK, "Schema")
+	id := m.target.functionName(m.Name)
+	schema := m.i.WithPackage(m.target.schemaPackage, "Schema")
 	diags := m.i.WithPackage(Diag, "Diagnostics")
-	attr := m.i.WithPackage(SDK, "Attribute")
+	attr := m.i.WithPackage(m.target.schemaPackage, "Attribute")
 
-	j := j.Commentf("// %v returns tfsdk.Schema definition for %v\n", id, m.Name).
+	j := j.Commentf("// %v returns Terraform Framework %v definition for %v\n", id, m.target.schemaDescription, m.Name).
 		Func().
 		Id(id).
 		Params(j.Id("ctx").Id(m.i.WithType("context.Context"))).
@@ -73,7 +106,7 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() j.Dict {
 	d := j.Dict{}
 
 	for _, f := range m.Fields {
-		f := NewFieldSchemaGenerator(f, m.i)
+		f := NewFieldSchemaGenerator(f, m.i, m.target)
 		d[j.Lit(f.NameSnake)] = f.Generate()
 	}
 
@@ -109,12 +142,13 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 // FieldSchemaGenerator represents the decorator for Field code generation
 type FieldSchemaGenerator struct {
 	*Field
-	i *Imports
+	i      *Imports
+	target schemaTarget
 }
 
 // NewFieldSchemaGenerator returns new FieldSchemaGenerator struct
-func NewFieldSchemaGenerator(f *Field, i *Imports) *FieldSchemaGenerator {
-	return &FieldSchemaGenerator{Field: f, i: i}
+func NewFieldSchemaGenerator(f *Field, i *Imports, target schemaTarget) *FieldSchemaGenerator {
+	return &FieldSchemaGenerator{Field: f, i: i, target: target}
 }
 
 // Generate returns field schema
@@ -169,7 +203,7 @@ func (f *FieldSchemaGenerator) schemaType() *j.Statement {
 			j.Id("ElemType"): f.primitiveSchemaTypeDef(),
 		})
 	case PrimitiveMapKind:
-		g := NewFieldSchemaGenerator(f.MapValueField, f.i)
+		g := NewFieldSchemaGenerator(f.MapValueField, f.i, f.target)
 
 		return j.Id(f.i.WithType(f.Type)).Values(j.Dict{
 			j.Id("ElemType"): g.primitiveSchemaTypeDef(),
@@ -183,15 +217,15 @@ func (f *FieldSchemaGenerator) schemaType() *j.Statement {
 func (f *FieldSchemaGenerator) attributes() *j.Statement {
 	switch f.Kind {
 	case ObjectKind:
-		m := NewMessageSchemaGenerator(f.Message, f.i)
+		m := NewMessageSchemaGenerator(f.Message, f.i, f.target)
 
 		return f.xNestedAttributes("Single", m)
 	case ObjectMapKind:
-		m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i)
+		m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i, f.target)
 
 		return f.xNestedAttributes("Map", m)
 	case ObjectListKind:
-		m := NewMessageSchemaGenerator(f.Message, f.i)
+		m := NewMessageSchemaGenerator(f.Message, f.i, f.target)
 
 		return f.xNestedAttributes("List", m)
 	}

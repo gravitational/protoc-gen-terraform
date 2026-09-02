@@ -73,7 +73,7 @@ func (m *MessageCopyToGenerator) GeneratePreserveUnknown(writer io.Writer) (int,
 			).
 			BlockFunc(func(g *j.Group) {
 				// schema, diags := GenSchemaFoo(ctx)
-				g.List(j.Id("schema"), j.Id("diags")).Op(":=").Id("GenSchema" + m.Name).Call(j.Id("ctx"))
+				g.List(j.Id("schema"), j.Id("diags")).Op(":=").Id("GenSchema" + m.Name + "Resource").Call(j.Id("ctx"))
 
 				// if diags.HasError() {
 				// 	return types.Object{}, diags
