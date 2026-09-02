@@ -27,36 +27,32 @@ import (
 	"github.com/gravitational/trace"
 )
 
-type schemaTarget interface {
-	SchemaPackage() string
-	FunctionName(messageName string) string
-	AttributeType(attributeType string) string
-	SupportsPlanModifiers() bool
+type schemaTarget struct {
+	schemaPackage         string
+	functionSuffix        string
+	supportsPlanModifiers bool
 }
 
-type resourceSchemaTarget struct{}
+var (
+	resourceSchemaTarget = schemaTarget{
+		schemaPackage:         ResourceSchema,
+		functionSuffix:        "Resource",
+		supportsPlanModifiers: true,
+	}
+	dataSourceSchemaTarget = schemaTarget{
+		schemaPackage:         DataSourceSchema,
+		functionSuffix:        "DataSource",
+		supportsPlanModifiers: false,
+	}
+)
 
-func (resourceSchemaTarget) SchemaPackage() string { return ResourceSchema }
-func (resourceSchemaTarget) FunctionName(name string) string {
-	return "GenSchema" + name + "Resource"
+func (t schemaTarget) functionName(name string) string {
+	return "GenSchema" + name + t.functionSuffix
 }
 
-func (resourceSchemaTarget) AttributeType(t string) string {
-	return ResourceSchema + "." + t
+func (t schemaTarget) attributeType(attributeType string) string {
+	return t.schemaPackage + "." + attributeType
 }
-func (resourceSchemaTarget) SupportsPlanModifiers() bool { return true }
-
-type dataSourceSchemaTarget struct{}
-
-func (dataSourceSchemaTarget) SchemaPackage() string { return DataSourceSchema }
-func (dataSourceSchemaTarget) FunctionName(name string) string {
-	return "GenSchema" + name + "DataSource"
-}
-
-func (dataSourceSchemaTarget) AttributeType(t string) string {
-	return DataSourceSchema + "." + t
-}
-func (dataSourceSchemaTarget) SupportsPlanModifiers() bool { return false }
 
 // MessageSchemaGenerator is the decorator struct to generate tfsdk.Schema of a message
 type MessageSchemaGenerator struct {
@@ -72,10 +68,10 @@ func NewMessageSchemaGenerator(m *Message, i *Imports, target schemaTarget) *Mes
 
 // Generate returns Go code for message schema
 func (m *MessageSchemaGenerator) Generate(writer io.Writer) (int, error) {
-	id := m.target.FunctionName(m.Name)
-	schema := m.i.WithPackage(m.target.SchemaPackage(), "Schema")
+	id := m.target.functionName(m.Name)
+	schema := m.i.WithPackage(m.target.schemaPackage, "Schema")
 	diags := m.i.WithPackage(Diag, "Diagnostics")
-	attr := m.i.WithPackage(m.target.SchemaPackage(), "Attribute")
+	attr := m.i.WithPackage(m.target.schemaPackage, "Attribute")
 
 	fieldsDict, err := m.fieldsDictSchema()
 	if err != nil {
@@ -149,7 +145,7 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) (*j.Stat
 		d[j.Id("Validators")] = generateValidators(m.i, j.Id(m.i.WithType(Validator+baseType)), f.Validators)
 	}
 
-	if m.target.SupportsPlanModifiers() && len(f.PlanModifiers) > 0 {
+	if m.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
 		baseType, err := baseTypeForAttributeType(f.AttributeType)
 		if err != nil {
 			return nil, trace.Wrap(err, "failed to get base type")
@@ -157,7 +153,7 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) (*j.Stat
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, j.Id(m.i.WithType(PlanModifier+baseType)), f.PlanModifiers)
 	}
 
-	return j.Id(m.i.WithType(m.target.AttributeType(f.AttributeType))).Values(d), nil
+	return j.Id(m.i.WithType(m.target.attributeType(f.AttributeType))).Values(d), nil
 }
 
 // FieldSchemaGenerator represents the decorator for Field code generation
@@ -227,7 +223,7 @@ func (f *FieldSchemaGenerator) baseAttributeDict() (j.Dict, error) {
 	}
 
 	// Plan modifiers
-	if f.target.SupportsPlanModifiers() && len(f.PlanModifiers) > 0 {
+	if f.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
 		planModifiers, err := f.generatePlanModifiers()
 		if err != nil {
 			return nil, trace.Wrap(err)
@@ -276,7 +272,7 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 }
 
 func (f *FieldSchemaGenerator) primitiveAttribute() *j.Statement {
-	return j.Id(f.i.WithType(f.target.AttributeType(f.AttributeType)))
+	return j.Id(f.i.WithType(f.target.attributeType(f.AttributeType)))
 }
 
 func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) (*j.Statement, error) {
@@ -284,7 +280,7 @@ func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) (*j.S
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
-	return j.Map(j.String()).Id(f.i.WithPackage(f.target.SchemaPackage(), "Attribute")).Values(fieldsDict), nil
+	return j.Map(j.String()).Id(f.i.WithPackage(f.target.schemaPackage, "Attribute")).Values(fieldsDict), nil
 }
 
 func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) (*j.Statement, error) {
@@ -294,7 +290,7 @@ func (f *FieldSchemaGenerator) singleNestedAttribute(d j.Dict) (*j.Statement, er
 		return nil, trace.Wrap(err)
 	}
 	d[j.Id("Attributes")] = nestedAttributes
-	return j.Id(f.i.WithPackage(f.target.SchemaPackage(), "SingleNestedAttribute")).Values(d), nil
+	return j.Id(f.i.WithPackage(f.target.schemaPackage, "SingleNestedAttribute")).Values(d), nil
 }
 
 func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) (*j.Statement, error) {
@@ -303,10 +299,10 @@ func (f *FieldSchemaGenerator) listNestedAttribute(d j.Dict) (*j.Statement, erro
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
-	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.SchemaPackage(), "NestedAttributeObject")).Values(j.Dict{
+	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.schemaPackage, "NestedAttributeObject")).Values(j.Dict{
 		j.Id("Attributes"): nestedAttributes,
 	})
-	return j.Id(f.i.WithPackage(f.target.SchemaPackage(), "ListNestedAttribute")).Values(d), nil
+	return j.Id(f.i.WithPackage(f.target.schemaPackage, "ListNestedAttribute")).Values(d), nil
 }
 
 func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) (*j.Statement, error) {
@@ -315,18 +311,18 @@ func (f *FieldSchemaGenerator) mapNestedAttribute(d j.Dict) (*j.Statement, error
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
-	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.SchemaPackage(), "NestedAttributeObject")).Values(j.Dict{
+	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.schemaPackage, "NestedAttributeObject")).Values(j.Dict{
 		j.Id("Attributes"): nestedAttributes,
 	})
-	return j.Id(f.i.WithPackage(f.target.SchemaPackage(), "MapNestedAttribute")).Values(d), nil
+	return j.Id(f.i.WithPackage(f.target.schemaPackage, "MapNestedAttribute")).Values(d), nil
 }
 
 func (f *FieldSchemaGenerator) customAttribute(d j.Dict) *j.Statement {
-	return j.Id(f.target.FunctionName(f.Suffix)).
+	return j.Id(f.target.functionName(f.Suffix)).
 		Call(
 			j.Id("ctx"),
 			j.Op("&").Id("diags"),
-			j.Id(f.i.WithType(f.target.AttributeType(f.AttributeType))).Values(d),
+			j.Id(f.i.WithType(f.target.attributeType(f.AttributeType))).Values(d),
 		)
 }
 
