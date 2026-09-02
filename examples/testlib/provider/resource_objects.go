@@ -26,7 +26,7 @@ func (r objectsResource) Metadata(ctx context.Context, req resource.MetadataRequ
 }
 
 func (r objectsResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaObjects(ctx)
+	return schemav1.GenSchemaObjectsResource(ctx)
 }
 
 func (r objectsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {

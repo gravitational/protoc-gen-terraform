@@ -8,7 +8,7 @@ import (
 )
 
 func TestSchema(t *testing.T) {
-	schema, diags := GenSchemaTest(context.Background())
+	schema, diags := GenSchemaTestResource(context.Background())
 	require.False(t, diags.HasError())
 	require.True(t, schema.Attributes["str"].Computed)
 	require.False(t, schema.Attributes["str"].Required)

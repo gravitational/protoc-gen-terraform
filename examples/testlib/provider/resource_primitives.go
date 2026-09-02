@@ -26,7 +26,7 @@ func (r primitivesResource) Metadata(ctx context.Context, req resource.MetadataR
 }
 
 func (r primitivesResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaPrimitives(ctx)
+	return schemav1.GenSchemaPrimitivesResource(ctx)
 }
 
 func (r primitivesResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {

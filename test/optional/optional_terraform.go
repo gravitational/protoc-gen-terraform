@@ -35,8 +35,62 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// GenSchemaOptionalTest returns tfsdk.Schema definition for OptionalTest
-func GenSchemaOptionalTest(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaOptionalTestResource returns Terraform Framework resource schema definition for OptionalTest
+func GenSchemaOptionalTestResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"choice_a": {
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
+		"choice_b": {
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
+		"optional_bool": {
+			Description: "OptionalBool is a proto3 optional bool field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+		},
+		"optional_inner_message": {
+			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"inner_bool": {
+				Description: "",
+				Optional:    true,
+				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
+			}}),
+			Description: "OptionalInnerMessage is a proto3 optional message field",
+			Optional:    true,
+		},
+		"optional_int64": {
+			Description: "OptionalInt64 is a proto3 optional int64 field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
+		},
+		"optional_map": {
+			Computed:    true,
+			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+		},
+		"optional_str": {
+			Description: "OptionalStr is a proto3 optional string field",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
+		"string_list": {
+			Computed:    true,
+			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			Optional:    true,
+			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
+		},
+	}}, nil
+}
+
+// GenSchemaOptionalTestDataSource returns Terraform Framework datasource schema definition for OptionalTest
+func GenSchemaOptionalTestDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"choice_a": {
 			Computed:    true,
@@ -286,7 +340,7 @@ func CopyOptionalTestToTerraform(ctx context.Context, obj *OptionalTest, tf *git
 // CopyOptionalTestToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyOptionalTestToTerraformPreserveUnknown(ctx context.Context, obj *OptionalTest, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaOptionalTest(ctx)
+	schema, diags := GenSchemaOptionalTestResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}

@@ -42,8 +42,73 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-// GenSchemaTime returns tfsdk.Schema definition for Time
-func GenSchemaTime(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+// GenSchemaTimeResource returns Terraform Framework resource schema definition for Time
+func GenSchemaTimeResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_custom": {
+			Computed:      true,
+			Description:   "duration_custom time.Duration field using casttype.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          DurationType{},
+		},
+		"duration_custom_list": {
+			Computed:      true,
+			Description:   "duration_custom_list []time.Duration field using casttype.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
+		},
+		"duration_list": {
+			Computed:      true,
+			Description:   "duration_list []time.Duration field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: DurationType{}},
+		},
+		"duration_standard": {
+			Computed:      true,
+			Description:   "duration_standard time.Duration field using stdduration.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          DurationType{},
+		},
+		"id": {
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+		},
+		"nullable_duration": {
+			Description: "nullable_duration nullable time.Duration field.",
+			Optional:    true,
+			Type:        DurationType{},
+		},
+		"nullable_timestamp": {
+			Description: "nullable_timestamp nullable time.Time field.",
+			Optional:    true,
+			Type:        UseRFC3339Time(),
+		},
+		"timestamp_list": {
+			Computed:      true,
+			Description:   "timestamp_list []time.Time field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: UseRFC3339Time()},
+		},
+		"timestamp_value": {
+			Computed:      true,
+			Description:   "timestamp_value time.Time field.",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			Type:          UseRFC3339Time(),
+		},
+	}}, nil
+}
+
+// GenSchemaTimeDataSource returns Terraform Framework datasource schema definition for Time
+func GenSchemaTimeDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 		"duration_custom": {
 			Computed:      true,
@@ -306,7 +371,7 @@ func CopyTimeToTerraform(ctx context.Context, obj *github_com_gravitational_prot
 // CopyTimeToTerraformPreserveUnknown copies contents of source struct into a Terraform object.
 // Set preserveUnknown to true to preserve unknown values.
 func CopyTimeToTerraformPreserveUnknown(ctx context.Context, obj *github_com_gravitational_protoc_gen_terraform_v4_examples_types.Time, tf *github_com_hashicorp_terraform_plugin_framework_types.Object, preserveUnknown bool) (github_com_hashicorp_terraform_plugin_framework_types.Object, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	schema, diags := GenSchemaTime(ctx)
+	schema, diags := GenSchemaTimeResource(ctx)
 	if diags.HasError() {
 		return github_com_hashicorp_terraform_plugin_framework_types.Object{}, diags
 	}
