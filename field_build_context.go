@@ -327,21 +327,14 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueCastFromType = elemType
 	}
 
-	t = applyTerraformTypeOverrides(t, c.GetAttributeMapping(), c.GetTerraformTypeOverride())
+	t = applyTerraformTypeOverrides(t, c.GetTerraformTypeOverride(), c.GetAttributeTypeOverride())
 
 	return t, nil
 }
 
-func applyTerraformTypeOverrides(t TerraformType, attributeOverride string, schemaOverride *SchemaType) TerraformType {
-	if attributeOverride != "" {
-		t.AttributeType = attributeOverride
-	}
-
-	// A schema override replaces the Terraform type metadata and takes
-	// precedence over the attribute mapping.
+func applyTerraformTypeOverrides(t TerraformType, schemaOverride *SchemaType, attributeTypeOverride string) TerraformType {
 	if schemaOverride != nil {
 		t.Type = schemaOverride.Type
-		t.AttributeType = schemaOverride.AttributeType
 		t.ValueType = schemaOverride.ValueType
 		t.ValueFromMethod = schemaOverride.ValueFromMethod
 		t.ValueToMethod = schemaOverride.ValueToMethod
@@ -353,6 +346,10 @@ func applyTerraformTypeOverrides(t TerraformType, attributeOverride string, sche
 
 		t.ElemType = t.Type
 		t.ElemValueType = t.ValueType
+	}
+
+	if attributeTypeOverride != "" {
+		t.AttributeType = attributeTypeOverride
 	}
 
 	return t
@@ -596,12 +593,15 @@ func (c *FieldBuildContext) GetTerraformTypeOverride() *SchemaType {
 	return nil
 }
 
-func (c *FieldBuildContext) GetAttributeMapping() string {
-	v, ok := c.config.AttributeMapping[c.GetCustomType()]
-	if ok {
-		return v
+// GetAttributeTypeOverride returns the configured schema.Attribute type.
+// Field-specific schema_types.<field>.attribute_type takes precedence over
+// custom-type-wide attribute_mapping entries.
+func (c *FieldBuildContext) GetAttributeTypeOverride() string {
+	if schemaType := c.GetTerraformTypeOverride(); schemaType != nil && strings.TrimSpace(schemaType.AttributeType) != "" {
+		return schemaType.AttributeType
 	}
-	return ""
+
+	return c.config.AttributeMapping[c.GetCustomType()]
 }
 
 // GetOneOfFieldName returns OneOf container name
