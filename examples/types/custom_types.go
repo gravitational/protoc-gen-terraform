@@ -23,8 +23,14 @@ func (d Duration) String() string {
 // BoolCustom custom bool array
 type BoolCustom bool
 
-// GenSchemaBoolSpecial generates custom field schema (bool list)
-func GenSchemaBoolSpecial(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+// GenSchemaBoolSpecialResource generates custom field schema
+func GenSchemaBoolSpecialResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+	attr.Type = types.BoolType
+	return attr
+}
+
+// GenSchemaBoolSpecialDataSource generates custom field schema
+func GenSchemaBoolSpecialDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
 	attr.Type = types.BoolType
 	return attr
 }
@@ -53,8 +59,16 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v at
 
 type BoolCustomList bool
 
-// GenSchemaBoolSpecialList generates custom field schema (bool list)
-func GenSchemaBoolSpecialList(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+// GenSchemaBoolSpecialListResource generates custom field schema (bool list)
+func GenSchemaBoolSpecialListResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+	attr.Type = types.ListType{
+		ElemType: types.BoolType,
+	}
+	return attr
+}
+
+// GenSchemaBoolSpecialListDataSource generates custom field schema (bool list)
+func GenSchemaBoolSpecialListDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
 	attr.Type = types.ListType{
 		ElemType: types.BoolType,
 	}
@@ -118,8 +132,16 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 // StringCustom is a custom type that maps a Terraform List of string, onto a
 // single go string by joining all elements with "/".
 
-// GenSchemaStringCustom returns the StringCustom schema.
-func GenSchemaStringCustom(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+// GenSchemaStringCustomResource returns the StringCustom schema.
+func GenSchemaStringCustomResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+	attr.Type = types.ListType{
+		ElemType: types.StringType,
+	}
+	return attr
+}
+
+// GenSchemaStringCustomDataSource returns the StringCustom schema.
+func GenSchemaStringCustomDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
 	attr.Type = types.ListType{
 		ElemType: types.StringType,
 	}

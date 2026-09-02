@@ -187,7 +187,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 	}
 
 	if f.Kind == CustomKind {
-		return j.Id("GenSchema"+f.Suffix).Call(j.Id("ctx"), j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d))
+		return j.Id(f.target.functionName(f.Suffix)).Call(j.Id("ctx"), j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d))
 	}
 
 	return j.Values(d)

@@ -41,13 +41,13 @@ var _ = math.Inf
 // GenSchemaCustomResource returns Terraform Framework resource schema definition for Custom
 func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"bool_custom": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom": GenSchemaBoolSpecialResource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bool_custom custom bool field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		}),
-		"bool_custom_list": GenSchemaBoolSpecialList(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom_list": GenSchemaBoolSpecialListResource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bool_custom_list custom bool list field.",
 			Optional:      true,
@@ -108,7 +108,7 @@ func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terrafor
 			Sensitive:     true,
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"string_override": GenSchemaStringCustom(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_override": GenSchemaStringCustomResource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:      true,
@@ -128,13 +128,13 @@ func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terrafor
 // GenSchemaCustomDataSource returns Terraform Framework datasource schema definition for Custom
 func GenSchemaCustomDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"bool_custom": GenSchemaBoolSpecial(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom": GenSchemaBoolSpecialDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bool_custom custom bool field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 		}),
-		"bool_custom_list": GenSchemaBoolSpecialList(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom_list": GenSchemaBoolSpecialListDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bool_custom_list custom bool list field.",
 			Optional:      true,
@@ -195,7 +195,7 @@ func GenSchemaCustomDataSource(ctx context.Context) (github_com_hashicorp_terraf
 			Sensitive:     true,
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"string_override": GenSchemaStringCustom(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_override": GenSchemaStringCustomDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:      true,
