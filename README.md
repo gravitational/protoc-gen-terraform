@@ -234,7 +234,8 @@ functions. For the example above, the generator expects these functions to be
 available:
 
 ```go
-func GenSchemaStringCustom(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
+func GenSchemaStringCustomResource(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
+func GenSchemaStringCustomDataSource(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
 func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string)
 func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value
 ```
