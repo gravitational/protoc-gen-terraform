@@ -76,15 +76,6 @@ type SchemaType struct {
 	TypeConstructor string `yaml:"type_constructor,omitempty"`
 }
 
-type Custom struct {
-	// TODO: Can we infer every thing from the AttributeType?
-
-	// AttributeType is the Terraform schema.Attribute
-	AttributeType string `yaml:"attribute_type,omitempty"`
-	// CustomType is the Terraform custom attribute type
-	CustomType string `yaml:"custom_type,omitempty"`
-}
-
 // InjectedField represents custom injected field descriptor
 type InjectedField struct {
 	// Name represents field schema name
