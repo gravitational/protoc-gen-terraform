@@ -90,9 +90,9 @@ type InjectedField struct {
 	PlanModifiers []string `yaml:"plan_modifiers,omitempty"`
 	// PlanModifiers is the array of Validators
 	Validators []string `yaml:"validators,omitempty"`
-	// ValueMethod is the method that will be called to construct a placeholder
+	// DefaultValueMethod is the method that will be called to construct a placeholder
 	// value for the field in Copy*ToTerraform methods
-	ValueMethod string `yaml:"value_method,omitempty"`
+	DefaultValueMethod string `yaml:"default_value_method,omitempty"`
 }
 
 // Config represents the plugin config
@@ -204,8 +204,8 @@ func (c *Config) validate() error {
 
 	for path, fields := range c.InjectedFields {
 		for _, field := range fields {
-			if strings.TrimSpace(field.ValueMethod) == "" {
-				return trace.BadParameter("injected_fields.%v.%v.value_method is required", path, field.Name)
+			if strings.TrimSpace(field.DefaultValueMethod) == "" {
+				return trace.BadParameter("injected_fields.%v.%v.default_value_method is required", path, field.Name)
 			}
 		}
 	}

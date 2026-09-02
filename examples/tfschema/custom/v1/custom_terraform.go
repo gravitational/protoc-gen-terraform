@@ -416,7 +416,7 @@ func CopyCustomToTerraformPreserveUnknown(ctx context.Context, obj *github_com_g
 	}
 	_, ok := attrs["injected"]
 	if !ok {
-		attrs["injected"] = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+		attrs["injected"] = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 	}
 	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
 	diags.Append(resultDiags...)

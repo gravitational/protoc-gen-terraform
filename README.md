@@ -136,7 +136,7 @@ injected_fields:
     - name: id
       type: github.com/hashicorp/terraform-plugin-framework/types.StringType
       computed: true
-      value_method: github.com/hashicorp/terraform-plugin-framework/types.StringUnknown
+      default_value_method: github.com/hashicorp/terraform-plugin-framework/types.StringNull
 ```
 
 ## Schema field naming

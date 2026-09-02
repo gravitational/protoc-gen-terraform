@@ -54,10 +54,10 @@ func TestConfig(t *testing.T) {
 
 	require.Equal(t, cfg.InjectedFields, map[string][]InjectedField{
 		"Test": {{
-			Name:        "id",
-			Type:        "github.com/hashicorp/terraform-plugin-framework/types.StringType",
-			Computed:    true,
-			ValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown",
+			Name:               "id",
+			Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			Computed:           true,
+			DefaultValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringNull",
 		}},
 	})
 	require.Equal(t, cfg.SchemaTypes, map[string]SchemaType{
@@ -104,7 +104,7 @@ injected_fields:
 
 	_, err := ReadConfig(map[string]string{"config": path})
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "injected_fields.Test.id.value_method is required")
+	require.Contains(t, err.Error(), "injected_fields.Test.id.default_value_method is required")
 }
 
 func writeConfig(t *testing.T, contents string) string {

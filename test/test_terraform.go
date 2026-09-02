@@ -4726,7 +4726,7 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 	}
 	_, ok := attrs["id"]
 	if !ok {
-		attrs["id"] = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+		attrs["id"] = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 	}
 	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
 	diags.Append(resultDiags...)

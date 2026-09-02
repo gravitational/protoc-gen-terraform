@@ -131,7 +131,7 @@ func (m *MessageCopyToGenerator) GenerateFields(g *j.Group) {
 		g.If(j.Op("!").Id("ok")).Block(
 			j.Id("attrs").Index(j.Lit(f.Name)).
 				Op("=").
-				Id(m.i.WithType(f.ValueMethod)).Call(),
+				Id(m.i.WithType(f.DefaultValueMethod)).Call(),
 		)
 	}
 }
