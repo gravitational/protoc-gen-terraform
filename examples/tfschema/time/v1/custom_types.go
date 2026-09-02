@@ -10,4 +10,12 @@ type TimeValue = types.TimeValue
 
 var (
 	UseRFC3339Time = types.UseRFC3339Time
+
+	NewDuration     = types.NewDuration
+	NullDuration    = types.NullDuration
+	UnknownDuration = types.UnknownDuration
+
+	NewTime     = types.NewTime
+	NullTime    = types.NullTime
+	UnknownTime = types.UnknownTime
 )

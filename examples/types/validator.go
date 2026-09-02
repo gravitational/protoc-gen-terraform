@@ -35,11 +35,11 @@ func (v MockValidator) Validate(_ context.Context, req tfsdk.ValidateAttributeRe
 		return
 	}
 
-	if value.Null || value.Unknown {
+	if value.IsNull() || value.IsUnknown() {
 		return
 	}
 
-	if value.Value != "valid" {
+	if value.ValueString() != "valid" {
 		resp.Diagnostics.AddError("mock error", fmt.Sprintf(
 			`Attribute %q value must be "valid"`,
 			req.AttributePath.String()))

@@ -12,6 +12,7 @@ injected_fields:
     - name: injected
       type: github.com/hashicorp/terraform-plugin-framework/types.StringType
       computed: true
+      default_value_method: github.com/hashicorp/terraform-plugin-framework/types.StringNull
       plan_modifiers:
         - "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"
 
@@ -51,5 +52,9 @@ schema_types:
   "Custom.schema_override":
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
     value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
+    value_from_method: "ValueString"
+    value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.StringValue"
+    null_value_method: "github.com/hashicorp/terraform-plugin-framework/types.StringNull"
+    unknown_value_method: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown"
     cast_to_type: "string"
     cast_from_type: "OverrideCastType"

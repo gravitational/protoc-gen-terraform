@@ -72,15 +72,50 @@ func (t TimeType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	return TimeValue{Value: current, Format: t.Format}, nil
 }
 
+// NewTime creates a TimeValue with a known value using format RFC3339.
+func NewTime(value time.Time) TimeValue {
+	return TimeValue{
+		Value:  value,
+		Format: time.RFC3339,
+	}
+}
+
+// NullTime creates a TimeValue with a null value.
+func NullTime() TimeValue {
+	return TimeValue{
+		Null:   true,
+		Format: time.RFC3339,
+	}
+}
+
+// UnknownTime creates a TimeValue with an unknown value.
+func UnknownTime() TimeValue {
+	return TimeValue{
+		Unknown: true,
+		Format:  time.RFC3339,
+	}
+}
+
 // TimeValue represents Terraform value of type TimeType
 type TimeValue struct {
 	// Unknown will be true if the value is not yet known.
+	//
+	// Deprecated: Use the TimeUnknown function to create an unknown TimeValue
+	// or use the IsUnknown method to determine whether the TimeValue
+	// is unknown instead.
 	Unknown bool
 	// Null will be true if the value was not set, or was explicitly set to
 	// null.
+	//
+	// Deprecated: Use the TimeNull function to create a null TimeValue or
+	// use the IsNull method to determine whether the TimeValue is null
+	// instead.
 	Null bool
 	// Value contains the set value, as long as Unknown and Null are both
 	// false.
+	//
+	// Deprecated: Use the NewTimeValue function to create a known TimeValue or
+	// use the ValueTime method to retrieve the time value instead.
 	Value time.Time
 	// Format time format
 	Format string
@@ -95,10 +130,10 @@ func (t TimeValue) Type(_ context.Context) attr.Type {
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
 func (t TimeValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
-	if t.Null {
+	if t.IsNull() {
 		return tftypes.NewValue(tftypes.String, nil), nil
 	}
-	if t.Unknown {
+	if t.IsUnknown() {
 		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
 	}
 
@@ -111,13 +146,13 @@ func (t TimeValue) Equal(other attr.Value) bool {
 	if !ok {
 		return false
 	}
-	if t.Unknown != o.Unknown {
+	if t.IsUnknown() != o.IsUnknown() {
 		return false
 	}
-	if t.Null != o.Null {
+	if t.IsNull() != o.IsNull() {
 		return false
 	}
-	return t.Value == o.Value
+	return t.Value.Equal(o.Value)
 }
 
 // IsNull returns true if receiver is null
@@ -132,15 +167,20 @@ func (t TimeValue) IsUnknown() bool {
 
 // String returns the string representation of the receiver
 func (t TimeValue) String() string {
-	if t.Unknown {
+	if t.IsUnknown() {
 		return attr.UnknownValueString
 	}
 
-	if t.Null {
+	if t.IsNull() {
 		return attr.NullValueString
 	}
 
 	return t.Value.String()
+}
+
+// ValueTime returns the underlying time value.
+func (t TimeValue) ValueTime() time.Time {
+	return t.Value
 }
 
 // DurationType represents time.Time Terraform type which is stored in RFC3339 format, nanoseconds truncated
@@ -196,31 +236,63 @@ func (t DurationType) ValueFromTerraform(ctx context.Context, in tftypes.Value) 
 	return DurationValue{Value: current}, nil
 }
 
+// NewDuration creates a DurationValue with a known value.
+func NewDuration(value time.Duration) DurationValue {
+	return DurationValue{
+		Value: value,
+	}
+}
+
+// NullDuration creates a DurationValue with a null value.
+func NullDuration() DurationValue {
+	return DurationValue{
+		Null: true,
+	}
+}
+
+// UnknownDuration creates a DurationValue with an unknown value.
+func UnknownDuration() DurationValue {
+	return DurationValue{
+		Unknown: true,
+	}
+}
+
 // DurationValue represents Terraform value of type TimeType
 type DurationValue struct {
 	// Unknown will be true if the value is not yet known.
+	//
+	// Deprecated: Use the TimeUnknown function to create an unknown DurationValue
+	// or use the IsUnknown method to determine whether the DurationValue
+	// is unknown instead.
 	Unknown bool
 	// Null will be true if the value was not set, or was explicitly set to
 	// null.
+	//
+	// Deprecated: Use the DurationNull function to create a null DurationValue or
+	// use the IsNull method to determine whether the DurationValue is null
+	// instead.
 	Null bool
 	// Value contains the set value, as long as Unknown and Null are both
 	// false.
+	//
+	// Deprecated: Use the NewDurationValue function to create a known DurationValue or
+	// use the ValueDuration method to retrieve the duration value instead.
 	Value time.Duration
 }
 
 // Type returns value type
 func (t DurationValue) Type(_ context.Context) attr.Type {
-	return TimeType{}
+	return DurationType{}
 }
 
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
 func (t DurationValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
-	if t.Null {
+	if t.IsNull() {
 		return tftypes.NewValue(tftypes.String, nil), nil
 	}
-	if t.Unknown {
+	if t.IsUnknown() {
 		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
 	}
 	return tftypes.NewValue(tftypes.String, t.Value.String()), nil
@@ -232,10 +304,10 @@ func (t DurationValue) Equal(other attr.Value) bool {
 	if !ok {
 		return false
 	}
-	if t.Unknown != o.Unknown {
+	if t.IsUnknown() != o.IsUnknown() {
 		return false
 	}
-	if t.Null != o.Null {
+	if t.IsNull() != o.IsNull() {
 		return false
 	}
 	return t.Value == o.Value
@@ -253,13 +325,18 @@ func (t DurationValue) IsUnknown() bool {
 
 // String returns the string representation of the receiver
 func (t DurationValue) String() string {
-	if t.Unknown {
+	if t.IsUnknown() {
 		return attr.UnknownValueString
 	}
 
-	if t.Null {
+	if t.IsNull() {
 		return attr.NullValueString
 	}
 
 	return t.Value.String()
+}
+
+// ValueDuration returns the underlying duration value.
+func (t DurationValue) ValueDuration() time.Duration {
+	return time.Duration(t.Value)
 }

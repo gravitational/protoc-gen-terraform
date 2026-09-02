@@ -40,9 +40,9 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attrs["id"] = types.String{Value: id}
-	plan.Attrs["computed"] = types.String{Value: "computed"}
-	plan.Attrs["injected"] = types.String{Value: "injected"}
+	plan.Attributes()["id"] = types.StringValue(id)
+	plan.Attributes()["computed"] = types.StringValue("computed")
+	plan.Attributes()["injected"] = types.StringValue("injected")
 
 	custom := &extypes.Custom{}
 	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)
@@ -52,12 +52,13 @@ func (r customResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	r.p.custom[id] = custom
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &plan)...)
+	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r customResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -73,14 +74,15 @@ func (r customResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	custom := r.p.custom[id.Value]
+	custom := r.p.custom[id.ValueString()]
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &state)...)
+	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &state)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r customResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -98,12 +100,13 @@ func (r customResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	r.p.custom[custom.Id] = custom
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraform(ctx, custom, &plan)...)
+	result, diags := schemav1.CopyCustomToTerraform(ctx, custom, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r customResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -119,7 +122,7 @@ func (r customResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		return
 	}
 
-	delete(r.p.custom, id.Value)
+	delete(r.p.custom, id.ValueString())
 }
 
 func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
@@ -140,7 +143,7 @@ func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanR
 
 	// Preserve the provider-managed ID, but rewrite all other fields from
 	// config so omitted or null values become explicit zero values in the plan.
-	id, hasID := plan.Attrs["id"]
+	id, hasID := plan.Attributes()["id"]
 
 	custom := &extypes.Custom{}
 	resp.Diagnostics.Append(schemav1.CopyCustomFromTerraform(ctx, plan, custom)...)
@@ -148,14 +151,15 @@ func (r customResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanR
 		return
 	}
 
-	resp.Diagnostics.Append(schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)...)
+	result, diags := schemav1.CopyCustomToTerraformPreserveUnknown(ctx, custom, &plan, true)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	if hasID {
-		plan.Attrs["id"] = id
+		result.Attributes()["id"] = id
 	}
 
-	resp.Diagnostics.Append(resp.Plan.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.Plan.Set(ctx, &result)...)
 }

@@ -59,7 +59,7 @@ specific package names.
 
 ```yaml
 import_path_overrides:
-    "types": "github.com/gravitational/teleport/api/types"
+  "types": "github.com/gravitational/teleport/api/types"
 ```
 
 ## Specifying types to export
@@ -108,12 +108,12 @@ You also can set list of `Validators` and `PlanModifiers` using configuration fi
 
 ```yaml
 validators:
-    "Metadata.Expires":
-        - rfc3339TimeValidator
+  "Metadata.Expires":
+    - rfc3339TimeValidator
 
 plan_modifiers:
-    "Role.Options":
-        - "github.com/hashicorp/terraform-plugin-framework/resource.RequiresReplace()"
+  "Role.Options":
+    - "github.com/hashicorp/terraform-plugin-framework/resource.RequiresReplace()"
 ```
 
 ## UseStateForUnknown by default
@@ -133,10 +133,10 @@ There are cases when you need to add fields not existing in the object to schema
 ```yaml
 injected_fields:
   Test: # Path to inject
-    -
-      name: id
+    - name: id
       type: github.com/hashicorp/terraform-plugin-framework/types.StringType
       computed: true
+      default_value_method: github.com/hashicorp/terraform-plugin-framework/types.StringNull
 ```
 
 ## Schema field naming
@@ -147,23 +147,106 @@ If you need to rename field in schema, use `name_overrides` option:
 
 ```yaml
 name_overrides:
-    "Role.Spec.AWSRoleARNs": aws_arns
+  "Role.Spec.AWSRoleARNs": aws_arns
 ```
 
 ## Custom fields
 
-If your proto generated objects use type alias for duration fields, you can set `custom_duration` to the name of a custom duration type.
+If your proto generated objects use type alias for duration fields, you can set `duration_custom_type` to the name of a custom duration type.
 
 `time_type`, `duration_type` and `schema_types` options are used to override Terraform types.
 
+Available configuration options include:
+- `type`: Terraform attr.Type used in schema, for example types.StringType.
+- `value_type`: Terraform attr.Value implementation expected when reading, for example types.String.
+- `value_from_method`: method called on the Terraform value to extract the Go value, for example ValueString().
+- `value_to_method`: constructor used to create a known Terraform value from Go, for example types.StringValue(...).
+- `null_value_method`: constructor used for null values, for example types.StringNull().
+- `unknown_value_method`: constructor used when preserving unknown values, for example types.StringUnknown().
+- `cast_to_type`: Go type passed into value_to_method.
+- `cast_from_type`: Go field type when reading back from Terraform.
+
 ```yaml
+# time_type overrides the protobuf time fields.
 time_type:
-    type: "TimeType"                    # attr.Type
-    value_type: "TimeValue"             # attr.Value
-    cast_to_type: "time.Time"           # TimeValue.Value type
-    cast_from_type: "time.Time"         # Go object field type
-    type_constructor: UseRFC3339Time()  # Function to put into schema definition Type, will generate TimeType{} if missing
+  type: "TimeType"
+  value_type: "TimeValue"
+  value_from_method: "ValueTime"
+  value_to_method: "NewTime"
+  null_value_method: "NullTime"
+  unknown_value_method: "UnknownTime"
+  cast_to_type: "time.Time"
+  cast_from_type: "time.Time"
+  type_constructor: UseRFC3339Time() # Function to put into schema definition Type, will generate TimeType{} if missing
+
+# duration_type overrides the protobuf duration fields.
+duration_type:
+  type: "DurationType"
+  value_type: "DurationValue"
+  value_from_method: "ValueDuration"
+  value_to_method: "NewDuration"
+  null_value_method: "NullDuration"
+  unknown_value_method: "UnknownDuration"
+  cast_to_type: "time.Duration"
+  cast_from_type: "time.Duration"
+
+# schema_types lets you override the Terraform type used for a specific proto field.
+schema_types:
+  "Custom.schema_override":
+    type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"
+    value_type: "github.com/hashicorp/terraform-plugin-framework/types.String"
+    value_from_method: "ValueString"
+    value_to_method: "github.com/hashicorp/terraform-plugin-framework/types.StringValue"
+    null_value_method: "github.com/hashicorp/terraform-plugin-framework/types.StringNull"
+    unknown_value_method: "github.com/hashicorp/terraform-plugin-framework/types.StringUnknown"
+    cast_to_type: "string"
+    cast_from_type: "OverrideCastType"
 ```
+
+If every time or duration field is overridden with `schema_types`, you can use
+placeholder definitions for `time_type` and `duration_type`. The generator only
+needs these global entries to recognize time and duration fields; the
+field-specific `schema_types` entries provide the real Terraform type and copy
+methods.
+
+```yaml
+# This must be defined for the generator to be happy, but in reality all time
+# fields are overridden because protobuf timestamps contain locks and the
+# linter gets mad if raw structs are used instead of pointers.
+time_type:
+  type: "PlaceholderType"
+duration_type:
+  type: "PlaceholderType"
+```
+
+## Custom types
+
+`custom_types` lets you replace the generator's normal schema and copy logic
+for a specific field with handwritten functions.
+
+```yaml
+custom_types:
+  "Custom.string_override": StringCustom
+```
+
+The map key is the field path. The value is the suffix used to find the custom
+functions. For the example above, the generator expects these functions to be
+available:
+
+```go
+func GenSchemaStringCustom(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
+func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string)
+func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value
+```
+
+Use `custom_types` when the Terraform representation is shaped differently from
+the Go field. For example, a Go `string` field can be represented in Terraform
+as a list of strings, with custom copy functions joining and splitting the
+value.
+
+Use `schema_types` when the generator can still perform the conversion and only
+needs different Terraform type/value constructors. Use `custom_types` when you
+need to own the schema and both copy directions for the field.
 
 ## Custom duration value
 
@@ -194,7 +277,7 @@ The signatures for `Test` resource would be the following:
 // tf must have all the object attrs present (including null and unknown).
 // Hence, tf must be the result of req.Plan.Get or similar Terraform method.
 // Otherwise, error would be returned.
-func CopyTestFromTerraform(tf types.Object, obj *Test) diag.Diagnostics
+func CopyTestFromTerraform(ctx context.Context, tf types.Object, obj *Test) diag.Diagnostics
 ```
 
 They can be used as following:
@@ -209,8 +292,8 @@ func (r resource) Create(ctx context.Context, req resource.CreateRequest, resp *
         return
     }
 
-    obj := types.Object{}
-    diags := tfschema.CopyObjFromTerraform(plan, &obj)
+    obj := &Test{}
+    diags = tfschema.CopyTestFromTerraform(ctx, plan, obj)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
         return
@@ -219,6 +302,7 @@ func (r resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 ```
 
 The following rules apply:
+
 1. Source Terraform object must contain values for all target object fields.
 2. Unknown values are treated as nulls. Target object value would be set to either nil or zero value.
 
@@ -226,17 +310,21 @@ So, the source Terraform object might be Plan, State or Object.
 
 ### CopyTo
 
-Copies object to Terraform object.
+Copies object to Terraform object returning a new Terraform object.
 
 ```go
-func CopyTestToTerraform(obj Test, tf *types.Object, updateOnly bool) error
+func CopyTestToTerraform(ctx context.Context, obj *Test, tf *types.Object) (types.Object, diag.Diagnostics)
 ```
 
-Target Terraform object must have AttrTypes for all fields of Object.
+Target Terraform object is used as the source of existing values and attribute
+types. The returned object contains the updated attributes.
 
 The following rules apply:
-1. All target attributes are marked as known.
-2. In case an attribute is present in AttrTypes, but is missing in AttrValues, it is created.
+
+1. The source Terraform object must have attribute types for all generated fields.
+2. Missing attribute values are created in the returned object.
+3. Unknown values are replaced by known values by default.
+4. Use `Copy*ToTerraformPreserveUnknown(..., true)` to preserve unknown values already present in the source object.
 
 ## Note on gogoproto.customtype
 
@@ -246,7 +334,7 @@ If a field has `gogoproto.customtype` flag, schema and converters for this field
 
 ```yaml
 suffixes:
-    "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
+  "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
 ```
 
 In the example above, `GenTraitsSchema` method will be called. Without this option, method name would be `GenGithubComGravitationalTeleportApiTypesWrappersTraits`.
@@ -259,7 +347,7 @@ Protobuf allows to define messages with no fields. Terraform treats such objects
 
 Run:
 
-```make test```
+`make test`
 
 # Build and test using Docker
 
@@ -269,6 +357,7 @@ make build test
 ```
 
 On Mac M1 use:
+
 ```sh
 cd build.assets
 make build test PROTOC_PLATFORM=linux-aarch_64
@@ -276,7 +365,7 @@ make build test PROTOC_PLATFORM=linux-aarch_64
 
 # Printing version
 
-```protoc-gen-terraform version```
+`protoc-gen-terraform version`
 
 will print version number and quit.
 
@@ -307,6 +396,7 @@ make gen
 ```
 
 Debuggers can be configured to read stdin from the file:
-* in GoLand: on a `Go Build` target, set `Redirect input from` to the dump file path
-* in VSCode: in the `Launch.json` file, set `stdinFrom` to the dump file path
-* with `dlv`: `dlv exec ./build/protoc-gen-terraform --listen=:2345 --headless=true --api-version=2 --accept-multiclient --redirect stdin:"$PROTOC_GEN_TERRAFORM_DUMP"
+
+- in GoLand: on a `Go Build` target, set `Redirect input from` to the dump file path
+- in VSCode: in the `Launch.json` file, set `stdinFrom` to the dump file path
+- with `dlv`: `dlv exec ./build/protoc-gen-terraform --listen=:2345 --headless=true --api-version=2 --accept-multiclient --redirect stdin:"$PROTOC_GEN_TERRAFORM_DUMP"

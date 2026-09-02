@@ -41,7 +41,7 @@ func (r objectsResource) Create(ctx context.Context, req resource.CreateRequest,
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attrs["id"] = types.String{Value: id}
+	plan.Attributes()["id"] = types.StringValue(id)
 
 	objects := &extypes.Objects{}
 	resp.Diagnostics.Append(schemav1.CopyObjectsFromTerraform(ctx, plan, objects)...)
@@ -66,12 +66,13 @@ func (r objectsResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	r.p.objects[id] = &newObjects
 
-	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)...)
+	result, diags := schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r objectsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -87,14 +88,15 @@ func (r objectsResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	objects := r.p.objects[id.Value]
+	objects := r.p.objects[id.ValueString()]
 
-	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, objects, &state)...)
+	result, diags := schemav1.CopyObjectsToTerraform(ctx, objects, &state)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r objectsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -129,12 +131,13 @@ func (r objectsResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	r.p.objects[newObjects.Id] = &newObjects
 
-	resp.Diagnostics.Append(schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)...)
+	result, diags := schemav1.CopyObjectsToTerraform(ctx, &newObjects, &plan)
+	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func (r objectsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -150,5 +153,5 @@ func (r objectsResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
-	delete(r.p.objects, id.Value)
+	delete(r.p.objects, id.ValueString())
 }
