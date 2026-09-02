@@ -22,3 +22,10 @@ func TestSchema(t *testing.T) {
 	require.Equal(t, "BoolCustomList []bool field", schema.Attributes["bool_custom_list"].Description)
 	require.True(t, schema.Attributes["bool_custom_list"].Optional)
 }
+
+func TestDataSourceSchema(t *testing.T) {
+	schema, diags := GenSchemaTestDataSource(context.Background())
+	require.False(t, diags.HasError())
+	require.Empty(t, schema.Attributes["str"].PlanModifiers)
+	require.Len(t, schema.Attributes["str"].Validators, 1)
+}

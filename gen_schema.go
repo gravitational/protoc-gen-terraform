@@ -132,7 +132,7 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 		d[j.Id("Validators")] = generateValidators(m.i, f.Validators)
 	}
 
-	if len(f.PlanModifiers) > 0 {
+	if m.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, f.PlanModifiers)
 	}
 
@@ -182,7 +182,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 	}
 
 	// Plan modifiers
-	if len(f.PlanModifiers) > 0 {
+	if f.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, f.PlanModifiers)
 	}
 
