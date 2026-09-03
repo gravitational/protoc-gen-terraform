@@ -189,6 +189,7 @@ duration_type:
   unknown_value_method: "UnknownDuration"
   cast_to_type: "time.Duration"
   cast_from_type: "time.Duration"
+  type_constructor: DurationType{}
 
 # schema_types lets you override the Terraform type used for a specific proto field.
 schema_types:

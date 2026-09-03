@@ -41,6 +41,7 @@ duration_type:
   unknown_value_method: "UnknownDuration" # Method to construct an unknown Terraform attribute
   cast_to_type: "time.Duration" # Go type of .Value
   cast_from_type: "time.Duration" # Go type of an object field
+  type_constructor: DurationType{}
 
 injected_fields:
   Test:
