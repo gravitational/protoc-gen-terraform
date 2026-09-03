@@ -28,7 +28,6 @@ import (
 	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -40,53 +39,47 @@ var _ = math.Inf
 // GenSchemaOptionalTestResource returns Terraform Framework resource schema definition for OptionalTest
 func GenSchemaOptionalTestResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
-		"choice_a": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"choice_a": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"choice_b": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"choice_b": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"optional_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_bool": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 			Description: "OptionalBool is a proto3 optional bool field",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 				Description: "",
 				Optional:    true,
-				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-			}}),
+			}},
 			Description: "OptionalInnerMessage is a proto3 optional message field",
 			Optional:    true,
 		},
-		"optional_int64": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_int64": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
 			Description: "OptionalInt64 is a proto3 optional int64 field",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"optional_map": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:    true,
 			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"optional_str": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_str": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Description: "OptionalStr is a proto3 optional string field",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"string_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:    true,
 			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }
@@ -94,53 +87,47 @@ func GenSchemaOptionalTestResource(ctx context.Context) (github_com_hashicorp_te
 // GenSchemaOptionalTestDataSource returns Terraform Framework datasource schema definition for OptionalTest
 func GenSchemaOptionalTestDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
-		"choice_a": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"choice_a": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"choice_b": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"choice_b": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"optional_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_bool": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
 			Description: "OptionalBool is a proto3 optional bool field",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
 				Description: "",
 				Optional:    true,
-				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-			}}),
+			}},
 			Description: "OptionalInnerMessage is a proto3 optional message field",
 			Optional:    true,
 		},
-		"optional_int64": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_int64": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
 			Description: "OptionalInt64 is a proto3 optional int64 field",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"optional_map": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapAttribute{
 			Computed:    true,
 			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"optional_str": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_str": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Description: "OptionalStr is a proto3 optional string field",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"string_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }

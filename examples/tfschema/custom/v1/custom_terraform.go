@@ -29,9 +29,12 @@ import (
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
 	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
-	github_com_hashicorp_terraform_plugin_framework_resource "github.com/hashicorp/terraform-plugin-framework/resource"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	github_com_hashicorp_terraform_plugin_framework_schema_validator "github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -43,86 +46,77 @@ var _ = math.Inf
 // GenSchemaCustomResource returns Terraform Framework resource schema definition for Custom
 func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
-		"bool_custom": GenSchemaBoolSpecialResource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom": GenSchemaBoolSpecialResource(ctx, github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 			Computed:      true,
 			Description:   "bool_custom custom bool field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Bool{github_com_hashicorp_terraform_plugin_framework_resource_schema_boolplanmodifier.UseStateForUnknown()},
 		}),
-		"bool_custom_list": GenSchemaBoolSpecialListResource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom_list": GenSchemaBoolSpecialListResource(ctx, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "bool_custom_list custom bool list field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		}),
-		"computed": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"computed": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "computed is a computed field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"custom_name_override": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"custom_name_override": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "name_override is a field with a name override.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"id": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"id": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"injected": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"injected": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Optional:      false,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 			Required:      false,
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"plan_modifier": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"plan_modifier": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "plan_modifier is a field with a plan modifier.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{UseMockPlanModifier()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{UseMockPlanModifier()},
 		},
-		"required": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"required": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Description: "required is a required field.",
 			Required:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"schema_override": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"schema_override": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"sensitive": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"sensitive": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "sensitive is a sensitive field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 			Sensitive:     true,
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"string_override": GenSchemaStringCustomResource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_override": GenSchemaStringCustomResource(ctx, github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
 			Description:   "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		}),
-		"validated": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"validated": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
 			Description:   "validated is a validated field.",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
-			Validators:    []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
+			Validators:    []github_com_hashicorp_terraform_plugin_framework_schema_validator.String{UseMockValidator()},
 		},
 	}}, nil
 }
@@ -130,75 +124,66 @@ func GenSchemaCustomResource(ctx context.Context) (github_com_hashicorp_terrafor
 // GenSchemaCustomDataSource returns Terraform Framework datasource schema definition for Custom
 func GenSchemaCustomDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
 	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
-		"bool_custom": GenSchemaBoolSpecialDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom": GenSchemaBoolSpecialDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_datasource_schema.BoolAttribute{
 			Computed:    true,
 			Description: "bool_custom custom bool field.",
 			Optional:    true,
 		}),
-		"bool_custom_list": GenSchemaBoolSpecialListDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"bool_custom_list": GenSchemaBoolSpecialListDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "bool_custom_list custom bool list field.",
 			Optional:    true,
 		}),
-		"computed": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"computed": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "computed is a computed field.",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"custom_name_override": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"custom_name_override": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "name_override is a field with a name override.",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"id": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"id": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"injected": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"injected": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed: true,
 			Optional: false,
 			Required: false,
-			Type:     github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"plan_modifier": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"plan_modifier": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "plan_modifier is a field with a plan modifier.",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"required": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"required": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Description: "required is a required field.",
 			Required:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"schema_override": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"schema_override": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"sensitive": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"sensitive": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "sensitive is a sensitive field.",
 			Optional:    true,
 			Sensitive:   true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"string_override": GenSchemaStringCustomDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_override": GenSchemaStringCustomDataSource(ctx, github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "string_override is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustom\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:    true,
 		}),
-		"validated": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"validated": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "validated is a validated field.",
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
-			Validators:  []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributeValidator{UseMockValidator()},
+			Validators:  []github_com_hashicorp_terraform_plugin_framework_schema_validator.String{UseMockValidator()},
 		},
 	}}, nil
 }
