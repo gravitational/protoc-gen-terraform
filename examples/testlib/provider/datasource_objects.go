@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	schemav1 "github.com/gravitational/protoc-gen-terraform/v4/examples/tfschema/objects/v1"
@@ -19,11 +18,13 @@ type objectsDataSource struct {
 }
 
 func (d objectsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = "example_objects"
+	resp.TypeName = req.ProviderTypeName + "_objects"
 }
 
-func (r objectsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaObjectsDataSource(ctx)
+func (d objectsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	schema, diags := schemav1.GenSchemaObjectsDataSource(ctx)
+	resp.Schema = schema
+	resp.Diagnostics.Append(diags...)
 }
 
 func (d objectsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
