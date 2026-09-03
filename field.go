@@ -46,6 +46,8 @@ const (
 
 // TerraformType represents Terraform type information
 type TerraformType struct {
+	// AttributeType represents Terraform schema.Attribute type
+	AttributeType string
 	// Type represents Terraform attr.Type name
 	Type string
 	// ValueType represents Terraform attr.Value name
@@ -287,12 +289,18 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	// when use_state_for_unknown_by_default=true.
 	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
 		// TODO: Remove deprecated plan modifier once all attributes are migrated
+		useDeprecated := true
 		switch f.Kind {
-		case ObjectKind, ObjectListKind, ObjectMapKind:
-			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
-		default:
-			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
+		case PrimitiveKind, ObjectKind, ObjectListKind, ObjectMapKind:
+			useDeprecated = false
 		}
+
+		if useDeprecated || f.UseStateForUnknownMethod == "" {
+			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
+		} else {
+			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
+		}
+
 	}
 
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
@@ -450,6 +458,10 @@ func (f *Field) getKind() Kind {
 func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 	o := c.GetTerraformTypeOverride()
 	if o != nil {
+		// TODO: Address schema overrides in a follow up PR
+		f.AttributeType = ""
+		f.UseStateForUnknownMethod = ""
+
 		f.Type = o.Type
 		f.ValueType = o.ValueType
 		f.ValueFromMethod = o.ValueFromMethod
