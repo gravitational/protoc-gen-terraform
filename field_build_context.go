@@ -89,10 +89,13 @@ var (
 	}
 
 	objectType = TerraformType{
-		Type:          Types + ".ObjectType",
-		ValueType:     Types + ".Object",
-		ElemType:      Types + ".ObjectType",
-		ElemValueType: Types + ".Object",
+		Type:                     Types + ".ObjectType",
+		ValueType:                Types + ".Object",
+		ElemType:                 Types + ".ObjectType",
+		ElemValueType:            Types + ".Object",
+		PlanModifierType:         PlanModifier + ".Object",
+		ValidatorType:            Validator + ".Object",
+		UseStateForUnknownMethod: ResourceSchema + "/objectplanmodifier.UseStateForUnknown()",
 	}
 )
 
@@ -307,11 +310,17 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 	if c.IsRepeated() {
 		t.Type = Types + ".ListType"
 		t.ValueType = Types + ".List"
+		t.PlanModifierType = PlanModifier + ".List"
+		t.ValidatorType = Validator + ".List"
+		t.UseStateForUnknownMethod = ResourceSchema + "/listplanmodifier.UseStateForUnknown()"
 	}
 
 	if c.IsMap() {
 		t.Type = Types + ".MapType"
 		t.ValueType = Types + ".Map"
+		t.PlanModifierType = PlanModifier + ".Map"
+		t.ValidatorType = Validator + ".Map"
+		t.UseStateForUnknownMethod = ResourceSchema + "/mapplanmodifier.UseStateForUnknown()"
 	}
 
 	if c.IsCastType() {
@@ -507,7 +516,7 @@ func (c *FieldBuildContext) GetValidators() []string {
 }
 
 // GetPlanModifiers returns field validators
-func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) []string {
+func (c *FieldBuildContext) GetPlanModifiers() []string {
 	v, ok := c.config.PlanModifiers[c.GetPath()]
 	if !ok {
 		v, ok = c.config.PlanModifiers[c.GetNameWithTypeName()]
@@ -515,10 +524,6 @@ func (c *FieldBuildContext) GetPlanModifiers(isProto3Optional bool) []string {
 
 	if ok {
 		return v
-	}
-
-	if c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		return []string{"github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()"}
 	}
 
 	return []string{}
