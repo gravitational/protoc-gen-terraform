@@ -5,12 +5,22 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gravitational/trace"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 const (
 	timeThreshold = time.Nanosecond
+)
+
+var (
+	_ types.StringTypable  = TimeType{}
+	_ types.StringValuable = TimeValue{}
+	_ types.StringTypable  = DurationType{}
+	_ types.StringValuable = DurationValue{}
 )
 
 // TimeType represents time.Time Terraform type which is stored in RFC3339 format, nanoseconds truncated
@@ -72,6 +82,21 @@ func (t TimeType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	return TimeValue{Value: current, Format: t.Format}, nil
 }
 
+func (t TimeType) ValueFromString(ctx context.Context, in types.String) (types.StringValuable, diag.Diagnostics) {
+	if in.IsUnknown() {
+		return TimeValue{Unknown: true, Format: t.Format}, nil
+	}
+	if in.IsNull() {
+		return TimeValue{Null: true, Format: t.Format}, nil
+	}
+
+	value, err := time.Parse(t.Format, in.ValueString())
+	if err != nil {
+		return nil, diag.Diagnostics{diag.NewErrorDiagnostic("Invalid Time Value", err.Error())}
+	}
+	return TimeValue{Value: value, Format: t.Format}, nil
+}
+
 // NewTime creates a TimeValue with a known value using Format RFC3339.
 func NewTime(value time.Time) TimeValue {
 	return TimeValue{
@@ -129,15 +154,23 @@ func (t TimeValue) Type(_ context.Context) attr.Type {
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
-func (t TimeValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
+func (t TimeValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	value, diags := t.ToStringValue(ctx)
+	if diags.HasError() {
+		return tftypes.NewValue(tftypes.String, nil), trace.Errorf("failed to convert to string value")
+	}
+	return value.ToTerraformValue(ctx)
+}
+
+// ToStringValue converts TimeValue into a framework string value.
+func (t TimeValue) ToStringValue(context.Context) (types.String, diag.Diagnostics) {
 	if t.IsNull() {
-		return tftypes.NewValue(tftypes.String, nil), nil
+		return types.StringNull(), nil
 	}
 	if t.IsUnknown() {
-		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
+		return types.StringUnknown(), nil
 	}
-
-	return tftypes.NewValue(tftypes.String, t.Value.Truncate(timeThreshold).Format(t.Format)), nil
+	return types.StringValue(t.Value.Truncate(timeThreshold).Format(t.Format)), nil
 }
 
 // Equal returns true if `other` is a *String and has the same value as `s`.
@@ -236,6 +269,21 @@ func (t DurationType) ValueFromTerraform(ctx context.Context, in tftypes.Value) 
 	return DurationValue{Value: current}, nil
 }
 
+func (t DurationType) ValueFromString(ctx context.Context, in types.String) (types.StringValuable, diag.Diagnostics) {
+	if in.IsUnknown() {
+		return DurationValue{Unknown: true}, nil
+	}
+	if in.IsNull() {
+		return DurationValue{Null: true}, nil
+	}
+
+	value, err := time.ParseDuration(in.ValueString())
+	if err != nil {
+		return nil, diag.Diagnostics{diag.NewErrorDiagnostic("Invalid Time Value", err.Error())}
+	}
+	return DurationValue{Value: value}, nil
+}
+
 // NewDuration creates a DurationValue with a known value.
 func NewDuration(value time.Duration) DurationValue {
 	return DurationValue{
@@ -288,14 +336,23 @@ func (t DurationValue) Type(_ context.Context) attr.Type {
 // ToTerraformValue returns the data contained in the *String as a string. If
 // Unknown is true, it returns a tftypes.UnknownValue. If Null is true, it
 // returns nil.
-func (t DurationValue) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
+func (t DurationValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	value, diags := t.ToStringValue(ctx)
+	if diags.HasError() {
+		return tftypes.NewValue(tftypes.String, nil), trace.Errorf("failed to convert to string value")
+	}
+	return value.ToTerraformValue(ctx)
+}
+
+// ToStringValue converts DurationValue into a framework string value.
+func (t DurationValue) ToStringValue(context.Context) (types.String, diag.Diagnostics) {
 	if t.IsNull() {
-		return tftypes.NewValue(tftypes.String, nil), nil
+		return types.StringNull(), nil
 	}
 	if t.IsUnknown() {
-		return tftypes.NewValue(tftypes.String, tftypes.UnknownValue), nil
+		return types.StringUnknown(), nil
 	}
-	return tftypes.NewValue(tftypes.String, t.Value.String()), nil
+	return types.StringValue(t.Value.String()), nil
 }
 
 // Equal returns true if `other` is a *String and has the same value as `s`.
