@@ -151,9 +151,9 @@ func NewFieldSchemaGenerator(f *Field, i *Imports, target schemaTarget) *FieldSc
 
 // Generate returns field schema
 func (f *FieldSchemaGenerator) Generate() *j.Statement {
-	// if f.AttributeType == "" {
-	// 	return f.genLegacy()
-	// }
+	if f.AttributeType == "" {
+		return f.genLegacy()
+	}
 
 	dict := f.baseAttributeDict()
 
@@ -164,8 +164,8 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 		return f.genListNestedAttribute(dict)
 	case ObjectMapKind:
 		return f.genMapNestedAttribute(dict)
-	// case PrimitiveKind, PrimitiveListKind, PrimitiveMapKind:
-	// 	return f.genPrimitiveAttribute(dict)
+	case PrimitiveKind:
+		return f.genPrimitiveAttribute(dict)
 	default:
 		return f.genLegacy()
 	}
@@ -212,9 +212,9 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	return d
 }
 
-// func (f *FieldSchemaGenerator) genPrimitiveAttribute(d j.Dict) *j.Statement {
-// 	return j.Id(f.i.WithType(f.target.attributeType(f.AttributeType))).Values(d)
-// }
+func (f *FieldSchemaGenerator) genPrimitiveAttribute(d j.Dict) *j.Statement {
+	return j.Id(f.i.WithType(f.target.attributeType(f.AttributeType))).Values(d)
+}
 
 func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) *j.Statement {
 	fieldsDict := m.fieldsDictSchema()

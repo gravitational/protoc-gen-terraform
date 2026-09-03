@@ -46,6 +46,8 @@ const (
 
 // TerraformType represents Terraform type information
 type TerraformType struct {
+	// AttributeType represents Terraform schema.Attribute type
+	AttributeType string
 	// Type represents Terraform attr.Type name
 	Type string
 	// ValueType represents Terraform attr.Value name
@@ -288,7 +290,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
 		// TODO: Remove deprecated plan modifier once custom type attributes are migrated
 		switch f.Kind {
-		case ObjectKind, ObjectListKind, ObjectMapKind:
+		case PrimitiveKind, ObjectKind, ObjectListKind, ObjectMapKind:
 			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
 		default:
 			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
