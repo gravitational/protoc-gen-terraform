@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	schemav1 "github.com/gravitational/protoc-gen-terraform/v4/examples/tfschema/time/v1"
@@ -19,11 +18,13 @@ type timeDataSource struct {
 }
 
 func (d timeDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = "example_time"
+	resp.TypeName = req.ProviderTypeName + "_time"
 }
 
-func (r timeDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaTimeDataSource(ctx)
+func (d timeDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	schema, diags := schemav1.GenSchemaTimeDataSource(ctx)
+	resp.Schema = schema
+	resp.Diagnostics.Append(diags...)
 }
 
 func (d timeDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

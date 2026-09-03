@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	schemav1 "github.com/gravitational/protoc-gen-terraform/v4/examples/tfschema/primitives/v1"
@@ -19,11 +18,13 @@ type primitivesDataSource struct {
 }
 
 func (d primitivesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = "example_primitives"
+	resp.TypeName = req.ProviderTypeName + "_primitives"
 }
 
-func (r primitivesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaPrimitivesDataSource(ctx)
+func (d primitivesDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	schema, diags := schemav1.GenSchemaPrimitivesDataSource(ctx)
+	resp.Schema = schema
+	resp.Diagnostics.Append(diags...)
 }
 
 func (d primitivesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
