@@ -164,7 +164,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 		return f.genListNestedAttribute(dict)
 	case ObjectMapKind:
 		return f.genMapNestedAttribute(dict)
-	case PrimitiveKind:
+	case PrimitiveKind, PrimitiveListKind, PrimitiveMapKind:
 		return f.genPrimitiveAttribute(dict)
 	default:
 		return f.genLegacy()
@@ -174,6 +174,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
+		j.Id("ElementType"): f.genElemType(),
 	}
 
 	// Required/Optional
@@ -296,13 +297,24 @@ func (f *FieldSchemaGenerator) schemaType() *j.Statement {
 		})
 	case PrimitiveMapKind:
 		g := NewFieldSchemaGenerator(f.MapValueField, f.i, f.target)
-
 		return j.Id(f.i.WithType(f.Type)).Values(j.Dict{
 			j.Id("ElemType"): g.primitiveSchemaTypeDef(),
 		})
 	}
 
 	return nil
+}
+
+func (f *FieldSchemaGenerator) genElemType() *j.Statement {
+	switch f.Kind {
+	case PrimitiveListKind:
+		return f.primitiveSchemaTypeDef()
+	case PrimitiveMapKind:
+		g := NewFieldSchemaGenerator(f.MapValueField, f.i, f.target)
+		return g.primitiveSchemaTypeDef()
+	default:
+		return nil
+	}
 }
 
 // Attributes returns a nested attribute definitions
