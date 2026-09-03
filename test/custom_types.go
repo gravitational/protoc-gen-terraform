@@ -25,24 +25,18 @@ type BoolCustom bool
 
 // GenSchemaBoolSpecialResource generates custom field schema (bool list)
 func GenSchemaBoolSpecialResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type: types.ListType{
-			ElemType: types.BoolType,
-		},
-		Description: attr.Description,
-		Optional:    attr.Optional,
+	attr.Type = types.ListType{
+		ElemType: types.BoolType,
 	}
+	return attr
 }
 
 // GenSchemaBoolSpecialDataSource generates custom field schema (bool list)
 func GenSchemaBoolSpecialDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type: types.ListType{
-			ElemType: types.BoolType,
-		},
-		Description: attr.Description,
-		Optional:    attr.Optional,
+	attr.Type = types.ListType{
+		ElemType: types.BoolType,
 	}
+	return attr
 }
 
 // CopyFromBoolSpecial copies target value to the source
@@ -103,21 +97,19 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v 
 // single go string by joining all elements with "/".
 
 // GenSchemaStringCustomResource returns the StringCustom schema.
-func GenSchemaStringCustomResource(_ context.Context, _ tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type: types.ListType{
-			ElemType: types.StringType,
-		},
+func GenSchemaStringCustomResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+	attr.Type = types.ListType{
+		ElemType: types.StringType,
 	}
+	return attr
 }
 
 // GenSchemaStringCustomDataSource returns the StringCustom schema.
-func GenSchemaStringCustomDataSource(_ context.Context, _ tfsdk.Attribute) tfsdk.Attribute {
-	return tfsdk.Attribute{
-		Type: types.ListType{
-			ElemType: types.StringType,
-		},
+func GenSchemaStringCustomDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
+	attr.Type = types.ListType{
+		ElemType: types.StringType,
 	}
+	return attr
 }
 
 // CopyFromStringCustom copies the value from Terraform (a list of strings) into
