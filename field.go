@@ -76,6 +76,12 @@ type TerraformType struct {
 	IsMessage bool
 	// TypeConstructor represents expression which is used to initialize type in schema
 	TypeConstructor string
+	// PlanModifierType represents Terraform planmodifier type
+	PlanModifierType string
+	// ValidatorType represents Terraform validator type
+	ValidatorType string
+	// UseStateForUnknownMethod is the method called to return UseStateForUnknown plan modifier
+	UseStateForUnknownMethod string
 }
 
 // ProtobufType represents protobuf object field type information
@@ -216,7 +222,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		IsNullable:       c.GetNullable(),
 		IsProto3Optional: isProto3Optional,
 		Validators:       c.GetValidators(),
-		PlanModifiers:    c.GetPlanModifiers(isProto3Optional),
+		PlanModifiers:    c.GetPlanModifiers(),
 		Path:             c.GetPath(),
 		Comment:          c.GetComment(),
 	}
@@ -275,9 +281,21 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	f.setTerraformTypeOverride(c)
 	f.setCustomType(c)
 
-	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
-
 	f.Kind = f.getKind()
+
+	// Set default UseStateForUnknown plan modifier for computed attributes
+	// when use_state_for_unknown_by_default=true.
+	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
+		// TODO: Remove deprecated plan modifier once custom type attributes are migrated
+		switch f.Kind {
+		case ObjectKind, ObjectListKind, ObjectMapKind:
+			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
+		default:
+			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
+		}
+	}
+
+	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
 
 	isOneOf, err := c.IsOneOf()
 	if err != nil {

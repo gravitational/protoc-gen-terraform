@@ -151,6 +151,100 @@ func NewFieldSchemaGenerator(f *Field, i *Imports, target schemaTarget) *FieldSc
 
 // Generate returns field schema
 func (f *FieldSchemaGenerator) Generate() *j.Statement {
+	// if f.AttributeType == "" {
+	// 	return f.genLegacy()
+	// }
+
+	dict := f.baseAttributeDict()
+
+	switch f.Kind {
+	case ObjectKind:
+		return f.genSingleNestedAttribute(dict)
+	case ObjectListKind:
+		return f.genListNestedAttribute(dict)
+	case ObjectMapKind:
+		return f.genMapNestedAttribute(dict)
+	// case PrimitiveKind, PrimitiveListKind, PrimitiveMapKind:
+	// 	return f.genPrimitiveAttribute(dict)
+	default:
+		return f.genLegacy()
+	}
+}
+
+func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
+	d := j.Dict{
+		j.Id("Description"): j.Lit(f.Comment),
+	}
+
+	// Required/Optional
+	if f.IsRequired {
+		d[j.Id("Required")] = j.True()
+	} else {
+		d[j.Id("Optional")] = j.True()
+	}
+
+	// Sensitive
+	if f.IsSensitive {
+		d[j.Id("Sensitive")] = j.True()
+	}
+
+	// Computed
+	if f.IsComputed {
+		d[j.Id("Computed")] = j.True()
+	}
+
+	// Validators
+	if len(f.Validators) > 0 {
+		d[j.Id("Validators")] = generateValidatorsWithType(
+			f.i,
+			f.ValidatorType,
+			f.Validators)
+	}
+
+	// Plan modifiers
+	if f.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
+		d[j.Id("PlanModifiers")] = generatePlanModifiersWithType(
+			f.i,
+			f.PlanModifierType,
+			f.PlanModifiers)
+	}
+
+	return d
+}
+
+// func (f *FieldSchemaGenerator) genPrimitiveAttribute(d j.Dict) *j.Statement {
+// 	return j.Id(f.i.WithType(f.target.attributeType(f.AttributeType))).Values(d)
+// }
+
+func (f *FieldSchemaGenerator) nestedAttributes(m *MessageSchemaGenerator) *j.Statement {
+	fieldsDict := m.fieldsDictSchema()
+	return j.Map(j.String()).Id(f.i.WithPackage(f.target.schemaPackage, "Attribute")).Values(fieldsDict)
+}
+
+func (f *FieldSchemaGenerator) genSingleNestedAttribute(d j.Dict) *j.Statement {
+	m := NewMessageSchemaGenerator(f.Message, f.i, f.target)
+	nestedAttributes := f.nestedAttributes(m)
+	d[j.Id("Attributes")] = nestedAttributes
+	return j.Id(f.i.WithPackage(f.target.schemaPackage, "SingleNestedAttribute")).Values(d)
+}
+
+func (f *FieldSchemaGenerator) genListNestedAttribute(d j.Dict) *j.Statement {
+	m := NewMessageSchemaGenerator(f.Message, f.i, f.target)
+	nestedAttributes := f.nestedAttributes(m)
+	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.schemaPackage, "NestedAttributeObject")).
+		Values(j.Dict{j.Id("Attributes"): nestedAttributes})
+	return j.Id(f.i.WithPackage(f.target.schemaPackage, "ListNestedAttribute")).Values(d)
+}
+
+func (f *FieldSchemaGenerator) genMapNestedAttribute(d j.Dict) *j.Statement {
+	m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i, f.target)
+	nestedAttributes := f.nestedAttributes(m)
+	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.schemaPackage, "NestedAttributeObject")).
+		Values(j.Dict{j.Id("Attributes"): nestedAttributes})
+	return j.Id(f.i.WithPackage(f.target.schemaPackage, "MapNestedAttribute")).Values(d)
+}
+
+func (f *FieldSchemaGenerator) genLegacy() *j.Statement {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
 		j.Id("Type"):        f.schemaType(), // nils are automatically omitted
@@ -269,4 +363,22 @@ func generateValidators(imports *Imports, vals []string) j.Code {
 	}
 
 	return j.Index().Id(imports.WithPackage(SDK, "AttributeValidator")).Values(v...)
+}
+
+func generatePlanModifiersWithType(imports *Imports, planModifierType string, pm []string) j.Code {
+	v := make([]jen.Code, len(pm))
+	for i, n := range pm {
+		v[i] = j.Id(imports.WithType(n))
+	}
+
+	return j.Index().Id(imports.WithType(planModifierType)).Values(v...)
+}
+
+func generateValidatorsWithType(imports *Imports, validatorType string, vals []string) j.Code {
+	v := make([]jen.Code, len(vals))
+	for i, n := range vals {
+		v[i] = j.Id(imports.WithType(n))
+	}
+
+	return j.Index().Id(imports.WithType(validatorType)).Values(v...)
 }
