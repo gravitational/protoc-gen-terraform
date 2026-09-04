@@ -168,13 +168,14 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 	case PrimitiveKind, PrimitiveListKind, PrimitiveMapKind:
 		return f.genPrimitiveAttribute(dict)
 	default:
-		return f.genLegacy()
+		return f.genCustomAttribute(dict)
 	}
 }
 
 func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
+		j.Id("CustomType"):  f.genCustomType(),
 		j.Id("ElementType"): f.genElemType(),
 	}
 
@@ -244,6 +245,21 @@ func (f *FieldSchemaGenerator) genMapNestedAttribute(d j.Dict) *j.Statement {
 	d[j.Id("NestedObject")] = j.Id(f.i.WithPackage(f.target.schemaPackage, "NestedAttributeObject")).
 		Values(j.Dict{j.Id("Attributes"): nestedAttributes})
 	return j.Id(f.i.WithPackage(f.target.schemaPackage, "MapNestedAttribute")).Values(d)
+}
+
+func (f *FieldSchemaGenerator) genCustomAttribute(d j.Dict) *j.Statement {
+	return j.Id(f.target.functionName(f.Suffix)).
+		Call(
+			j.Id("ctx"),
+			j.Id(f.i.WithType(f.target.attributeType(f.AttributeType))).Values(d),
+		)
+}
+
+func (f *FieldSchemaGenerator) genCustomType() *j.Statement {
+	if f.Kind == PrimitiveKind && f.TerraformType.TypeConstructor != "" {
+		return j.Id(f.i.WithType(f.TerraformType.TypeConstructor))
+	}
+	return nil
 }
 
 func (f *FieldSchemaGenerator) genLegacy() *j.Statement {

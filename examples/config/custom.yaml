@@ -40,6 +40,9 @@ suffixes:
 custom_types:
   "Custom.string_override": StringCustom
 
+base_types:
+  "StringCustom": "ListAttribute"
+
 validators:
   "Custom.validated":
     - UseMockValidator()

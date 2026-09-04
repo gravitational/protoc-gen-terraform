@@ -7,8 +7,9 @@ import (
 	time "time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	diag "github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -24,18 +25,14 @@ func (d Duration) String() string {
 type BoolCustom bool
 
 // GenSchemaBoolSpecialResource generates custom field schema (bool list)
-func GenSchemaBoolSpecialResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.BoolType,
-	}
+func GenSchemaBoolSpecialResource(_ context.Context, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.BoolType
 	return attr
 }
 
 // GenSchemaBoolSpecialDataSource generates custom field schema (bool list)
-func GenSchemaBoolSpecialDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.BoolType,
-	}
+func GenSchemaBoolSpecialDataSource(_ context.Context, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.BoolType
 	return attr
 }
 
@@ -97,18 +94,14 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj []BoolCustom, t attr.Type, v 
 // single go string by joining all elements with "/".
 
 // GenSchemaStringCustomResource returns the StringCustom schema.
-func GenSchemaStringCustomResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.StringType,
-	}
+func GenSchemaStringCustomResource(_ context.Context, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.StringType
 	return attr
 }
 
 // GenSchemaStringCustomDataSource returns the StringCustom schema.
-func GenSchemaStringCustomDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.StringType,
-	}
+func GenSchemaStringCustomDataSource(_ context.Context, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.StringType
 	return attr
 }
 
