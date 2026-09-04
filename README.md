@@ -227,6 +227,11 @@ for a specific field with handwritten functions.
 ```yaml
 custom_types:
   "Custom.string_override": StringCustom
+
+# Optional: override the Terraform schema attribute type used for the custom
+# schema hook.
+base_types:
+  "StringCustom": "ListAttribute"
 ```
 
 The map key is the field path. The value is the suffix used to find the custom
@@ -234,11 +239,17 @@ functions. For the example above, the generator expects these functions to be
 available:
 
 ```go
-func GenSchemaStringCustomResource(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
-func GenSchemaStringCustomDataSource(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
+func GenSchemaStringCustomResource(ctx context.Context, attr rschema.ListAttribute) rschema.ListAttribute
+func GenSchemaStringCustomDataSource(ctx context.Context, attr dschema.ListAttribute) dschema.ListAttribute
 func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string)
 func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value
 ```
+
+Without `base_types`, the schema hook receives the Terraform attribute type
+inferred from the proto field. For example, a custom bool field receives
+`resource/schema.BoolAttribute` and `datasource/schema.BoolAttribute`.
+Use `base_types` when a custom type needs a different Terraform representation,
+such as a Go `string` field represented as a Terraform list.
 
 Use `custom_types` when the Terraform representation is shaped differently from
 the Go field. For example, a Go `string` field can be represented in Terraform
