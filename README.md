@@ -234,7 +234,8 @@ functions. For the example above, the generator expects these functions to be
 available:
 
 ```go
-func GenSchemaStringCustom(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
+func GenSchemaStringCustomResource(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
+func GenSchemaStringCustomDataSource(ctx context.Context, attr tfsdk.Attribute) tfsdk.Attribute
 func CopyFromStringCustom(diags diag.Diagnostics, tf attr.Value, obj *string)
 func CopyToStringCustom(diags diag.Diagnostics, obj string, t attr.Type, v attr.Value, preserveUnknown bool) attr.Value
 ```
@@ -263,8 +264,33 @@ duration_custom_type=Duration
 ```
 
 ## Generated methods
+`GenSchema*Resource`, `GenSchema*DataSource`, `Copy*ToTerraform`, and
+`Copy*FromTerraform` methods are generated for every .proto message.
+`GenSchema*Resource` returns a Terraform Framework resource schema, and
+`GenSchema*DataSource` returns a Terraform Framework datasource schema. The
+copy methods convert Terraform state object to go proto type and vice versa
+using normal go assignment operations (no reflect).
 
-`Copy*ToTerraform` and `Copy*FromTerraform` methods are generated for every .proto message. They convert Terraform state object to go proto type and vice versa using normal go assignment operations (no reflect).
+For example, a `Test` message generates:
+
+```go
+func GenSchemaTestResource(ctx context.Context) (tfsdk.Schema, diag.Diagnostics)
+func GenSchemaTestDataSource(ctx context.Context) (tfsdk.Schema, diag.Diagnostics)
+func CopyTestFromTerraform(ctx context.Context, tf types.Object, obj *Test) diag.Diagnostics
+func CopyTestToTerraform(ctx context.Context, obj *Test, tf *types.Object) (types.Object, diag.Diagnostics)
+```
+
+### GenSchema
+
+`GenSchema*Resource` and `GenSchema*DataSource` return the complete Terraform
+Framework schema for the generated message. They can be used directly in
+resource and datasource `GetSchema` methods:
+
+```go
+func (r resource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+    return tfschema.GenSchemaTestResource(ctx)
+}
+```
 
 ### CopyFrom
 
@@ -328,7 +354,10 @@ The following rules apply:
 
 ## Note on gogoproto.customtype
 
-If a field has `gogoproto.customtype` flag, schema and converters for this field can not be generated automatically. You need to define `Gen<type>Schema`, `Copy<type>FromTerraform`, `Copy<type>ToTerraform` methods.
+If a field has `gogoproto.customtype` flag, schema and converters for this field
+can not be generated automatically. You need to define
+`GenSchema<type>Resource`, `GenSchema<type>DataSource`,
+`CopyFrom<type>`, `CopyTo<type>` methods.
 
 `suffixes` option can be used to control method names:
 
@@ -337,7 +366,9 @@ suffixes:
   "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
 ```
 
-In the example above, `GenTraitsSchema` method will be called. Without this option, method name would be `GenGithubComGravitationalTeleportApiTypesWrappersTraits`.
+In the example above, `GenSchemaTraitsResource` and
+`GenSchemaTraitsDataSource` methods will be called. Without this option, method
+names would include the full custom type package path.
 
 # Note on empty messages
 

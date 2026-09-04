@@ -2,6 +2,22 @@ package testlib
 
 import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
+func (s *TerraformSuite) TestPrimitivesDataSource() {
+	t := s.T()
+	name := "data.example_primitives.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("primitives_datasource.tf"),
+				Check:  s.testCheckPrimitivesResource(name),
+			},
+		},
+	})
+}
+
 func (s *TerraformSuite) TestPrimitives() {
 	t := s.T()
 	name := "example_primitives.test"

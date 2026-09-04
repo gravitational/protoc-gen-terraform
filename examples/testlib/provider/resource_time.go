@@ -25,7 +25,7 @@ func (r timeResource) Metadata(ctx context.Context, req resource.MetadataRequest
 }
 
 func (r timeResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaTime(ctx)
+	return schemav1.GenSchemaTimeResource(ctx)
 }
 
 func (r timeResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -48,7 +48,9 @@ func (r timeResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
+	r.p.Lock()
 	r.p.time[id] = time
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -72,7 +74,13 @@ func (r timeResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	time := r.p.time[id.ValueString()]
+	r.p.RLock()
+	time, ok := r.p.time[id.ValueString()]
+	r.p.RUnlock()
+	if !ok {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 
 	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &state)
 	resp.Diagnostics.Append(diags...)
@@ -96,7 +104,9 @@ func (r timeResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
+	r.p.Lock()
 	r.p.time[time.Id] = time
+	r.p.Unlock()
 
 	result, diags := schemav1.CopyTimeToTerraform(ctx, time, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -120,5 +130,7 @@ func (r timeResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
+	r.p.Lock()
 	delete(r.p.time, id.ValueString())
+	r.p.Unlock()
 }
