@@ -120,21 +120,26 @@ func (m *MessageSchemaGenerator) fieldsDictSchema() j.Dict {
 // generateInjectedField generates code for injected field
 func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 	d := j.Dict{
-		j.Id("Type"):     j.Id(m.i.WithType(f.Type)),
 		j.Id("Required"): j.Lit(f.Required),
 		j.Id("Computed"): j.Lit(f.Computed),
 		j.Id("Optional"): j.Lit(f.Optional),
 	}
 
 	if len(f.Validators) > 0 {
-		d[j.Id("Validators")] = generateValidators(m.i, f.Validators)
+		d[j.Id("Validators")] = generateValidatorsWithType(
+			m.i,
+			f.ValidatorType,
+			f.Validators)
 	}
 
 	if m.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
-		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, f.PlanModifiers)
+		d[j.Id("PlanModifiers")] = generatePlanModifiersWithType(
+			m.i,
+			f.PlanModifierType,
+			f.PlanModifiers)
 	}
 
-	return j.Id(m.i.WithPackage(SDK, "Attribute")).Values(d)
+	return j.Id(m.i.WithType(m.target.attributeType(f.AttributeType))).Values(d)
 }
 
 // FieldSchemaGenerator represents the decorator for Field code generation
