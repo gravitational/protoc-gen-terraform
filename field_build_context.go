@@ -264,6 +264,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			return t, trace.Errorf("%v field has time type, but config.time_type is not defined", c.path)
 		}
 		t = TerraformType{
+			AttributeType:            "StringAttribute",
 			Type:                     c.config.TimeType.Type,
 			ValueType:                c.config.TimeType.ValueType,
 			ValueFromMethod:          c.config.TimeType.ValueFromMethod,
@@ -275,13 +276,16 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ValueCastToType:          c.config.TimeType.CastToType,
 			ValueCastFromType:        c.config.TimeType.CastFromType,
 			TypeConstructor:          c.config.TimeType.TypeConstructor,
-			UseStateForUnknownMethod: "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()",
+			PlanModifierType:         PlanModifier + ".String",
+			ValidatorType:            Validator + ".String",
+			UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseStateForUnknown()",
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
 			return t, trace.Errorf("%v field has duration type, but config.duration_type is not defined", c.path)
 		}
 		t = TerraformType{
+			AttributeType:            "StringAttribute",
 			Type:                     c.config.DurationType.Type,
 			ValueType:                c.config.DurationType.ValueType,
 			ValueFromMethod:          c.config.DurationType.ValueFromMethod,
@@ -293,7 +297,9 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			ValueCastToType:          c.config.DurationType.CastToType,
 			ValueCastFromType:        c.config.DurationType.CastFromType,
 			TypeConstructor:          c.config.DurationType.TypeConstructor,
-			UseStateForUnknownMethod: "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()",
+			PlanModifierType:         PlanModifier + ".String",
+			ValidatorType:            Validator + ".String",
+			UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseStateForUnknown()",
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
