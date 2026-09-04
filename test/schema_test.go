@@ -7,7 +7,6 @@ import (
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
 )
@@ -46,7 +45,7 @@ func TestSchema(t *testing.T) {
 		attr, diags := s.AttributeAtPath(t.Context(), path.Root("id"))
 		require.False(t, diags.HasError())
 
-		id, ok := attr.(tfsdk.Attribute)
+		id, ok := attr.(rschema.StringAttribute)
 		require.True(t, ok)
 
 		require.True(t, id.IsComputed())
