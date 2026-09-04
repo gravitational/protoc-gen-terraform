@@ -265,7 +265,35 @@ duration_custom_type=Duration
 
 ## Generated methods
 
-`Copy*ToTerraform` and `Copy*FromTerraform` methods are generated for every .proto message. They convert Terraform state object to go proto type and vice versa using normal go assignment operations (no reflect).
+`GenSchema*Resource`, `GenSchema*DataSource`, `Copy*ToTerraform`, and
+`Copy*FromTerraform` methods are generated for every .proto message.
+`GenSchema*Resource` returns a Terraform Framework resource schema, and
+`GenSchema*DataSource` returns a Terraform Framework datasource schema. The
+copy methods convert Terraform state object to go proto type and vice versa
+using normal go assignment operations (no reflect).
+
+For example, a `Test` message generates:
+
+```go
+func GenSchemaTestResource(ctx context.Context) (resource_schema.Schema, diag.Diagnostics)
+func GenSchemaTestDataSource(ctx context.Context) (datasource_schema.Schema, diag.Diagnostics)
+func CopyTestFromTerraform(ctx context.Context, tf types.Object, obj *Test) diag.Diagnostics
+func CopyTestToTerraform(ctx context.Context, obj *Test, tf *types.Object) (types.Object, diag.Diagnostics)
+```
+
+### GenSchema
+
+`GenSchema*Resource` and `GenSchema*DataSource` return the complete Terraform
+Framework schema for the generated message. They can be used directly in
+resource and datasource `Schema` methods:
+
+```go
+func (r resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+    schema, diags := tfschema.GenSchemaTestResource(ctx)
+    resp.Diagnostics.Append(diags...)
+    resp.Schema = schema
+}
+```
 
 ### CopyFrom
 
@@ -329,7 +357,10 @@ The following rules apply:
 
 ## Note on gogoproto.customtype
 
-If a field has `gogoproto.customtype` flag, schema and converters for this field can not be generated automatically. You need to define `Gen<type>Schema`, `Copy<type>FromTerraform`, `Copy<type>ToTerraform` methods.
+If a field has `gogoproto.customtype` flag, schema and converters for this
+field can not be generated automatically. You need to define
+`GenSchema<type>Resource`, `GenSchema<type>DataSource`,
+`Copy<type>FromTerraform`, `Copy<type>ToTerraform` methods.
 
 `suffixes` option can be used to control method names:
 
@@ -338,7 +369,10 @@ suffixes:
   "github.com/gravitational/teleport/api/types/wrappers.Traits": "Traits"
 ```
 
-In the example above, `GenTraitsSchema` method will be called. Without this option, method name would be `GenGithubComGravitationalTeleportApiTypesWrappersTraits`.
+In the example above, `GenSchemaTraitsResource` and
+`GenSchemaTraitsDataSource` methods will be called. Without this option, method
+names would be `GenSchemaGithubComGravitationalTeleportApiTypesWrappersTraitsResource`
+and `GenSchemaGithubComGravitationalTeleportApiTypesWrappersTraitsDataSource`.
 
 # Note on empty messages
 
