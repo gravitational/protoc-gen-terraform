@@ -45,8 +45,8 @@ type Custom struct {
 	// string_override is represented by a single string in the go struct, but by
 	// a list of strings in the Terraform Schema. The plugin's configuration
 	// specifies a custom_type (StringCustom), the generator should use the
-	// functions "GenSchemaStringCustom", "CopyFromStringCustom",
-	// "CopyToStringCustom" instead of attempting to generate them.
+	// functions "GenSchemaStringCustomResource", "GenSchemaStringCustomDataSource",
+	// "CopyFromStringCustom", "CopyToStringCustom" instead of attempting to generate them.
 	StringOverride       string           `protobuf:"bytes,11,opt,name=string_override,json=stringOverride,proto3" json:"string_override,omitempty"`
 	SchemaOverride       OverrideCastType `protobuf:"bytes,12,opt,name=schema_override,json=schemaOverride,proto3,casttype=OverrideCastType" json:"schema_override"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
