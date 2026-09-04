@@ -280,7 +280,9 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		}
 	}
 
-	f.setTerraformTypeOverride(c)
+	if err := f.setTerraformTypeOverride(c); err != nil {
+		return nil, trace.Wrap(err, "failed to set Terraform type override")
+	}
 	f.setCustomType(c)
 
 	f.Kind = f.getKind()
@@ -288,12 +290,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	// Set default UseStateForUnknown plan modifier for computed attributes
 	// when use_state_for_unknown_by_default=true.
 	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		// TODO: Remove deprecated plan modifier once all attributes are migrated
-		if f.UseStateForUnknownMethod == "" {
-			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
-		} else {
-			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
-		}
+		f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
 	}
 
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
@@ -448,12 +445,17 @@ func (f *Field) getKind() Kind {
 }
 
 // setSchemaCustomType sets schema type override
-func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
+func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) error {
 	o := c.GetTerraformTypeOverride()
 	if o != nil {
-		// TODO: Address schema overrides in a follow up PR
-		f.AttributeType = ""
-		f.UseStateForUnknownMethod = ""
+		terraformType, err := getTerraformType(o.Type)
+		if err != nil {
+			return trace.Wrap(err, "schema_types.%v.type is required", c.GetPath())
+		}
+		f.AttributeType = terraformType.AttributeType
+		f.PlanModifierType = terraformType.PlanModifierType
+		f.ValidatorType = terraformType.ValidatorType
+		f.UseStateForUnknownMethod = terraformType.UseStateForUnknownMethod
 
 		f.Type = o.Type
 		f.ValueType = o.ValueType
@@ -470,6 +472,7 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 		f.GoType = f.ValueCastFromType
 		f.GoElemType = f.ValueCastFromType
 	}
+	return nil
 }
 
 // setCustomType sets IsCustomType, GoCustomType and Suffix.
