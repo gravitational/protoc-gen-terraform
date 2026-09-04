@@ -289,18 +289,11 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	// when use_state_for_unknown_by_default=true.
 	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
 		// TODO: Remove deprecated plan modifier once all attributes are migrated
-		useDeprecated := true
-		switch f.Kind {
-		case PrimitiveListKind, PrimitiveMapKind, PrimitiveKind, ObjectKind, ObjectListKind, ObjectMapKind:
-			useDeprecated = false
-		}
-
-		if useDeprecated || f.UseStateForUnknownMethod == "" {
+		if f.UseStateForUnknownMethod == "" {
 			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
 		} else {
 			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
 		}
-
 	}
 
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)

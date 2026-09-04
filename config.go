@@ -150,6 +150,8 @@ type Config struct {
 	// CustomTypes fields marks fields as custom types like the
 	// "gogoproto.customtype" tag would do.
 	CustomTypes map[string]string `yaml:"custom_types,omitempty"`
+	// BaseTypes maps a custom type name to its base Terraform schema.Attribute type.
+	BaseTypes map[string]string `yaml:"base_types,omitempty"`
 
 	// params represents CLI params passed from the plugin
 	params map[string]string `yaml:"-"`

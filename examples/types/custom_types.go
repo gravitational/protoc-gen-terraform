@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -24,14 +25,12 @@ func (d Duration) String() string {
 type BoolCustom bool
 
 // GenSchemaBoolSpecialResource generates custom field schema
-func GenSchemaBoolSpecialResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.BoolType
+func GenSchemaBoolSpecialResource(_ context.Context, attr rschema.BoolAttribute) rschema.BoolAttribute {
 	return attr
 }
 
 // GenSchemaBoolSpecialDataSource generates custom field schema
-func GenSchemaBoolSpecialDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.BoolType
+func GenSchemaBoolSpecialDataSource(_ context.Context, attr dschema.BoolAttribute) dschema.BoolAttribute {
 	return attr
 }
 
@@ -60,18 +59,14 @@ func CopyToBoolSpecial(diags diag.Diagnostics, obj BoolCustom, t attr.Type, v at
 type BoolCustomList bool
 
 // GenSchemaBoolSpecialListResource generates custom field schema (bool list)
-func GenSchemaBoolSpecialListResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.BoolType,
-	}
+func GenSchemaBoolSpecialListResource(_ context.Context, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.BoolType
 	return attr
 }
 
 // GenSchemaBoolSpecialListDataSource generates custom field schema (bool list)
-func GenSchemaBoolSpecialListDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.BoolType,
-	}
+func GenSchemaBoolSpecialListDataSource(_ context.Context, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.BoolType
 	return attr
 }
 
@@ -133,18 +128,14 @@ func CopyToBoolSpecialList(diags diag.Diagnostics, obj []BoolCustomList, t attr.
 // single go string by joining all elements with "/".
 
 // GenSchemaStringCustomResource returns the StringCustom schema.
-func GenSchemaStringCustomResource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.StringType,
-	}
+func GenSchemaStringCustomResource(_ context.Context, attr rschema.ListAttribute) rschema.ListAttribute {
+	attr.ElementType = types.StringType
 	return attr
 }
 
 // GenSchemaStringCustomDataSource returns the StringCustom schema.
-func GenSchemaStringCustomDataSource(_ context.Context, attr tfsdk.Attribute) tfsdk.Attribute {
-	attr.Type = types.ListType{
-		ElemType: types.StringType,
-	}
+func GenSchemaStringCustomDataSource(_ context.Context, attr dschema.ListAttribute) dschema.ListAttribute {
+	attr.ElementType = types.StringType
 	return attr
 }
 
