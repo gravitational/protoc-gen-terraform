@@ -104,6 +104,24 @@ var (
 		UseStateForUnknownMethod: ResourceSchema + "/boolplanmodifier.UseStateForUnknown()",
 	}
 
+	listType = TerraformType{
+		AttributeType:            "ListAttribute",
+		Type:                     Types + ".ListType",
+		ValueType:                Types + ".List",
+		PlanModifierType:         PlanModifier + ".List",
+		ValidatorType:            Validator + ".List",
+		UseStateForUnknownMethod: ResourceSchema + "/listplanmodifier.UseStateForUnknown()",
+	}
+
+	mapType = TerraformType{
+		AttributeType:            "MapAttribute",
+		Type:                     Types + ".MapType",
+		ValueType:                Types + ".Map",
+		PlanModifierType:         PlanModifier + ".Map",
+		ValidatorType:            Validator + ".Map",
+		UseStateForUnknownMethod: ResourceSchema + "/mapplanmodifier.UseStateForUnknown()",
+	}
+
 	objectType = TerraformType{
 		AttributeType:            "ObjectAttribute",
 		Type:                     Types + ".ObjectType",
@@ -344,6 +362,11 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 
 	if c.IsCastType() {
 		t.ValueCastFromType = elemType
+	}
+
+	// Override attribute type if specified
+	if attributeType := c.GetAttributeTypeOverride(); attributeType != "" {
+		t = applyAttributeTypeOverride(t, attributeType)
 	}
 
 	return t, nil
@@ -595,4 +618,41 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 	}
 
 	return c.config.DefaultPackageName + "." + name
+}
+
+func (c *FieldBuildContext) GetAttributeTypeOverride() string {
+	return c.config.BaseTypes[c.GetCustomType()]
+}
+
+func applyAttributeTypeOverride(t TerraformType, attributeType string) TerraformType {
+	var override TerraformType
+
+	switch attributeType {
+	case "":
+		return t
+	case stringType.AttributeType:
+		override = stringType
+	case boolType.AttributeType:
+		override = boolType
+	case int64Type.AttributeType:
+		override = int64Type
+	case float64Type.AttributeType:
+		override = float64Type
+	case listType.AttributeType:
+		override = listType
+	case mapType.AttributeType:
+		override = mapType
+	case objectType.AttributeType:
+		override = objectType
+	default:
+		t.AttributeType = attributeType
+		return t
+	}
+
+	t.AttributeType = override.AttributeType
+	t.PlanModifierType = override.PlanModifierType
+	t.ValidatorType = override.ValidatorType
+	t.UseStateForUnknownMethod = override.UseStateForUnknownMethod
+
+	return t
 }

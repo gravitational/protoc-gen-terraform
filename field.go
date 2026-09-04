@@ -288,13 +288,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	// Set default UseStateForUnknown plan modifier for computed attributes
 	// when use_state_for_unknown_by_default=true.
 	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
-		// TODO: Remove deprecated plan modifier once custom type attributes are migrated
-		switch f.Kind {
-		case PrimitiveListKind, PrimitiveMapKind, PrimitiveKind, ObjectKind, ObjectListKind, ObjectMapKind:
-			f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
-		default:
-			f.PlanModifiers = append(f.PlanModifiers, "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()")
-		}
+		f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)
 	}
 
 	f.GoElemTypeIndirect = strings.Replace(f.GoElemType, "*", "", -1)
