@@ -274,8 +274,8 @@ using normal go assignment operations (no reflect).
 For example, a `Test` message generates:
 
 ```go
-func GenSchemaTestResource(ctx context.Context) (tfsdk.Schema, diag.Diagnostics)
-func GenSchemaTestDataSource(ctx context.Context) (tfsdk.Schema, diag.Diagnostics)
+func GenSchemaTestResource(ctx context.Context) (resource_schema.Schema, diag.Diagnostics)
+func GenSchemaTestDataSource(ctx context.Context) (datasource_schema.Schema, diag.Diagnostics)
 func CopyTestFromTerraform(ctx context.Context, tf types.Object, obj *Test) diag.Diagnostics
 func CopyTestToTerraform(ctx context.Context, obj *Test, tf *types.Object) (types.Object, diag.Diagnostics)
 ```
@@ -284,11 +284,13 @@ func CopyTestToTerraform(ctx context.Context, obj *Test, tf *types.Object) (type
 
 `GenSchema*Resource` and `GenSchema*DataSource` return the complete Terraform
 Framework schema for the generated message. They can be used directly in
-resource and datasource `GetSchema` methods:
+resource and datasource `Schema` methods:
 
 ```go
-func (r resource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-    return tfschema.GenSchemaTestResource(ctx)
+func (r resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+    schema, diags := tfschema.GenSchemaTestResource(ctx)
+    resp.Diagnostics.Append(diags...)
+    resp.Schema = schema
 }
 ```
 
@@ -354,8 +356,8 @@ The following rules apply:
 
 ## Note on gogoproto.customtype
 
-If a field has `gogoproto.customtype` flag, schema and converters for this field
-can not be generated automatically. You need to define
+If a field has `gogoproto.customtype` flag, schema and converters for this
+field can not be generated automatically. You need to define
 `GenSchema<type>Resource`, `GenSchema<type>DataSource`,
 `CopyFrom<type>`, `CopyTo<type>` methods.
 
@@ -368,7 +370,8 @@ suffixes:
 
 In the example above, `GenSchemaTraitsResource` and
 `GenSchemaTraitsDataSource` methods will be called. Without this option, method
-names would include the full custom type package path.
+names would be `GenSchemaGithubComGravitationalTeleportApiTypesWrappersTraitsResource`
+and `GenSchemaGithubComGravitationalTeleportApiTypesWrappersTraitsDataSource`.
 
 # Note on empty messages
 
