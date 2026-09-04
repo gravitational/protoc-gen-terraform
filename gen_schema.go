@@ -126,14 +126,14 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 	}
 
 	if len(f.Validators) > 0 {
-		d[j.Id("Validators")] = generateValidatorsWithType(
+		d[j.Id("Validators")] = generateValidators(
 			m.i,
 			f.ValidatorType,
 			f.Validators)
 	}
 
 	if m.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
-		d[j.Id("PlanModifiers")] = generatePlanModifiersWithType(
+		d[j.Id("PlanModifiers")] = generatePlanModifiers(
 			m.i,
 			f.PlanModifierType,
 			f.PlanModifiers)
@@ -156,11 +156,6 @@ func NewFieldSchemaGenerator(f *Field, i *Imports, target schemaTarget) *FieldSc
 
 // Generate returns field schema
 func (f *FieldSchemaGenerator) Generate() *j.Statement {
-	// TODO: Remove genLegacy once all attribute types have been migrated
-	if f.AttributeType == "" {
-		return f.genLegacy()
-	}
-
 	dict := f.baseAttributeDict()
 
 	switch f.Kind {
@@ -203,7 +198,7 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 
 	// Validators
 	if len(f.Validators) > 0 {
-		d[j.Id("Validators")] = generateValidatorsWithType(
+		d[j.Id("Validators")] = generateValidators(
 			f.i,
 			f.ValidatorType,
 			f.Validators)
@@ -211,7 +206,7 @@ func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
 
 	// Plan modifiers
 	if f.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
-		d[j.Id("PlanModifiers")] = generatePlanModifiersWithType(
+		d[j.Id("PlanModifiers")] = generatePlanModifiers(
 			f.i,
 			f.PlanModifierType,
 			f.PlanModifiers)
@@ -267,66 +262,6 @@ func (f *FieldSchemaGenerator) genCustomType() *j.Statement {
 	return nil
 }
 
-func (f *FieldSchemaGenerator) genLegacy() *j.Statement {
-	d := j.Dict{
-		j.Id("Description"): j.Lit(f.Comment),
-		j.Id("Type"):        f.schemaType(), // nils are automatically omitted
-		j.Id("Attributes"):  f.attributes(),
-	}
-
-	// Required/Optional
-	if f.IsRequired {
-		d[j.Id("Required")] = j.True()
-	} else {
-		d[j.Id("Optional")] = j.True()
-	}
-
-	// Sensitive
-	if f.IsSensitive {
-		d[j.Id("Sensitive")] = j.True()
-	}
-
-	// Computed
-	if f.IsComputed {
-		d[j.Id("Computed")] = j.True()
-	}
-
-	// Validators
-	if len(f.Validators) > 0 {
-		d[j.Id("Validators")] = generateValidators(f.i, f.Validators)
-	}
-
-	// Plan modifiers
-	if f.target.supportsPlanModifiers && len(f.PlanModifiers) > 0 {
-		d[j.Id("PlanModifiers")] = generatePlanModifiers(f.i, f.PlanModifiers)
-	}
-
-	if f.Kind == CustomKind {
-		return j.Id(f.target.functionName(f.Suffix)).Call(j.Id("ctx"), j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d))
-	}
-
-	return j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d)
-}
-
-// SchemaType returns the schema Type field value
-func (f *FieldSchemaGenerator) schemaType() *j.Statement {
-	switch f.Kind {
-	case PrimitiveKind:
-		return f.primitiveSchemaTypeDef()
-	case PrimitiveListKind:
-		return j.Id(f.i.WithType(f.Type)).Values(j.Dict{
-			j.Id("ElemType"): f.primitiveSchemaTypeDef(),
-		})
-	case PrimitiveMapKind:
-		g := NewFieldSchemaGenerator(f.MapValueField, f.i, f.target)
-		return j.Id(f.i.WithType(f.Type)).Values(j.Dict{
-			j.Id("ElemType"): g.primitiveSchemaTypeDef(),
-		})
-	}
-
-	return nil
-}
-
 func (f *FieldSchemaGenerator) genElemType() *j.Statement {
 	switch f.Kind {
 	case PrimitiveListKind:
@@ -337,25 +272,6 @@ func (f *FieldSchemaGenerator) genElemType() *j.Statement {
 	default:
 		return nil
 	}
-}
-
-// Attributes returns a nested attribute definitions
-func (f *FieldSchemaGenerator) attributes() *j.Statement {
-	switch f.Kind {
-	case ObjectKind:
-		m := NewMessageSchemaGenerator(f.Message, f.i, f.target)
-
-		return f.xNestedAttributes("Single", m)
-	case ObjectMapKind:
-		m := NewMessageSchemaGenerator(f.MapValueField.Message, f.i, f.target)
-
-		return f.xNestedAttributes("Map", m)
-	case ObjectListKind:
-		m := NewMessageSchemaGenerator(f.Message, f.i, f.target)
-
-		return f.xNestedAttributes("List", m)
-	}
-	return nil
 }
 
 // primitiveSchemaTypeDef returns the primitive type
@@ -371,35 +287,7 @@ func (f *FieldSchemaGenerator) primitiveSchemaTypeDef() *j.Statement {
 	return j.Id(f.i.WithType(f.ElemType)).Values()
 }
 
-// xNestedAttributes generates *NestedAttributes call
-func (f *FieldSchemaGenerator) xNestedAttributes(typ string, m *MessageSchemaGenerator) *j.Statement {
-	var options *j.Statement
-
-	return j.Id(f.i.WithPackage(SDK, typ+"NestedAttributes")).Params(
-		j.Map(j.String()).Id(f.i.WithPackage(SDK, "Attribute")).Values(m.fieldsDictSchema()),
-		options,
-	)
-}
-
-func generatePlanModifiers(imports *Imports, pm []string) j.Code {
-	v := make([]jen.Code, len(pm))
-	for i, n := range pm {
-		v[i] = j.Id(imports.WithType(n))
-	}
-
-	return j.Index().Id(imports.WithPackage(SDK, "AttributePlanModifier")).Values(v...)
-}
-
-func generateValidators(imports *Imports, vals []string) j.Code {
-	v := make([]jen.Code, len(vals))
-	for i, n := range vals {
-		v[i] = j.Id(imports.WithType(n))
-	}
-
-	return j.Index().Id(imports.WithPackage(SDK, "AttributeValidator")).Values(v...)
-}
-
-func generatePlanModifiersWithType(imports *Imports, planModifierType string, pm []string) j.Code {
+func generatePlanModifiers(imports *Imports, planModifierType string, pm []string) j.Code {
 	v := make([]jen.Code, len(pm))
 	for i, n := range pm {
 		v[i] = j.Id(imports.WithType(n))
@@ -408,7 +296,7 @@ func generatePlanModifiersWithType(imports *Imports, planModifierType string, pm
 	return j.Index().Id(imports.WithType(planModifierType)).Values(v...)
 }
 
-func generateValidatorsWithType(imports *Imports, validatorType string, vals []string) j.Code {
+func generateValidators(imports *Imports, validatorType string, vals []string) j.Code {
 	v := make([]jen.Code, len(vals))
 	for i, n := range vals {
 		v[i] = j.Id(imports.WithType(n))
