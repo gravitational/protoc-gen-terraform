@@ -280,7 +280,9 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		}
 	}
 
-	f.setTerraformTypeOverride(c)
+	if err := f.setTerraformTypeOverride(c); err != nil {
+		return nil, trace.Wrap(err, "failed to set Terraform type override")
+	}
 	f.setCustomType(c)
 
 	f.Kind = f.getKind()
@@ -448,12 +450,17 @@ func (f *Field) getKind() Kind {
 }
 
 // setSchemaCustomType sets schema type override
-func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
+func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) error {
 	o := c.GetTerraformTypeOverride()
 	if o != nil {
-		// TODO: Address schema overrides in a follow up PR
-		f.AttributeType = ""
-		f.UseStateForUnknownMethod = ""
+		terraformType, err := getTerraformType(o.Type)
+		if err != nil {
+			return trace.Wrap(err, "schema_types.%v.type is required", c.GetPath())
+		}
+		f.AttributeType = terraformType.AttributeType
+		f.PlanModifierType = terraformType.PlanModifierType
+		f.ValidatorType = terraformType.ValidatorType
+		f.UseStateForUnknownMethod = terraformType.UseStateForUnknownMethod
 
 		f.Type = o.Type
 		f.ValueType = o.ValueType
@@ -470,6 +477,7 @@ func (f *Field) setTerraformTypeOverride(c *FieldBuildContext) {
 		f.GoType = f.ValueCastFromType
 		f.GoElemType = f.ValueCastFromType
 	}
+	return nil
 }
 
 // setCustomType sets IsCustomType, GoCustomType and Suffix.
