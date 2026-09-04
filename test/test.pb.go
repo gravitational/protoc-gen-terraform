@@ -133,8 +133,8 @@ type Test struct {
 	// StringOverride is represented by a single string in the go struct, but by
 	// a list of strings in the Terraform Schema. The plugin's configuration
 	// specifies a custom_type (StringCustom), the generator should use the
-	// functions "GenSchemaStringCustom", "CopyFromStringCustom",
-	// "CopyToStringCustom" instead of attempting to generate them.
+	// functions "GenSchemaStringCustomResource", "GenSchemaStringCustomDataSource",
+	// "CopyFromStringCustom", "CopyToStringCustom" instead of attempting to generate them.
 	StringOverride string `protobuf:"bytes,40,opt,name=StringOverride,proto3" json:"StringOverride,omitempty"`
 	// Types that are valid to be assigned to LowerSnakeOneof:
 	//
