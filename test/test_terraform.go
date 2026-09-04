@@ -117,12 +117,12 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Float64{github_com_hashicorp_terraform_plugin_framework_resource_schema_float64planmodifier.UseStateForUnknown()},
 		},
-		"duration_custom": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_custom": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationCustom time.Duration field (with casttype)",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 		"duration_custom_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
@@ -131,26 +131,26 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
-		"duration_custom_missing": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_custom_missing": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationCustomMissing time.Duration field (with casttype) missing in input data",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"duration_standard": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_standard": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationStandard time.Duration field (standard)",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"duration_standard_missing": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_standard_missing": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "DurationStandardMissing time.Duration field (standard) missing in input data",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 		"embedded_nested_field": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
 			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"embedded_nested_string": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
@@ -304,12 +304,12 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Map{github_com_hashicorp_terraform_plugin_framework_resource_schema_mapplanmodifier.UseStateForUnknown()},
 		},
-		"max_age": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"max_age": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    DurationType{},
 			Description:   "",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          DurationType{},
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 		"mode": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
 			Computed:      true,
@@ -583,12 +583,12 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		}),
-		"timestamp": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    UseRFC3339Time(),
 			Description:   "Timestamp time.Time field",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          UseRFC3339Time(),
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
 		"timestamp_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:      true,
@@ -597,22 +597,22 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.List{github_com_hashicorp_terraform_plugin_framework_resource_schema_listplanmodifier.UseStateForUnknown()},
 		},
-		"timestamp_missing": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp_missing": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Computed:      true,
+			CustomType:    UseRFC3339Time(),
 			Description:   "Timestamp time.Time field",
 			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
-			Type:          UseRFC3339Time(),
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"timestamp_nullable": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp_nullable": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
 			Description: "TimestampNullable *time.Time field",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
-		"timestamp_nullable_with_nil_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp_nullable_with_nil_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
 			Description: "TimestampNullableWithNilValue *time.Time field",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
 	}}, nil
 }
@@ -674,11 +674,11 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			Description: "Double double field",
 			Optional:    true,
 		},
-		"duration_custom": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_custom": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  DurationType{},
 			Description: "DurationCustom time.Duration field (with casttype)",
 			Optional:    true,
-			Type:        DurationType{},
 		},
 		"duration_custom_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
@@ -686,23 +686,23 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			ElementType: DurationType{},
 			Optional:    true,
 		},
-		"duration_custom_missing": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_custom_missing": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  DurationType{},
 			Description: "DurationCustomMissing time.Duration field (with casttype) missing in input data",
 			Optional:    true,
-			Type:        DurationType{},
 		},
-		"duration_standard": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_standard": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  DurationType{},
 			Description: "DurationStandard time.Duration field (standard)",
 			Optional:    true,
-			Type:        DurationType{},
 		},
-		"duration_standard_missing": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"duration_standard_missing": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  DurationType{},
 			Description: "DurationStandardMissing time.Duration field (standard) missing in input data",
 			Optional:    true,
-			Type:        DurationType{},
 		},
 		"embedded_nested_field": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
 			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"embedded_nested_string": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
@@ -835,11 +835,11 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			}},
 			Optional: true,
 		},
-		"max_age": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"max_age": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  DurationType{},
 			Description: "",
 			Optional:    true,
-			Type:        DurationType{},
 		},
 		"mode": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
 			Computed:    true,
@@ -1073,11 +1073,11 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			Description: "StringOverride is represented by a single string in the go struct, but by a list of strings in the Terraform Schema. The plugin's configuration specifies a custom_type (StringCustom), the generator should use the functions \"GenSchemaStringCustomResource\", \"GenSchemaStringCustomDataSource\", \"CopyFromStringCustom\", \"CopyToStringCustom\" instead of attempting to generate them.",
 			Optional:    true,
 		}),
-		"timestamp": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  UseRFC3339Time(),
 			Description: "Timestamp time.Time field",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
 		"timestamp_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
@@ -1085,21 +1085,21 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			ElementType: UseRFC3339Time(),
 			Optional:    true,
 		},
-		"timestamp_missing": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp_missing": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
+			CustomType:  UseRFC3339Time(),
 			Description: "Timestamp time.Time field",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
-		"timestamp_nullable": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp_nullable": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
 			Description: "TimestampNullable *time.Time field",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
-		"timestamp_nullable_with_nil_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"timestamp_nullable_with_nil_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			CustomType:  UseRFC3339Time(),
 			Description: "TimestampNullableWithNilValue *time.Time field",
 			Optional:    true,
-			Type:        UseRFC3339Time(),
 		},
 	}}, nil
 }
