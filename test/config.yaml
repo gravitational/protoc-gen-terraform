@@ -60,6 +60,9 @@ validators:
 custom_types:
   "Test.StringOverride": StringCustom
 
+base_types:
+  "StringCustom": "ListAttribute"
+
 schema_types:
   "Test.SchemaOverride":
     type: "github.com/hashicorp/terraform-plugin-framework/types.StringType"

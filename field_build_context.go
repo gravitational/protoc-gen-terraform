@@ -104,6 +104,24 @@ var (
 		UseStateForUnknownMethod: ResourceSchema + "/boolplanmodifier.UseStateForUnknown()",
 	}
 
+	listType = TerraformType{
+		AttributeType:            "ListAttribute",
+		Type:                     Types + ".ListType",
+		ValueType:                Types + ".List",
+		PlanModifierType:         PlanModifier + ".List",
+		ValidatorType:            Validator + ".List",
+		UseStateForUnknownMethod: ResourceSchema + "/listplanmodifier.UseStateForUnknown()",
+	}
+
+	mapType = TerraformType{
+		AttributeType:            "MapAttribute",
+		Type:                     Types + ".MapType",
+		ValueType:                Types + ".Map",
+		PlanModifierType:         PlanModifier + ".Map",
+		ValidatorType:            Validator + ".Map",
+		UseStateForUnknownMethod: ResourceSchema + "/mapplanmodifier.UseStateForUnknown()",
+	}
+
 	objectType = TerraformType{
 		AttributeType:            "ObjectAttribute",
 		Type:                     Types + ".ObjectType",
@@ -246,34 +264,36 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			return t, trace.Errorf("%v field has time type, but config.time_type is not defined", c.path)
 		}
 		t = TerraformType{
-			Type:               c.config.TimeType.Type,
-			ValueType:          c.config.TimeType.ValueType,
-			ValueFromMethod:    c.config.TimeType.ValueFromMethod,
-			ValueToMethod:      c.config.TimeType.ValueToMethod,
-			NullValueMethod:    c.config.TimeType.NullValueMethod,
-			UnknownValueMethod: c.config.TimeType.UnknownValueMethod,
-			ElemType:           c.config.TimeType.Type,
-			ElemValueType:      c.config.TimeType.ValueType,
-			ValueCastToType:    c.config.TimeType.CastToType,
-			ValueCastFromType:  c.config.TimeType.CastFromType,
-			TypeConstructor:    c.config.TimeType.TypeConstructor,
+			Type:                     c.config.TimeType.Type,
+			ValueType:                c.config.TimeType.ValueType,
+			ValueFromMethod:          c.config.TimeType.ValueFromMethod,
+			ValueToMethod:            c.config.TimeType.ValueToMethod,
+			NullValueMethod:          c.config.TimeType.NullValueMethod,
+			UnknownValueMethod:       c.config.TimeType.UnknownValueMethod,
+			ElemType:                 c.config.TimeType.Type,
+			ElemValueType:            c.config.TimeType.ValueType,
+			ValueCastToType:          c.config.TimeType.CastToType,
+			ValueCastFromType:        c.config.TimeType.CastFromType,
+			TypeConstructor:          c.config.TimeType.TypeConstructor,
+			UseStateForUnknownMethod: "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()",
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
 			return t, trace.Errorf("%v field has duration type, but config.duration_type is not defined", c.path)
 		}
 		t = TerraformType{
-			Type:               c.config.DurationType.Type,
-			ValueType:          c.config.DurationType.ValueType,
-			ValueFromMethod:    c.config.DurationType.ValueFromMethod,
-			ValueToMethod:      c.config.DurationType.ValueToMethod,
-			NullValueMethod:    c.config.DurationType.NullValueMethod,
-			UnknownValueMethod: c.config.DurationType.UnknownValueMethod,
-			ElemType:           c.config.DurationType.Type,
-			ElemValueType:      c.config.DurationType.ValueType,
-			ValueCastToType:    c.config.DurationType.CastToType,
-			ValueCastFromType:  c.config.DurationType.CastFromType,
-			TypeConstructor:    c.config.DurationType.TypeConstructor,
+			Type:                     c.config.DurationType.Type,
+			ValueType:                c.config.DurationType.ValueType,
+			ValueFromMethod:          c.config.DurationType.ValueFromMethod,
+			ValueToMethod:            c.config.DurationType.ValueToMethod,
+			NullValueMethod:          c.config.DurationType.NullValueMethod,
+			UnknownValueMethod:       c.config.DurationType.UnknownValueMethod,
+			ElemType:                 c.config.DurationType.Type,
+			ElemValueType:            c.config.DurationType.ValueType,
+			ValueCastToType:          c.config.DurationType.CastToType,
+			ValueCastFromType:        c.config.DurationType.CastFromType,
+			TypeConstructor:          c.config.DurationType.TypeConstructor,
+			UseStateForUnknownMethod: "github.com/hashicorp/terraform-plugin-framework/resource.UseStateForUnknown()",
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
@@ -344,6 +364,11 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 
 	if c.IsCastType() {
 		t.ValueCastFromType = elemType
+	}
+
+	// Override attribute type if specified
+	if attributeType := c.GetAttributeTypeOverride(); attributeType != "" {
+		t = applyAttributeTypeOverride(t, attributeType)
 	}
 
 	return t, nil
@@ -595,4 +620,42 @@ func (c *FieldBuildContext) GetOneOfTypeName() string {
 	}
 
 	return c.config.DefaultPackageName + "." + name
+}
+
+// GetAttributeTypeOverride returns the AttributeType override
+func (c *FieldBuildContext) GetAttributeTypeOverride() string {
+	return c.config.BaseTypes[c.GetCustomType()]
+}
+
+func applyAttributeTypeOverride(t TerraformType, attributeType string) TerraformType {
+	var override TerraformType
+
+	switch attributeType {
+	case "":
+		return t
+	case stringType.AttributeType:
+		override = stringType
+	case boolType.AttributeType:
+		override = boolType
+	case int64Type.AttributeType:
+		override = int64Type
+	case float64Type.AttributeType:
+		override = float64Type
+	case listType.AttributeType:
+		override = listType
+	case mapType.AttributeType:
+		override = mapType
+	case objectType.AttributeType:
+		override = objectType
+	default:
+		t.AttributeType = attributeType
+		return t
+	}
+
+	t.AttributeType = override.AttributeType
+	t.PlanModifierType = override.PlanModifierType
+	t.ValidatorType = override.ValidatorType
+	t.UseStateForUnknownMethod = override.UseStateForUnknownMethod
+
+	return t
 }
