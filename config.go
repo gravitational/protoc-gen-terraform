@@ -95,6 +95,10 @@ type InjectedField struct {
 	// DefaultValueMethod is the method that will be called to construct a placeholder
 	// value for the field in Copy*ToTerraform methods
 	DefaultValueMethod string `yaml:"default_value_method,omitempty"`
+	// PlanModifierType represents Terraform planmodifier type
+	PlanModifierType string `yaml:"plan_modifier_type,omitempty"`
+	// ValidatorType represents Terraform validator type
+	ValidatorType string `yaml:"validator_type,omitempty"`
 }
 
 // Config represents the plugin config
@@ -207,14 +211,53 @@ func (c *Config) validate() error {
 	}
 
 	for path, fields := range c.InjectedFields {
-		for _, field := range fields {
+		for index, field := range fields {
+			// Infer values from provided type.
+			terraformType, err := getTerraformType(field.Type)
+			if err != nil {
+				return trace.Wrap(err, "injected_fields.%v.%v.type is required", path, field.Name)
+			}
+
+			if field.AttributeType == "" {
+				field.AttributeType = terraformType.AttributeType
+			}
+			if field.PlanModifierType == "" {
+				field.PlanModifierType = terraformType.PlanModifierType
+			}
+			if field.ValidatorType == "" {
+				field.ValidatorType = terraformType.ValidatorType
+			}
+			fields[index] = field
+
 			if strings.TrimSpace(field.DefaultValueMethod) == "" {
 				return trace.BadParameter("injected_fields.%v.%v.default_value_method is required", path, field.Name)
 			}
 		}
+		c.InjectedFields[path] = fields
 	}
 
 	return nil
+}
+
+func getTerraformType(t string) (TerraformType, error) {
+	switch t {
+	case stringType.Type:
+		return stringType, nil
+	case boolType.Type:
+		return boolType, nil
+	case int64Type.Type:
+		return int64Type, nil
+	case float64Type.Type:
+		return float64Type, nil
+	case listType.Type:
+		return listType, nil
+	case mapType.Type:
+		return mapType, nil
+	case objectType.Type:
+		return objectType, nil
+	default:
+		return TerraformType{}, trace.BadParameter("unsupported type %q", t)
+	}
 }
 
 func validateSchemaType(name string, schemaType *SchemaType) error {
