@@ -2,16 +2,15 @@ package types
 
 import (
 	"context"
-	fmt "fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type MockPlanModifier struct{}
 
 // DefaultRoleOptions returns the default implementation of the DefaultRoleOptionsModifier
-func UseMockPlanModifier() tfsdk.AttributePlanModifier {
+func UseMockPlanModifier() planmodifier.String {
 	return MockPlanModifier{}
 }
 
@@ -23,23 +22,11 @@ func (m MockPlanModifier) MarkdownDescription(_ context.Context) string {
 	return "Mock plan modifier"
 }
 
-func (m MockPlanModifier) Modify(ctx context.Context, req tfsdk.ModifyAttributePlanRequest, resp *tfsdk.ModifyAttributePlanResponse) {
-	if req.AttributeConfig == nil {
+func (m MockPlanModifier) PlanModifyString(ctx context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		resp.PlanValue = types.StringValue("modified_value")
 		return
 	}
 
-	value, ok := req.AttributeConfig.(types.String)
-	if !ok {
-		resp.Diagnostics.AddError("mock error", fmt.Sprintf(
-			"Attribute %q can not be converted to StringValue",
-			req.AttributePath.String()))
-		return
-	}
-
-	if value.IsNull() || value.IsUnknown() {
-		resp.AttributePlan = types.StringValue("modified_value")
-		return
-	}
-
-	resp.AttributePlan = value
+	resp.PlanValue = req.ConfigValue
 }
