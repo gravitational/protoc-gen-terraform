@@ -56,31 +56,25 @@ func TestSchema(t *testing.T) {
 		attr, diags := s.AttributeAtPath(t.Context(), path.Root("bool_custom_list"))
 		require.False(t, diags.HasError())
 
-		boolCustomList, ok := attr.(tfsdk.Attribute)
-		require.True(t, ok)
-
-		listType, ok := boolCustomList.GetType().(types.ListType)
+		boolCustomList, ok := attr.(rschema.ListAttribute)
 		require.True(t, ok)
 
 		require.Equal(t, "BoolCustomList []bool field", boolCustomList.GetDescription())
 		require.True(t, boolCustomList.IsOptional())
-		require.True(t, listType.ElementType().Equal(types.BoolType))
+		require.True(t, boolCustomList.ElementType.Equal(types.BoolType))
 	})
 
 	t.Run("custom schema override can change Terraform shape", func(t *testing.T) {
 		attr, diags := s.AttributeAtPath(t.Context(), path.Root("string_override"))
 		require.False(t, diags.HasError())
 
-		stringOverride, ok := attr.(tfsdk.Attribute)
-		require.True(t, ok)
-
-		listType, ok := stringOverride.GetType().(types.ListType)
+		stringOverride, ok := attr.(rschema.ListAttribute)
 		require.True(t, ok)
 
 		require.True(t, stringOverride.IsComputed())
 		require.True(t, stringOverride.IsOptional())
-		require.True(t, listType.ElementType().Equal(types.StringType))
-		require.Len(t, stringOverride.GetPlanModifiers(), 1)
+		require.True(t, stringOverride.ElementType.Equal(types.StringType))
+		require.Len(t, stringOverride.ListPlanModifiers(), 1)
 	})
 }
 
