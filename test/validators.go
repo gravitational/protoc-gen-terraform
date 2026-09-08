@@ -3,14 +3,14 @@ package test
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 // MockValidator ensures that a time is in the future
 type MockValidator struct{}
 
 // UseMockValidator returns TimeValueInFutureValidator
-func UseMockValidator() tfsdk.AttributeValidator {
+func UseMockValidator() validator.String {
 	return MockValidator{}
 }
 
@@ -25,6 +25,6 @@ func (v MockValidator) MarkdownDescription(_ context.Context) string {
 }
 
 // Validate performs the validation.
-func (v MockValidator) Validate(_ context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
+func (v MockValidator) ValidateString(_ context.Context, req validator.StringRequest, resp *validator.StringResponse) {
 
 }

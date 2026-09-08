@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 type MockValidator struct{}
 
-func UseMockValidator() tfsdk.AttributeValidator {
+func UseMockValidator() validator.String {
 	return MockValidator{}
 }
 
@@ -22,27 +21,15 @@ func (v MockValidator) MarkdownDescription(_ context.Context) string {
 	return "Mock validator"
 }
 
-func (v MockValidator) Validate(_ context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	if req.AttributeConfig == nil {
+func (v MockValidator) ValidateString(_ context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
 		return
 	}
 
-	value, ok := req.AttributeConfig.(types.String)
-	if !ok {
-		resp.Diagnostics.AddError("mock error", fmt.Sprintf(
-			"Attribute %q can not be converted to StringValue",
-			req.AttributePath.String()))
-		return
-	}
-
-	if value.IsNull() || value.IsUnknown() {
-		return
-	}
-
-	if value.ValueString() != "valid" {
+	if req.ConfigValue.ValueString() != "valid" {
 		resp.Diagnostics.AddError("mock error", fmt.Sprintf(
 			`Attribute %q value must be "valid"`,
-			req.AttributePath.String()))
+			req.Path.String()))
 		return
 	}
 }

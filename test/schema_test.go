@@ -4,7 +4,9 @@ import (
 	"context"
 	"testing"
 
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
@@ -18,21 +20,21 @@ func TestSchema(t *testing.T) {
 		attr, diags := s.AttributeAtPath(t.Context(), path.Root("str"))
 		require.False(t, diags.HasError())
 
-		str, ok := attr.(tfsdk.Attribute)
+		str, ok := attr.(rschema.StringAttribute)
 		require.True(t, ok)
 
 		require.True(t, str.IsComputed())
 		require.False(t, str.IsRequired())
 		require.True(t, str.IsSensitive())
-		require.Len(t, str.GetPlanModifiers(), 1)
-		require.Len(t, str.GetValidators(), 1)
+		require.Len(t, str.StringPlanModifiers(), 1)
+		require.Len(t, str.StringValidators(), 1)
 	})
 
 	t.Run("required string", func(t *testing.T) {
 		attr, diags := s.AttributeAtPath(t.Context(), path.Root("required_str"))
 		require.False(t, diags.HasError())
 
-		requiredStr, ok := attr.(tfsdk.Attribute)
+		requiredStr, ok := attr.(rschema.StringAttribute)
 		require.True(t, ok)
 
 		require.False(t, requiredStr.IsComputed())
@@ -90,10 +92,12 @@ func TestDataSourceSchema(t *testing.T) {
 		attr, diags := s.AttributeAtPath(t.Context(), path.Root("str"))
 		require.False(t, diags.HasError())
 
-		str, ok := attr.(tfsdk.Attribute)
+		str, ok := attr.(dschema.StringAttribute)
 		require.True(t, ok)
 
-		require.Empty(t, str.GetPlanModifiers())
-		require.Len(t, str.GetValidators(), 1)
+		require.True(t, str.IsComputed())
+		require.False(t, str.IsRequired())
+		require.True(t, str.IsSensitive())
+		require.Len(t, str.StringValidators(), 1)
 	})
 }
