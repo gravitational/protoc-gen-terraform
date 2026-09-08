@@ -57,12 +57,12 @@ func GenSchemaOptionalTestResource(ctx context.Context) (github_com_hashicorp_te
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				Description: "",
 				Optional:    true,
 				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-			}}),
+			}},
 			Description: "OptionalInnerMessage is a proto3 optional message field",
 			Optional:    true,
 		},
@@ -111,12 +111,12 @@ func GenSchemaOptionalTestDataSource(ctx context.Context) (github_com_hashicorp_
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-			Attributes: github_com_hashicorp_terraform_plugin_framework_tfsdk.SingleNestedAttributes(map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_inner_message": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"inner_bool": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 				Description: "",
 				Optional:    true,
 				Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
-			}}),
+			}},
 			Description: "OptionalInnerMessage is a proto3 optional message field",
 			Optional:    true,
 		},
