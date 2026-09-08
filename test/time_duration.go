@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
@@ -17,10 +18,10 @@ const (
 )
 
 var (
-	_ types.StringTypable  = TimeType{}
-	_ types.StringValuable = TimeValue{}
-	_ types.StringTypable  = DurationType{}
-	_ types.StringValuable = DurationValue{}
+	_ basetypes.StringTypable  = TimeType{}
+	_ basetypes.StringValuable = TimeValue{}
+	_ basetypes.StringTypable  = DurationType{}
+	_ basetypes.StringValuable = DurationValue{}
 )
 
 // TimeType represents time.Time Terraform type which is stored in RFC3339 format, nanoseconds truncated
@@ -83,7 +84,7 @@ func (t TimeType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 }
 
 // ValueFromString converts the String to a StringValuable type.
-func (t TimeType) ValueFromString(ctx context.Context, in types.String) (types.StringValuable, diag.Diagnostics) {
+func (t TimeType) ValueFromString(ctx context.Context, in types.String) (basetypes.StringValuable, diag.Diagnostics) {
 	if in.IsUnknown() {
 		return TimeValue{Unknown: true, Format: t.Format}, nil
 	}
@@ -271,7 +272,7 @@ func (t DurationType) ValueFromTerraform(ctx context.Context, in tftypes.Value) 
 }
 
 // ValueFromString converts the String to a StringValuable type.
-func (t DurationType) ValueFromString(ctx context.Context, in types.String) (types.StringValuable, diag.Diagnostics) {
+func (t DurationType) ValueFromString(ctx context.Context, in types.String) (basetypes.StringValuable, diag.Diagnostics) {
 	if in.IsUnknown() {
 		return DurationValue{Unknown: true}, nil
 	}
