@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	schemav1 "github.com/gravitational/protoc-gen-terraform/v4/examples/tfschema/custom/v1"
@@ -19,11 +18,13 @@ type customDataSource struct {
 }
 
 func (d customDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = "example_custom"
+	resp.TypeName = req.ProviderTypeName + "_custom"
 }
 
-func (r customDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return schemav1.GenSchemaCustomDataSource(ctx)
+func (d customDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	schema, diags := schemav1.GenSchemaCustomDataSource(ctx)
+	resp.Schema = schema
+	resp.Diagnostics.Append(diags...)
 }
 
 func (d customDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

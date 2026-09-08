@@ -27,8 +27,10 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gravitational_protoc_gen_terraform_v4_examples_types "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
 	github_com_hashicorp_terraform_plugin_framework_attr "github.com/hashicorp/terraform-plugin-framework/attr"
+	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource "github.com/hashicorp/terraform-plugin-framework/resource"
+	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -39,121 +41,121 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 // GenSchemaPrimitivesResource returns Terraform Framework resource schema definition for Primitives
-func GenSchemaPrimitivesResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"bool_list": {
+func GenSchemaPrimitivesResource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	return github_com_hashicorp_terraform_plugin_framework_resource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
+		"bool_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bool_list bool list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 		},
-		"bool_value": {
+		"bool_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bool_value bool field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"bytes_list": {
+		"bytes_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bytes_list bytes list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"bytes_value": {
+		"bytes_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "bytes_value bytes field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"double_list": {
+		"double_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "double_list double list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 		},
-		"double_value": {
+		"double_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "double_value float64 field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 		},
-		"enum_list": {
+		"enum_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "enum_list enum list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"enum_value": {
+		"enum_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "enum_value enum field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"float_list": {
+		"float_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "float_list float list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 		},
-		"float_value": {
+		"float_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "float_value float32 field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 		},
-		"id": {
+		"id": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"int32_list": {
+		"int32_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "int32_list int32 list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"int32_value": {
+		"int32_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "int32_value int32 field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"int64_list": {
+		"int64_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "int64_list int64 list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"int64_value": {
+		"int64_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "int64_value int64 field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"string_list": {
+		"string_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "string_list string list field.",
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_tfsdk.AttributePlanModifier{github_com_hashicorp_terraform_plugin_framework_resource.UseStateForUnknown()},
 			Type:          github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"string_value": {
+		"string_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:      true,
 			Description:   "string_value string field.",
 			Optional:      true,
@@ -164,105 +166,105 @@ func GenSchemaPrimitivesResource(ctx context.Context) (github_com_hashicorp_terr
 }
 
 // GenSchemaPrimitivesDataSource returns Terraform Framework datasource schema definition for Primitives
-func GenSchemaPrimitivesDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
-	return github_com_hashicorp_terraform_plugin_framework_tfsdk.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
-		"bool_list": {
+func GenSchemaPrimitivesDataSource(ctx context.Context) (github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema, github_com_hashicorp_terraform_plugin_framework_diag.Diagnostics) {
+	return github_com_hashicorp_terraform_plugin_framework_datasource_schema.Schema{Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+		"bool_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "bool_list bool list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.BoolType},
 		},
-		"bool_value": {
+		"bool_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "bool_value bool field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.BoolType,
 		},
-		"bytes_list": {
+		"bytes_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "bytes_list bytes list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"bytes_value": {
+		"bytes_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "bytes_value bytes field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"double_list": {
+		"double_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "double_list double list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 		},
-		"double_value": {
+		"double_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "double_value float64 field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 		},
-		"enum_list": {
+		"enum_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "enum_list enum list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"enum_value": {
+		"enum_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "enum_value enum field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"float_list": {
+		"float_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "float_list float list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Float64Type},
 		},
-		"float_value": {
+		"float_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "float_value float32 field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Float64Type,
 		},
-		"id": {
+		"id": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.StringType,
 		},
-		"int32_list": {
+		"int32_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "int32_list int32 list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"int32_value": {
+		"int32_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "int32_value int32 field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"int64_list": {
+		"int64_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "int64_list int64 list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.Int64Type},
 		},
-		"int64_value": {
+		"int64_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "int64_value int64 field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.Int64Type,
 		},
-		"string_list": {
+		"string_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "string_list string list field.",
 			Optional:    true,
 			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
-		"string_value": {
+		"string_value": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
 			Computed:    true,
 			Description: "string_value string field.",
 			Optional:    true,

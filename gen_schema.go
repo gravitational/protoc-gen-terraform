@@ -35,15 +35,13 @@ type schemaTarget struct {
 
 var (
 	resourceSchemaTarget = schemaTarget{
-		// TODO: Migrate to ResourceSchema
-		schemaPackage:         SDK,
+		schemaPackage:         ResourceSchema,
 		schemaDescription:     "resource schema",
 		functionSuffix:        "Resource",
 		supportsPlanModifiers: true,
 	}
 	dataSourceSchemaTarget = schemaTarget{
-		// TODO: Migrate to DataSourceSchema
-		schemaPackage:         SDK,
+		schemaPackage:         DataSourceSchema,
 		schemaDescription:     "datasource schema",
 		functionSuffix:        "DataSource",
 		supportsPlanModifiers: false,
@@ -136,7 +134,7 @@ func (m *MessageSchemaGenerator) generateInjectedField(f InjectedField) j.Code {
 		d[j.Id("PlanModifiers")] = generatePlanModifiers(m.i, f.PlanModifiers)
 	}
 
-	return j.Values(d)
+	return j.Id(m.i.WithPackage(SDK, "Attribute")).Values(d)
 }
 
 // FieldSchemaGenerator represents the decorator for Field code generation
@@ -190,7 +188,7 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 		return j.Id(f.target.functionName(f.Suffix)).Call(j.Id("ctx"), j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d))
 	}
 
-	return j.Values(d)
+	return j.Id(f.i.WithPackage(SDK, "Attribute")).Values(d)
 }
 
 // SchemaType returns the schema Type field value

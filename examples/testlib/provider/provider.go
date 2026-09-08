@@ -5,10 +5,8 @@ import (
 	"sync"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 
 	"github.com/gravitational/protoc-gen-terraform/v4/examples/types"
 )
@@ -39,9 +37,13 @@ func New() provider.Provider {
 	}
 }
 
-// GetSchema satisfies the provider.Provider interface for exampleProvider.
-func (p *exampleProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{}, nil
+func (p *exampleProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "example"
+}
+
+// Schema satisfies the provider.Provider interface for exampleProvider.
+func (p *exampleProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+	// Nothing to configure
 }
 
 // Configure satisfies the provider.Provider interface for exampleProvider.
