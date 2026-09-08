@@ -27,7 +27,7 @@ import (
 )
 
 func schemaObject(t *testing.T) types.Object {
-	s, d := GenSchemaOptionalTest(context.Background())
+	s, d := GenSchemaOptionalTestResource(context.Background())
 	require.False(t, d.HasError())
 
 	obj, ok := s.Type().(types.ObjectType)
@@ -74,7 +74,7 @@ func nullValue(attrType attr.Type) attr.Value {
 }
 
 func TestSchemaHasOptionalFields(t *testing.T) {
-	s, d := GenSchemaOptionalTest(context.Background())
+	s, d := GenSchemaOptionalTestResource(context.Background())
 	require.False(t, d.HasError())
 
 	_, ok := s.Attributes["optional_str"]
@@ -176,7 +176,7 @@ func TestCopyToOptionalFieldsNil(t *testing.T) {
 }
 
 func TestCopyFromOptionalFields(t *testing.T) {
-	s, d := GenSchemaOptionalTest(context.Background())
+	s, d := GenSchemaOptionalTestResource(context.Background())
 	require.False(t, d.HasError())
 
 	typ := s.Type()
@@ -253,7 +253,7 @@ func TestCopyFromOptionalFields(t *testing.T) {
 }
 
 func TestCopyFromOptionalFieldsNull(t *testing.T) {
-	s, d := GenSchemaOptionalTest(context.Background())
+	s, d := GenSchemaOptionalTestResource(context.Background())
 	require.False(t, d.HasError())
 
 	typ := s.Type()

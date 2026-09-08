@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"sync"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -15,6 +16,12 @@ import (
 var _ provider.Provider = &exampleProvider{}
 
 type exampleProvider struct {
+	*exampleStore
+}
+
+type exampleStore struct {
+	sync.RWMutex
+
 	primitives map[string]*types.Primitives
 	time       map[string]*types.Time
 	objects    map[string]*types.Objects
@@ -23,10 +30,12 @@ type exampleProvider struct {
 
 func New() provider.Provider {
 	return &exampleProvider{
-		primitives: make(map[string]*types.Primitives),
-		time:       make(map[string]*types.Time),
-		objects:    make(map[string]*types.Objects),
-		custom:     make(map[string]*types.Custom),
+		exampleStore: &exampleStore{
+			primitives: make(map[string]*types.Primitives),
+			time:       make(map[string]*types.Time),
+			objects:    make(map[string]*types.Objects),
+			custom:     make(map[string]*types.Custom),
+		},
 	}
 }
 
@@ -41,7 +50,12 @@ func (p *exampleProvider) Configure(ctx context.Context, req provider.ConfigureR
 }
 
 func (p *exampleProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		func() datasource.DataSource { return primitivesDataSource{p: p} },
+		func() datasource.DataSource { return timeDataSource{p: p} },
+		func() datasource.DataSource { return objectsDataSource{p: p} },
+		func() datasource.DataSource { return customDataSource{p: p} },
+	}
 }
 
 func (p *exampleProvider) Resources(ctx context.Context) []func() resource.Resource {

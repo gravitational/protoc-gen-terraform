@@ -2,6 +2,22 @@ package testlib
 
 import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
+func (s *TerraformSuite) TestTimeDataSource() {
+	t := s.T()
+	name := "data.example_time.test"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: s.terraformProviders,
+		IsUnitTest:               true,
+		Steps: []resource.TestStep{
+			{
+				Config: s.getFixture("time_datasource.tf"),
+				Check:  s.testCheckTimeResource(name),
+			},
+		},
+	})
+}
+
 func (s *TerraformSuite) TestTime() {
 	t := s.T()
 	name := "example_time.test"

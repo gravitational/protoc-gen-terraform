@@ -133,9 +133,13 @@ func (p *Plugin) write(m []*Message, out io.Writer) error {
 			continue
 		}
 
-		g := NewMessageSchemaGenerator(message, &p.Imports)
-		_, err := g.Generate(out)
-		if err != nil {
+		resourceGen := NewMessageSchemaGenerator(message, &p.Imports, resourceSchemaTarget)
+		if _, err := resourceGen.Generate(out); err != nil {
+			return trace.Wrap(err)
+		}
+
+		dataSourceGen := NewMessageSchemaGenerator(message, &p.Imports, dataSourceSchemaTarget)
+		if _, err := dataSourceGen.Generate(out); err != nil {
 			return trace.Wrap(err)
 		}
 	}

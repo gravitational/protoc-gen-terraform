@@ -114,7 +114,7 @@ func createTestObj() *Test {
 func copyFromTerraformObject(t *testing.T) types.Object {
 	t.Helper()
 
-	s, d := GenSchemaTest(context.Background())
+	s, d := GenSchemaTestResource(context.Background())
 
 	require.False(t, d.HasError())
 	typ := s.Type()
@@ -609,7 +609,7 @@ func copyFromTerraformObject(t *testing.T) types.Object {
 }
 
 func copyToTerraformObject(t *testing.T) types.Object {
-	s, d := GenSchemaTest(context.Background())
+	s, d := GenSchemaTestResource(context.Background())
 	require.False(t, d.HasError())
 
 	obj, ok := s.Type().(types.ObjectType)

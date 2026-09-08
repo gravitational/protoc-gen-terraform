@@ -31,8 +31,10 @@ const (
 	Diag = "github.com/hashicorp/terraform-plugin-framework/diag"
 	// Attr represents the name of Terraform attr package
 	Attr = "github.com/hashicorp/terraform-plugin-framework/attr"
-	// TFTypes represents the name of Terraform SDK TFTypes package
-	TFTypes = "github.com/hashicorp/terraform-plugin-go/tftypes"
+	// DataSourceSchema represents the path to the Terraform datasource schema package
+	DataSourceSchema = "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	// ResourceSchema represents the path to the Terraform resource schema package
+	ResourceSchema = "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
 // Imports represents the collection of imports and acts as the facade for generator.PluginImports
