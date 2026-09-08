@@ -77,7 +77,7 @@ type SchemaType struct {
 // InjectedField represents custom injected field descriptor
 type InjectedField struct {
 	// AttributeType represents Terraform schema.Attribute type
-	AttributeType string
+	AttributeType string `yaml:"attribute_type,omitempty"`
 	// Name represents field schema name
 	Name string `yaml:"name,omitempty"`
 	// Type represents field type
