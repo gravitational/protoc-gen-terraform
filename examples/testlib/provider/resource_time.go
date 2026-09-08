@@ -41,7 +41,13 @@ func (r timeResource) Create(ctx context.Context, req resource.CreateRequest, re
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("unable to generate uuid", err.Error()))
 	}
 
-	plan.Attributes()["id"] = types.StringValue(id)
+	attrs := plan.Attributes()
+	attrs["id"] = types.StringValue(id)
+	plan, diags := types.ObjectValue(plan.AttributeTypes(ctx), attrs)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	time := &extypes.Time{}
 	resp.Diagnostics.Append(schemav1.CopyTimeFromTerraform(ctx, plan, time)...)
