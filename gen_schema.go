@@ -173,6 +173,8 @@ func (f *FieldSchemaGenerator) Generate() *j.Statement {
 }
 
 func (f *FieldSchemaGenerator) baseAttributeDict() j.Dict {
+
+	// nil value entries are automatically omitted
 	d := j.Dict{
 		j.Id("Description"): j.Lit(f.Comment),
 		j.Id("ElementType"): f.genElemType(),
