@@ -82,6 +82,7 @@ func (t TimeType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	return TimeValue{Value: current, Format: t.Format}, nil
 }
 
+// ValueFromString converts the String to a StringValuable type.
 func (t TimeType) ValueFromString(ctx context.Context, in types.String) (types.StringValuable, diag.Diagnostics) {
 	if in.IsUnknown() {
 		return TimeValue{Unknown: true, Format: t.Format}, nil
@@ -269,6 +270,7 @@ func (t DurationType) ValueFromTerraform(ctx context.Context, in tftypes.Value) 
 	return DurationValue{Value: current}, nil
 }
 
+// ValueFromString converts the String to a StringValuable type.
 func (t DurationType) ValueFromString(ctx context.Context, in types.String) (types.StringValuable, diag.Diagnostics) {
 	if in.IsUnknown() {
 		return DurationValue{Unknown: true}, nil
