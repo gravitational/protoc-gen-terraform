@@ -631,8 +631,6 @@ func applyAttributeTypeOverride(t TerraformType, attributeType string) Terraform
 	var override TerraformType
 
 	switch attributeType {
-	case "":
-		return t
 	case stringType.AttributeType:
 		override = stringType
 	case boolType.AttributeType:
