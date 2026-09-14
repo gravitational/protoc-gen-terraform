@@ -59,6 +59,9 @@ func TestConfig(t *testing.T) {
 			Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
 			Computed:           true,
 			DefaultValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringNull",
+			AttributeType:      "StringAttribute",
+			PlanModifierType:   "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier.String",
+			ValidatorType:      "github.com/hashicorp/terraform-plugin-framework/schema/validator.String",
 		}},
 	})
 	require.Equal(t, cfg.SchemaTypes, map[string]SchemaType{
@@ -106,6 +109,64 @@ injected_fields:
 	_, err := ReadConfig(map[string]string{"config": path})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "injected_fields.Test.id.default_value_method is required")
+}
+
+func TestConfigInjectedFieldDefaults(t *testing.T) {
+	path := writeConfig(t, `
+types:
+  - Test
+injected_fields:
+  Test:
+    - name: id
+      type: github.com/hashicorp/terraform-plugin-framework/types.StringType
+      computed: true
+      default_value_method: github.com/hashicorp/terraform-plugin-framework/types.StringNull
+    - name: tags
+      type: github.com/hashicorp/terraform-plugin-framework/types.ListType
+      optional: true
+      default_value_method: github.com/hashicorp/terraform-plugin-framework/types.ListNull
+      validator_type: CustomValidator
+`)
+
+	cfg, err := ReadConfig(map[string]string{"config": path})
+	require.NoError(t, err)
+
+	require.Equal(t, InjectedField{
+		Name:               "id",
+		Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+		Computed:           true,
+		DefaultValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringNull",
+		AttributeType:      "StringAttribute",
+		PlanModifierType:   "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier.String",
+		ValidatorType:      "github.com/hashicorp/terraform-plugin-framework/schema/validator.String",
+	}, cfg.InjectedFields["Test"][0])
+
+	require.Equal(t, InjectedField{
+		Name:               "tags",
+		Type:               "github.com/hashicorp/terraform-plugin-framework/types.ListType",
+		Optional:           true,
+		DefaultValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.ListNull",
+		AttributeType:      "ListAttribute",
+		PlanModifierType:   "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier.List",
+		ValidatorType:      "CustomValidator",
+	}, cfg.InjectedFields["Test"][1])
+}
+
+func TestConfigInjectedFieldUnsupportedType(t *testing.T) {
+	path := writeConfig(t, `
+types:
+  - Test
+injected_fields:
+  Test:
+    - name: id
+      type: CustomType
+      computed: true
+      default_value_method: CustomNull
+`)
+
+	_, err := ReadConfig(map[string]string{"config": path})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), `unsupported type "CustomType"`)
 }
 
 func writeConfig(t *testing.T, contents string) string {
