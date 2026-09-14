@@ -35,6 +35,10 @@ const (
 	DataSourceSchema = "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	// ResourceSchema represents the path to the Terraform resource schema package
 	ResourceSchema = "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	// PlanModifier represents the path to the Terraform planmodifier package
+	PlanModifier = "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	// Validator represents the path to the Terraform validator package
+	Validator = "github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 // Imports represents the collection of imports and acts as the facade for generator.PluginImports
