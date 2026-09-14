@@ -28,7 +28,6 @@ import (
 	github_com_hashicorp_terraform_plugin_framework_datasource_schema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	github_com_hashicorp_terraform_plugin_framework_diag "github.com/hashicorp/terraform-plugin-framework/diag"
 	github_com_hashicorp_terraform_plugin_framework_resource_schema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	github_com_hashicorp_terraform_plugin_framework_tfsdk "github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	github_com_hashicorp_terraform_plugin_framework_types "github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -66,21 +65,21 @@ func GenSchemaOptionalTestResource(ctx context.Context) (github_com_hashicorp_te
 			Description: "OptionalInt64 is a proto3 optional int64 field",
 			Optional:    true,
 		},
-		"optional_map": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_map": github_com_hashicorp_terraform_plugin_framework_resource_schema.MapAttribute{
 			Computed:    true,
 			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"optional_str": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
 			Description: "OptionalStr is a proto3 optional string field",
 			Optional:    true,
 		},
-		"string_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_list": github_com_hashicorp_terraform_plugin_framework_resource_schema.ListAttribute{
 			Computed:    true,
 			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }
@@ -114,21 +113,21 @@ func GenSchemaOptionalTestDataSource(ctx context.Context) (github_com_hashicorp_
 			Description: "OptionalInt64 is a proto3 optional int64 field",
 			Optional:    true,
 		},
-		"optional_map": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"optional_map": github_com_hashicorp_terraform_plugin_framework_datasource_schema.MapAttribute{
 			Computed:    true,
 			Description: "maps don't support optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.MapType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 		"optional_str": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Description: "OptionalStr is a proto3 optional string field",
 			Optional:    true,
 		},
-		"string_list": github_com_hashicorp_terraform_plugin_framework_tfsdk.Attribute{
+		"string_list": github_com_hashicorp_terraform_plugin_framework_datasource_schema.ListAttribute{
 			Computed:    true,
 			Description: "lists don't support the optional keyword, but we add it here to check the generation",
+			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
-			Type:        github_com_hashicorp_terraform_plugin_framework_types.ListType{ElemType: github_com_hashicorp_terraform_plugin_framework_types.StringType},
 		},
 	}}, nil
 }

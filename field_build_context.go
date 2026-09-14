@@ -325,6 +325,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 	}
 
 	if c.IsRepeated() {
+		t.AttributeType = "ListAttribute"
 		t.Type = Types + ".ListType"
 		t.ValueType = Types + ".List"
 		t.PlanModifierType = PlanModifier + ".List"
@@ -333,6 +334,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 	}
 
 	if c.IsMap() {
+		t.AttributeType = "MapAttribute"
 		t.Type = Types + ".MapType"
 		t.ValueType = Types + ".Map"
 		t.PlanModifierType = PlanModifier + ".Map"

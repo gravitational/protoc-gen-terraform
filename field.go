@@ -291,7 +291,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 		// TODO: Remove deprecated plan modifier once all attributes are migrated
 		useDeprecated := true
 		switch f.Kind {
-		case PrimitiveKind, ObjectKind, ObjectListKind, ObjectMapKind:
+		case PrimitiveListKind, PrimitiveMapKind, PrimitiveKind, ObjectKind, ObjectListKind, ObjectMapKind:
 			useDeprecated = false
 		}
 
