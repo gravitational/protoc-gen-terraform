@@ -1,6 +1,6 @@
 ---
 target_package_name: v1
-default_package_name: "github.com/gravitational/protoc-gen-terraform/v4/examples/types"
+default_package_name: "github.com/gravitational/protoc-gen-terraform/v5/examples/types"
 use_state_for_unknown_by_default: true
 sort: true
 

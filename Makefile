@@ -52,7 +52,7 @@ test: build gen
 		--plugin=$(BINFILE) \
 		--terraform_out=config=test/optional/config.yaml:. \
 		optional.proto
-	mv ./github.com/gravitational/protoc-gen-terraform/v4/test/optional/optional_terraform.go ./test/optional/
+	mv ./github.com/gravitational/protoc-gen-terraform/v5/test/optional/optional_terraform.go ./test/optional/
 	rm -rf ./github.com
 
 	@go test ./...
