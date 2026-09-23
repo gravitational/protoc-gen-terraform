@@ -1,6 +1,6 @@
 package testlib
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+import "github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
 func (s *TerraformSuite) TestCustomDataSource() {
 	t := s.T()
