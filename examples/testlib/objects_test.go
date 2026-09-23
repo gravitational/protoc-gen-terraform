@@ -163,11 +163,11 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 
 		resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", ""),
 		resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", ""),
-		resource.TestCheckNoResourceAttr(name, "nested_nullable_list"),
+		resource.TestCheckResourceAttr(name, "nested_nullable_list.#", "0"),
 
 		resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", ""),
 		resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", ""),
-		resource.TestCheckNoResourceAttr(name, "nested_nullable_map"),
+		resource.TestCheckResourceAttr(name, "nested_nullable_map.%", "0"),
 
 		resource.TestCheckResourceAttr(name, "branch_nested.leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "branch_leaf"),
