@@ -287,7 +287,7 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 	f.Kind = f.getKind()
 
-	// Set default UseStateForUnknown plan modifier for computed attributes
+	// Set default UseNonNullStateForUnknown plan modifier for computed attributes
 	// when use_state_for_unknown_by_default=true.
 	if len(f.PlanModifiers) == 0 && c.config.UseStateForUnknownByDefault && c.IsComputed(isProto3Optional) {
 		f.PlanModifiers = append(f.PlanModifiers, f.UseStateForUnknownMethod)

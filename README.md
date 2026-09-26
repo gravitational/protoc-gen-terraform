@@ -116,7 +116,7 @@ plan_modifiers:
     - "github.com/hashicorp/terraform-plugin-framework/resource.RequiresReplace()"
 ```
 
-## UseStateForUnknown by default
+## Preserve non-null state for unknown values by default
 
 The following setting:
 
@@ -124,7 +124,10 @@ The following setting:
 use_state_for_unknown_by_default: true
 ```
 
-will add `resource.UseStateForUnknown()` PlanModifier to all computed fields.
+will add the type-specific `UseNonNullStateForUnknown()` plan modifier to
+computed fields that do not already define plan modifiers. This preserves the
+pre-v1.15.1 behavior of `UseStateForUnknown()` and requires
+`terraform-plugin-framework` v1.17.0 or newer.
 
 ## Injecting fields into schema
 
