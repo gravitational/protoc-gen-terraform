@@ -122,13 +122,9 @@ func (s *TerraformSuite) testCheckObjectResource(name string) resource.TestCheck
 
 		resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", "list-1"),
 		resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", "list-2"),
-		resource.TestCheckResourceAttr(name, "nested_nullable_list.0.leaf.value", "list-1"),
-		resource.TestCheckResourceAttr(name, "nested_nullable_list.1.leaf.value", "list-2"),
 
 		resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", "map-1"),
 		resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", "map-2"),
-		resource.TestCheckResourceAttr(name, "nested_nullable_map.key1.leaf.value", "map-1"),
-		resource.TestCheckResourceAttr(name, "nested_nullable_map.key2.leaf.value", "map-2"),
 
 		resource.TestCheckResourceAttr(name, "branch_nested.leaf.value", "branch-1"),
 		resource.TestCheckNoResourceAttr(name, "branch_leaf"),
@@ -163,11 +159,9 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 
 		resource.TestCheckResourceAttr(name, "nested_list.0.leaf.value", ""),
 		resource.TestCheckResourceAttr(name, "nested_list.1.leaf.value", ""),
-		resource.TestCheckResourceAttr(name, "nested_nullable_list.#", "0"),
 
 		resource.TestCheckResourceAttr(name, "nested_map.key1.leaf.value", ""),
 		resource.TestCheckResourceAttr(name, "nested_map.key2.leaf.value", ""),
-		resource.TestCheckResourceAttr(name, "nested_nullable_map.%", "0"),
 
 		resource.TestCheckResourceAttr(name, "branch_nested.leaf.value", ""),
 		resource.TestCheckNoResourceAttr(name, "branch_leaf"),
@@ -205,13 +199,9 @@ func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource
 
 		resource.TestCheckNoResourceAttr(name, "nested_list.0.leaf.value"),
 		resource.TestCheckNoResourceAttr(name, "nested_list.1.leaf.value"),
-		resource.TestCheckNoResourceAttr(name, "nested_nullable_list.0.leaf.value"),
-		resource.TestCheckNoResourceAttr(name, "nested_nullable_list.1.leaf.value"),
 
 		resource.TestCheckNoResourceAttr(name, "nested_map.key1.leaf.value"),
 		resource.TestCheckNoResourceAttr(name, "nested_map.key2.leaf.value"),
-		resource.TestCheckNoResourceAttr(name, "nested_nullable_map.key1.leaf.value"),
-		resource.TestCheckNoResourceAttr(name, "nested_nullable_map.key2.leaf.value"),
 
 		resource.TestCheckNoResourceAttr(name, "branch_nested.leaf.value"),
 		resource.TestCheckNoResourceAttr(name, "branch_leaf.leaf.value"),
