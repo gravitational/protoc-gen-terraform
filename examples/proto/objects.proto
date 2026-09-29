@@ -34,14 +34,8 @@ message Objects {
   // nested_list is a list of nested objects.
   repeated Nested nested_list = 8 [ (gogoproto.nullable) = false ];
 
-  // nested_nullable_list is a nullable list of nested objects.
-  repeated Nested nested_nullable_list = 9 [ (gogoproto.nullable) = true ];
-
   // nested_map is a map of nested objects.
   map<string, Nested> nested_map = 10 [ (gogoproto.nullable) = false ];
-
-  // nested_map is a nullable map of nested objects.
-  map<string, Nested> nested_nullable_map = 11 [ (gogoproto.nullable) = true ];
 
   // empty is an empty field.
   Empty empty = 12;
