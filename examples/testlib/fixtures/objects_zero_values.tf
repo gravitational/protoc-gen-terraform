@@ -35,14 +35,10 @@ resource "example_objects" "test" {
     { leaf = { value = "" } },
   ]
 
-  nested_nullable_list = null
-
   nested_map = {
     key1 = { leaf = { value = "" } }
     key2 = { leaf = { value = "" } }
   }
-
-  nested_nullable_map = null
 
   branch_nested = {
     leaf = {

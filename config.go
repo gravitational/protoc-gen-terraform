@@ -119,7 +119,7 @@ type Config struct {
 	DefaultPackageName string `yaml:"default_package_name,omitempty"`
 	// Sort sort fields and messages by name (otherwise, will keep the order as it was in .proto file)
 	Sort bool `yaml:"sort,omitempty"`
-	// UseStateForUnknownByDefault represents flag, if true - appends UseStateForUnknown to all computed fields
+	// UseStateForUnknownByDefault appends UseNonNullStateForUnknown to computed fields without plan modifiers.
 	UseStateForUnknownByDefault bool `yaml:"use_state_for_unknown_by_default,omitempty"`
 	// ComputedFields is the list of fields to mark as 'Computed: true'
 	//

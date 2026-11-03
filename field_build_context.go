@@ -44,7 +44,7 @@ var (
 		IsElemTypeScalar:         true,
 		PlanModifierType:         PlanModifier + ".Float64",
 		ValidatorType:            Validator + ".Float64",
-		UseStateForUnknownMethod: ResourceSchema + "/float64planmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/float64planmodifier.UseNonNullStateForUnknown()",
 	}
 
 	int64Type = TerraformType{
@@ -63,7 +63,7 @@ var (
 		IsElemTypeScalar:         true,
 		PlanModifierType:         PlanModifier + ".Int64",
 		ValidatorType:            Validator + ".Int64",
-		UseStateForUnknownMethod: ResourceSchema + "/int64planmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/int64planmodifier.UseNonNullStateForUnknown()",
 	}
 
 	stringType = TerraformType{
@@ -82,7 +82,7 @@ var (
 		IsElemTypeScalar:         true,
 		PlanModifierType:         PlanModifier + ".String",
 		ValidatorType:            Validator + ".String",
-		UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseNonNullStateForUnknown()",
 	}
 
 	boolType = TerraformType{
@@ -101,7 +101,7 @@ var (
 		IsElemTypeScalar:         true,
 		PlanModifierType:         PlanModifier + ".Bool",
 		ValidatorType:            Validator + ".Bool",
-		UseStateForUnknownMethod: ResourceSchema + "/boolplanmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/boolplanmodifier.UseNonNullStateForUnknown()",
 	}
 
 	listType = TerraformType{
@@ -110,7 +110,7 @@ var (
 		ValueType:                Types + ".List",
 		PlanModifierType:         PlanModifier + ".List",
 		ValidatorType:            Validator + ".List",
-		UseStateForUnknownMethod: ResourceSchema + "/listplanmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/listplanmodifier.UseNonNullStateForUnknown()",
 	}
 
 	mapType = TerraformType{
@@ -119,7 +119,7 @@ var (
 		ValueType:                Types + ".Map",
 		PlanModifierType:         PlanModifier + ".Map",
 		ValidatorType:            Validator + ".Map",
-		UseStateForUnknownMethod: ResourceSchema + "/mapplanmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/mapplanmodifier.UseNonNullStateForUnknown()",
 	}
 
 	objectType = TerraformType{
@@ -130,7 +130,7 @@ var (
 		ElemValueType:            Types + ".Object",
 		PlanModifierType:         PlanModifier + ".Object",
 		ValidatorType:            Validator + ".Object",
-		UseStateForUnknownMethod: ResourceSchema + "/objectplanmodifier.UseStateForUnknown()",
+		UseStateForUnknownMethod: ResourceSchema + "/objectplanmodifier.UseNonNullStateForUnknown()",
 	}
 )
 
@@ -278,7 +278,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			TypeConstructor:          c.config.TimeType.TypeConstructor,
 			PlanModifierType:         PlanModifier + ".String",
 			ValidatorType:            Validator + ".String",
-			UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseStateForUnknown()",
+			UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseNonNullStateForUnknown()",
 		}
 	case c.field.IsDuration(c.config.DurationCustomType): // In Terraform Framework special type needs to be defined
 		if c.config.DurationType == nil {
@@ -299,7 +299,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 			TypeConstructor:          c.config.DurationType.TypeConstructor,
 			PlanModifierType:         PlanModifier + ".String",
 			ValidatorType:            Validator + ".String",
-			UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseStateForUnknown()",
+			UseStateForUnknownMethod: ResourceSchema + "/stringplanmodifier.UseNonNullStateForUnknown()",
 		}
 	case c.field.IsTypeEq(descriptor.FieldDescriptorProto_TYPE_DOUBLE) || gogoproto.IsStdDouble(p):
 		t = float64Type
@@ -356,7 +356,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueType = Types + ".List"
 		t.PlanModifierType = PlanModifier + ".List"
 		t.ValidatorType = Validator + ".List"
-		t.UseStateForUnknownMethod = ResourceSchema + "/listplanmodifier.UseStateForUnknown()"
+		t.UseStateForUnknownMethod = ResourceSchema + "/listplanmodifier.UseNonNullStateForUnknown()"
 	}
 
 	if c.IsMap() {
@@ -365,7 +365,7 @@ func (c *FieldBuildContext) GetTerraformType() (TerraformType, error) {
 		t.ValueType = Types + ".Map"
 		t.PlanModifierType = PlanModifier + ".Map"
 		t.ValidatorType = Validator + ".Map"
-		t.UseStateForUnknownMethod = ResourceSchema + "/mapplanmodifier.UseStateForUnknown()"
+		t.UseStateForUnknownMethod = ResourceSchema + "/mapplanmodifier.UseNonNullStateForUnknown()"
 	}
 
 	if c.IsCastType() {
