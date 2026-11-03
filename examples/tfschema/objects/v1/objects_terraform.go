@@ -109,12 +109,6 @@ func GenSchemaObjectsResource(ctx context.Context) (github_com_hashicorp_terrafo
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
 		},
-		"embedded_value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
-			Computed:      true,
-			Description:   "",
-			Optional:      true,
-			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
-		},
 		"empty": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
 			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"active": github_com_hashicorp_terraform_plugin_framework_resource_schema.BoolAttribute{
 				Computed:    true,
@@ -380,6 +374,12 @@ func GenSchemaObjectsResource(ctx context.Context) (github_com_hashicorp_terrafo
 			Optional:      true,
 			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Map{github_com_hashicorp_terraform_plugin_framework_resource_schema_mapplanmodifier.UseStateForUnknown()},
 		},
+		"value": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
+			Computed:      true,
+			Description:   "",
+			Optional:      true,
+			PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.String{github_com_hashicorp_terraform_plugin_framework_resource_schema_stringplanmodifier.UseStateForUnknown()},
+		},
 	}}, nil
 }
 
@@ -435,11 +435,6 @@ func GenSchemaObjectsDataSource(ctx context.Context) (github_com_hashicorp_terra
 			Optional:    true,
 		},
 		"branch_string": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
-			Computed:    true,
-			Description: "",
-			Optional:    true,
-		},
-		"embedded_value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
 			Computed:    true,
 			Description: "",
 			Optional:    true,
@@ -669,6 +664,11 @@ func GenSchemaObjectsDataSource(ctx context.Context) (github_com_hashicorp_terra
 			ElementType: github_com_hashicorp_terraform_plugin_framework_types.StringType,
 			Optional:    true,
 		},
+		"value": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+			Computed:    true,
+			Description: "",
+			Optional:    true,
+		},
 	}}, nil
 }
 
@@ -865,28 +865,6 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 		}
 	}
 	{
-		a, ok := tf.Attributes()["embedded_value"]
-		if !ok {
-			diags.Append(attrReadMissingDiag{"Objects.embedded_value"})
-		} else {
-			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
-			if !ok {
-				diags.Append(attrReadConversionFailureDiag{"Objects.embedded_value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
-			} else {
-				var t string
-				if !v.IsNull() && !v.IsUnknown() {
-					t = (v.ValueString())
-				}
-				if !v.IsNull() && !v.IsUnknown() {
-					if obj.LeafEmbedded == nil {
-						obj.LeafEmbedded = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.LeafEmbedded{}
-					}
-					obj.EmbeddedValue = t
-				}
-			}
-		}
-	}
-	{
 		a, ok := tf.Attributes()["empty"]
 		if !ok {
 			diags.Append(attrReadMissingDiag{"Objects.empty"})
@@ -954,10 +932,10 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Objects.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
-				obj.Leaf = github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
+				obj.Nested.Leaf = github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
 				if !v.IsNull() && !v.IsUnknown() {
 					tf := v
-					obj := &obj.Leaf
+					obj := &obj.Nested.Leaf
 					{
 						a, ok := tf.Attributes()["value"]
 						if !ok {
@@ -1745,6 +1723,28 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 			}
 		}
 	}
+	{
+		a, ok := tf.Attributes()["value"]
+		if !ok {
+			diags.Append(attrReadMissingDiag{"Objects.value"})
+		} else {
+			v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+			if !ok {
+				diags.Append(attrReadConversionFailureDiag{"Objects.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+			} else {
+				var t string
+				if !v.IsNull() && !v.IsUnknown() {
+					t = (v.ValueString())
+				}
+				if !v.IsNull() && !v.IsUnknown() {
+					if obj.Leaf == nil {
+						obj.Leaf = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
+					}
+					obj.Leaf.Value = t
+				}
+			}
+		}
+	}
 	return diags
 }
 
@@ -2028,20 +2028,6 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 		attrs["branch_string"] = v
 	}
 	{
-		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
-		existing := attrs["embedded_value"]
-		if preserveUnknown && existing != nil && existing.IsUnknown() {
-			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
-		} else {
-			if obj.LeafEmbedded == nil {
-				v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
-			} else {
-				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.EmbeddedValue))
-			}
-		}
-		attrs["embedded_value"] = v
-	}
-	{
 		attrType, ok := attrType.AttributeTypes()["empty"]
 		if !ok {
 			diags.Append(attrWriteMissingDiag{"Objects.empty"})
@@ -2146,7 +2132,7 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 						return github_com_hashicorp_terraform_plugin_framework_types.ObjectUnknown(attrType.AttributeTypes())
 					} else {
 						{
-							obj := obj.Leaf
+							obj := obj.Nested.Leaf
 							attrs := make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(attrType.AttributeTypes()))
 							v, ok := existing.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 							if ok && v.Attributes() != nil {
@@ -3158,6 +3144,20 @@ func CopyObjectsToTerraformPreserveUnknown(ctx context.Context, obj *github_com_
 				attrs["string_map"] = v
 			}
 		}
+	}
+	{
+		var v github_com_hashicorp_terraform_plugin_framework_attr.Value
+		existing := attrs["value"]
+		if preserveUnknown && existing != nil && existing.IsUnknown() {
+			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
+		} else {
+			if obj.Leaf == nil {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
+			} else {
+				v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.Leaf.Value))
+			}
+		}
+		attrs["value"] = v
 	}
 	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
 	diags.Append(resultDiags...)

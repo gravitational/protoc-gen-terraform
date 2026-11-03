@@ -139,7 +139,7 @@ func (s *TerraformSuite) testCheckObjectResource(name string) resource.TestCheck
 		resource.TestCheckNoResourceAttr(name, "branch_int"),
 
 		resource.TestCheckResourceAttr(name, "leaf.value", "embedded-leaf"),
-		resource.TestCheckResourceAttr(name, "embedded_value", "embedded-nullable-value"),
+		resource.TestCheckResourceAttr(name, "value", "embedded-nullable-value"),
 	)
 }
 
@@ -178,7 +178,7 @@ func (s *TerraformSuite) testCheckObjectZeroValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "branch_int"),
 
 		resource.TestCheckResourceAttr(name, "leaf.value", ""),
-		resource.TestCheckResourceAttr(name, "embedded_value", ""),
+		resource.TestCheckResourceAttr(name, "value", ""),
 	)
 }
 
@@ -222,6 +222,6 @@ func (s *TerraformSuite) testCheckObjectNullValuesResource(name string) resource
 		resource.TestCheckNoResourceAttr(name, "branch_string"),
 
 		resource.TestCheckResourceAttr(name, "leaf.value", ""),
-		resource.TestCheckNoResourceAttr(name, "embedded_value"),
+		resource.TestCheckNoResourceAttr(name, "value"),
 	)
 }

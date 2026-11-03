@@ -53,7 +53,7 @@ message Objects {
   ];
 
   // embedded_nullable is an embedded nullable field.
-  LeafEmbedded embedded_nullable = 14 [
+  Leaf embedded_nullable = 14 [
     (gogoproto.nullable) = true,
     (gogoproto.embed) = true
   ];
@@ -81,8 +81,4 @@ message Nested {
 
 message Leaf {
   string value = 1;
-}
-
-message LeafEmbedded {
-  string embedded_value = 1;
 }

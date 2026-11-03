@@ -272,7 +272,7 @@ func (f *FieldCopyToGenerator) genAssignNullableValue(fieldName string) *j.State
 //	}
 func (f *FieldCopyToGenerator) genAssignOneOf(fieldName string) *j.Statement {
 	return j.Block(
-		j.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj."+f.OneOfName).Assert(j.Id("*"+f.i.WithType(f.OneOfType))),
+		j.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj."+f.EmbedPath+f.OneOfName).Assert(j.Id("*"+f.i.WithType(f.OneOfType))),
 		j.If(j.Id("!ok")).Block(
 			j.Id("v").Op("=").Id(f.i.WithType(f.NullValueMethod)).Call(),
 		).Else().Block(
@@ -366,7 +366,7 @@ func (f *FieldCopyToGenerator) getValueField() *Field {
 
 // genPrimitive generates CopyTo statement for a primitive type
 func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
-	fieldName := "obj." + f.Name
+	fieldName := "obj." + f.EmbedPath + f.Name
 
 	return j.BlockFunc(func(g *j.Group) {
 		g.Var().Id("v").Id(f.i.WithPackage(Attr, "Value"))
@@ -379,7 +379,7 @@ func (f *FieldCopyToGenerator) genPrimitive() *j.Statement {
 // genObject generates CopyTo statement for a nested message
 func (f *FieldCopyToGenerator) genObject() *j.Statement {
 	m := NewMessageCopyToGenerator(f.Message, f.i)
-	fieldName := "obj." + f.Name
+	fieldName := "obj." + f.EmbedPath + f.Name
 
 	return f.nextField("attrType", func(g *j.Group) {
 		if f.OneOfName != "" {
@@ -399,14 +399,14 @@ func (f *FieldCopyToGenerator) genOneOfStub(g *j.Group) {
 	//     obj, ok := obj.OneOf.(*Test_Branch3)
 	//     if !ok { obj = &Test_Branch3{} }
 	// }
-	g.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj." + f.OneOfName).Assert(j.Id("*" + f.i.WithType(f.OneOfType)))
+	g.List(j.Id("obj"), j.Id("ok")).Op(":=").Id("obj." + f.EmbedPath + f.OneOfName).Assert(j.Id("*" + f.i.WithType(f.OneOfType)))
 	g.If(j.Id("!ok")).Block(
 		j.Id("obj").Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(),
 	)
 }
 
 func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
-	fieldName := "obj." + f.Name
+	fieldName := "obj." + f.EmbedPath + f.Name
 
 	var makeValue, makeUnknown, makeElems j.Code
 
@@ -489,7 +489,7 @@ func (f *FieldCopyToGenerator) genListOrMap() *j.Statement {
 func (f *FieldCopyToGenerator) genCustom() *j.Statement {
 	return f.nextField("t", func(g *j.Group) {
 		g.Id("v").Op(":=").Id("CopyTo"+f.Suffix).Params(
-			j.Id("diags"), j.Id("obj."+f.Name), j.Id("t"), j.Id("attrs").Index(j.Lit(f.NameSnake)), j.Id("preserveUnknown"),
+			j.Id("diags"), j.Id("obj."+f.EmbedPath+f.Name), j.Id("t"), j.Id("attrs").Index(j.Lit(f.NameSnake)), j.Id("preserveUnknown"),
 		)
 		g.Id("attrs").Index(j.Lit(f.NameSnake)).Op("=").Id("v")
 	})

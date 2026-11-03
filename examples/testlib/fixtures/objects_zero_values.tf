@@ -56,5 +56,5 @@ resource "example_objects" "test" {
     value = ""
   }
 
-  embedded_value = ""
+  value = ""
 }

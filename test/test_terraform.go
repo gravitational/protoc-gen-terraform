@@ -1401,11 +1401,11 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 			if !ok {
 				diags.Append(attrReadConversionFailureDiag{"Test.EmbeddedNestedField", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
-				obj.EmbeddedNestedField = nil
+				obj.EmbeddedField.EmbeddedNestedField = nil
 				if !v.IsNull() && !v.IsUnknown() {
 					tf := v
-					obj.EmbeddedNestedField = &EmbeddedNestedField{}
-					obj := obj.EmbeddedNestedField
+					obj.EmbeddedField.EmbeddedNestedField = &EmbeddedNestedField{}
+					obj := obj.EmbeddedField.EmbeddedNestedField
 					{
 						a, ok := tf.Attributes()["embedded_nested_string"]
 						if !ok {
@@ -1440,7 +1440,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 				if !v.IsNull() && !v.IsUnknown() {
 					t = (v.ValueString())
 				}
-				obj.EmbeddedString = t
+				obj.EmbeddedField.EmbeddedString = t
 			}
 		}
 	}
@@ -2932,7 +2932,7 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					if obj.MaxAgeDuration == nil {
 						obj.MaxAgeDuration = &MaxAgeDuration{}
 					}
-					obj.Value = t
+					obj.MaxAgeDuration.Value = t
 				}
 			}
 		}
@@ -3258,10 +3258,10 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 					if preserveUnknown && existing != nil && existing.IsUnknown() {
 						return github_com_hashicorp_terraform_plugin_framework_types.ObjectUnknown(attrType.AttributeTypes())
 					} else {
-						if obj.EmbeddedNestedField == nil {
+						if obj.EmbeddedField.EmbeddedNestedField == nil {
 							return github_com_hashicorp_terraform_plugin_framework_types.ObjectNull(attrType.AttributeTypes())
 						} else {
-							obj := obj.EmbeddedNestedField
+							obj := obj.EmbeddedField.EmbeddedNestedField
 							attrs := make(map[string]github_com_hashicorp_terraform_plugin_framework_attr.Value, len(attrType.AttributeTypes()))
 							v, ok := existing.(github_com_hashicorp_terraform_plugin_framework_types.Object)
 							if ok && v.Attributes() != nil {
@@ -3293,7 +3293,7 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 		if preserveUnknown && existing != nil && existing.IsUnknown() {
 			v = github_com_hashicorp_terraform_plugin_framework_types.StringUnknown()
 		} else {
-			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.EmbeddedString))
+			v = github_com_hashicorp_terraform_plugin_framework_types.StringValue(string(obj.EmbeddedField.EmbeddedString))
 		}
 		attrs["embedded_string"] = v
 	}
@@ -5172,7 +5172,7 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 			if obj.MaxAgeDuration == nil {
 				v = NullDuration()
 			} else {
-				v = NewDuration(time.Duration(obj.Value))
+				v = NewDuration(time.Duration(obj.MaxAgeDuration.Value))
 			}
 		}
 		attrs["max_age"] = v

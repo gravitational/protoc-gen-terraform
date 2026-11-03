@@ -67,5 +67,5 @@ resource "example_objects" "test" {
     value = "embedded-leaf"
   }
 
-  embedded_value = "embedded-nullable-value"
+  value = "embedded-nullable-value"
 }
