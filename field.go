@@ -136,6 +136,9 @@ type Field struct {
 	// ParentIsOptionalEmbedFieldName is the Type of the embedded field.
 	// Eg MaxAge
 	ParentIsOptionalEmbedFieldName string
+	// EmbedPath is the Go selector prefix of the embedded fields this field is reached through,
+	// eg "Nested." for a field of an embedded Nested message. Empty for regular fields.
+	EmbedPath string
 	// IsNullable represents field nullable state
 	IsNullable bool
 	// IsProto3Optional is true if the field was declared with the proto3
@@ -245,7 +248,24 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 
 		// If this is an embedded field, return message's fields instead of creating another field
 		if gogoproto.IsEmbed(c.field.FieldDescriptorProto) {
+			typeWithPackageName := strings.TrimPrefix(c.goType, "*")
+
+			// Go names an embedded field after its type.
+			embeddedFieldName := typeWithPackageName
+			if stringPositionDot := strings.LastIndex(typeWithPackageName, "."); stringPositionDot != -1 {
+				embeddedFieldName = typeWithPackageName[stringPositionDot+1:]
+			}
+
 			if !c.GetNullable() {
+				for _, f := range f.Message.Fields {
+					// Access the children through the embedded field explicitly. Relying on field
+					// promotion picks the wrong field (or does not compile) when a sibling field or
+					// another embedded message has a field with the same name.
+					f.EmbedPath = embeddedFieldName + "." + f.EmbedPath
+					if f.ParentIsOptionalEmbed {
+						f.ParentIsOptionalEmbedFieldName = embeddedFieldName + "." + f.ParentIsOptionalEmbedFieldName
+					}
+				}
 				return f.Message.Fields, nil
 			}
 
@@ -253,16 +273,10 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 			// Otherwise, we would get a panic.
 			children := make([]*Field, 0, len(f.Message.Fields))
 			for _, f := range f.Message.Fields {
-				typeWithPackageName := strings.TrimPrefix(c.goType, "*")
-
-				embeddedFieldName := typeWithPackageName
-				if stringPositionDot := strings.LastIndex(typeWithPackageName, "."); stringPositionDot != -1 {
-					embeddedFieldName = typeWithPackageName[stringPositionDot+1:]
-				}
-
 				f.ParentIsOptionalEmbed = true
 				f.ParentIsOptionalEmbedFullType = typeWithPackageName
 				f.ParentIsOptionalEmbedFieldName = embeddedFieldName
+				f.EmbedPath = embeddedFieldName + "." + f.EmbedPath
 				children = append(children, f)
 			}
 			return children, nil

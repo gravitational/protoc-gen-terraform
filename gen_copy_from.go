@@ -136,7 +136,7 @@ func (f *FieldCopyFromGenerator) genPrimitiveBody(g *j.Group) {
 
 // genListOrMapBody generates base iterator statement, which iterates over a list or map
 func (f *FieldCopyFromGenerator) genListOrMapIterator(g *j.Group, typ *j.Statement, els func(g *j.Group)) {
-	objFieldName := "obj." + f.Name
+	objFieldName := "obj." + f.EmbedPath + f.Name
 
 	// obj.List = make([]string, len(v.Elements())) - same for maps
 	g.Id(objFieldName).Op("=").Make(j.Id(f.i.WithType(f.GoType)), j.Len(j.Id("v.Elements").Call()))
@@ -162,7 +162,7 @@ func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 		if f.OneOfName != "" {
 			// Do not set empty oneOf value to not override values possibly set by other branches
 			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
-				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
+				g.Id("obj." + f.EmbedPath + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
 					j.Id(f.Name): j.Id("t"),
 				})
 			})
@@ -175,19 +175,19 @@ func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 				g.If(j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("==").Nil()).Block(
 					j.Id("obj." + f.ParentIsOptionalEmbedFieldName).Op("=").Id("&" + f.ParentIsOptionalEmbedFullType + "{}"),
 				)
-				g.Id("obj." + f.Name).Op("=").Id("t")
+				g.Id("obj." + f.EmbedPath + f.Name).Op("=").Id("t")
 			})
 			return
 		}
 
-		g.Id("obj." + f.Name).Op("=").Id("t")
+		g.Id("obj." + f.EmbedPath + f.Name).Op("=").Id("t")
 	})
 }
 
 // genObject generates CopyFrom fragment for a nested object
 func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 	m := NewMessageCopyFromGenerator(f.Message, f.i)
-	objFieldName := "obj." + f.Name
+	objFieldName := "obj." + f.EmbedPath + f.Name
 
 	return f.nextField(func(g *j.Group) {
 		if f.OneOfName == "" {
@@ -223,7 +223,7 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
 				g.Id("b").Op(":=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
 
-				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
+				g.Id("obj." + f.EmbedPath + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
 					j.Id(f.Name): j.Id("b"),
 				})
 
@@ -248,7 +248,7 @@ func (f *FieldCopyFromGenerator) getValueField() *Field {
 
 // genPrimitiveListOrMap generates CopyFrom fragment for a list or a map of a primitive values
 func (f *FieldCopyFromGenerator) genPrimitiveListOrMap() *j.Statement {
-	objFieldName := "obj." + f.Name
+	objFieldName := "obj." + f.EmbedPath + f.Name
 
 	field := f.getValueField()
 
@@ -264,7 +264,7 @@ func (f *FieldCopyFromGenerator) genPrimitiveListOrMap() *j.Statement {
 
 // genNestedListOrMap generates CopyFrom fragment for a list or a map of a nested objects
 func (f *FieldCopyFromGenerator) genObjectListOrMap() *j.Statement {
-	objFieldName := "obj." + f.Name
+	objFieldName := "obj." + f.EmbedPath + f.Name
 
 	field := f.getValueField()
 	m := NewMessageCopyFromGenerator(field.Message, f.i)
@@ -302,6 +302,6 @@ func (f *FieldCopyFromGenerator) genCustom() *j.Statement {
 		// a, ok := ft.Attributes()["key"]
 		j.List(j.Id("a"), j.Id("ok")).Op(":=").Id("tf.Attributes").Call().Index(j.Lit(f.NameSnake)),
 		j.If(j.Id("!ok")).BlockFunc(f.errAttrMissingDiag),
-		j.Id("CopyFrom"+f.Suffix).Params(j.Id("diags"), j.Id("a"), j.Id("&obj."+f.Name)),
+		j.Id("CopyFrom"+f.Suffix).Params(j.Id("diags"), j.Id("a"), j.Id("&obj."+f.EmbedPath+f.Name)),
 	)
 }
