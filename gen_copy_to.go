@@ -127,8 +127,7 @@ func (m *MessageCopyToGenerator) GenerateFields(g *j.Group) {
 	}
 
 	for _, f := range m.InjectedFields {
-		g.List(j.Id("_"), j.Id("ok")).Op(":=").Id("attrs").Index(j.Lit(f.Name))
-		g.If(j.Op("!").Id("ok")).Block(
+		g.If(j.List(j.Id("_"), j.Id("ok")).Op(":=").Id("attrs").Index(j.Lit(f.Name)), j.Op("!").Id("ok")).Block(
 			j.Id("attrs").Index(j.Lit(f.Name)).
 				Op("=").
 				Id(m.i.WithType(f.DefaultValueMethod)).Call(),

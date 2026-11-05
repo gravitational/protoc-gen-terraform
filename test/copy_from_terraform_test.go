@@ -177,7 +177,8 @@ func TestCopyFromOneOfObjectBranch(t *testing.T) {
 	branch2 = types.ObjectValueMust(
 		branch2.AttributeTypes(t.Context()),
 		map[string]attr.Value{
-			"int32": types.Int64Value(5),
+			"int32":    types.Int64Value(5),
+			"injected": types.StringNull(),
 		},
 	)
 	attrs["branch2"] = branch2
