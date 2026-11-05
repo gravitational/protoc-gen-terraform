@@ -330,6 +330,11 @@ func TestCopyToOneOfBranch2(t *testing.T) {
 		types.Int64Value(5),
 		o.Attributes()["branch2"].(types.Object).Attributes()["int32"],
 	)
+	require.Equal(
+		t,
+		types.StringNull(),
+		o.Attributes()["branch2"].(types.Object).Attributes()["injected"],
+	)
 }
 
 func TestCopyToOneOfNoBranch(t *testing.T) {

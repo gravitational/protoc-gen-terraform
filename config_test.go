@@ -63,6 +63,15 @@ func TestConfig(t *testing.T) {
 			PlanModifierType:   "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier.String",
 			ValidatorType:      "github.com/hashicorp/terraform-plugin-framework/schema/validator.String",
 		}},
+		"Test.Branch2": {{
+			Name:               "injected",
+			Type:               "github.com/hashicorp/terraform-plugin-framework/types.StringType",
+			Optional:           true,
+			DefaultValueMethod: "github.com/hashicorp/terraform-plugin-framework/types.StringNull",
+			AttributeType:      "StringAttribute",
+			PlanModifierType:   "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier.String",
+			ValidatorType:      "github.com/hashicorp/terraform-plugin-framework/schema/validator.String",
+		}},
 	})
 	require.Equal(t, cfg.SchemaTypes, map[string]SchemaType{
 		"Test.SchemaOverride": {
