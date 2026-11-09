@@ -81,12 +81,19 @@ func GenSchemaTestResource(ctx context.Context) (github_com_hashicorp_terraform_
 			Optional:    true,
 		},
 		"branch2": github_com_hashicorp_terraform_plugin_framework_resource_schema.SingleNestedAttribute{
-			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{"int32": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
-				Computed:      true,
-				Description:   "Int32 int field",
-				Optional:      true,
-				PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Int64{github_com_hashicorp_terraform_plugin_framework_resource_schema_int64planmodifier.UseNonNullStateForUnknown()},
-			}},
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_resource_schema.Attribute{
+				"injected": github_com_hashicorp_terraform_plugin_framework_resource_schema.StringAttribute{
+					Computed: false,
+					Optional: true,
+					Required: false,
+				},
+				"int32": github_com_hashicorp_terraform_plugin_framework_resource_schema.Int64Attribute{
+					Computed:      true,
+					Description:   "Int32 int field",
+					Optional:      true,
+					PlanModifiers: []github_com_hashicorp_terraform_plugin_framework_resource_schema_planmodifier.Int64{github_com_hashicorp_terraform_plugin_framework_resource_schema_int64planmodifier.UseNonNullStateForUnknown()},
+				},
+			},
 			Description: "Branch2 is the second oneOf branch",
 			Optional:    true,
 		},
@@ -641,11 +648,18 @@ func GenSchemaTestDataSource(ctx context.Context) (github_com_hashicorp_terrafor
 			Optional:    true,
 		},
 		"branch2": github_com_hashicorp_terraform_plugin_framework_datasource_schema.SingleNestedAttribute{
-			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{"int32": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
-				Computed:    true,
-				Description: "Int32 int field",
-				Optional:    true,
-			}},
+			Attributes: map[string]github_com_hashicorp_terraform_plugin_framework_datasource_schema.Attribute{
+				"injected": github_com_hashicorp_terraform_plugin_framework_datasource_schema.StringAttribute{
+					Computed: false,
+					Optional: true,
+					Required: false,
+				},
+				"int32": github_com_hashicorp_terraform_plugin_framework_datasource_schema.Int64Attribute{
+					Computed:    true,
+					Description: "Int32 int field",
+					Optional:    true,
+				},
+			},
 			Description: "Branch2 is the second oneOf branch",
 			Optional:    true,
 		},
@@ -3079,6 +3093,9 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 								}
 								attrs["int32"] = v
 							}
+							if _, ok := attrs["injected"]; !ok {
+								attrs["injected"] = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
+							}
 							result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
 							diags.Append(resultDiags...)
 							return result
@@ -5177,8 +5194,7 @@ func CopyTestToTerraformPreserveUnknown(ctx context.Context, obj *Test, tf *gith
 		}
 		attrs["max_age"] = v
 	}
-	_, ok := attrs["id"]
-	if !ok {
+	if _, ok := attrs["id"]; !ok {
 		attrs["id"] = github_com_hashicorp_terraform_plugin_framework_types.StringNull()
 	}
 	result, resultDiags := github_com_hashicorp_terraform_plugin_framework_types.ObjectValue(attrType.AttributeTypes(), attrs)
