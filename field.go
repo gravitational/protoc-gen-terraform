@@ -243,29 +243,15 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 			return nil, trace.Wrap(err)
 		}
 
-		// If this is an embedded field, return message's fields instead of creating another field
+		// If this is an embedded field, return message's fields instead of creating another field.
+		// Qualify each Go selector with the embedded type name. gogo promotes embedded
+		// fields, and a shallower embed of the same type shadows the promoted name
+		// (issue #59: .leaf.value received the nullable embed's value).
 		if gogoproto.IsEmbed(c.field.FieldDescriptorProto) {
-			if !c.GetNullable() {
-				return f.Message.Fields, nil
+			if f.Message == nil {
+				return nil, nil
 			}
-
-			// For nullable and embedded fields, we must initialize it before being able to access their children.
-			// Otherwise, we would get a panic.
-			children := make([]*Field, 0, len(f.Message.Fields))
-			for _, f := range f.Message.Fields {
-				typeWithPackageName := strings.TrimPrefix(c.goType, "*")
-
-				embeddedFieldName := typeWithPackageName
-				if stringPositionDot := strings.LastIndex(typeWithPackageName, "."); stringPositionDot != -1 {
-					embeddedFieldName = typeWithPackageName[stringPositionDot+1:]
-				}
-
-				f.ParentIsOptionalEmbed = true
-				f.ParentIsOptionalEmbedFullType = typeWithPackageName
-				f.ParentIsOptionalEmbedFieldName = embeddedFieldName
-				children = append(children, f)
-			}
-			return children, nil
+			return flattenEmbeddedFields(f.Message.Fields, c.goType, c.GetNullable()), nil
 		}
 	}
 
@@ -305,6 +291,48 @@ func BuildField(c *FieldBuildContext) ([]*Field, error) {
 	}
 
 	return []*Field{f}, nil
+}
+
+// embeddedGoFieldName is the Go name of an anonymously embedded field.
+// gogo names that field after the message type, not the proto field name.
+func embeddedGoFieldName(goType string) string {
+	name := strings.TrimPrefix(goType, "*")
+	if i := strings.LastIndex(name, "."); i != -1 {
+		return name[i+1:]
+	}
+	return name
+}
+
+// flattenEmbeddedFields promotes an embedded message onto its parent.
+// Each returned field is a copy whose Go name is qualified (Nested.Leaf).
+// Copy-from and copy-to then address obj.Nested.Leaf instead of the promoted
+// obj.Leaf, which Go binds to a shallower embed of type Leaf when both exist.
+// Nullable embeds still nil-check and allocate the embedded pointer.
+func flattenEmbeddedFields(fields []*Field, embedGoType string, optional bool) []*Field {
+	if fields == nil {
+		return nil
+	}
+
+	embedName := embeddedGoFieldName(embedGoType)
+	fullType := strings.TrimPrefix(embedGoType, "*")
+	out := make([]*Field, len(fields))
+	for i, src := range fields {
+		cp := *src
+		cp.Name = embedName + "." + src.Name
+		// A child that is already an optional embed keeps its own nil-check.
+		// Qualify that path too, or copy-from would allocate a different pointer
+		// than the one it writes.
+		if src.ParentIsOptionalEmbed {
+			cp.ParentIsOptionalEmbedFieldName = embedName + "." + src.ParentIsOptionalEmbedFieldName
+		}
+		if optional {
+			cp.ParentIsOptionalEmbed = true
+			cp.ParentIsOptionalEmbedFullType = fullType
+			cp.ParentIsOptionalEmbedFieldName = embedName
+		}
+		out[i] = &cp
+	}
+	return out
 }
 
 // BuildPlaceholderField represents no-field-message single field placeholder
