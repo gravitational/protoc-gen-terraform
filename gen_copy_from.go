@@ -89,6 +89,16 @@ func (f *FieldCopyFromGenerator) errAttrMissingDiag(g *j.Group) {
 	)
 }
 
+// genOneOfAssign copies this member only when the oneof is still unset.
+// A later configured member reports a conflict instead of replacing the first.
+func (f *FieldCopyFromGenerator) genOneOfAssign(g *j.Group, assign func(g *j.Group)) {
+	g.If(j.Id("obj." + f.OneOfName).Op("!=").Nil()).Block(
+		j.Id("diags.Append").Call(
+			j.Id("attrReadOneOfConflictDiag").Values(j.Lit(f.OneOfName), j.Lit(f.Path)),
+		),
+	).Else().BlockFunc(assign)
+}
+
 // errAttrConversionFailure diags.Append(attrConversionFailureDiag{path, typ})
 func (f *FieldCopyFromGenerator) errAttrConversionFailure(path string, typ string) func(g *j.Group) {
 	return func(g *j.Group) {
@@ -160,10 +170,13 @@ func (f *FieldCopyFromGenerator) genPrimitive() *j.Statement {
 		f.genPrimitiveBody(g)
 
 		if f.OneOfName != "" {
-			// Do not set empty oneOf value to not override values possibly set by other branches
+			// Do not set empty oneOf value to not override values possibly set by other branches.
+			// A second configured member is an error: the last member must not win silently.
 			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
-				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
-					j.Id(f.Name): j.Id("t"),
+				f.genOneOfAssign(g, func(g *j.Group) {
+					g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
+						j.Id(f.Name): j.Id("t"),
+					})
 				})
 			})
 			return
@@ -218,20 +231,22 @@ func (f *FieldCopyFromGenerator) genObject() *j.Statement {
 				}
 			})
 		} else {
-			// We do not need nullable checks because all oneOf branches are nullable by design
-			// We do not need to assign OneOf explicitly to not overrite other OneOf branch values
+			// We do not need nullable checks because all oneOf branches are nullable by design.
+			// A second configured member is an error: the last member must not win silently.
 			g.If(j.Id("!v.IsNull() && !v.IsUnknown()")).BlockFunc(func(g *j.Group) {
-				g.Id("b").Op(":=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
+				f.genOneOfAssign(g, func(g *j.Group) {
+					g.Id("b").Op(":=&").Id(f.i.WithType(f.GoElemTypeIndirect)).Values()
 
-				g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
-					j.Id(f.Name): j.Id("b"),
+					g.Id("obj." + f.OneOfName).Op("=").Id("&" + f.i.WithType(f.OneOfType)).Values(j.Dict{
+						j.Id(f.Name): j.Id("b"),
+					})
+
+					if !m.IsEmpty {
+						g.Id("obj").Op(":=").Id("b")
+						g.Id("tf").Op(":=").Id("v")
+						m.GenerateFields(g)
+					}
 				})
-
-				if !m.IsEmpty {
-					g.Id("obj").Op(":=").Id("b")
-					g.Id("tf").Op(":=").Id("v")
-					m.GenerateFields(g)
-				}
 			})
 		}
 	})

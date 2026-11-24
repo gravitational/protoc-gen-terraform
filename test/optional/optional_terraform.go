@@ -150,7 +150,11 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.RealOneOf = &OptionalTest_ChoiceA{ChoiceA: t}
+					if obj.RealOneOf != nil {
+						diags.Append(attrReadOneOfConflictDiag{"RealOneOf", "OptionalTest.choice_a"})
+					} else {
+						obj.RealOneOf = &OptionalTest_ChoiceA{ChoiceA: t}
+					}
 				}
 			}
 		}
@@ -169,7 +173,11 @@ func CopyOptionalTestFromTerraform(_ context.Context, tf github_com_hashicorp_te
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.RealOneOf = &OptionalTest_ChoiceB{ChoiceB: t}
+					if obj.RealOneOf != nil {
+						diags.Append(attrReadOneOfConflictDiag{"RealOneOf", "OptionalTest.choice_b"})
+					} else {
+						obj.RealOneOf = &OptionalTest_ChoiceB{ChoiceB: t}
+					}
 				}
 			}
 		}
@@ -585,6 +593,28 @@ func (d attrReadConversionFailureDiag) Detail() string {
 }
 
 func (d attrReadConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrReadOneOfConflictDiag represents diagnostic message when more than one oneof member is set
+type attrReadOneOfConflictDiag struct {
+	OneOf string
+	Path  string
+}
+
+func (d attrReadOneOfConflictDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrReadOneOfConflictDiag) Summary() string {
+	return "Error reading from Terraform object"
+}
+
+func (d attrReadOneOfConflictDiag) Detail() string {
+	return fmt.Sprintf("multiple members of oneof %v are set; %v conflicts with a member already copied", d.OneOf, d.Path)
+}
+
+func (d attrReadOneOfConflictDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 

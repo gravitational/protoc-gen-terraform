@@ -652,7 +652,11 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 					t = (v.ValueBool())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchBool{BranchBool: t}
+					if obj.OneOfPrimitives != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfPrimitives", "Objects.branch_bool"})
+					} else {
+						obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchBool{BranchBool: t}
+					}
 				}
 			}
 		}
@@ -667,8 +671,12 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 				diags.Append(attrReadConversionFailureDiag{"Objects.branch_empty", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				if !v.IsNull() && !v.IsUnknown() {
-					b := &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Empty{}
-					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchEmpty{BranchEmpty: b}
+					if obj.OneOfObjects != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfObjects", "Objects.branch_empty"})
+					} else {
+						b := &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Empty{}
+						obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchEmpty{BranchEmpty: b}
+					}
 				}
 			}
 		}
@@ -687,7 +695,11 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 					t = (v.ValueInt64())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchInt{BranchInt: t}
+					if obj.OneOfPrimitives != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfPrimitives", "Objects.branch_int"})
+					} else {
+						obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchInt{BranchInt: t}
+					}
 				}
 			}
 		}
@@ -702,24 +714,28 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 				diags.Append(attrReadConversionFailureDiag{"Objects.branch_leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				if !v.IsNull() && !v.IsUnknown() {
-					b := &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
-					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchLeaf{BranchLeaf: b}
-					obj := b
-					tf := v
-					{
-						a, ok := tf.Attributes()["value"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Objects.branch_leaf.value"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+					if obj.OneOfObjects != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfObjects", "Objects.branch_leaf"})
+					} else {
+						b := &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
+						obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchLeaf{BranchLeaf: b}
+						obj := b
+						tf := v
+						{
+							a, ok := tf.Attributes()["value"]
 							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Objects.branch_leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								diags.Append(attrReadMissingDiag{"Objects.branch_leaf.value"})
 							} else {
-								var t string
-								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.ValueString())
+								v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrReadConversionFailureDiag{"Objects.branch_leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								} else {
+									var t string
+									if !v.IsNull() && !v.IsUnknown() {
+										t = (v.ValueString())
+									}
+									obj.Value = t
 								}
-								obj.Value = t
 							}
 						}
 					}
@@ -737,37 +753,41 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 				diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				if !v.IsNull() && !v.IsUnknown() {
-					b := &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Nested{}
-					obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchNested{BranchNested: b}
-					obj := b
-					tf := v
-					{
-						a, ok := tf.Attributes()["leaf"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Objects.branch_nested.leaf"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+					if obj.OneOfObjects != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfObjects", "Objects.branch_nested"})
+					} else {
+						b := &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Nested{}
+						obj.OneOfObjects = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchNested{BranchNested: b}
+						obj := b
+						tf := v
+						{
+							a, ok := tf.Attributes()["leaf"]
 							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+								diags.Append(attrReadMissingDiag{"Objects.branch_nested.leaf"})
 							} else {
-								obj.Leaf = github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
-								if !v.IsNull() && !v.IsUnknown() {
-									tf := v
-									obj := &obj.Leaf
-									{
-										a, ok := tf.Attributes()["value"]
-										if !ok {
-											diags.Append(attrReadMissingDiag{"Objects.branch_nested.leaf.value"})
-										} else {
-											v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Object)
+								if !ok {
+									diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested.leaf", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
+								} else {
+									obj.Leaf = github_com_gravitational_protoc_gen_terraform_v5_examples_types.Leaf{}
+									if !v.IsNull() && !v.IsUnknown() {
+										tf := v
+										obj := &obj.Leaf
+										{
+											a, ok := tf.Attributes()["value"]
 											if !ok {
-												diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+												diags.Append(attrReadMissingDiag{"Objects.branch_nested.leaf.value"})
 											} else {
-												var t string
-												if !v.IsNull() && !v.IsUnknown() {
-													t = (v.ValueString())
+												v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+												if !ok {
+													diags.Append(attrReadConversionFailureDiag{"Objects.branch_nested.leaf.value", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+												} else {
+													var t string
+													if !v.IsNull() && !v.IsUnknown() {
+														t = (v.ValueString())
+													}
+													obj.Value = t
 												}
-												obj.Value = t
 											}
 										}
 									}
@@ -793,7 +813,11 @@ func CopyObjectsFromTerraform(_ context.Context, tf github_com_hashicorp_terrafo
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchString{BranchString: t}
+					if obj.OneOfPrimitives != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfPrimitives", "Objects.branch_string"})
+					} else {
+						obj.OneOfPrimitives = &github_com_gravitational_protoc_gen_terraform_v5_examples_types.Objects_BranchString{BranchString: t}
+					}
 				}
 			}
 		}
@@ -2825,6 +2849,28 @@ func (d attrReadConversionFailureDiag) Detail() string {
 }
 
 func (d attrReadConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrReadOneOfConflictDiag represents diagnostic message when more than one oneof member is set
+type attrReadOneOfConflictDiag struct {
+	OneOf string
+	Path  string
+}
+
+func (d attrReadOneOfConflictDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrReadOneOfConflictDiag) Summary() string {
+	return "Error reading from Terraform object"
+}
+
+func (d attrReadOneOfConflictDiag) Detail() string {
+	return fmt.Sprintf("multiple members of oneof %v are set; %v conflicts with a member already copied", d.OneOf, d.Path)
+}
+
+func (d attrReadOneOfConflictDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 

@@ -1132,7 +1132,11 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.LowerSnakeOneof = &Test_Bar{Bar: t}
+					if obj.LowerSnakeOneof != nil {
+						diags.Append(attrReadOneOfConflictDiag{"LowerSnakeOneof", "Test.bar"})
+					} else {
+						obj.LowerSnakeOneof = &Test_Bar{Bar: t}
+					}
 				}
 			}
 		}
@@ -1171,24 +1175,28 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 				diags.Append(attrReadConversionFailureDiag{"Test.Branch1", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				if !v.IsNull() && !v.IsUnknown() {
-					b := &Branch1{}
-					obj.OneOf = &Test_Branch1{Branch1: b}
-					obj := b
-					tf := v
-					{
-						a, ok := tf.Attributes()["str"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.Branch1.Str"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+					if obj.OneOf != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOf", "Test.Branch1"})
+					} else {
+						b := &Branch1{}
+						obj.OneOf = &Test_Branch1{Branch1: b}
+						obj := b
+						tf := v
+						{
+							a, ok := tf.Attributes()["str"]
 							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.Branch1.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								diags.Append(attrReadMissingDiag{"Test.Branch1.Str"})
 							} else {
-								var t string
-								if !v.IsNull() && !v.IsUnknown() {
-									t = (v.ValueString())
+								v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.String)
+								if !ok {
+									diags.Append(attrReadConversionFailureDiag{"Test.Branch1.Str", "github.com/hashicorp/terraform-plugin-framework/types.String"})
+								} else {
+									var t string
+									if !v.IsNull() && !v.IsUnknown() {
+										t = (v.ValueString())
+									}
+									obj.Str = t
 								}
-								obj.Str = t
 							}
 						}
 					}
@@ -1206,24 +1214,28 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 				diags.Append(attrReadConversionFailureDiag{"Test.Branch2", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				if !v.IsNull() && !v.IsUnknown() {
-					b := &Branch2{}
-					obj.OneOf = &Test_Branch2{Branch2: b}
-					obj := b
-					tf := v
-					{
-						a, ok := tf.Attributes()["int32"]
-						if !ok {
-							diags.Append(attrReadMissingDiag{"Test.Branch2.Int32"})
-						} else {
-							v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+					if obj.OneOf != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOf", "Test.Branch2"})
+					} else {
+						b := &Branch2{}
+						obj.OneOf = &Test_Branch2{Branch2: b}
+						obj := b
+						tf := v
+						{
+							a, ok := tf.Attributes()["int32"]
 							if !ok {
-								diags.Append(attrReadConversionFailureDiag{"Test.Branch2.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+								diags.Append(attrReadMissingDiag{"Test.Branch2.Int32"})
 							} else {
-								var t int32
-								if !v.IsNull() && !v.IsUnknown() {
-									t = int32(v.ValueInt64())
+								v, ok := a.(github_com_hashicorp_terraform_plugin_framework_types.Int64)
+								if !ok {
+									diags.Append(attrReadConversionFailureDiag{"Test.Branch2.Int32", "github.com/hashicorp/terraform-plugin-framework/types.Int64"})
+								} else {
+									var t int32
+									if !v.IsNull() && !v.IsUnknown() {
+										t = int32(v.ValueInt64())
+									}
+									obj.Int32 = t
 								}
-								obj.Int32 = t
 							}
 						}
 					}
@@ -1245,7 +1257,11 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.OneOf = &Test_Branch3{Branch3: t}
+					if obj.OneOf != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOf", "Test.Branch3"})
+					} else {
+						obj.OneOf = &Test_Branch3{Branch3: t}
+					}
 				}
 			}
 		}
@@ -1468,8 +1484,12 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 				diags.Append(attrReadConversionFailureDiag{"Test.EmptyMessageBranch", "github.com/hashicorp/terraform-plugin-framework/types.Object"})
 			} else {
 				if !v.IsNull() && !v.IsUnknown() {
-					b := &EmptyMessageBranch{}
-					obj.OneOfWithEmptyMessage = &Test_EmptyMessageBranch{EmptyMessageBranch: b}
+					if obj.OneOfWithEmptyMessage != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfWithEmptyMessage", "Test.EmptyMessageBranch"})
+					} else {
+						b := &EmptyMessageBranch{}
+						obj.OneOfWithEmptyMessage = &Test_EmptyMessageBranch{EmptyMessageBranch: b}
+					}
 				}
 			}
 		}
@@ -1505,7 +1525,11 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.LowerSnakeOneof = &Test_Foo{Foo: t}
+					if obj.LowerSnakeOneof != nil {
+						diags.Append(attrReadOneOfConflictDiag{"LowerSnakeOneof", "Test.foo"})
+					} else {
+						obj.LowerSnakeOneof = &Test_Foo{Foo: t}
+					}
 				}
 			}
 		}
@@ -2765,7 +2789,11 @@ func CopyTestFromTerraform(_ context.Context, tf github_com_hashicorp_terraform_
 					t = (v.ValueString())
 				}
 				if !v.IsNull() && !v.IsUnknown() {
-					obj.OneOfWithEmptyMessage = &Test_StringBranch{StringBranch: t}
+					if obj.OneOfWithEmptyMessage != nil {
+						diags.Append(attrReadOneOfConflictDiag{"OneOfWithEmptyMessage", "Test.StringBranch"})
+					} else {
+						obj.OneOfWithEmptyMessage = &Test_StringBranch{StringBranch: t}
+					}
 				}
 			}
 		}
@@ -5242,6 +5270,28 @@ func (d attrReadConversionFailureDiag) Detail() string {
 }
 
 func (d attrReadConversionFailureDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
+// attrReadOneOfConflictDiag represents diagnostic message when more than one oneof member is set
+type attrReadOneOfConflictDiag struct {
+	OneOf string
+	Path  string
+}
+
+func (d attrReadOneOfConflictDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrReadOneOfConflictDiag) Summary() string {
+	return "Error reading from Terraform object"
+}
+
+func (d attrReadOneOfConflictDiag) Detail() string {
+	return fmt.Sprintf("multiple members of oneof %v are set; %v conflicts with a member already copied", d.OneOf, d.Path)
+}
+
+func (d attrReadOneOfConflictDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 

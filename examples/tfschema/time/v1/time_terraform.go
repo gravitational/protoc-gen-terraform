@@ -609,6 +609,28 @@ func (d attrReadConversionFailureDiag) Equal(o github_com_hashicorp_terraform_pl
 	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
 }
 
+// attrReadOneOfConflictDiag represents diagnostic message when more than one oneof member is set
+type attrReadOneOfConflictDiag struct {
+	OneOf string
+	Path  string
+}
+
+func (d attrReadOneOfConflictDiag) Severity() github_com_hashicorp_terraform_plugin_framework_diag.Severity {
+	return github_com_hashicorp_terraform_plugin_framework_diag.SeverityError
+}
+
+func (d attrReadOneOfConflictDiag) Summary() string {
+	return "Error reading from Terraform object"
+}
+
+func (d attrReadOneOfConflictDiag) Detail() string {
+	return fmt.Sprintf("multiple members of oneof %v are set; %v conflicts with a member already copied", d.OneOf, d.Path)
+}
+
+func (d attrReadOneOfConflictDiag) Equal(o github_com_hashicorp_terraform_plugin_framework_diag.Diagnostic) bool {
+	return (d.Severity() == o.Severity()) && (d.Summary() == o.Summary()) && (d.Detail() == o.Detail())
+}
+
 // attrWriteMissingDiag represents diagnostic message on an attribute missing in the target object
 type attrWriteMissingDiag struct {
 	Path string

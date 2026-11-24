@@ -192,6 +192,33 @@ func TestCopyFromOneOfObjectBranch(t *testing.T) {
 	require.Equal(t, int32(5), target.OneOf.(*Test_Branch2).Branch2.Int32)
 }
 
+func TestCopyFromOneOfRejectsMultipleMembers(t *testing.T) {
+	obj := copyFromTerraformObject(t)
+	attrs := obj.Attributes()
+	attrs["branch3"] = types.StringValue("Test")
+
+	branch2, ok := attrs["branch2"].(types.Object)
+	require.True(t, ok)
+	branch2 = types.ObjectValueMust(
+		branch2.AttributeTypes(t.Context()),
+		map[string]attr.Value{
+			"int32":    types.Int64Value(5),
+			"injected": types.StringNull(),
+		},
+	)
+	attrs["branch2"] = branch2
+
+	obj = types.ObjectValueMust(obj.AttributeTypes(t.Context()), attrs)
+
+	target := Test{}
+	diags := CopyTestFromTerraform(context.Background(), obj, &target)
+	require.True(t, diags.HasError())
+
+	got, ok := target.OneOf.(*Test_Branch2)
+	require.True(t, ok)
+	require.Equal(t, int32(5), got.Branch2.Int32)
+}
+
 func TestCopyFromOneOfObjectNoBranch(t *testing.T) {
 	obj := copyFromTerraformObject(t)
 
